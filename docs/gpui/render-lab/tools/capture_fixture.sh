@@ -61,14 +61,14 @@ sleep 4
 
 A0="$(active_of)"; [ "$A0" = "$FIXTURE" ] || { echo "ASSERT-PRE-FAILED want=$FIXTURE got=$A0"; exit 1; }
 ADDRESS="$(window_address)"; [ -n "$ADDRESS" ] || { echo "SHELLY_WINDOW_NOT_UNIQUE"; exit 1; }
-focus_window "$ADDRESS"
 park; sleep 1
+focus_window "$ADDRESS"
 GEOM="$(window_geom)"; [ -n "$GEOM" ] || { echo "WINDOW-GEOMETRY-FAILED address=$ADDRESS"; exit 1; }
 grim -g "$GEOM" "${OUT}.a.png" || exit 1
 A1="$(active_of)"; [ "$A1" = "$FIXTURE" ] || { echo "ASSERT-MID-FAILED want=$FIXTURE got=$A1"; exit 1; }
 
-focus_window "$ADDRESS"
 park; sleep 1
+focus_window "$ADDRESS"
 GEOM="$(window_geom)"; [ -n "$GEOM" ] || { echo "WINDOW-GEOMETRY-FAILED address=$ADDRESS"; exit 1; }
 grim -g "$GEOM" "${OUT}.b.png" || exit 1
 A2="$(active_of)"; [ "$A2" = "$FIXTURE" ] || { echo "ASSERT-POST-FAILED want=$FIXTURE got=$A2"; exit 1; }
