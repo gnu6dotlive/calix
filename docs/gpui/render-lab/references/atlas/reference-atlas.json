@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "status": "verified",
+  "status": "verified-with-g-row-major-correction",
   "selection_policy": "board cells explicitly recorded; crops are raw RGBA with no resize",
   "source_assets": {
     "G": {
@@ -185,14 +185,14 @@
       "source_asset": "gnosix-board-GHIJ-source.png",
       "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
       "crop_px": [
-        523,
-        576,
+        70,
+        798,
         427,
         87
       ],
-      "crop_sha256_rgba": "2c92ee9010ab1c508fbaf0944925a054f2d0ad313e96159036ae158633a74f12",
+      "crop_sha256_rgba": "92e5b7e698e0324defd14ece8ff99ef3c1e7b76ef6da3e3b2944a48081f91a2c",
       "label": "Component stress",
-      "selection_method": "explicit-board-cell-boundary + verified",
+      "selection_method": "explicit-board-cell-boundary + verified (row-major correction)",
       "normalization": "none; raw RGBA crop",
       "mask": null,
       "review_status": "verified"
@@ -204,14 +204,14 @@
       "source_asset": "gnosix-board-GHIJ-source.png",
       "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
       "crop_px": [
-        70,
-        798,
+        523,
+        355,
         427,
         87
       ],
-      "crop_sha256_rgba": "92e5b7e698e0324defd14ece8ff99ef3c1e7b76ef6da3e3b2944a48081f91a2c",
+      "crop_sha256_rgba": "eba7cc5313c99248cd7684ea70100839e708b3b29b893f587aeb86a3775b81db",
       "label": "Current direction",
-      "selection_method": "explicit-board-cell-boundary + verified",
+      "selection_method": "explicit-board-cell-boundary + verified (row-major correction)",
       "normalization": "none; raw RGBA crop",
       "mask": null,
       "review_status": "verified"
@@ -224,13 +224,13 @@
       "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
       "crop_px": [
         70,
-        576,
+        355,
         427,
         87
       ],
-      "crop_sha256_rgba": "a6db78339da661b7257c42eb0604d235fb0398cd81d66345e559c2c4ceb7fa38",
+      "crop_sha256_rgba": "1f501e69081454e2de137e4f5772ab0757705e8f0baa08d6e0a6cf7b018b9110",
       "label": "Current magnitude",
-      "selection_method": "explicit-board-cell-boundary + verified",
+      "selection_method": "explicit-board-cell-boundary + verified (row-major correction)",
       "normalization": "none; raw RGBA crop",
       "mask": null,
       "review_status": "verified"
@@ -243,13 +243,13 @@
       "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
       "crop_px": [
         523,
-        355,
+        576,
         427,
         87
       ],
-      "crop_sha256_rgba": "eba7cc5313c99248cd7684ea70100839e708b3b29b893f587aeb86a3775b81db",
+      "crop_sha256_rgba": "2c92ee9010ab1c508fbaf0944925a054f2d0ad313e96159036ae158633a74f12",
       "label": "Diagnostic confidence",
-      "selection_method": "explicit-board-cell-boundary + verified",
+      "selection_method": "explicit-board-cell-boundary + verified (row-major correction)",
       "normalization": "none; raw RGBA crop",
       "mask": null,
       "review_status": "verified"
@@ -261,14 +261,14 @@
       "source_asset": "gnosix-board-GHIJ-source.png",
       "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
       "crop_px": [
-        523,
-        132,
+        70,
+        576,
         427,
         87
       ],
-      "crop_sha256_rgba": "8d772f795638a2f80decc28e94f49b909ccf06dd45b45ec9e7730f72a7e83834",
+      "crop_sha256_rgba": "a6db78339da661b7257c42eb0604d235fb0398cd81d66345e559c2c4ceb7fa38",
       "label": "Overload heat",
-      "selection_method": "explicit-board-cell-boundary + verified",
+      "selection_method": "explicit-board-cell-boundary + verified (row-major correction)",
       "normalization": "none; raw RGBA crop",
       "mask": null,
       "review_status": "verified"
@@ -287,7 +287,7 @@
       ],
       "crop_sha256_rgba": "9112a7e3315183c28e068051febd2de48b68360bf655d064cd291ec7231a4f46",
       "label": "Selection density",
-      "selection_method": "explicit-board-cell-boundary + verified",
+      "selection_method": "explicit-board-cell-boundary + verified (row-major correction)",
       "normalization": "none; raw RGBA crop",
       "mask": null,
       "review_status": "verified"
@@ -299,14 +299,14 @@
       "source_asset": "gnosix-board-GHIJ-source.png",
       "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
       "crop_px": [
-        70,
-        355,
+        523,
+        132,
         427,
         87
       ],
-      "crop_sha256_rgba": "1f501e69081454e2de137e4f5772ab0757705e8f0baa08d6e0a6cf7b018b9110",
+      "crop_sha256_rgba": "8d772f795638a2f80decc28e94f49b909ccf06dd45b45ec9e7730f72a7e83834",
       "label": "Signed voltage",
-      "selection_method": "explicit-board-cell-boundary + verified",
+      "selection_method": "explicit-board-cell-boundary + verified (row-major correction)",
       "normalization": "none; raw RGBA crop",
       "mask": null,
       "review_status": "verified"
@@ -325,7 +325,7 @@
       ],
       "crop_sha256_rgba": "a1f8387d9c50fe1fc1717c95052d65ff8e291ef65502b681ec5a63d25c58eaf1",
       "label": "Zero-to-positive scalar",
-      "selection_method": "explicit-board-cell-boundary + verified",
+      "selection_method": "explicit-board-cell-boundary + verified (row-major correction)",
       "normalization": "none; raw RGBA crop",
       "mask": null,
       "review_status": "verified"
@@ -499,7 +499,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k02": {
       "fixture_id": "micro.k02",
@@ -518,7 +520,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k03": {
       "fixture_id": "micro.k03",
@@ -537,7 +541,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k04": {
       "fixture_id": "micro.k04",
@@ -556,7 +562,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k05": {
       "fixture_id": "micro.k05",
@@ -575,7 +583,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k06": {
       "fixture_id": "micro.k06",
@@ -594,7 +604,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k07": {
       "fixture_id": "micro.k07",
@@ -613,7 +625,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k08": {
       "fixture_id": "micro.k08",
@@ -632,7 +646,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k09": {
       "fixture_id": "micro.k09",
@@ -651,7 +667,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k10": {
       "fixture_id": "micro.k10",
@@ -670,7 +688,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k11": {
       "fixture_id": "micro.k11",
@@ -689,7 +709,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k12": {
       "fixture_id": "micro.k12",
@@ -708,7 +730,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k13": {
       "fixture_id": "micro.k13",
@@ -727,7 +751,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "micro.k14": {
       "fixture_id": "micro.k14",
@@ -746,7 +772,9 @@
       "selection_method": "explicit-board-cell-boundary + verified",
       "normalization": "none; raw RGBA crop",
       "mask": null,
-      "review_status": "verified"
+      "review_status": "verified",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED"
     },
     "optical.directional-fade": {
       "fixture_id": "optical.directional-fade",
@@ -900,5 +928,6 @@
       "mask": null,
       "review_status": "verified"
     }
-  }
+  },
+  "g_mapping_correction": "Cells are row-major: 1,2 / 3,4 / 5,6 / 7,8."
 }

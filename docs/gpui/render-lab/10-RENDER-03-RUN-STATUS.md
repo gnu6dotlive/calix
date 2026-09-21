@@ -1,5 +1,18 @@
 # RENDER-03 — Measurement Run Status
 
+## First visual-gap run disposition
+
+The first C–F visual-gap corpus is **DIAGNOSTIC_ONLY** and is not valid for
+`FIDELITY_GAP`, `PERFORMANCE_GAP`, `SHADER_REQUIRED`, or human quality
+verdicts. It exposed an atlas G mapping defect, incomplete QC output,
+preview-canvas versus intrinsic-primitive geometry, aspect-ratio-changing
+`ResizeLinear`, semantic carrier differences, and unvalidated ordinal K
+mapping.
+
+The previous offline resize experiment is named **R03-E1 — OFFLINE
+RESAMPLING SENSITIVITY**. It is not a GPUI scale sweep and does not measure
+texture regeneration.
+
 The first controlled C–F run is stored outside the repository under
 `/mnt/workbench/evidence/render-03/visual-gap/`.
 

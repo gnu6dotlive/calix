@@ -1,0 +1,809 @@
+{
+  "schema_version": 1,
+  "status": "pre-rerun classification",
+  "modes": [
+    "DIRECT_SPATIAL",
+    "SEMANTIC_FEATURE",
+    "TEXTURE_STATISTICAL",
+    "REFERENCE_AMBIGUOUS"
+  ],
+  "fixture_count": 46,
+  "rows": [
+    {
+      "fixture_id": "depth.component-lift-shadow",
+      "board": "H",
+      "cell_index": 2,
+      "reference_semantics": "Component lift shadow",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "contact/lift direction",
+        "rim or bevel continuity",
+        "shadow separation"
+      ],
+      "reason": "Depth references encode geometry and lighting cues; output carrier geometry is not identical to the board tile.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "depth.contact-shadow",
+      "board": "H",
+      "cell_index": 1,
+      "reference_semantics": "Contact shadow",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "contact/lift direction",
+        "rim or bevel continuity",
+        "shadow separation"
+      ],
+      "reason": "Depth references encode geometry and lighting cues; output carrier geometry is not identical to the board tile.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "depth.inset-panel-inner-shadow",
+      "board": "H",
+      "cell_index": 4,
+      "reference_semantics": "Inset panel border with inner shadow",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "contact/lift direction",
+        "rim or bevel continuity",
+        "shadow separation"
+      ],
+      "reason": "Depth references encode geometry and lighting cues; output carrier geometry is not identical to the board tile.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "depth.raised-instrument-subtle-bevel",
+      "board": "H",
+      "cell_index": 5,
+      "reference_semantics": "Raised instrument body subtle bevel",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "contact/lift direction",
+        "rim or bevel continuity",
+        "shadow separation"
+      ],
+      "reason": "Depth references encode geometry and lighting cues; output carrier geometry is not identical to the board tile.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "depth.recessed-socket-shadow",
+      "board": "H",
+      "cell_index": 3,
+      "reference_semantics": "Recessed socket shadow",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "contact/lift direction",
+        "rim or bevel continuity",
+        "shadow separation"
+      ],
+      "reason": "Depth references encode geometry and lighting cues; output carrier geometry is not identical to the board tile.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "depth.rim-highlight-outline",
+      "board": "H",
+      "cell_index": 7,
+      "reference_semantics": "Rim highlight outline",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "contact/lift direction",
+        "rim or bevel continuity",
+        "shadow separation"
+      ],
+      "reason": "Depth references encode geometry and lighting cues; output carrier geometry is not identical to the board tile.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "depth.shallow-bevel-3d-edge",
+      "board": "H",
+      "cell_index": 8,
+      "reference_semantics": "Shallow bevel 3D edge",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "contact/lift direction",
+        "rim or bevel continuity",
+        "shadow separation"
+      ],
+      "reason": "Depth references encode geometry and lighting cues; output carrier geometry is not identical to the board tile.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "depth.soft-edge-top-highlight",
+      "board": "H",
+      "cell_index": 6,
+      "reference_semantics": "Soft edge highlight top line",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "contact/lift direction",
+        "rim or bevel continuity",
+        "shadow separation"
+      ],
+      "reason": "Depth references encode geometry and lighting cues; output carrier geometry is not identical to the board tile.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "field.component-stress",
+      "board": "G",
+      "cell_index": 7,
+      "reference_semantics": "Component stress",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "DIRECT_SPATIAL",
+      "semantic_features": [
+        "field orientation/gradient continuity",
+        "scalar polarity or direction"
+      ],
+      "reason": "Field references use a rectangular carrier and named scalar/directional semantics; direct comparison still requires a controlled matching viewport.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "field.current-direction",
+      "board": "G",
+      "cell_index": 4,
+      "reference_semantics": "Current direction",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "DIRECT_SPATIAL",
+      "semantic_features": [
+        "field orientation/gradient continuity",
+        "scalar polarity or direction"
+      ],
+      "reason": "Field references use a rectangular carrier and named scalar/directional semantics; direct comparison still requires a controlled matching viewport.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "field.current-magnitude",
+      "board": "G",
+      "cell_index": 3,
+      "reference_semantics": "Current magnitude",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "DIRECT_SPATIAL",
+      "semantic_features": [
+        "field orientation/gradient continuity",
+        "scalar polarity or direction"
+      ],
+      "reason": "Field references use a rectangular carrier and named scalar/directional semantics; direct comparison still requires a controlled matching viewport.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "field.diagnostic-confidence",
+      "board": "G",
+      "cell_index": 6,
+      "reference_semantics": "Diagnostic confidence",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "DIRECT_SPATIAL",
+      "semantic_features": [
+        "field orientation/gradient continuity",
+        "scalar polarity or direction"
+      ],
+      "reason": "Field references use a rectangular carrier and named scalar/directional semantics; direct comparison still requires a controlled matching viewport.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "field.overload-heat",
+      "board": "G",
+      "cell_index": 5,
+      "reference_semantics": "Overload heat",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "DIRECT_SPATIAL",
+      "semantic_features": [
+        "field orientation/gradient continuity",
+        "scalar polarity or direction"
+      ],
+      "reason": "Field references use a rectangular carrier and named scalar/directional semantics; direct comparison still requires a controlled matching viewport.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "field.selection-density",
+      "board": "G",
+      "cell_index": 8,
+      "reference_semantics": "Selection density",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "DIRECT_SPATIAL",
+      "semantic_features": [
+        "field orientation/gradient continuity",
+        "scalar polarity or direction"
+      ],
+      "reason": "Field references use a rectangular carrier and named scalar/directional semantics; direct comparison still requires a controlled matching viewport.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "field.signed-voltage",
+      "board": "G",
+      "cell_index": 2,
+      "reference_semantics": "Signed voltage",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "DIRECT_SPATIAL",
+      "semantic_features": [
+        "field orientation/gradient continuity",
+        "scalar polarity or direction"
+      ],
+      "reason": "Field references use a rectangular carrier and named scalar/directional semantics; direct comparison still requires a controlled matching viewport.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "field.zero-positive-scalar",
+      "board": "G",
+      "cell_index": 1,
+      "reference_semantics": "Zero-to-positive scalar",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "DIRECT_SPATIAL",
+      "semantic_features": [
+        "field orientation/gradient continuity",
+        "scalar polarity or direction"
+      ],
+      "reason": "Field references use a rectangular carrier and named scalar/directional semantics; direct comparison still requires a controlled matching viewport.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "material.brushed-aluminum",
+      "board": "J",
+      "cell_index": 5,
+      "reference_semantics": "Brushed aluminum",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "TEXTURE_STATISTICAL",
+      "semantic_features": [
+        "directionality",
+        "highlight response",
+        "contrast distribution",
+        "surface texture"
+      ],
+      "reason": "Material cells use sphere/swatch presentation; texture-bearing cells require statistics rather than silhouette pixels.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "material.dark-anodized-aluminum",
+      "board": "J",
+      "cell_index": 6,
+      "reference_semantics": "Dark anodized aluminum",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "TEXTURE_STATISTICAL",
+      "semantic_features": [
+        "directionality",
+        "highlight response",
+        "contrast distribution",
+        "surface texture"
+      ],
+      "reason": "Material cells use sphere/swatch presentation; texture-bearing cells require statistics rather than silhouette pixels.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "material.painted-metal.beret-green",
+      "board": "J",
+      "cell_index": 3,
+      "reference_semantics": "Beret green painted metal",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "directionality",
+        "highlight response",
+        "contrast distribution",
+        "surface texture"
+      ],
+      "reason": "Material cells use sphere/swatch presentation; texture-bearing cells require statistics rather than silhouette pixels.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "material.painted-metal.matte-anthracite",
+      "board": "J",
+      "cell_index": 1,
+      "reference_semantics": "Matte anthracite",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "directionality",
+        "highlight response",
+        "contrast distribution",
+        "surface texture"
+      ],
+      "reason": "Material cells use sphere/swatch presentation; texture-bearing cells require statistics rather than silhouette pixels.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "material.painted-metal.royal-blue",
+      "board": "J",
+      "cell_index": 4,
+      "reference_semantics": "Royal blue painted metal",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "directionality",
+        "highlight response",
+        "contrast distribution",
+        "surface texture"
+      ],
+      "reason": "Material cells use sphere/swatch presentation; texture-bearing cells require statistics rather than silhouette pixels.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "material.painted-metal.signal-orange",
+      "board": "J",
+      "cell_index": 2,
+      "reference_semantics": "Signal orange painted metal",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "directionality",
+        "highlight response",
+        "contrast distribution",
+        "surface texture"
+      ],
+      "reason": "Material cells use sphere/swatch presentation; texture-bearing cells require statistics rather than silhouette pixels.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "material.smoked-plastic",
+      "board": "J",
+      "cell_index": 8,
+      "reference_semantics": "Smoked plastic",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "TEXTURE_STATISTICAL",
+      "semantic_features": [
+        "directionality",
+        "highlight response",
+        "contrast distribution",
+        "surface texture"
+      ],
+      "reason": "Material cells use sphere/swatch presentation; texture-bearing cells require statistics rather than silhouette pixels.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "material.warm-paper",
+      "board": "J",
+      "cell_index": 7,
+      "reference_semantics": "Warm paper",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "TEXTURE_STATISTICAL",
+      "semantic_features": [
+        "directionality",
+        "highlight response",
+        "contrast distribution",
+        "surface texture"
+      ],
+      "reason": "Material cells use sphere/swatch presentation; texture-bearing cells require statistics rather than silhouette pixels.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k01",
+      "board": "K",
+      "cell_index": 1,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k02",
+      "board": "K",
+      "cell_index": 2,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k03",
+      "board": "K",
+      "cell_index": 3,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k04",
+      "board": "K",
+      "cell_index": 4,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k05",
+      "board": "K",
+      "cell_index": 5,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k06",
+      "board": "K",
+      "cell_index": 6,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k07",
+      "board": "K",
+      "cell_index": 7,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k08",
+      "board": "K",
+      "cell_index": 8,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k09",
+      "board": "K",
+      "cell_index": 9,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k10",
+      "board": "K",
+      "cell_index": 10,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k11",
+      "board": "K",
+      "cell_index": 11,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k12",
+      "board": "K",
+      "cell_index": 12,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k13",
+      "board": "K",
+      "cell_index": 13,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "micro.k14",
+      "board": "K",
+      "cell_index": 14,
+      "reference_semantics": null,
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "REFERENCE_AMBIGUOUS",
+      "semantic_features": [
+        "frequency",
+        "orientation",
+        "density",
+        "repetition"
+      ],
+      "reason": "K cell mapping is ordinal only and has no semantic label validation.",
+      "mapping_basis": "ordinal",
+      "semantic_validation": "UNVALIDATED",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "optical.directional-fade",
+      "board": "I",
+      "cell_index": 2,
+      "reference_semantics": "Directional fade",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "falloff monotonicity",
+        "radial/directional envelope",
+        "glow continuity"
+      ],
+      "reason": "Optical references test phenomena whose carrier and palette differ across the board and stock recipe.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "optical.edge-vignette",
+      "board": "I",
+      "cell_index": 5,
+      "reference_semantics": "Edge vignette corners darker",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "falloff monotonicity",
+        "radial/directional envelope",
+        "glow continuity"
+      ],
+      "reason": "Optical references test phenomena whose carrier and palette differ across the board and stock recipe.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "optical.energized-wire-glow",
+      "board": "I",
+      "cell_index": 7,
+      "reference_semantics": "Energized wire yellow glow",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "falloff monotonicity",
+        "radial/directional envelope",
+        "glow continuity"
+      ],
+      "reason": "Optical references test phenomena whose carrier and palette differ across the board and stock recipe.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "optical.heat-region-glow",
+      "board": "I",
+      "cell_index": 8,
+      "reference_semantics": "Heat region orange glow",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "falloff monotonicity",
+        "radial/directional envelope",
+        "glow continuity"
+      ],
+      "reason": "Optical references test phenomena whose carrier and palette differ across the board and stock recipe.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "optical.local-focus",
+      "board": "I",
+      "cell_index": 6,
+      "reference_semantics": "Local focus center bright",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "falloff monotonicity",
+        "radial/directional envelope",
+        "glow continuity"
+      ],
+      "reason": "Optical references test phenomena whose carrier and palette differ across the board and stock recipe.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "optical.radial-fade",
+      "board": "I",
+      "cell_index": 1,
+      "reference_semantics": "Radial fade",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "falloff monotonicity",
+        "radial/directional envelope",
+        "glow continuity"
+      ],
+      "reason": "Optical references test phenomena whose carrier and palette differ across the board and stock recipe.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "optical.soft-circle-radial",
+      "board": "I",
+      "cell_index": 4,
+      "reference_semantics": "Soft circle radial",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "falloff monotonicity",
+        "radial/directional envelope",
+        "glow continuity"
+      ],
+      "reason": "Optical references test phenomena whose carrier and palette differ across the board and stock recipe.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    },
+    {
+      "fixture_id": "optical.soft-rectangle-rounded",
+      "board": "I",
+      "cell_index": 3,
+      "reference_semantics": "Soft rectangle rounded",
+      "carrier_geometry": "board-cell presentation; GPUI preview carrier remains 481x336",
+      "comparison_mode": "SEMANTIC_FEATURE",
+      "semantic_features": [
+        "falloff monotonicity",
+        "radial/directional envelope",
+        "glow continuity"
+      ],
+      "reason": "Optical references test phenomena whose carrier and palette differ across the board and stock recipe.",
+      "mapping_basis": "labeled-board-cell",
+      "semantic_validation": "verified-by-label",
+      "review_status": "PENDING"
+    }
+  ]
+}
