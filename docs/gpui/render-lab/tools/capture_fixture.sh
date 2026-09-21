@@ -11,7 +11,7 @@
 # Env:
 #   SHELLY_BIN       shelly-gpui binary (required)
 #   RUNTIME_DIR      XDG_RUNTIME_DIR of the lab instance (required)
-#   WIN_GEOM         optional grim window geometry "x,y WxH"; discovered when absent
+#   WIN_GEOM         deprecated; observed geometry is always read from Hyprland
 #   EXPECTED_ROI     optional exact ROI dimensions "WxH" (fails on mismatch)
 #
 # Usage: capture_fixture.sh <fixture-id> <out-prefix>
@@ -22,11 +22,32 @@ TOOLS="$(cd "$(dirname "$0")" && pwd)"
 
 cli() { XDG_RUNTIME_DIR="$RUNTIME_DIR" "$SHELLY_BIN" "$@"; }
 park() { hyprctl eval 'return hl.dispatch(hl.dsp.cursor.move({x=50, y=50}))' >/dev/null 2>&1; }
+window_address() {
+  hyprctl clients -j | jq -r 'map(select(.class=="shelly-gpui" and .mapped == true and .xwayland == false)) | if length == 1 then .[0].address else empty end'
+}
+focus_window() {
+  local address="$1"
+  hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })" >/dev/null || {
+    echo "WINDOW_FOCUS_FAILED address=$address"
+    exit 1
+  }
+  hyprctl dispatch "hl.dsp.window.alter_zorder({ window = \"address:$address\", mode = \"top\" })" >/dev/null || {
+    echo "WINDOW_RAISE_FAILED address=$address"
+    exit 1
+  }
+  sleep 0.2
+  local active
+  active="$(hyprctl activewindow -j)"
+  local active_address active_class active_xwayland
+  active_address="$(printf '%s' "$active" | jq -r '.address')"
+  active_class="$(printf '%s' "$active" | jq -r '.class')"
+  active_xwayland="$(printf '%s' "$active" | jq -r '.xwayland')"
+  [ "$active_address" = "$address" ] && [ "$active_class" = "shelly-gpui" ] && [ "$active_xwayland" = "false" ] || {
+    echo "WINDOW_FOCUS_ASSERTION_FAILED target=$address active=$active_address"
+    exit 1
+  }
+}
 window_geom() {
-  if [ -n "${WIN_GEOM:-}" ]; then
-    printf '%s\n' "$WIN_GEOM"
-    return
-  fi
   hyprctl clients -j | jq -r 'map(select(.class=="shelly-gpui" and .mapped == true and .xwayland == false)) | if length == 1 then (.[0].at[0] | tostring) + "," + (.[0].at[1] | tostring) + " " + (.[0].size[0] | tostring) + "x" + (.[0].size[1] | tostring) else empty end'
 }
 
@@ -39,17 +60,27 @@ cli render-lab fixture "$FIXTURE" >/dev/null 2>&1 || { echo "SELECT-FAILED $FIXT
 sleep 4
 
 A0="$(active_of)"; [ "$A0" = "$FIXTURE" ] || { echo "ASSERT-PRE-FAILED want=$FIXTURE got=$A0"; exit 1; }
+ADDRESS="$(window_address)"; [ -n "$ADDRESS" ] || { echo "SHELLY_WINDOW_NOT_UNIQUE"; exit 1; }
+focus_window "$ADDRESS"
 park; sleep 1
-GEOM="$(window_geom)"; [ -n "$GEOM" ] || { echo "WINDOW-GEOMETRY-FAILED"; exit 1; }
+GEOM="$(window_geom)"; [ -n "$GEOM" ] || { echo "WINDOW-GEOMETRY-FAILED address=$ADDRESS"; exit 1; }
 grim -g "$GEOM" "${OUT}.a.png" || exit 1
 A1="$(active_of)"; [ "$A1" = "$FIXTURE" ] || { echo "ASSERT-MID-FAILED want=$FIXTURE got=$A1"; exit 1; }
 
+focus_window "$ADDRESS"
 park; sleep 1
+GEOM="$(window_geom)"; [ -n "$GEOM" ] || { echo "WINDOW-GEOMETRY-FAILED address=$ADDRESS"; exit 1; }
 grim -g "$GEOM" "${OUT}.b.png" || exit 1
 A2="$(active_of)"; [ "$A2" = "$FIXTURE" ] || { echo "ASSERT-POST-FAILED want=$FIXTURE got=$A2"; exit 1; }
 
-RA="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.a.png")"
-RB="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.b.png")"
+if ! RA="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.a.png")"; then
+  echo "FIDUCIAL_NOT_FOUND capture=${OUT}.a.png target_window=$ADDRESS geometry=$GEOM"
+  exit 1
+fi
+if ! RB="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.b.png")"; then
+  echo "FIDUCIAL_NOT_FOUND capture=${OUT}.b.png target_window=$ADDRESS geometry=$GEOM"
+  exit 1
+fi
 [ "$RA" = "$RB" ] || { echo "ROI-MISMATCH a=$RA b=$RB"; exit 1; }
 ROI="$(echo "$RA" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f\"{d['x']},{d['y']},{d['w']},{d['h']}\")")"
 [ -z "${EXPECTED_ROI:-}" ] || [ "$(echo "$RA" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f\"{d['w']}x{d['h']}\")")" = "$EXPECTED_ROI" ] || { echo "ROI-DIMENSION-MISMATCH expected=$EXPECTED_ROI actual=$RA"; exit 1; }
