@@ -88,16 +88,21 @@ flowchart TD
 ### RENDER-02: Recipe Serialization & Complexity Metrics
 - **Scope**:
   1. Formalize the recipe grammar (`RecipeId`, layer definitions, composition rules).
-  2. Implement an in-memory recording harness that counts primitives per fixture (div count, shadow lobes, gradient stops, draw calls).
-  3. Integrate automated golden-image regression tests into the local test runner.
-- **Exit Gate**: Complete recipe ledger exportable via CLI (`shelly-gpui render-lab export-recipes`) with deterministic runtime budgets.
+   2. Implement an in-memory recording harness that counts recipe structure
+      (graph nodes, expanded operations, shadow lobes, gradient operations and
+      texture payloads). GPU draw calls and runtime budgets are not inferred.
+   3. Integrate deterministic fixture evidence into the local test runner.
+ - **Exit Gate**: Complete recipe ledger exportable via CLI (`shelly-gpui render-lab export-recipes`) with structural metrics.
 
 ### RENDER-03: Visual Gap & Composition Ceiling Measurement
 - **Scope**:
   1. Investigate the visual distance between stock GPUI rendering and reference ground truth.
-  2. Measure CPU/GPU render time and memory footprint as layer count scales (e.g. concentric discs for radial gradients).
+   2. Measure only quantities directly observed by the harness: recipe
+      construction, texture synthesis, controlled capture timing and payload
+      memory. GPU execution time, draw calls and VRAM are not claimed without
+      direct instrumentation.
   3. **Working Hypotheses (Non-Contractual)**:
-     - SSIM (Structural Similarity Index) and CIEDE2000 ($\Delta E^*$) are proposed as preliminary analytical metrics, alongside latency budgets ($\le 2.0\text{ ms}$).
+      - SSIM (Structural Similarity Index) and CIEDE2000 ($\Delta E^*$) remain candidate analytical features only. No latency budget is ratified here; RENDER-03 must calibrate metrics and report timing distributions before proposing one.
      - *Important Architectural Note*: These are working hypotheses, not ratified contracts. A material rendering may be perceptually superior while deviating in raw pixel similarity from an artistic reference. RENDER-03 will establish a multi-criteria evaluation model combining structural fidelity, color fidelity, semantic feature preservation, artifact detection, performance cost, and human visual review.
   4. **The Strict Burden of Proof for `SHADER_REQUIRED`**:
      > `SHADER_REQUIRED` does not mean "I would prefer this in a shader". It means: the primitive cannot be reproduced with sufficient functional/perceptual fidelity in the available stock primitives without unacceptable performance degradation or visual distortion incompatible with its contract.

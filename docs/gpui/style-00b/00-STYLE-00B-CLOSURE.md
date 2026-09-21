@@ -30,7 +30,12 @@ The ratified boundary was:
 
 > Baseline: `801674a2d9fed03c25f213b55d59d26cb7999057`  
 > Implementation: `8e7d6d74e75bec51517eee432005453b8bad376b`  
-> Closure: `ca816f597baa5e9aca28ba8432d0f73c6d0d2a0e`
+> Closure/evidence HEAD: `94d7186f65c3e254d98e0d442ab78f5037e0c2a8`
+>
+> Historical evidence note: the R2 Standard screenshot A/B gate was left
+> incomplete. R3/R3B then demonstrated that live product-window `grim` hashes
+> were not deterministic, so that gate was superseded by the R4 structural
+> paint-contract audit. STYLE-00B remains CLOSED & RATIFIED.
 
 ---
 
