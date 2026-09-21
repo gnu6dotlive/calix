@@ -1,0 +1,904 @@
+{
+  "schema_version": 1,
+  "status": "verified",
+  "selection_policy": "board cells explicitly recorded; crops are raw RGBA with no resize",
+  "source_assets": {
+    "G": {
+      "path": "gnosix-board-GHIJ-source.png",
+      "sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16"
+    },
+    "H": {
+      "path": "gnosix-board-GHIJ-source.png",
+      "sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16"
+    },
+    "I": {
+      "path": "gnosix-board-GHIJ-source.png",
+      "sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16"
+    },
+    "J": {
+      "path": "gnosix-board-GHIJ-source.png",
+      "sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16"
+    },
+    "K": {
+      "path": "gnosix-board-K-source.png",
+      "sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8"
+    }
+  },
+  "fixture_count": 46,
+  "fixtures": {
+    "depth.component-lift-shadow": {
+      "fixture_id": "depth.component-lift-shadow",
+      "board": "H",
+      "cell_index": 2,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1510,
+        72,
+        420,
+        147
+      ],
+      "crop_sha256_rgba": "5f9469c91c5b05d117216638705fdcd1259f6694507fc2542edea723b961fc43",
+      "label": "Component lift shadow",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "depth.contact-shadow": {
+      "fixture_id": "depth.contact-shadow",
+      "board": "H",
+      "cell_index": 1,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1050,
+        72,
+        428,
+        147
+      ],
+      "crop_sha256_rgba": "d7bb3742c2a0daadbf1637f974c83cc937e52e3027ed0f3de194003b7620a2b8",
+      "label": "Contact shadow",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "depth.inset-panel-inner-shadow": {
+      "fixture_id": "depth.inset-panel-inner-shadow",
+      "board": "H",
+      "cell_index": 4,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1510,
+        295,
+        420,
+        147
+      ],
+      "crop_sha256_rgba": "1c275f1f24476f4f8a2de4cede6ef062c1b04081bd9d0319b28b1509e01daea2",
+      "label": "Inset panel border with inner shadow",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "depth.raised-instrument-subtle-bevel": {
+      "fixture_id": "depth.raised-instrument-subtle-bevel",
+      "board": "H",
+      "cell_index": 5,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1050,
+        517,
+        428,
+        147
+      ],
+      "crop_sha256_rgba": "f605e43fd9b2e7b72c24b3750176ef599d8118a3bd30b655dd453a6506defefe",
+      "label": "Raised instrument body subtle bevel",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "depth.recessed-socket-shadow": {
+      "fixture_id": "depth.recessed-socket-shadow",
+      "board": "H",
+      "cell_index": 3,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1050,
+        295,
+        428,
+        147
+      ],
+      "crop_sha256_rgba": "05ada5f5d1cdc6c44ed15078d565975f6d403233737f6b539d0fdbf4c8174970",
+      "label": "Recessed socket shadow",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "depth.rim-highlight-outline": {
+      "fixture_id": "depth.rim-highlight-outline",
+      "board": "H",
+      "cell_index": 7,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1502,
+        739,
+        200,
+        150
+      ],
+      "crop_sha256_rgba": "75673d67a951d8feb8de20574c9d2d9087a9a3946d395d7c0653264ef6eaa074",
+      "label": "Rim highlight outline",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "depth.shallow-bevel-3d-edge": {
+      "fixture_id": "depth.shallow-bevel-3d-edge",
+      "board": "H",
+      "cell_index": 8,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1728,
+        739,
+        200,
+        150
+      ],
+      "crop_sha256_rgba": "8d0e816978ce0d08137880b8646fbc454605d9424a3485c266c04f06570096b9",
+      "label": "Shallow bevel 3D edge",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "depth.soft-edge-top-highlight": {
+      "fixture_id": "depth.soft-edge-top-highlight",
+      "board": "H",
+      "cell_index": 6,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1510,
+        517,
+        420,
+        147
+      ],
+      "crop_sha256_rgba": "b24e379a69a1b506514b93a381696b9b76c17bdea96ce2870a5fb47a31192208",
+      "label": "Soft edge highlight top line",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "field.component-stress": {
+      "fixture_id": "field.component-stress",
+      "board": "G",
+      "cell_index": 7,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        523,
+        576,
+        427,
+        87
+      ],
+      "crop_sha256_rgba": "2c92ee9010ab1c508fbaf0944925a054f2d0ad313e96159036ae158633a74f12",
+      "label": "Component stress",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "field.current-direction": {
+      "fixture_id": "field.current-direction",
+      "board": "G",
+      "cell_index": 4,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        70,
+        798,
+        427,
+        87
+      ],
+      "crop_sha256_rgba": "92e5b7e698e0324defd14ece8ff99ef3c1e7b76ef6da3e3b2944a48081f91a2c",
+      "label": "Current direction",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "field.current-magnitude": {
+      "fixture_id": "field.current-magnitude",
+      "board": "G",
+      "cell_index": 3,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        70,
+        576,
+        427,
+        87
+      ],
+      "crop_sha256_rgba": "a6db78339da661b7257c42eb0604d235fb0398cd81d66345e559c2c4ceb7fa38",
+      "label": "Current magnitude",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "field.diagnostic-confidence": {
+      "fixture_id": "field.diagnostic-confidence",
+      "board": "G",
+      "cell_index": 6,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        523,
+        355,
+        427,
+        87
+      ],
+      "crop_sha256_rgba": "eba7cc5313c99248cd7684ea70100839e708b3b29b893f587aeb86a3775b81db",
+      "label": "Diagnostic confidence",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "field.overload-heat": {
+      "fixture_id": "field.overload-heat",
+      "board": "G",
+      "cell_index": 5,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        523,
+        132,
+        427,
+        87
+      ],
+      "crop_sha256_rgba": "8d772f795638a2f80decc28e94f49b909ccf06dd45b45ec9e7730f72a7e83834",
+      "label": "Overload heat",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "field.selection-density": {
+      "fixture_id": "field.selection-density",
+      "board": "G",
+      "cell_index": 8,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        523,
+        798,
+        427,
+        87
+      ],
+      "crop_sha256_rgba": "9112a7e3315183c28e068051febd2de48b68360bf655d064cd291ec7231a4f46",
+      "label": "Selection density",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "field.signed-voltage": {
+      "fixture_id": "field.signed-voltage",
+      "board": "G",
+      "cell_index": 2,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        70,
+        355,
+        427,
+        87
+      ],
+      "crop_sha256_rgba": "1f501e69081454e2de137e4f5772ab0757705e8f0baa08d6e0a6cf7b018b9110",
+      "label": "Signed voltage",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "field.zero-positive-scalar": {
+      "fixture_id": "field.zero-positive-scalar",
+      "board": "G",
+      "cell_index": 1,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        70,
+        132,
+        427,
+        87
+      ],
+      "crop_sha256_rgba": "a1f8387d9c50fe1fc1717c95052d65ff8e291ef65502b681ec5a63d25c58eaf1",
+      "label": "Zero-to-positive scalar",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "material.brushed-aluminum": {
+      "fixture_id": "material.brushed-aluminum",
+      "board": "J",
+      "cell_index": 5,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1050,
+        1510,
+        200,
+        180
+      ],
+      "crop_sha256_rgba": "ee2ed34f45c1ac2e37da33ebf83f0e2493bcc0124a826a5a2737083406effb75",
+      "label": "Brushed aluminum",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "material.dark-anodized-aluminum": {
+      "fixture_id": "material.dark-anodized-aluminum",
+      "board": "J",
+      "cell_index": 6,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1276,
+        1510,
+        200,
+        180
+      ],
+      "crop_sha256_rgba": "fc3df2dc690eed55103187364a6f2fb44f550987b6dba889b6dd8b21d61ed082",
+      "label": "Dark anodized aluminum",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "material.painted-metal.beret-green": {
+      "fixture_id": "material.painted-metal.beret-green",
+      "board": "J",
+      "cell_index": 3,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1502,
+        1100,
+        200,
+        180
+      ],
+      "crop_sha256_rgba": "4aff93b7d9c19b1ba40e06b7a65bef5340fd7a232145f31750ecedbca4dd41dd",
+      "label": "Beret green painted metal",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "material.painted-metal.matte-anthracite": {
+      "fixture_id": "material.painted-metal.matte-anthracite",
+      "board": "J",
+      "cell_index": 1,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1050,
+        1100,
+        200,
+        180
+      ],
+      "crop_sha256_rgba": "751f68534a595fb150f6bedd47077a5f24e33afd1084f9626791e6eeca4e87dd",
+      "label": "Matte anthracite",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "material.painted-metal.royal-blue": {
+      "fixture_id": "material.painted-metal.royal-blue",
+      "board": "J",
+      "cell_index": 4,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1728,
+        1100,
+        200,
+        180
+      ],
+      "crop_sha256_rgba": "0f44b944c86daf768ca43abf3909c6df40a73051dae3e7e51c564cb04a1535d3",
+      "label": "Royal blue painted metal",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "material.painted-metal.signal-orange": {
+      "fixture_id": "material.painted-metal.signal-orange",
+      "board": "J",
+      "cell_index": 2,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1276,
+        1100,
+        200,
+        180
+      ],
+      "crop_sha256_rgba": "1c0094bae51c3509f7ef9f83b8708e3f6c3bc556ba10b8d359b386d14639a844",
+      "label": "Signal orange painted metal",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "material.smoked-plastic": {
+      "fixture_id": "material.smoked-plastic",
+      "board": "J",
+      "cell_index": 8,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1728,
+        1510,
+        200,
+        180
+      ],
+      "crop_sha256_rgba": "eeea879cbb507e05d9c02527e3ea02187ae49c5469fdd4545cfee4ea11fd6ba5",
+      "label": "Smoked plastic",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "material.warm-paper": {
+      "fixture_id": "material.warm-paper",
+      "board": "J",
+      "cell_index": 7,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        1502,
+        1510,
+        200,
+        180
+      ],
+      "crop_sha256_rgba": "9a552cfb085f992c6dc8052b7ad50fa97d2d33cd23f0c15b7bea4124f16aab0d",
+      "label": "Warm paper",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k01": {
+      "fixture_id": "micro.k01",
+      "board": "K",
+      "cell_index": 1,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        50,
+        50,
+        400,
+        400
+      ],
+      "crop_sha256_rgba": "f690bf490bf797000e68e3a5502598097c7e1c2f8df71abbf5aa0271c329f2dc",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k02": {
+      "fixture_id": "micro.k02",
+      "board": "K",
+      "cell_index": 2,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        766,
+        50,
+        468,
+        400
+      ],
+      "crop_sha256_rgba": "b9935ba88775ef19e1c378a1fc50e969bada1a2cb0b5d048c1bc177291a575ac",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k03": {
+      "fixture_id": "micro.k03",
+      "board": "K",
+      "cell_index": 3,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        1550,
+        50,
+        400,
+        400
+      ],
+      "crop_sha256_rgba": "419e18cf4c386377da8cd08c1a9707cfb43990bd47f6cf0b70c9bfaf6bfce9f3",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k04": {
+      "fixture_id": "micro.k04",
+      "board": "K",
+      "cell_index": 4,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        50,
+        550,
+        400,
+        400
+      ],
+      "crop_sha256_rgba": "364d1e0e9efb03518e56a0bc7052b85429485c33717ae456114acf252a7e9aa7",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k05": {
+      "fixture_id": "micro.k05",
+      "board": "K",
+      "cell_index": 5,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        766,
+        550,
+        468,
+        400
+      ],
+      "crop_sha256_rgba": "1bac262e08fe941a740c4a50692077a7326f8876297964de9a1cd19ff1c63cd7",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k06": {
+      "fixture_id": "micro.k06",
+      "board": "K",
+      "cell_index": 6,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        1550,
+        550,
+        400,
+        400
+      ],
+      "crop_sha256_rgba": "99af73140c93e5cfe60084b1054a171348d07b81cefb88040326875aeac98603",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k07": {
+      "fixture_id": "micro.k07",
+      "board": "K",
+      "cell_index": 7,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        50,
+        1050,
+        400,
+        400
+      ],
+      "crop_sha256_rgba": "49b42181949447dfc56c14e6a63c6293ac0dba88d11bcb7477e6e902d76e5eae",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k08": {
+      "fixture_id": "micro.k08",
+      "board": "K",
+      "cell_index": 8,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        550,
+        1050,
+        400,
+        400
+      ],
+      "crop_sha256_rgba": "1222c695d92410a0b4e1cf1fbbebb1773941572aba4cf872cd289e52de7b751d",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k09": {
+      "fixture_id": "micro.k09",
+      "board": "K",
+      "cell_index": 9,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        1050,
+        1050,
+        400,
+        400
+      ],
+      "crop_sha256_rgba": "4b733c976d89ce60c7a0f8638ac5ce203e369cc28d10b7afd104cb26f1f0d769",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k10": {
+      "fixture_id": "micro.k10",
+      "board": "K",
+      "cell_index": 10,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        1550,
+        1050,
+        400,
+        400
+      ],
+      "crop_sha256_rgba": "704726e91ed6d9b495dbadddb43f60373a9799f617acc61ad866523a42e27b77",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k11": {
+      "fixture_id": "micro.k11",
+      "board": "K",
+      "cell_index": 11,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        50,
+        1550,
+        400,
+        400
+      ],
+      "crop_sha256_rgba": "9e0be75dc007716cc17cfe54030107980d3d2c15704c6c2080cd02d5c414d7f8",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k12": {
+      "fixture_id": "micro.k12",
+      "board": "K",
+      "cell_index": 12,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        550,
+        1550,
+        400,
+        400
+      ],
+      "crop_sha256_rgba": "7d22cdd6a0c5aa44aca9b293545eca0edb066f3e0974d248e39c57d8f4e39aab",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k13": {
+      "fixture_id": "micro.k13",
+      "board": "K",
+      "cell_index": 13,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        1050,
+        1550,
+        400,
+        400
+      ],
+      "crop_sha256_rgba": "a4da4dba79c634489fe68a5519b82d32746b4e0f2698d061b3fb9a26da8f5d51",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "micro.k14": {
+      "fixture_id": "micro.k14",
+      "board": "K",
+      "cell_index": 14,
+      "source_asset": "gnosix-board-K-source.png",
+      "source_sha256": "950682c3fa7ef9e51d1b8604c1f15d25d5fe1e446b2b47c9cc9120387b8726b8",
+      "crop_px": [
+        1550,
+        1550,
+        400,
+        400
+      ],
+      "crop_sha256_rgba": "2465dd828a46bd7fdef89949fe492bc1b929baed878136e9283a06f6c472d591",
+      "label": null,
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "optical.directional-fade": {
+      "fixture_id": "optical.directional-fade",
+      "board": "I",
+      "cell_index": 2,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        296,
+        1198,
+        200,
+        170
+      ],
+      "crop_sha256_rgba": "edb5e2f2cc3445bc46581f6a90734b5d133310e309cb49e7dcb02dee32e9c6a8",
+      "label": "Directional fade",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "optical.edge-vignette": {
+      "fixture_id": "optical.edge-vignette",
+      "board": "I",
+      "cell_index": 5,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        70,
+        1510,
+        200,
+        170
+      ],
+      "crop_sha256_rgba": "b3ad23805d5716a8ad56fdd09f1c81366500ec129e202f36d0fb30911a85d0d2",
+      "label": "Edge vignette corners darker",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "optical.energized-wire-glow": {
+      "fixture_id": "optical.energized-wire-glow",
+      "board": "I",
+      "cell_index": 7,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        523,
+        1510,
+        200,
+        170
+      ],
+      "crop_sha256_rgba": "a7ecbe4e1a2970f7704ad27e7320e642bc21eaa2f78d00d794f3f8fdcee54f20",
+      "label": "Energized wire yellow glow",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "optical.heat-region-glow": {
+      "fixture_id": "optical.heat-region-glow",
+      "board": "I",
+      "cell_index": 8,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        750,
+        1510,
+        200,
+        170
+      ],
+      "crop_sha256_rgba": "04e008b80bfbfa5b0a5abc064658e53d1e05536bfd151b279087bad70a1855c3",
+      "label": "Heat region orange glow",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "optical.local-focus": {
+      "fixture_id": "optical.local-focus",
+      "board": "I",
+      "cell_index": 6,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        296,
+        1510,
+        200,
+        170
+      ],
+      "crop_sha256_rgba": "eaf2f683959bcaafeeffee8cdc31b6088423bc3d393e04212bf461e158cf0774",
+      "label": "Local focus center bright",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "optical.radial-fade": {
+      "fixture_id": "optical.radial-fade",
+      "board": "I",
+      "cell_index": 1,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        70,
+        1198,
+        200,
+        170
+      ],
+      "crop_sha256_rgba": "8d4b0733da8cc0cb35c65e0b5759eaafb386c30208bb9cfb2a7088174778d8e6",
+      "label": "Radial fade",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "optical.soft-circle-radial": {
+      "fixture_id": "optical.soft-circle-radial",
+      "board": "I",
+      "cell_index": 4,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        750,
+        1198,
+        200,
+        170
+      ],
+      "crop_sha256_rgba": "47b21690af4ace58aafe3d192eec84602f5ea1945e2a62f1b110dd5caba7fbac",
+      "label": "Soft circle radial",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    },
+    "optical.soft-rectangle-rounded": {
+      "fixture_id": "optical.soft-rectangle-rounded",
+      "board": "I",
+      "cell_index": 3,
+      "source_asset": "gnosix-board-GHIJ-source.png",
+      "source_sha256": "96d94a6b1cd7c5680c5e1432d49acbb92be0873d60eff34408c9ffbb5675ac16",
+      "crop_px": [
+        523,
+        1198,
+        200,
+        170
+      ],
+      "crop_sha256_rgba": "5ef0d7381921ecbe2a662fbb75257a59972dd6ab55c4bab8dba4f21788435ffe",
+      "label": "Soft rectangle rounded",
+      "selection_method": "explicit-board-cell-boundary + verified",
+      "normalization": "none; raw RGBA crop",
+      "mask": null,
+      "review_status": "verified"
+    }
+  }
+}
