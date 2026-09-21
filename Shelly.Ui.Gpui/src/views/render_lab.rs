@@ -1,6 +1,6 @@
 use crate::render_lab::catalog::FixtureCatalog;
 use crate::render_lab::confront::{
-    comparison_canvas_spec, recipe_for, render_confrontation, CONFRONT_BOX_HEIGHT_PX,
+    comparison_canvas_spec, recipe_for, render_confrontation, BoundsProbe, CONFRONT_BOX_HEIGHT_PX,
     FIDUCIAL_MARKER_RGB,
 };
 use crate::render_lab::fixture::{FixtureGroup, FixtureId};
@@ -323,7 +323,7 @@ impl RenderLabView {
                     .border_color(rgb(FIDUCIAL_MARKER_RGB));
                 match render_confrontation(f) {
                     Some(content) => {
-                        confront_box = confront_box.child(content);
+                        confront_box = confront_box.child(BoundsProbe::new(content, "recipe"));
                     }
                     None => {
                         confront_box = confront_box
@@ -348,7 +348,8 @@ impl RenderLabView {
                             );
                     }
                 }
-                preview = preview.child(confront_box);
+                preview =
+                    preview.child(BoundsProbe::new(confront_box.into_any_element(), "wrapper"));
 
                 // Observed verdict badge: ledger observation when recorded,
                 // unevaluated otherwise. Never the catalog default.

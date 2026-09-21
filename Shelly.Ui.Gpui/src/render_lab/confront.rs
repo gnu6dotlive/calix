@@ -2,7 +2,11 @@ use crate::render_lab::fixture::{FixtureDef, FixtureGroup};
 use crate::render_lab::graph::compile_stock_gpui;
 use crate::render_lab::plans::plan_for_recipe;
 use crate::render_lab::recipe::{RecipeCatalog, RecipeDef};
-use gpui::AnyElement;
+use gpui::{
+    AnyElement, App, Bounds, Element, ElementId, GlobalElementId, IntoElement, LayoutId, Pixels,
+    Window,
+};
+use std::panic::Location;
 
 /// Fixed preview-box height: the confrontation surface is always 340px
 /// tall, full column width. ROI width is session-dependent and recorded
@@ -28,6 +32,80 @@ pub fn comparison_canvas_spec(def: &FixtureDef) -> Option<ComparisonCanvasSpec> 
         width_px: 427,
         height_px: 87,
     })
+}
+
+pub(crate) struct BoundsProbe {
+    inner: AnyElement,
+    label: &'static str,
+}
+
+impl BoundsProbe {
+    pub(crate) fn new(inner: AnyElement, label: &'static str) -> Self {
+        Self { inner, label }
+    }
+}
+
+impl IntoElement for BoundsProbe {
+    type Element = Self;
+
+    fn into_element(self) -> Self::Element {
+        self
+    }
+}
+
+impl Element for BoundsProbe {
+    type RequestLayoutState = ();
+    type PrepaintState = ();
+
+    fn id(&self) -> Option<ElementId> {
+        None
+    }
+
+    fn source_location(&self) -> Option<&'static Location<'static>> {
+        None
+    }
+
+    fn request_layout(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&gpui::InspectorElementId>,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> (LayoutId, Self::RequestLayoutState) {
+        (self.inner.request_layout(window, cx), ())
+    }
+
+    fn prepaint(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&gpui::InspectorElementId>,
+        bounds: Bounds<Pixels>,
+        _request_layout: &mut Self::RequestLayoutState,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> Self::PrepaintState {
+        if std::env::var_os("C2A_BOUNDS_DEBUG").is_some() {
+            eprintln!(
+                "C2A_BOUNDS label={} origin=({}, {}) size={}x{}",
+                self.label, bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height
+            );
+        }
+        self.inner.prepaint(window, cx);
+        ()
+    }
+
+    fn paint(
+        &mut self,
+        _id: Option<&GlobalElementId>,
+        _inspector_id: Option<&gpui::InspectorElementId>,
+        _bounds: Bounds<Pixels>,
+        _request_layout: &mut Self::RequestLayoutState,
+        _prepaint: &mut Self::PrepaintState,
+        window: &mut Window,
+        cx: &mut App,
+    ) {
+        self.inner.paint(window, cx);
+    }
 }
 
 /// Renders the stock confrontation for a fixture, or `None` when no
