@@ -318,6 +318,7 @@ impl RenderLabView {
                     .when(canvas.is_none(), |element| {
                         element.w_full().h(px(CONFRONT_BOX_HEIGHT_PX))
                     })
+                    .when(canvas.is_some(), |element| element.flex_none())
                     .border_1()
                     .border_color(rgb(FIDUCIAL_MARKER_RGB));
                 match render_confrontation(f) {
