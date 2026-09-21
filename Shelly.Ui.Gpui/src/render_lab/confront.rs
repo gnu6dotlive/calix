@@ -6,6 +6,9 @@ use gpui::{
     AnyElement, App, Bounds, Element, ElementId, GlobalElementId, IntoElement, LayoutId, Pixels,
     Window,
 };
+use serde_json::json;
+use std::fs::{self, OpenOptions};
+use std::io::Write;
 use std::panic::Location;
 
 /// Fixed preview-box height: the confrontation surface is always 340px
@@ -37,11 +40,16 @@ pub fn comparison_canvas_spec(def: &FixtureDef) -> Option<ComparisonCanvasSpec> 
 pub(crate) struct BoundsProbe {
     inner: AnyElement,
     label: &'static str,
+    fixture: &'static str,
 }
 
 impl BoundsProbe {
-    pub(crate) fn new(inner: AnyElement, label: &'static str) -> Self {
-        Self { inner, label }
+    pub(crate) fn new(inner: AnyElement, label: &'static str, fixture: &'static str) -> Self {
+        Self {
+            inner,
+            label,
+            fixture,
+        }
     }
 }
 
@@ -85,10 +93,7 @@ impl Element for BoundsProbe {
         cx: &mut App,
     ) -> Self::PrepaintState {
         if std::env::var_os("C2A_BOUNDS_DEBUG").is_some() {
-            eprintln!(
-                "C2A_BOUNDS label={} origin=({}, {}) size={}x{}",
-                self.label, bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height
-            );
+            persist_bounds(self.fixture, self.label, bounds);
         }
         self.inner.prepaint(window, cx);
         ()
@@ -106,6 +111,40 @@ impl Element for BoundsProbe {
     ) {
         self.inner.paint(window, cx);
     }
+}
+
+fn persist_bounds(fixture: &'static str, label: &'static str, bounds: Bounds<Pixels>) {
+    let Some(runtime_dir) = dirs::runtime_dir() else {
+        return;
+    };
+    let directory = runtime_dir.join("shelly-gpui");
+    let path = directory.join("c2a-bounds.jsonl");
+    let width = f32::from(bounds.size.width);
+    let height = f32::from(bounds.size.height);
+    let record = json!({
+        "fixture": fixture,
+        "label": label,
+        "x": f32::from(bounds.origin.x),
+        "y": f32::from(bounds.origin.y),
+        "width": width,
+        "height": height,
+    });
+    let serialized = record.to_string();
+
+    if let Ok(existing) = fs::read_to_string(&path) {
+        let duplicate = existing.lines().any(|line| line == serialized);
+        if duplicate {
+            return;
+        }
+    }
+
+    if fs::create_dir_all(&directory).is_err() {
+        return;
+    }
+    let Ok(mut file) = OpenOptions::new().create(true).append(true).open(path) else {
+        return;
+    };
+    let _ = writeln!(file, "{serialized}");
 }
 
 /// Renders the stock confrontation for a fixture, or `None` when no

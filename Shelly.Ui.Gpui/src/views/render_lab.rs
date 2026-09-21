@@ -323,7 +323,8 @@ impl RenderLabView {
                     .border_color(rgb(FIDUCIAL_MARKER_RGB));
                 match render_confrontation(f) {
                     Some(content) => {
-                        confront_box = confront_box.child(BoundsProbe::new(content, "recipe"));
+                        confront_box =
+                            confront_box.child(BoundsProbe::new(content, "recipe", f.id.as_str()));
                     }
                     None => {
                         confront_box = confront_box
@@ -348,8 +349,11 @@ impl RenderLabView {
                             );
                     }
                 }
-                preview =
-                    preview.child(BoundsProbe::new(confront_box.into_any_element(), "wrapper"));
+                preview = preview.child(BoundsProbe::new(
+                    confront_box.into_any_element(),
+                    "wrapper",
+                    f.id.as_str(),
+                ));
 
                 // Observed verdict badge: ledger observation when recorded,
                 // unevaluated otherwise. Never the catalog default.
