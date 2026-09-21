@@ -1,4 +1,4 @@
-use crate::render_lab::fixture::FixtureDef;
+use crate::render_lab::fixture::{FixtureDef, FixtureGroup};
 use crate::render_lab::graph::compile_stock_gpui;
 use crate::render_lab::plans::plan_for_recipe;
 use crate::render_lab::recipe::{RecipeCatalog, RecipeDef};
@@ -13,6 +13,22 @@ pub const CONFRONT_BOX_HEIGHT_PX: f32 = 340.0;
 /// harness locates this exact color in window captures to derive the
 /// fixed preview ROI; the marker itself is excluded from pixel hashing.
 pub const FIDUCIAL_MARKER_RGB: u32 = 0xFF00FF;
+
+/// Exact atlas-backed canvas for the first direct-spatial comparison slice.
+/// The fiducial wrapper is four pixels larger so the existing two-pixel inset
+/// extracts the content rectangle without a fallback resize.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ComparisonCanvasSpec {
+    pub width_px: u32,
+    pub height_px: u32,
+}
+
+pub fn comparison_canvas_spec(def: &FixtureDef) -> Option<ComparisonCanvasSpec> {
+    (def.group == FixtureGroup::Fields).then_some(ComparisonCanvasSpec {
+        width_px: 427,
+        height_px: 87,
+    })
+}
 
 /// Renders the stock confrontation for a fixture, or `None` when no
 /// recipe exists yet (unevaluated slot).
@@ -36,6 +52,19 @@ mod tests {
     fn test_confront_box_geometry_constants() {
         assert_eq!(CONFRONT_BOX_HEIGHT_PX, 340.0);
         assert_eq!(FIDUCIAL_MARKER_RGB, 0xFF00FF);
+    }
+
+    #[test]
+    fn test_fields_use_atlas_canvas_dimensions() {
+        for def in crate::render_lab::catalog::FixtureCatalog::for_group(FixtureGroup::Fields) {
+            assert_eq!(
+                comparison_canvas_spec(def),
+                Some(ComparisonCanvasSpec {
+                    width_px: 427,
+                    height_px: 87,
+                })
+            );
+        }
     }
 
     #[test]

@@ -1,6 +1,7 @@
 use crate::render_lab::catalog::FixtureCatalog;
 use crate::render_lab::confront::{
-    recipe_for, render_confrontation, CONFRONT_BOX_HEIGHT_PX, FIDUCIAL_MARKER_RGB,
+    comparison_canvas_spec, recipe_for, render_confrontation, CONFRONT_BOX_HEIGHT_PX,
+    FIDUCIAL_MARKER_RGB,
 };
 use crate::render_lab::fixture::{FixtureGroup, FixtureId};
 use crate::render_lab::ledger::CapabilityLedger;
@@ -11,6 +12,7 @@ use crate::visual_style::profile::ColorScheme;
 use crate::visual_style::resolver::resolve_style;
 use crate::visual_style::roles::SurfaceRole;
 use crate::visual_style::VisualStyleId;
+use gpui::prelude::FluentBuilder;
 use gpui::*;
 use std::rc::Rc;
 
@@ -306,9 +308,16 @@ impl RenderLabView {
                 // Confrontation Box: fixed-height stock render framed by the
                 // fiducial marker the determinism harness locates in captures.
                 let observation = CapabilityLedger::find(f.id.as_str());
+                let canvas = comparison_canvas_spec(f);
                 let mut confront_box = div()
-                    .w_full()
-                    .h(px(CONFRONT_BOX_HEIGHT_PX))
+                    .when_some(canvas, |element, spec| {
+                        element
+                            .w(px(spec.width_px as f32 + 4.0))
+                            .h(px(spec.height_px as f32 + 4.0))
+                    })
+                    .when(canvas.is_none(), |element| {
+                        element.w_full().h(px(CONFRONT_BOX_HEIGHT_PX))
+                    })
                     .border_1()
                     .border_color(rgb(FIDUCIAL_MARKER_RGB));
                 match render_confrontation(f) {
