@@ -30,7 +30,8 @@ The ratified boundary was:
 
 > Baseline: `801674a2d9fed03c25f213b55d59d26cb7999057`  
 > Implementation: `8e7d6d74e75bec51517eee432005453b8bad376b`  
-> Closure/evidence HEAD: `94d7186f65c3e254d98e0d442ab78f5037e0c2a8`
+> Closure: `b0fab6deab9884cd90f8543034c29287941d0018`
+> Final evidence / published HEAD: `94d7186f65c3e254d98e0d442ab78f5037e0c2a8`
 >
 > Historical evidence note: the R2 Standard screenshot A/B gate was left
 > incomplete. R3/R3B then demonstrated that live product-window `grim` hashes

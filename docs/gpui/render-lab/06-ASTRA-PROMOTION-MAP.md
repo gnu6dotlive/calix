@@ -143,7 +143,7 @@ To prevent architectural drift, the following four inference boundaries are perm
 | **SPIR-V Validation** | `spirv-val` (Passed cleanly) | Automated validation pass |
 | **GPU Execution** | NVIDIA RTX 3070 (Vulkan 1.4) | Cross-vendor Vulkan 1.2+ / WebGPU |
 | **Numerical Stability** | Diverged over 90 timesteps ($\nabla \cdot \mathbf{u} \neq 0$) | Unconditionally bounded ($L_\infty < \epsilon$) |
-| **Working Budget Hypothesis** | $14.2\text{ ms}$ per dispatch | $\le 2.0\text{ ms}$ per dispatch (hypothesis) |
+| **Working Budget Hypothesis** | $14.2\text{ ms}$ per dispatch | Not established; RENDER-03 must measure distributions first |
 | **Memory Footprint** | $4 \times 1024 \times 1024 \times 16\text{ B} = 64\text{ MB}$ | $\le 16\text{ MB}$ dynamic pool |
 
 ### Formal Disposition:
