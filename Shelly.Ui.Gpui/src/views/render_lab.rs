@@ -41,19 +41,49 @@ impl RenderLabView {
         let active_id = props.state.active_fixture.as_ref();
         let selected_def = active_id.and_then(FixtureCatalog::find);
 
-        div()
-            .id("render_lab_root")
-            .size_full()
+        let mut measurement_stage = div()
+            .id("render_lab_measurement_stage")
+            .w_full()
+            .flex_none()
+            .flex()
+            .justify_center()
+            .py_2();
+        if let Some(f) = selected_def {
+            if let Some(spec) = comparison_canvas_spec(f) {
+                let mut controlled = div()
+                    .w(px(spec.width_px as f32 + 4.0))
+                    .h(px(spec.height_px as f32 + 4.0))
+                    .flex_none()
+                    .border_1()
+                    .border_color(rgb(FIDUCIAL_MARKER_RGB));
+                if let Some(content) = render_confrontation(f) {
+                    controlled = controlled.child(content);
+                }
+                measurement_stage = measurement_stage.child(controlled);
+            }
+        }
+
+        let body = div()
+            .id("render_lab_body")
+            .flex_1()
             .flex()
             .flex_row()
-            .bg(theme.bg_app)
-            .text_color(theme.text_primary)
             // ── Column 1: Catalog Column (260px) ───────────────────────────
             .child(Self::render_catalog(&props, &theme, active_id))
             // ── Column 2: Preview / Fixture Specification (flex-1) ─────────
             .child(Self::render_preview(&props, &theme, selected_def))
             // ── Column 3: State Ledger & Diagnostics (280px) ───────────────
-            .child(Self::render_inspector(props.state, &theme))
+            .child(Self::render_inspector(props.state, &theme));
+
+        div()
+            .id("render_lab_root")
+            .size_full()
+            .flex()
+            .flex_col()
+            .bg(theme.bg_app)
+            .text_color(theme.text_primary)
+            .child(measurement_stage)
+            .child(body)
     }
 
     fn render_catalog(
@@ -320,7 +350,11 @@ impl RenderLabView {
                     })
                     .when(canvas.is_some(), |element| element.flex_none())
                     .border_1()
-                    .border_color(rgb(FIDUCIAL_MARKER_RGB));
+                    .border_color(if canvas.is_some() {
+                        theme.border
+                    } else {
+                        rgb(FIDUCIAL_MARKER_RGB)
+                    });
                 match render_confrontation(f) {
                     Some(content) => {
                         confront_box = confront_box.child(content);
