@@ -1,0 +1,63 @@
+IDENTITY
+git show -s --format='%an|%ae|%cn|%ce' 49fbc622
+Syster-Agent|syster@gnu6.live|Syster-Agent|syster@gnu6.live
+
+REFERENCE
+optical.local-focus
+i06-central-luminance-boost/r1
+atlas crop 200x170, 8-bit sRGB
+historical stock ROI 481x336, sha256=6d0933186418194c544c8a0efcfc846a47ba11d2a5f0255e7cacc65ecfbcf9ec
+stock plan nodes=2 expanded=3 depth=2 fills=2 gradients=0 borders=0 shadows=1 textures=0
+capability=Composable
+
+FRESH I05 REPRODUCTION
+fresh stock gpui 0.2.2 copy created under /mnt/workbench/pkgbuild/render-04-p1/upstream/gpui-0.2.2
+I05 hook patch applied PASS
+I05 resolution adjustment applied PASS
+fresh GPUI cargo check --features wayland PASS
+
+A0 LIFETIME
+renderer-owned BladePipelines::local_focus created once per renderer
+frame callbacks reuse the same pipeline
+existing renderer destroy calls wait_for_gpu before pipeline teardown
+per-frame pipeline creation NO
+per-frame pipeline destruction before submit NO
+pipeline lifetime ESTABLISHED_WITHIN_EXISTING_RENDERER_TEARDOWN
+
+COMPILER DISCOVERIES
+first direct vec4 vertex output SHADER_COMPILE_BLOCKED; explicit VertexOutput fixed it
+uniform attempt 1 runtime blocked: Plain size 52, expected 64
+uniform attempt 2 runtime blocked: Plain size 64, expected 80
+three vec4 uniform block compiled and ran
+
+RUNTIME
+Wayland NVIDIA GeForce RTX 3070
+local-focus pipeline initialization PASS
+local-focus pipeline teardown PASS
+no panic in final runtime
+direct current-frame shader output PASS
+scissors and local UV derived from same bounds PASS
+resize probe 256x128 PASS
+
+VISUAL ITERATIONS
+B0 center=0.5,0.5 inner=0.18 outer=0.80 intensity=0.90: halo too broad and edge too bright
+B1 center=0.5,0.5 inner=0.12 outer=0.62 intensity=0.90: localized halo
+B2 center=0.5,0.5 inner=0.08 outer=0.55 intensity=0.72: better peak/falloff balance
+
+FINAL CAPTURE
+/mnt/workbench/pkgbuild/render-04-p1/p1-final-comparison.png
+sha256=ae9112faed7b2365a5995348cc39890b22df3fa99d8c141a830d8b17cb3a8e2a
+
+PATCHES
+render04-p1-gpui.patch sha256=cf18f8cb65a01552abe4d8a48012a4bd28823b462c7817c92f4d6422caeaefab
+render04-p1-gpui-resolution-adjustment.patch sha256=a775dc0a57641d5dd5a9eade101199c020bce1b92c22ff77d8a6c915e15fc17
+render04-p1-shelly.patch sha256=c1902479326e8d36be173b90339a99ad892268ed8358e01c36d4b72a2bda7b1d
+
+STOCK RESTORATION GATES
+cargo fmt --check PASS
+cargo check --locked PASS
+cargo test --locked render_lab PASS: 37 passed; 0 failed; 0 ignored; 0 measured; 141 filtered out
+git diff --check PASS
+git diff -- Shelly.Ui.Gpui/Cargo.toml Shelly.Ui.Gpui/Cargo.lock NO DIFF
+patch --dry-run P1 GPUI PASS
+patch --dry-run P1 Shelly PASS

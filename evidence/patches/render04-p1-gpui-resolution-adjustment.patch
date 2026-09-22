@@ -1,0 +1,20 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -239,7 +239,7 @@
+ optional = true
+ 
+ [dependencies.blade-graphics]
+-version = "0.7.0"
++version = "=0.7.1"
+ optional = true
+ 
+ [dependencies.blade-macros]
+@@ -461,7 +461,7 @@
+ default-features = false
+ 
+ [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies.blade-graphics]
+-version = "0.7.0"
++version = "=0.7.1"
+ optional = true
+ 
+ [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies.blade-macros]

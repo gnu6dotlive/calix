@@ -1,0 +1,85 @@
+{
+  "run_id": "render04-p1-local-focus",
+  "status": "APPLIED_EXPERIMENT_ESTABLISHED",
+  "reference": {
+    "fixture": "optical.local-focus",
+    "recipe": "i06-central-luminance-boost/r1",
+    "file": "docs/gpui/render-lab/references/atlas/crops/optical.local-focus.png",
+    "dimensions": [200, 170],
+    "format": "8-bit sRGB",
+    "historical_stock_roi": {
+      "file": "docs/gpui/render-lab/evidence/render01/i/optical.local-focus.roi.png",
+      "dimensions": [481, 336],
+      "sha256": "6d0933186418194c544c8a0efcfc846a47ba11d2a5f0255e7cacc65ecfbcf9ec"
+    },
+    "mapping": "atlas crop includes fixture card/header; A and B use equal 220x170 confrontation panels"
+  },
+  "stock_a": {
+    "path": "FixtureDef -> RecipePlan -> compile_stock_gpui",
+    "metrics": {
+      "nodes": 2,
+      "expanded_ops": 3,
+      "depth": 2,
+      "fills": 2,
+      "gradients": 0,
+      "borders": 0,
+      "shadows": 1,
+      "textures": 0
+    },
+    "recipe": "dark full panel + centered 140px white rounded disc + 60px blur/30px spread shadow"
+  },
+  "shader_b": {
+    "hook": "I05 frame-scoped callback",
+    "pipeline_owner": "renderer-owned BladePipelines::local_focus",
+    "parameter_path": "three vec4 uniform block: bounds, focus, color",
+    "bounds": [[220, 170], [256, 128]],
+    "scissor_matches_shader_bounds": true,
+    "readback": false,
+    "cpu_compositing": false,
+    "second_blade_context": false,
+    "composition_order": "POST-SCENE / PRE-SUBMIT-PRESENT",
+    "b2_parameters": {
+      "center": [0.5, 0.5],
+      "inner_radius": 0.08,
+      "outer_radius": 0.55,
+      "intensity": 0.72,
+      "base": [0.0549, 0.0784, 0.1098]
+    }
+  },
+  "iterations": [
+    { "id": "B0", "inner_radius": 0.18, "outer_radius": 0.80, "intensity": 0.90, "observation": "first functioning field; too broad and bright at edges" },
+    { "id": "B1", "inner_radius": 0.12, "outer_radius": 0.62, "intensity": 0.90, "observation": "localized the halo" },
+    { "id": "B2", "inner_radius": 0.08, "outer_radius": 0.55, "intensity": 0.72, "observation": "better peak/falloff balance; reads as local focus" }
+  ],
+  "metrics": {
+    "color_space": "approximate sRGB numeric comparison against Bgra8Unorm target",
+    "stock_a": { "center_rgb": [255, 255, 255], "top_edge_rgb": [43, 65, 89], "corner_rgb": [27, 40, 55] },
+    "shader_b2": { "center_rgb": [198, 204, 212], "top_edge_rgb": [20, 26, 34], "corner_rgb": [14, 20, 28] },
+    "radial_centerline_luma_samples": {
+      "stock_a1": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.251, 0.232, 0.214, 0.195],
+      "shader_b2": [0.797, 0.797, 0.785, 0.723, 0.617, 0.491, 0.354, 0.233, 0.135, 0.080, 0.076]
+    }
+  },
+  "pipeline_lifetime": {
+    "created_once_per_renderer": true,
+    "reused_across_frames": true,
+    "destroyed_before_submit": false,
+    "destroyed_with_renderer_teardown": true,
+    "teardown_waits_for_last_sync": true,
+    "status": "ESTABLISHED_WITHIN_EXISTING_RENDERER_TEARDOWN"
+  },
+  "compiler_discoveries": [
+    "direct vec4 vertex output was rejected; explicit VertexOutput required",
+    "uniform layout 52 bytes was rejected against expected 64",
+    "uniform layout 64 bytes was rejected against expected 80",
+    "three vec4 uniform layout compiled and ran"
+  ],
+  "patches": {
+    "gpui": { "path": "evidence/patches/render04-p1-gpui.patch", "sha256": "cf18f8cb65a01552abe4d8a48012a4bd28823b462c7817c92f4d6422caeaefab" },
+    "gpui_resolution": { "path": "evidence/patches/render04-p1-gpui-resolution-adjustment.patch", "sha256": "a775dc0a57641d5dd5a9eade101199c020bce1b92c22ff77d8a6c915e15fc17" },
+    "shelly": { "path": "evidence/patches/render04-p1-shelly.patch", "sha256": "c1902479326e8d36be173b90339a99ad892268ed8358e01c36d4b72a2bda7b1d" }
+  },
+  "production_architecture": "NOT_RATIFIED",
+  "canonical_checkout_restored": true,
+  "push": false
+}

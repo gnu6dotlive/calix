@@ -1,0 +1,283 @@
+--- a/src/platform.rs
++++ b/src/platform.rs
+@@ -17,6 +17,15 @@
+ ))]
+ mod blade;
+ 
++#[cfg(any(
++    all(
++        any(target_os = "linux", target_os = "freebsd"),
++        any(feature = "x11", feature = "wayland")
++    ),
++    all(target_os = "macos", feature = "macos-blade")
++))]
++pub use blade::{GpuFrame, GpuFrameCallback};
++
+ #[cfg(any(test, feature = "test-support"))]
+ mod test;
+ 
+--- a/src/platform/blade.rs
++++ b/src/platform/blade.rs
+@@ -4,8 +4,99 @@
+ mod blade_context;
+ mod blade_renderer;
+ 
++use blade_graphics as gpu;
++
++#[repr(C)]
++#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
++struct LocalFocusParams {
++    bounds: [f32; 4],
++    focus: [f32; 4],
++    color: [f32; 4],
++}
++
++#[derive(blade_macros::ShaderData)]
++struct LocalFocusData {
++    params: LocalFocusParams,
++}
++
+ #[cfg(target_os = "macos")]
+ pub(crate) use apple_compat::*;
+ pub(crate) use blade_atlas::*;
+ pub(crate) use blade_context::*;
+ pub(crate) use blade_renderer::*;
++
++/// A borrowed command-encoding capability for one GPUI frame.
++pub struct GpuFrame<'ctx, 'pass> {
++    gpu: &'ctx gpu::Context,
++    pass: &'pass mut gpu::RenderCommandEncoder<'ctx>,
++    local_focus_pipeline: &'pass gpu::RenderPipeline,
++    extent: gpu::Extent,
++    format: gpu::TextureFormat,
++}
++
++impl<'ctx, 'pass> GpuFrame<'ctx, 'pass> {
++    pub(crate) fn new(
++        gpu: &'ctx gpu::Context,
++        pass: &'pass mut gpu::RenderCommandEncoder<'ctx>,
++        local_focus_pipeline: &'pass gpu::RenderPipeline,
++        extent: gpu::Extent,
++        format: gpu::TextureFormat,
++    ) -> Self {
++        Self {
++            gpu,
++            pass,
++            local_focus_pipeline,
++            extent,
++            format,
++        }
++    }
++
++    /// Returns the existing GPUI Blade context for this frame only.
++    pub fn context(&self) -> &gpu::Context {
++        self.gpu
++    }
++
++    /// Returns the active render pass for this frame only.
++    pub fn render_pass(&mut self) -> &mut gpu::RenderCommandEncoder<'ctx> {
++        self.pass
++    }
++
++    /// Returns the active frame extent.
++    pub fn extent(&self) -> gpu::Extent {
++        self.extent
++    }
++
++    /// Returns the active frame color format.
++    pub fn target_format(&self) -> gpu::TextureFormat {
++        self.format
++    }
++
++    /// Applies a GPU scissor to subsequent custom draws.
++    pub fn set_scissor_rect(&mut self, rect: gpu::ScissorRect) {
++        self.pass.set_scissor_rect(&rect);
++    }
++
++    /// Draws the P1 local-focus specimen using the renderer-owned pipeline.
++    pub fn draw_local_focus(
++        &mut self,
++        origin: [f32; 2],
++        size: [f32; 2],
++        center: [f32; 2],
++        inner_radius: f32,
++        outer_radius: f32,
++        intensity: f32,
++        base: [f32; 3],
++    ) {
++        let params = LocalFocusParams {
++            bounds: [origin[0], origin[1], size[0], size[1]],
++            focus: [center[0], center[1], inner_radius, outer_radius],
++            color: [intensity, base[0], base[1], base[2]],
++        };
++        let mut encoder = self.pass.with(self.local_focus_pipeline);
++        encoder.bind(0, &LocalFocusData { params });
++        encoder.draw(0, 3, 0, 1);
++    }
++}
++
++/// Work submitted by an application for one renderer frame.
++pub type GpuFrameCallback = Box<dyn for<'ctx, 'pass> FnOnce(&mut GpuFrame<'ctx, 'pass>) + 'static>;
+--- a/src/platform/blade/blade_renderer.rs
++++ b/src/platform/blade/blade_renderer.rs
+@@ -1,7 +1,7 @@
+ // Doing `if let` gives you nice scoping with passes/encoders
+ #![allow(irrefutable_let_patterns)]
+ 
+-use super::{BladeAtlas, BladeContext};
++use super::{BladeAtlas, BladeContext, GpuFrame};
+ use crate::{
+     Background, Bounds, DevicePixels, GpuSpecs, MonochromeSprite, Path, Point, PolychromeSprite,
+     PrimitiveBatch, Quad, ScaledPixels, Scene, Shadow, Size, Underline,
+@@ -131,6 +131,7 @@
+     mono_sprites: gpu::RenderPipeline,
+     poly_sprites: gpu::RenderPipeline,
+     surfaces: gpu::RenderPipeline,
++    local_focus: gpu::RenderPipeline,
+ }
+ 
+ impl BladePipelines {
+@@ -166,6 +167,10 @@
+             write_mask: gpu::ColorWrites::default(),
+         }];
+ 
++        let local_focus_shader = gpu.create_shader(gpu::ShaderDesc {
++            source: include_str!("local_focus.wgsl"),
++        });
++        log::info!("Initializing experimental local-focus pipeline once per renderer");
+         Self {
+             quads: gpu.create_render_pipeline(gpu::RenderPipelineDesc {
+                 name: "quads",
+@@ -300,6 +305,17 @@
+                 color_targets,
+                 multisample_state: gpu::MultisampleState::default(),
+             }),
++            local_focus: gpu.create_render_pipeline(gpu::RenderPipelineDesc {
++                name: "render04-p1-local-focus",
++                data_layouts: &[&super::LocalFocusData::layout()],
++                vertex: local_focus_shader.at("vs_main"),
++                vertex_fetches: &[],
++                primitive: Default::default(),
++                depth_stencil: None,
++                fragment: Some(local_focus_shader.at("fs_main")),
++                color_targets,
++                multisample_state: gpu::MultisampleState::default(),
++            }),
+         }
+     }
+ 
+@@ -312,6 +328,8 @@
+         gpu.destroy_render_pipeline(&mut self.mono_sprites);
+         gpu.destroy_render_pipeline(&mut self.poly_sprites);
+         gpu.destroy_render_pipeline(&mut self.surfaces);
++        log::info!("Destroying experimental local-focus pipeline with renderer");
++        gpu.destroy_render_pipeline(&mut self.local_focus);
+     }
+ }
+ 
+@@ -904,6 +922,17 @@
+                 }
+             }
+         }
++
++        for callback in scene.take_gpu_frame_callbacks() {
++            let mut gpu_frame = GpuFrame::new(
++                &self.gpu,
++                &mut pass,
++                &self.pipelines.local_focus,
++                self.surface_config.size,
++                self.surface.info().format,
++            );
++            callback(&mut gpu_frame);
++        }
+         drop(pass);
+ 
+         self.command_encoder.present(frame);
+--- a/src/platform/blade/local_focus.wgsl
++++ b/src/platform/blade/local_focus.wgsl
+@@ -0,0 +1,32 @@
++struct LocalFocusParams {
++    bounds: vec4<f32>,
++    focus: vec4<f32>,
++    color: vec4<f32>,
++}
++
++var<uniform> params: LocalFocusParams;
++
++struct VertexOutput {
++    @builtin(position) position: vec4<f32>,
++}
++
++@vertex
++fn vs_main(@builtin(vertex_index) vertex_index: u32) -> VertexOutput {
++    var positions = array<vec2<f32>, 3>(
++        vec2<f32>(-1.0, -1.0),
++        vec2<f32>(3.0, -1.0),
++        vec2<f32>(-1.0, 3.0),
++    );
++    return VertexOutput(vec4<f32>(positions[vertex_index], 0.0, 1.0));
++}
++
++@fragment
++fn fs_main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
++    let uv = (position.xy - params.bounds.xy) / params.bounds.zw;
++    let aspect = params.bounds.z / params.bounds.w;
++    let local = (uv - params.focus.xy) * vec2<f32>(aspect, 1.0);
++    let distance = length(local);
++    let focus = 1.0 - smoothstep(params.focus.z, params.focus.w, distance);
++    let color = params.color.yzw + vec3<f32>(focus * params.color.x);
++    return vec4<f32>(color, 1.0);
++}
+--- a/src/scene.rs
++++ b/src/scene.rs
+@@ -9,6 +9,7 @@
+     Point, Radians, ScaledPixels, Size, bounds_tree::BoundsTree, point,
+ };
+ use std::{
++    cell::RefCell,
+     fmt::Debug,
+     iter::Peekable,
+     ops::{Add, Range, Sub},
+@@ -32,6 +33,7 @@
+     pub(crate) monochrome_sprites: Vec<MonochromeSprite>,
+     pub(crate) polychrome_sprites: Vec<PolychromeSprite>,
+     pub(crate) surfaces: Vec<PaintSurface>,
++    gpu_frame_callbacks: RefCell<Vec<crate::GpuFrameCallback>>,
+ }
+ 
+ impl Scene {
+@@ -46,6 +48,15 @@
+         self.monochrome_sprites.clear();
+         self.polychrome_sprites.clear();
+         self.surfaces.clear();
++        self.gpu_frame_callbacks.borrow_mut().clear();
++    }
++
++    pub(crate) fn push_gpu_frame_callback(&self, callback: crate::GpuFrameCallback) {
++        self.gpu_frame_callbacks.borrow_mut().push(callback);
++    }
++
++    pub(crate) fn take_gpu_frame_callbacks(&self) -> Vec<crate::GpuFrameCallback> {
++        std::mem::take(&mut *self.gpu_frame_callbacks.borrow_mut())
+     }
+ 
+     pub fn len(&self) -> usize {
+--- a/src/window.rs
++++ b/src/window.rs
+@@ -1980,6 +1980,16 @@
+         ArenaClearNeeded
+     }
+ 
++    /// Enqueues a callback that records custom commands into the current GPUI frame.
++    pub fn enqueue_gpu_frame_callback(
++        &mut self,
++        callback: impl for<'ctx, 'pass> FnOnce(&mut crate::GpuFrame<'ctx, 'pass>) + 'static,
++    ) {
++        self.next_frame
++            .scene
++            .push_gpu_frame_callback(Box::new(callback));
++    }
++
+     fn record_entities_accessed(&mut self, cx: &mut App) {
+         let mut entities_ref = cx.entities.accessed_entities.borrow_mut();
+         let mut entities = mem::take(entities_ref.deref_mut());

@@ -1,0 +1,164 @@
+diff --git a/Shelly.Ui.Gpui/src/render_lab/experimental.rs b/Shelly.Ui.Gpui/src/render_lab/experimental.rs
+index 36fa7f72..ed10bcc6 100644
+--- a/Shelly.Ui.Gpui/src/render_lab/experimental.rs
++++ b/Shelly.Ui.Gpui/src/render_lab/experimental.rs
+@@ -4,6 +4,7 @@ use blade_graphics::{
+     TextureFormat, TextureSubresources, TextureUsage, ViewDimension,
+ };
+ use gpui::RenderImage;
++use gpui::*;
+ use image::{Frame, RgbaImage};
+ use std::sync::{Arc, OnceLock};
+ use std::time::Instant;
+@@ -49,6 +50,66 @@ pub struct ShaderProbeOutput {
+ 
+ static PROBE: OnceLock<Result<ShaderProbeOutput, String>> = OnceLock::new();
+ 
++static LOCAL_FOCUS_REFERENCE: OnceLock<Result<Arc<RenderImage>, String>> = OnceLock::new();
++
++pub fn local_focus_reference() -> &'static Result<Arc<RenderImage>, String> {
++    LOCAL_FOCUS_REFERENCE.get_or_init(|| {
++        let bytes = include_bytes!("../../../docs/gpui/render-lab/references/atlas/crops/optical.local-focus.png");
++        let image = image::load_from_memory(bytes)
++            .map_err(|error| format!("local-focus reference decode failed: {error}"))?
++            .to_rgba8();
++        Ok(Arc::new(RenderImage::new(vec![Frame::new(image)])))
++    })
++}
++
++pub fn local_focus_shader_probe() -> impl IntoElement {
++    local_focus_shader_probe_sized(220.0, 170.0)
++}
++
++pub fn local_focus_shader_probe_sized(width: f32, height: f32) -> impl IntoElement {
++    div()
++        .id(SharedString::from(format!(
++            "render04_p1_local_focus_shader_{}x{}",
++            width, height
++        )))
++        .w(px(width))
++        .h(px(height))
++        .bg(rgb(0x0e141c))
++        .child(canvas(
++            |_bounds, _window, _cx| {},
++            |bounds, _, window, _cx| {
++                let scale = window.scale_factor();
++                let origin = [
++                    f32::from(bounds.origin.x) * scale,
++                    f32::from(bounds.origin.y) * scale,
++                ];
++                let size = [
++                    f32::from(bounds.size.width) * scale,
++                    f32::from(bounds.size.height) * scale,
++                ];
++                let scissor = blade_graphics::ScissorRect {
++                    x: origin[0].max(0.0) as i32,
++                    y: origin[1].max(0.0) as i32,
++                    w: size[0].max(1.0) as u32,
++                    h: size[1].max(1.0) as u32,
++                };
++                window.enqueue_gpu_frame_callback(move |frame| {
++                    frame.set_scissor_rect(scissor);
++                    frame.draw_local_focus(
++                        origin,
++                        size,
++                        [0.5, 0.5],
++                        0.08,
++                        0.55,
++                        0.72,
++                        [0.0549, 0.0784, 0.1098],
++                    );
++                });
++            },
++        )
++        .size_full())
++}
++
+ pub fn shader_present_probe() -> &'static Result<ShaderProbeOutput, String> {
+     PROBE.get_or_init(render_shader_once)
+ }
+diff --git a/Shelly.Ui.Gpui/src/views/render_lab.rs b/Shelly.Ui.Gpui/src/views/render_lab.rs
+index b57d1663..9dc3b3ee 100644
+--- a/Shelly.Ui.Gpui/src/views/render_lab.rs
++++ b/Shelly.Ui.Gpui/src/views/render_lab.rs
+@@ -3,7 +3,10 @@ use crate::render_lab::confront::{
+     comparison_canvas_spec, recipe_for, render_confrontation, CONFRONT_BOX_HEIGHT_PX,
+     FIDUCIAL_MARKER_RGB,
+ };
+-use crate::render_lab::experimental::shader_present_probe;
++use crate::render_lab::experimental::{
++    local_focus_reference, local_focus_shader_probe, local_focus_shader_probe_sized,
++    shader_present_probe,
++};
+ use crate::render_lab::fixture::{FixtureGroup, FixtureId};
+ use crate::render_lab::ledger::CapabilityLedger;
+ use crate::render_lab::state::{ClockMode, RenderLabState};
+@@ -119,7 +122,68 @@ impl RenderLabView {
+                 );
+             }
+         }
++        let local_focus_id = FixtureId::from_static("optical.local-focus");
++        let local_focus_stock = FixtureCatalog::find(&local_focus_id)
++            .and_then(render_confrontation);
++        let local_focus_comparison = div()
++            .id("render04_p1_local_focus_comparison")
++            .flex()
++            .flex_row()
++            .gap_2()
++            .child(
++                div()
++                    .flex()
++                    .flex_col()
++                    .flex_none()
++                    .gap_1()
++                    .child(div().text_xs().child("REFERENCE · 200x170"))
++                    .child(match local_focus_reference() {
++                        Ok(image) => img(image.clone())
++                            .w(px(220.0))
++                            .h(px(170.0))
++                            .object_fit(ObjectFit::Contain)
++                            .into_any_element(),
++                        Err(error) => div().text_xs().child(error.clone()).into_any_element(),
++                    }),
++            )
++            .child(
++                div()
++                    .flex()
++                    .flex_col()
++                    .flex_none()
++                    .gap_1()
++                    .child(div().text_xs().child("STOCK A · GPUI COMPOSITION"))
++                    .child(match local_focus_stock {
++                        Some(stock) => div()
++                            .w(px(220.0))
++                            .h(px(170.0))
++                            .child(stock)
++                            .into_any_element(),
++                        None => div()
++                            .text_xs()
++                            .child("stock recipe unavailable")
++                            .into_any_element(),
++                    }),
++            )
++            .child(
++                div()
++                    .flex()
++                    .flex_col()
++                    .flex_none()
++                    .gap_1()
++                    .child(div().text_xs().child("SHADER B · SAME-CONTEXT WGSL"))
++                    .child(local_focus_shader_probe()),
++            );
+         probe
++            .child(local_focus_comparison)
++            .child(
++                div()
++                    .flex()
++                    .flex_col()
++                    .gap_1()
++                    .child(div().text_xs().child("SHADER B RESIZE · 256x128"))
++                            .child(local_focus_shader_probe_sized(256.0, 128.0)),
++            )
+     }
+ 
+     fn render_catalog(
