@@ -1,0 +1,18 @@
+RENDER-04-P0-I03 runtime log
+============================
+
+command: cargo run --example render04_p0_i03_blade_readback --locked
+binary: /mnt/workbench/target/debug/examples/render04_p0_i03_blade_readback
+exit: 0
+
+CPU_READBACK_PRESENTATION_READY
+bytes_copied=256
+encode_submit_micros=159283
+completion_readback_micros=159425
+total_micros=159848
+sample=(0, 0) rgba=[16, 16, 64, 255]
+sample=(4, 4) rgba=[143, 143, 64, 255]
+sample=(7, 7) rgba=[239, 239, 64, 255]
+image_bytes=256
+
+compile/test note: proc-macro-error2 v2.0.1 emitted the known future-incompatibility warning; no warning suppression or dependency upgrade was performed.

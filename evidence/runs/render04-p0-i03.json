@@ -1,0 +1,43 @@
+{
+  "probe": "RENDER-04-P0-I03",
+  "status": "CPU_READBACK_PRESENTATION_ESTABLISHED",
+  "gpu_native": "GPU_NATIVE_INTEROP_BLOCKED",
+  "pre_commit_head": "9b12b4e280df667a20d4d450985ce3bf623351fc",
+  "renderer": {
+    "crate": "blade-graphics",
+    "version": "0.7.1",
+    "backend": "Vulkan via Blade"
+  },
+  "target": {
+    "width": 8,
+    "height": 8,
+    "format": "Rgba8Unorm",
+    "bytes_copied": 256
+  },
+  "shader": "WGSL UV gradient",
+  "readback": {
+    "result": "PASS",
+    "samples": [
+      {"x": 0, "y": 0, "rgba": [16, 16, 64, 255]},
+      {"x": 4, "y": 4, "rgba": [143, 143, 64, 255]},
+      {"x": 7, "y": 7, "rgba": [239, 239, 64, 255]}
+    ],
+    "encode_submit_micros": 159283,
+    "completion_readback_micros": 159425,
+    "total_micros": 159848
+  },
+  "gpui": {
+    "image": "RenderImage from CPU RgbaImage",
+    "fixture": "experiment.render04-i03-shader-present",
+    "presentation": "PASS",
+    "native_wayland": true,
+    "capture": "/mnt/workbench/pkgbuild/render-04-p0-i03/render-lab-final.png"
+  },
+  "commands": [
+    "cargo fmt --check",
+    "cargo check --locked",
+    "cargo check --example render04_p0_i03_blade_readback --locked",
+    "cargo test --locked render_lab",
+    "cargo run --example render04_p0_i03_blade_readback --locked"
+  ]
+}

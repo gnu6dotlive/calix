@@ -3,6 +3,7 @@ use crate::render_lab::confront::{
     comparison_canvas_spec, recipe_for, render_confrontation, CONFRONT_BOX_HEIGHT_PX,
     FIDUCIAL_MARKER_RGB,
 };
+use crate::render_lab::experimental::shader_present_probe;
 use crate::render_lab::fixture::{FixtureGroup, FixtureId};
 use crate::render_lab::ledger::CapabilityLedger;
 use crate::render_lab::state::{ClockMode, RenderLabState};
@@ -62,6 +63,7 @@ impl RenderLabView {
                 measurement_stage = measurement_stage.child(controlled);
             }
         }
+        measurement_stage = measurement_stage.child(Self::render_shader_experiment(&theme));
 
         let body = div()
             .id("render_lab_body")
@@ -84,6 +86,40 @@ impl RenderLabView {
             .text_color(theme.text_primary)
             .child(measurement_stage)
             .child(body)
+    }
+
+    fn render_shader_experiment(theme: &Theme) -> impl IntoElement {
+        let mut probe = div()
+            .id("render04_i03_shader_probe")
+            .flex()
+            .flex_col()
+            .items_center()
+            .gap_1()
+            .child(
+                div()
+                    .text_xs()
+                    .font_weight(FontWeight::BOLD)
+                    .text_color(theme.warning_text)
+                    .child("EXPERIMENTAL · experiment.render04-i03-shader-present"),
+            );
+        match shader_present_probe() {
+            Ok(output) => {
+                probe = probe.child(
+                    img(output.image.clone())
+                        .size(px(256.0))
+                        .object_fit(ObjectFit::Contain),
+                );
+            }
+            Err(error) => {
+                probe = probe.child(
+                    div()
+                        .text_xs()
+                        .text_color(theme.warning_text)
+                        .child(format!("CPU readback blocked: {error}")),
+                );
+            }
+        }
+        probe
     }
 
     fn render_catalog(

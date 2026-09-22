@@ -2,6 +2,7 @@ pub mod capability;
 pub mod catalog;
 pub mod confront;
 pub mod diagnostics;
+pub mod experimental;
 pub mod fixture;
 pub mod graph;
 pub mod ledger;
