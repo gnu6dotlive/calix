@@ -1,0 +1,55 @@
+{
+  "id": "ux05-render-lab-ergonomics",
+  "base_commit": "ab3f581d63d83874f5ca0a4e925739b484b2b059",
+  "status": "IMPLEMENTED_RUNTIME_PARTIAL",
+  "worktree": "/mnt/workbench/workspaces/gnu.in.labs/shelly-gpui-ux05",
+  "binary": {
+    "path": "/mnt/workbench/pkgbuild/ux-05-render-lab/target/debug/shelly-gpui",
+    "sha256": "121175a06319a4e96de933c1d0f40ebd32fa3c90ce117a9b7a4d6bb4ffabab4a"
+  },
+  "runtime": {
+    "wayland_display": "wayland-1",
+    "xwayland": false,
+    "p2_environment": "not_set",
+    "known_experimental_processes": 1
+  },
+  "gates": {
+    "settings_to_render_lab": true,
+    "render_lab_to_settings": true,
+    "global_sidebar_render_lab": false,
+    "advanced_settings_default_collapsed": true,
+    "ledger_default_expanded": true,
+    "ledger_toggle_state_local": true,
+    "catalog_dedicated_scroll_handle": true,
+    "renderer_architecture_changed": false,
+    "p2_code_mixed": false,
+    "push": false
+  },
+  "tests": {
+    "render_lab_filtered": {"passed": 37, "failed": 0},
+    "settings_filtered": {"passed": 11, "failed": 0},
+    "full_suite": {"passed": 178, "failed": 0}
+  },
+  "captures": [
+    {
+      "name": "settings-advanced-collapsed.png",
+      "sha256": "a8b057cbc27ac8d58ce345bab008a8dcc99524c5857bdb6a5b43ee21194d7ea6",
+      "valid": true
+    },
+    {
+      "name": "render-lab-ledger-expanded.png",
+      "sha256": "63a6cc0fc6412bb328625b27ac4cdcbc0ad1d47708f6da29ee3e5cf672976d28",
+      "valid": true
+    },
+    {
+      "name": "render-lab-ledger-collapsed-attempt.png",
+      "sha256": "f6c38ec64b38e214d2109e9ef900800e53523d342984c7dd46ce120a7d4138f4",
+      "valid": false,
+      "reason": "active-window focus changed during native interaction"
+    }
+  ],
+  "evidence": {
+    "runtime_log": "evidence/logs/ux05-render-lab-ergonomics.log",
+    "capture_directory": "/mnt/workbench/pkgbuild/ux-05-render-lab/captures"
+  }
+}

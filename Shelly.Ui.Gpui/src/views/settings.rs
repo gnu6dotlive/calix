@@ -2,8 +2,10 @@ use crate::components::menu::{
     MenuCheckmarkItem, MenuKeyHandler, MenuLifecycle, MenuSurface, MenuSurfaceProps,
 };
 use crate::config::{ConfigManager, GpuiUiConfig, ShellySettings};
+use crate::icons::AppIcon;
 use crate::theme::Theme;
 use crate::visual_style::VisualStyleId;
+use gpui::prelude::FluentBuilder;
 use gpui::*;
 use std::rc::Rc;
 
@@ -30,6 +32,7 @@ pub struct SettingsViewProps<'a> {
     pub style_menu_open: bool,
     pub style_menu_epoch: usize,
     pub style_menu_highlighted: usize,
+    pub advanced_settings_expanded: bool,
     pub theme: &'a Theme,
     pub on_toggle_aur: WindowActionHandler,
     pub on_toggle_flatpak: WindowActionHandler,
@@ -44,6 +47,8 @@ pub struct SettingsViewProps<'a> {
     pub on_close_style_menu: WindowActionHandler,
     pub on_navigate_style_menu: MenuKeyHandler,
     pub on_select_style: StyleSelectHandler,
+    pub on_toggle_advanced_settings: WindowActionHandler,
+    pub on_open_render_lab: WindowActionHandler,
     pub on_save: WindowActionHandler,
     pub on_reset: Option<WindowActionHandler>,
 }
@@ -56,6 +61,7 @@ pub struct SettingsView {
     pub style_menu_open: bool,
     pub style_menu_epoch: usize,
     pub style_menu_highlighted: usize,
+    pub advanced_settings_expanded: bool,
 }
 
 impl SettingsView {
@@ -67,6 +73,7 @@ impl SettingsView {
             style_menu_open: false,
             style_menu_epoch: 0,
             style_menu_highlighted: 0,
+            advanced_settings_expanded: false,
         }
     }
 
@@ -119,6 +126,10 @@ impl SettingsView {
         self.draft_gpui.visual_style = style;
         self.is_dirty = true;
         self.style_menu_open = false;
+    }
+
+    pub fn toggle_advanced_settings(&mut self) {
+        self.advanced_settings_expanded = !self.advanced_settings_expanded;
     }
 
     pub fn toggle_aur(&mut self) {
@@ -454,6 +465,138 @@ impl SettingsView {
             ));
 
         root = root.child(logs_section);
+
+        let advanced_toggle = props.on_toggle_advanced_settings.clone();
+        let advanced_toggle_key = props.on_toggle_advanced_settings.clone();
+        let advanced_open = props.on_open_render_lab.clone();
+        let advanced_open_key = props.on_open_render_lab;
+        let focus_border = theme.border_focus;
+        let advanced_section = div()
+            .flex()
+            .flex_col()
+            .p_4()
+            .mb_6()
+            .rounded_md()
+            .bg(theme.bg_surface)
+            .border_1()
+            .border_color(theme.border)
+            .child(
+                div()
+                    .id("settings_advanced_toggle")
+                    .focusable()
+                    .tab_stop(true)
+                    .focus(move |s| s.border_1().border_color(focus_border))
+                    .on_key_down(move |event, window, cx| {
+                        let key = event.keystroke.key.as_str();
+                        if key == "enter" || key == "space" {
+                            advanced_toggle_key(window, cx);
+                        }
+                    })
+                    .flex()
+                    .items_center()
+                    .justify_between()
+                    .cursor_pointer()
+                    .on_mouse_down(MouseButton::Left, move |_event, window, cx| {
+                        advanced_toggle(window, cx);
+                    })
+                    .child(
+                        div()
+                            .text_sm()
+                            .font_weight(FontWeight::BOLD)
+                            .text_color(theme.accent)
+                            .child("ADVANCED SETTINGS"),
+                    )
+                    .child(
+                        div()
+                            .text_sm()
+                            .text_color(theme.text_secondary)
+                            .child(if props.advanced_settings_expanded {
+                                "Collapse"
+                            } else {
+                                "Expand"
+                            })
+                            .child(if props.advanced_settings_expanded {
+                                "  ▴"
+                            } else {
+                                "  ▾"
+                            }),
+                    ),
+            )
+            .when(props.advanced_settings_expanded, |section| {
+                section.child(
+                    div()
+                        .mt_3()
+                        .p_3()
+                        .rounded_md()
+                        .bg(theme.bg_app)
+                        .border_1()
+                        .border_color(theme.border)
+                        .flex()
+                        .items_center()
+                        .justify_between()
+                        .child(
+                            div()
+                                .flex()
+                                .items_center()
+                                .gap_2()
+                                .child(
+                                    svg()
+                                        .path(AppIcon::RenderLab.path())
+                                        .size(px(16.0))
+                                        .text_color(theme.accent),
+                                )
+                                .child(
+                                    div()
+                                        .flex()
+                                        .flex_col()
+                                        .gap_0p5()
+                                        .child(
+                                            div()
+                                                .text_xs()
+                                                .font_weight(FontWeight::BOLD)
+                                                .text_color(theme.text_primary)
+                                                .child("Render Lab"),
+                                        )
+                                        .child(
+                                            div()
+                                                .text_xs()
+                                                .text_color(theme.text_secondary)
+                                                .child("Open the experimental rendering and visual capability laboratory."),
+                                        ),
+                                ),
+                        )
+                        .child(
+                            div()
+                                .id("settings_render_lab_btn")
+                                .focusable()
+                                .tab_stop(true)
+                                .focus(move |s| s.border_1().border_color(theme.border_focus))
+                                .on_key_down(move |event, window, cx| {
+                                    let key = event.keystroke.key.as_str();
+                                    if key == "enter" || key == "space" {
+                                        advanced_open_key(window, cx);
+                                    }
+                                })
+                                .px_3()
+                                .py_1()
+                                .rounded_md()
+                                .bg(theme.bg_surface_active)
+                                .border_1()
+                                .border_color(theme.border)
+                                .text_xs()
+                                .font_weight(FontWeight::BOLD)
+                                .text_color(theme.text_primary)
+                                .cursor_pointer()
+                                .hover(move |s| s.bg(theme.bg_surface_hover))
+                                .child("Open")
+                                .on_mouse_down(MouseButton::Left, move |_event, window, cx| {
+                                    advanced_open(window, cx);
+                                }),
+                        ),
+                )
+            });
+
+        root = root.child(advanced_section);
 
         // Bouton de sauvegarde explicite & bouton de réinitialisation
         let on_save = props.on_save;
@@ -819,6 +962,12 @@ mod tests {
 
         settings.toggle_reduce_motion();
         assert!(!settings.draft_gpui.reduce_motion);
+
+        assert!(!settings.advanced_settings_expanded);
+        settings.toggle_advanced_settings();
+        assert!(settings.advanced_settings_expanded);
+        settings.toggle_advanced_settings();
+        assert!(!settings.advanced_settings_expanded);
     }
 
     #[test]

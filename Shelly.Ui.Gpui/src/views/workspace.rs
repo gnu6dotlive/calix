@@ -41,6 +41,8 @@ pub struct WorkspaceView {
     pub console_view: Entity<OperationConsoleView>,
     pub settings: SettingsView,
     pub render_lab: Entity<crate::render_lab::RenderLabState>,
+    pub render_lab_ledger_collapsed: bool,
+    pub render_lab_catalog_scroll: ScrollHandle,
     pub shelly_settings: ShellySettings,
     pub gpui_config: GpuiUiConfig,
     pub theme: Theme,
@@ -304,6 +306,8 @@ impl WorkspaceView {
             console_view,
             settings,
             render_lab,
+            render_lab_ledger_collapsed: false,
+            render_lab_catalog_scroll: ScrollHandle::new(),
             shelly_settings,
             gpui_config: gpui_config.clone(),
             theme,
@@ -1943,6 +1947,7 @@ impl Render for WorkspaceView {
                         style_menu_open: self.settings.style_menu_open,
                         style_menu_epoch: self.settings.style_menu_epoch,
                         style_menu_highlighted: self.settings.style_menu_highlighted,
+                        advanced_settings_expanded: self.settings.advanced_settings_expanded,
                         theme: theme_ref,
                         on_toggle_aur: {
                             let e = entity_st.clone();
@@ -2089,6 +2094,25 @@ impl Render for WorkspaceView {
                                 })
                             })
                         },
+                        on_toggle_advanced_settings: {
+                            let e = entity_st.clone();
+                            Rc::new(move |_w, cx| {
+                                e.update(cx, |view, cx| {
+                                    view.settings.toggle_advanced_settings();
+                                    cx.notify();
+                                })
+                            })
+                        },
+                        on_open_render_lab: {
+                            let e = entity_st.clone();
+                            Rc::new(move |_w, cx| {
+                                e.update(cx, |view, cx| {
+                                    view.session.update(cx, |s, cx| {
+                                        s.set_destination(NavDestination::RenderLab, cx);
+                                    });
+                                })
+                            })
+                        },
                         on_save: {
                             let e = entity_st.clone();
                             Rc::new(move |w, cx| {
@@ -2147,6 +2171,8 @@ impl Render for WorkspaceView {
                         crate::views::render_lab::RenderLabViewProps {
                             state: rl_state,
                             theme: &theme,
+                            ledger_collapsed: self.render_lab_ledger_collapsed,
+                            catalog_scroll_handle: &self.render_lab_catalog_scroll,
                             on_select_fixture: {
                                 let e = entity_rl.clone();
                                 Rc::new(move |id, _w, cx| {
@@ -2165,6 +2191,26 @@ impl Render for WorkspaceView {
                                         view.render_lab.update(cx, |rl, cx| {
                                             rl.set_fixture(None, cx);
                                         });
+                                        cx.notify();
+                                    });
+                                })
+                            },
+                            on_back_settings: {
+                                let e = entity_rl.clone();
+                                Rc::new(move |_w, cx| {
+                                    e.update(cx, |view, cx| {
+                                        view.session.update(cx, |s, cx| {
+                                            s.set_destination(NavDestination::Settings, cx);
+                                        });
+                                    });
+                                })
+                            },
+                            on_toggle_ledger: {
+                                let e = entity_rl;
+                                Rc::new(move |_w, cx| {
+                                    e.update(cx, |view, cx| {
+                                        view.render_lab_ledger_collapsed =
+                                            !view.render_lab_ledger_collapsed;
                                         cx.notify();
                                     });
                                 })

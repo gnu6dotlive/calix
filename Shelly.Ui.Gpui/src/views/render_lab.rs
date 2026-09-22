@@ -19,12 +19,17 @@ use std::rc::Rc;
 
 pub type SelectFixtureHandler = Rc<dyn Fn(FixtureId, &mut Window, &mut App) + 'static>;
 pub type ClearFixtureHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
+pub type WindowActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 
 pub struct RenderLabViewProps<'a> {
     pub state: &'a RenderLabState,
     pub theme: &'a Theme,
     pub on_select_fixture: SelectFixtureHandler,
     pub on_clear_fixture: ClearFixtureHandler,
+    pub on_back_settings: WindowActionHandler,
+    pub on_toggle_ledger: WindowActionHandler,
+    pub ledger_collapsed: bool,
+    pub catalog_scroll_handle: &'a ScrollHandle,
 }
 
 struct MatrixRoleRow {
@@ -71,11 +76,66 @@ impl RenderLabView {
             .flex()
             .flex_row()
             // ── Column 1: Catalog Column (260px) ───────────────────────────
-            .child(Self::render_catalog(&props, &theme, active_id))
+            .child(Self::render_catalog(
+                &props,
+                &theme,
+                active_id,
+                props.catalog_scroll_handle,
+            ))
             // ── Column 2: Preview / Fixture Specification (flex-1) ─────────
             .child(Self::render_preview(&props, &theme, selected_def))
             // ── Column 3: State Ledger & Diagnostics (280px) ───────────────
-            .child(Self::render_inspector(props.state, &theme));
+            .child(Self::render_inspector(
+                props.state,
+                &theme,
+                props.ledger_collapsed,
+                props.on_toggle_ledger,
+            ));
+
+        let on_back_key = props.on_back_settings.clone();
+        let on_back = props.on_back_settings;
+        let header_focus = theme.border_focus;
+        let header = div()
+            .id("render_lab_header")
+            .flex()
+            .items_center()
+            .gap_3()
+            .px_4()
+            .py_3()
+            .border_b_1()
+            .border_color(theme.border)
+            .bg(theme.bg_surface)
+            .child(
+                div()
+                    .id("render_lab_back_settings")
+                    .focusable()
+                    .tab_stop(true)
+                    .focus(move |s| s.border_1().border_color(header_focus))
+                    .on_key_down(move |event, window, cx| {
+                        let key = event.keystroke.key.as_str();
+                        if key == "enter" || key == "space" {
+                            on_back_key(window, cx);
+                        }
+                    })
+                    .px_2()
+                    .py_1()
+                    .rounded_md()
+                    .text_xs()
+                    .text_color(theme.text_secondary)
+                    .cursor_pointer()
+                    .hover(move |s| s.bg(theme.bg_surface_hover))
+                    .child("← Back to Settings")
+                    .on_mouse_down(MouseButton::Left, move |_event, window, cx| {
+                        on_back(window, cx);
+                    }),
+            )
+            .child(
+                div()
+                    .text_lg()
+                    .font_weight(FontWeight::BOLD)
+                    .text_color(theme.text_primary)
+                    .child("Render Lab"),
+            );
 
         div()
             .id("render_lab_root")
@@ -84,6 +144,7 @@ impl RenderLabView {
             .flex_col()
             .bg(theme.bg_app)
             .text_color(theme.text_primary)
+            .child(header)
             .child(measurement_stage)
             .child(body)
     }
@@ -126,6 +187,7 @@ impl RenderLabView {
         props: &RenderLabViewProps,
         theme: &Theme,
         active_id: Option<&FixtureId>,
+        scroll_handle: &ScrollHandle,
     ) -> impl IntoElement {
         let mut groups_col = div()
             .id("render_lab_catalog")
@@ -136,7 +198,8 @@ impl RenderLabView {
             .border_r_1()
             .border_color(theme.border)
             .bg(theme.bg_surface)
-            .overflow_scroll();
+            .overflow_scroll()
+            .track_scroll(scroll_handle);
 
         // Header
         groups_col = groups_col.child(
@@ -832,40 +895,24 @@ impl RenderLabView {
             )
     }
 
-    fn render_inspector(state: &RenderLabState, theme: &Theme) -> impl IntoElement {
+    fn render_inspector(
+        state: &RenderLabState,
+        theme: &Theme,
+        collapsed: bool,
+        on_toggle: WindowActionHandler,
+    ) -> impl IntoElement {
         let (clock_str, clock_detail) = match state.clock {
             ClockMode::Realtime => ("Realtime", "Running at wall clock".to_string()),
             ClockMode::Frozen(t) => ("Frozen", format!("t = {t:.3}s")),
         };
 
-        div()
-            .id("render_lab_inspector")
-            .w(px(280.0))
-            .h_full()
+        let on_toggle_key = on_toggle.clone();
+        let focus_border = theme.border_focus;
+        let ledger_content = div()
             .flex()
             .flex_col()
-            .border_l_1()
-            .border_color(theme.border)
-            .bg(theme.bg_surface)
-            .overflow_scroll()
-            .p_4()
-            .child(
-                div()
-                    .mb_4()
-                    .child(
-                        div()
-                            .text_sm()
-                            .font_weight(FontWeight::BOLD)
-                            .child("Render Lab Ledger"),
-                    )
-                    .child(
-                        div()
-                            .text_xs()
-                            .text_color(theme.text_muted)
-                            .child("Read-only control state (CLI-driven)"),
-                    ),
-            )
-            // State Axes Section
+            .gap_4()
+            .w_full()
             .child(
                 div()
                     .p_3()
@@ -902,10 +949,8 @@ impl RenderLabView {
                     .child(Self::meta_row(theme, "Clock Mode", clock_str))
                     .child(Self::meta_row(theme, "Clock Time", &clock_detail)),
             )
-            // Diagnostics
             .child(
                 div()
-                    .mt_4()
                     .child(
                         div()
                             .text_xs()
@@ -930,7 +975,71 @@ impl RenderLabView {
                         }
                         diag_col
                     }),
+            );
+
+        div()
+            .id("render_lab_inspector")
+            .w(px(if collapsed { 40.0 } else { 280.0 }))
+            .h_full()
+            .flex()
+            .flex_col()
+            .items_center()
+            .border_l_1()
+            .border_color(theme.border)
+            .bg(theme.bg_surface)
+            .overflow_scroll()
+            .when(!collapsed, |element| element.p_4())
+            .child(
+                div()
+                    .id("render_lab_ledger_toggle")
+                    .focusable()
+                    .tab_stop(true)
+                    .focus(move |s| s.border_1().border_color(focus_border))
+                    .on_key_down(move |event, window, cx| {
+                        let key = event.keystroke.key.as_str();
+                        if key == "enter" || key == "space" {
+                            on_toggle_key(window, cx);
+                        }
+                    })
+                    .flex()
+                    .w_full()
+                    .items_center()
+                    .justify_center()
+                    .gap_2()
+                    .cursor_pointer()
+                    .hover(move |s| s.bg(theme.bg_surface_hover))
+                    .child(
+                        svg()
+                            .path(if collapsed {
+                                crate::icons::AppIcon::Expand.path()
+                            } else {
+                                crate::icons::AppIcon::Collapse.path()
+                            })
+                            .size(px(16.0))
+                            .text_color(theme.text_secondary),
+                    )
+                    .when(!collapsed, |element| {
+                        element.child(
+                            div()
+                                .flex()
+                                .flex_col()
+                                .gap_0p5()
+                                .child(
+                                    div()
+                                        .text_sm()
+                                        .font_weight(FontWeight::BOLD)
+                                        .child("Render Lab Ledger"),
+                                )
+                                .child(
+                                    div()
+                                        .text_xs()
+                                        .text_color(theme.text_muted)
+                                        .child("Read-only control state (CLI-driven)"),
+                                ),
+                        )
+                    }),
             )
+            .when(!collapsed, |element| element.child(ledger_content))
     }
 
     fn meta_row(theme: &Theme, label: &'static str, val: &str) -> impl IntoElement {
