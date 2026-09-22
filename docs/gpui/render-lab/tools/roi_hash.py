@@ -24,12 +24,15 @@ INSET = 2
 def find_marker_bbox(im):
     px = im.load()
     w, h = im.size
+    def is_marker(pixel):
+        r, g, b = pixel[:3]
+        return r > 200 and g < 80 and b > 200
+
     xs0, ys0 = w, h
     xs1, ys1 = -1, -1
     for y in range(h):
         for x in range(w):
-            r, g, b = px[x, y][:3]
-            if r > 200 and g < 80 and b > 200:
+            if is_marker(px[x, y]):
                 if x < xs0:
                     xs0 = x
                 if y < ys0:
@@ -40,6 +43,24 @@ def find_marker_bbox(im):
                     ys1 = y
     if xs1 < 0:
         raise SystemExit("ERROR: fiducial marker #FF00FF not found in capture")
+    top = [(x, ys0) for x in range(xs0, xs1 + 1) if is_marker(px[x, ys0])]
+    bottom = [(x, ys1) for x in range(xs0, xs1 + 1) if is_marker(px[x, ys1])]
+    left = [(xs0, y) for y in range(ys0, ys1 + 1) if is_marker(px[xs0, y])]
+    right = [(xs1, y) for y in range(ys0, ys1 + 1) if is_marker(px[xs1, y])]
+    expected_width = xs1 - xs0 + 1
+    expected_height = ys1 - ys0 + 1
+    if not all(
+        len(edge) == expected and len(edge) > 0
+        for edge, expected in (
+            (top, expected_width),
+            (bottom, expected_width),
+            (left, expected_height),
+            (right, expected_height),
+        )
+    ):
+        raise SystemExit(
+            f"ERROR: fiducial marker #FF00FF truncated bbox={xs0},{ys0},{expected_width},{expected_height}"
+        )
     return (xs0 + INSET, ys0 + INSET, xs1 - xs0 + 1 - 2 * INSET, ys1 - ys0 + 1 - 2 * INSET)
 
 
