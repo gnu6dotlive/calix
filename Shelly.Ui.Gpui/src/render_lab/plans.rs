@@ -52,7 +52,11 @@ pub fn plan_for_recipe(recipe_id: &str) -> Option<RecipePlan> {
 
         "g04-streamline-vector-field/r1" => RecipeNode::rect()
             .size_full()
-            .solid(ColorSpec::rgb(0x12, 0x17, 0x1d))
+            .linear_gradient(
+                90.0,
+                ColorSpec::rgb(0xf4, 0xf4, 0xf2),
+                ColorSpec::rgb(0x6e, 0x6e, 0x70),
+            )
             .center()
             .child(RecipeNode::direction_arrows(
                 5,
