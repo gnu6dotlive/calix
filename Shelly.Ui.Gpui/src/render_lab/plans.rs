@@ -43,50 +43,10 @@ pub fn plan_for_recipe(recipe_id: &str) -> Option<RecipePlan> {
 
         "g03-magnitude-contour-stops/r1" => RecipeNode::rect()
             .size_full()
-            .flex_row()
-            .child(
-                RecipeNode::rect()
-                    .w(Dim::Flex(1.0))
-                    .h(Dim::Full)
-                    .linear_gradient(
-                        90.0,
-                        ColorSpec::rgb(0x13, 0x0e, 0x28),
-                        ColorSpec::rgb(0x28, 0x1b, 0x54),
-                    )
-                    .build(),
-            )
-            .child(
-                RecipeNode::rect()
-                    .w(Dim::Flex(1.0))
-                    .h(Dim::Full)
-                    .linear_gradient(
-                        90.0,
-                        ColorSpec::rgb(0x36, 0x27, 0x72),
-                        ColorSpec::rgb(0x56, 0x38, 0xa2),
-                    )
-                    .build(),
-            )
-            .child(
-                RecipeNode::rect()
-                    .w(Dim::Flex(1.0))
-                    .h(Dim::Full)
-                    .linear_gradient(
-                        90.0,
-                        ColorSpec::rgb(0x25, 0x6c, 0xb0),
-                        ColorSpec::rgb(0x2c, 0xb3, 0xd4),
-                    )
-                    .build(),
-            )
-            .child(
-                RecipeNode::rect()
-                    .w(Dim::Flex(1.0))
-                    .h(Dim::Full)
-                    .linear_gradient(
-                        90.0,
-                        ColorSpec::rgb(0x5a, 0xe4, 0xd8),
-                        ColorSpec::rgb(0xe0, 0xff, 0xff),
-                    )
-                    .build(),
+            .linear_gradient(
+                90.0,
+                ColorSpec::rgb(0xfe, 0xfe, 0xfe),
+                ColorSpec::rgb(0x4d, 0x4d, 0x51),
             )
             .build(),
 
