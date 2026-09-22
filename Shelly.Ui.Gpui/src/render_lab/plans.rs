@@ -9,8 +9,8 @@ pub fn plan_for_recipe(recipe_id: &str) -> Option<RecipePlan> {
             .size_full()
             .linear_gradient(
                 90.0,
-                ColorSpec::rgb(0x0e, 0x1b, 0x24),
-                ColorSpec::rgb(0x20, 0xa8, 0x94),
+                ColorSpec::rgb(0x0e, 0x0f, 0x14),
+                ColorSpec::rgb(0xfa, 0x6c, 0x00),
             )
             .build(),
 
@@ -23,8 +23,8 @@ pub fn plan_for_recipe(recipe_id: &str) -> Option<RecipePlan> {
                     .h(Dim::Full)
                     .linear_gradient(
                         90.0,
-                        ColorSpec::rgb(0x2e, 0x56, 0xc7),
-                        ColorSpec::rgb(0xa7, 0x9e, 0x99),
+                        ColorSpec::rgb(0x30, 0x57, 0xc7),
+                        ColorSpec::rgb(0x9c, 0x9e, 0xaa),
                     )
                     .build(),
             )
@@ -34,8 +34,8 @@ pub fn plan_for_recipe(recipe_id: &str) -> Option<RecipePlan> {
                     .h(Dim::Full)
                     .linear_gradient(
                         90.0,
-                        ColorSpec::rgb(0xa7, 0x9e, 0x99),
-                        ColorSpec::rgb(0xfc, 0x71, 0x08),
+                        ColorSpec::rgb(0x9c, 0x9e, 0xaa),
+                        ColorSpec::rgb(0xf8, 0x73, 0x19),
                     )
                     .build(),
             )
@@ -143,8 +143,8 @@ pub fn plan_for_recipe(recipe_id: &str) -> Option<RecipePlan> {
             .size_full()
             .linear_gradient(
                 90.0,
-                ColorSpec::rgb(0x52, 0x44, 0x2b),
-                ColorSpec::rgb(0x2f, 0xe0, 0x98),
+                ColorSpec::rgb(0x95, 0x93, 0x98),
+                ColorSpec::rgb(0x62, 0x7e, 0x55),
             )
             .build(),
 
@@ -187,15 +187,15 @@ pub fn plan_for_recipe(recipe_id: &str) -> Option<RecipePlan> {
 
         "g08-continuous-density-plane/r1" => RecipeNode::rect()
             .size_full()
-            .solid(ColorSpec::rgb(0x11, 0x16, 0x1d))
+            .solid(ColorSpec::rgb(0xa1, 0xa1, 0x9f))
             .relative()
             .child(
                 RecipeNode::rect()
                     .size_full()
                     .linear_gradient(
                         90.0,
-                        ColorSpec::rgba(0x0a, 0x84, 0xff, 0x00),
-                        ColorSpec::rgba(0x0a, 0x84, 0xff, 0xcc),
+                        ColorSpec::rgba(0xff, 0xff, 0xff, 0x00),
+                        ColorSpec::rgba(0x7c, 0x62, 0x91, 0x66),
                     )
                     .build(),
             )
@@ -205,8 +205,8 @@ pub fn plan_for_recipe(recipe_id: &str) -> Option<RecipePlan> {
                     .absolute_fill()
                     .linear_gradient(
                         180.0,
-                        ColorSpec::rgba(0x00, 0x00, 0x00, 0x00),
-                        ColorSpec::rgba(0x00, 0x00, 0x00, 0xbb),
+                        ColorSpec::rgba(0xff, 0xff, 0xff, 0x00),
+                        ColorSpec::rgba(0xff, 0xff, 0xff, 0x88),
                     )
                     .build(),
             )
