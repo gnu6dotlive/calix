@@ -1,0 +1,53 @@
+{
+  "id": "ux05r-render-lab-interactions",
+  "baseline_commit": "fd882bac",
+  "status": "CODE_ESTABLISHED_RUNTIME_PARTIAL_HUMAN_VERIFIED_PENDING",
+  "worktree": "/mnt/workbench/workspaces/gnu.in.labs/shelly-gpui-ux05r",
+  "binary": {
+    "path": "/mnt/workbench/pkgbuild/ux-05r-render-lab/target/debug/shelly-gpui",
+    "sha256": "d53ee7c2a378c70140b006e6f733e1e1e032ecc14f635fb441e692c7c27b1f06"
+  },
+  "provenance": {
+    "pid": 1939044,
+    "proc_exe": "/mnt/workbench/pkgbuild/ux-05r-render-lab/target/debug/shelly-gpui",
+    "stable_id": "shelly-gpui",
+    "xwayland": false,
+    "wayland_display": "wayland-1",
+    "known_experimental_processes": 1
+  },
+  "findings": {
+    "ledger_mouse_handler_before_repair": false,
+    "ledger_mouse_handler_after_repair": true,
+    "ledger_root_cause": "ESTABLISHED",
+    "baseline_catalog_viewport": {"bounds": "260x2693", "max_offset_y": 0},
+    "repaired_catalog_viewport": {"bounds": "260x551", "max_offset_y": 2142},
+    "catalog_root_cause": "ESTABLISHED"
+  },
+  "gates": {
+    "ledger_mouse_collapse": "NOT VERIFIED",
+    "ledger_mouse_expand": "NOT VERIFIED",
+    "ledger_enter_space": "NOT VERIFIED",
+    "catalog_wheel_scrolling": "NOT VERIFIED",
+    "lower_fixture_boards_reachable": "NOT VERIFIED",
+    "scroll_position_survives_selection": "NOT VERIFIED",
+    "scroll_smoothness": "HUMAN_VERIFIED_PENDING",
+    "settings_to_render_lab": "CLI_PATH_VERIFIED_UI_NOT_VERIFIED",
+    "render_lab_to_settings": "CLI_PATH_VERIFIED_UI_NOT_VERIFIED",
+    "renderer_modified": false,
+    "p2_mixed": false,
+    "persistence_added": false,
+    "main_modified": false,
+    "push": false
+  },
+  "tests": {
+    "full": {"passed": 178, "failed": 0},
+    "render_lab": {"passed": 37, "failed": 0},
+    "settings": {"passed": 11, "failed": 0}
+  },
+  "evidence": {
+    "runtime_log": "evidence/logs/ux05r-render-lab-interactions.log",
+    "baseline_scroll_audit": "evidence/logs/ux05r-baseline-scroll.log",
+    "repaired_scroll_audit": "evidence/logs/ux05r-scroll-audit.log",
+    "heavy_artifacts": "/mnt/workbench/pkgbuild/ux-05r-render-lab"
+  }
+}

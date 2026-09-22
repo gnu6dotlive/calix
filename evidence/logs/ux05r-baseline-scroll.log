@@ -1,0 +1,191 @@
+[2026-09-22T14:13:51Z INFO  shelly_gpui] Starting Shelly GPUI desktop session...
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::init] Presentation support: "VK_KHR_wayland_surface"
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::init] Presentation support: "VK_KHR_xcb_surface"
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::init] Presentation support: "VK_KHR_xlib_surface"
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::init] Presentation support: "VK_EXT_swapchain_colorspace"
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::init] Enabling Vulkan Portability
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::init] Adapter: "NVIDIA GeForce RTX 3070"
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::init] Ray tracing is supported
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T14:13:52Z INFO  gpui::platform::blade::blade_renderer] Initializing Blade pipelines for surface SurfaceInfo { format: Bgra8Unorm, alpha: PreMultiplied }
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00553f810 of size 1440x960x1 and format Bgra8Unorm, name 'path intermediate', handle 0
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00565e880 of size 1440x960x1 and format Bgra8Unorm, name 'path intermediate msaa', handle 1
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T14:13:52Z INFO  blade_graphics::hal::surface] Retaining current format: Bgra8Unorm
+[2026-09-22T14:13:52Z INFO  gpui::platform::blade::blade_renderer] Initializing Blade pipelines for surface SurfaceInfo { format: Bgra8Unorm, alpha: Ignored }
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T14:13:52Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T14:13:52Z INFO  shelly_gpui::backend::client] ShellyClient initialisé avec le binaire : /usr/bin/shelly
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Creating texture 0x55b005669920 of size 1024x1024x1 and format R8Unorm, name 'atlas', handle 2
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b003135c10 of size 65536, name 'chunk-0', handle 3
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::surface] Retaining current format: Bgra8Unorm
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00553f810, handle 0
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00565e880, handle 1
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00565e880 of size 867x715x1 and format Bgra8Unorm, name 'path intermediate', handle 1
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00554c260 of size 867x715x1 and format Bgra8Unorm, name 'path intermediate msaa', handle 0
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b0056c4f90 of size 4096, name 'chunk-0', handle 4
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b003135a00 of size 12320, name 'chunk-1', handle 5
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b00314dd60 of size 4640, name 'chunk-2', handle 6
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b003152cd0 of size 35280, name 'chunk-3', handle 7
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b00566dba0 of size 4096, name 'chunk-4', handle 8
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b00554c830 of size 14336, name 'chunk-5', handle 9
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::surface] Retaining current format: Bgra8Unorm
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00565e880, handle 1
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00554c260, handle 0
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00565e880 of size 855x703x1 and format Bgra8Unorm, name 'path intermediate', handle 0
+[2026-09-22T14:13:53Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00554c260 of size 855x703x1 and format Bgra8Unorm, name 'path intermediate msaa', handle 1
+[2026-09-22T14:13:54Z WARN  blade_graphics::hal::init] Requested layer is not found: "VK_LAYER_KHRONOS_validation"
+[2026-09-22T14:13:54Z INFO  blade_graphics::hal::init] Enabling Vulkan Portability
+[2026-09-22T14:13:54Z INFO  blade_graphics::hal::init] Adapter: "NVIDIA GeForce RTX 3070"
+[2026-09-22T14:13:54Z INFO  blade_graphics::hal::init] Ray tracing is supported
+[2026-09-22T14:13:54Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00824d130 of size 8x8x1 and format Rgba8Unorm, name 'render04-p0-i03-offscreen', handle 0
+[2026-09-22T14:13:54Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b00825e370 of size 256, name 'render04-p0-i03-readback', handle 1
+[2026-09-22T14:13:54Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T14:13:54Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b008259a70 of size 4, name '_marker', handle 2
+[2026-09-22T14:13:54Z INFO  blade_graphics::hal::resource] Destroying buffer 0x55b008259a70, handle 2
+[2026-09-22T14:13:54Z INFO  blade_graphics::hal::resource] Destroying buffer 0x55b00825e370, handle 1
+[2026-09-22T14:13:54Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00824d130, handle 0
+[2026-09-22T14:13:54Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 0px, y: 0px }, size: Size { 0px × 0px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:55Z INFO  blade_graphics::hal::resource] Creating texture 0x55b005ff0eb0 of size 1024x1024x1 and format Bgra8Unorm, name 'atlas', handle 10
+[2026-09-22T14:13:55Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b00555d880 of size 17248, name 'chunk-6', handle 11
+[2026-09-22T14:13:55Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b00825e370 of size 19376, name 'chunk-7', handle 12
+[2026-09-22T14:13:55Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:55Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:55Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:55Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:55Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:55Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:55Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:55Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:55Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:55Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:55Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:56Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:13:57Z WARN  shelly_gpui::views::workspace] Initial updates check failed: Désérialisation de la liste des mises à jour
+
+    Caused by:
+        invalid type: map, expected a sequence at line 1 column 0
+[2026-09-22T14:13:57Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:14:06Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:14:07Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:14:09Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:14:10Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:14:10Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:14:10Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: 0px }
+[2026-09-22T14:14:10Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -78px }
+[2026-09-22T14:14:10Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -156px }
+[2026-09-22T14:14:10Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -312px }
+[2026-09-22T14:14:10Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -156px }
+[2026-09-22T14:14:16Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -0px }
+[2026-09-22T14:14:16Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -0px }
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::surface] Retaining current format: Bgra8Unorm
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00565e880, handle 0
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00554c260, handle 1
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00565e880 of size 851x699x1 and format Bgra8Unorm, name 'path intermediate', handle 1
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00554c260 of size 851x699x1 and format Bgra8Unorm, name 'path intermediate msaa', handle 0
+[2026-09-22T14:14:17Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -0px }
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::surface] Retaining current format: Bgra8Unorm
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00565e880, handle 1
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00554c260, handle 0
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00565e880 of size 867x715x1 and format Bgra8Unorm, name 'path intermediate', handle 0
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00554c260 of size 867x715x1 and format Bgra8Unorm, name 'path intermediate msaa', handle 1
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::surface] Retaining current format: Bgra8Unorm
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00565e880, handle 0
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00554c260, handle 1
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00565e880 of size 1024x715x1 and format Bgra8Unorm, name 'path intermediate', handle 1
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00554c260 of size 1024x715x1 and format Bgra8Unorm, name 'path intermediate msaa', handle 0
+[2026-09-22T14:14:17Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -0px }
+[2026-09-22T14:14:17Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b008259a70 of size 22960, name 'chunk-8', handle 13
+[2026-09-22T14:14:18Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T14:14:18Z INFO  blade_graphics::hal::surface] Retaining current format: Bgra8Unorm
+[2026-09-22T14:14:18Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00565e880, handle 1
+[2026-09-22T14:14:18Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00554c260, handle 0
+[2026-09-22T14:14:18Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00565e880 of size 1062x943x1 and format Bgra8Unorm, name 'path intermediate', handle 0
+[2026-09-22T14:14:18Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00554c260 of size 1062x943x1 and format Bgra8Unorm, name 'path intermediate msaa', handle 1
+[2026-09-22T14:14:18Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -0px }
+[2026-09-22T14:14:18Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b005cbe390 of size 36960, name 'chunk-9', handle 14
+[2026-09-22T14:14:18Z INFO  blade_graphics::hal::resource] Creating buffer 0x55b0060b4380 of size 38752, name 'chunk-10', handle 15
+[2026-09-22T14:14:18Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T14:14:18Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T14:14:18Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 256 sets
+[2026-09-22T14:14:18Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 256 sets
+[2026-09-22T14:14:18Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -0px }
+[2026-09-22T14:14:22Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -0px }
+[2026-09-22T14:14:22Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -0px }
+[2026-09-22T14:14:22Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T14:14:22Z INFO  blade_graphics::hal::surface] Retaining current format: Bgra8Unorm
+[2026-09-22T14:14:22Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00565e880, handle 0
+[2026-09-22T14:14:22Z INFO  blade_graphics::hal::resource] Destroying texture 0x55b00554c260, handle 1
+[2026-09-22T14:14:22Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00565e880 of size 1062x941x1 and format Bgra8Unorm, name 'path intermediate', handle 1
+[2026-09-22T14:14:22Z INFO  blade_graphics::hal::resource] Creating texture 0x55b00554c260 of size 1062x941x1 and format Bgra8Unorm, name 'path intermediate msaa', handle 0
+[2026-09-22T14:14:22Z INFO  shelly_gpui::views::render_lab] UX05R_BASELINE_CATALOG_SCROLL bounds=Bounds { origin: Point { x: 190px, y: 350px }, size: Size { 260px × 2693px } } max_offset=Size { 0px × 0px } offset=Point { x: 0px, y: -0px }

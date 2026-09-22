@@ -75,6 +75,7 @@ impl RenderLabView {
             .flex_1()
             .flex()
             .flex_row()
+            .overflow_hidden()
             // ── Column 1: Catalog Column (260px) ───────────────────────────
             .child(Self::render_catalog(
                 &props,
@@ -198,7 +199,7 @@ impl RenderLabView {
             .border_r_1()
             .border_color(theme.border)
             .bg(theme.bg_surface)
-            .overflow_scroll()
+            .overflow_y_scroll()
             .track_scroll(scroll_handle);
 
         // Header
@@ -907,6 +908,7 @@ impl RenderLabView {
         };
 
         let on_toggle_key = on_toggle.clone();
+        let on_toggle_mouse = on_toggle;
         let focus_border = theme.border_focus;
         let ledger_content = div()
             .flex()
@@ -1000,6 +1002,9 @@ impl RenderLabView {
                         if key == "enter" || key == "space" {
                             on_toggle_key(window, cx);
                         }
+                    })
+                    .on_mouse_down(MouseButton::Left, move |_event, window, cx| {
+                        on_toggle_mouse(window, cx);
                     })
                     .flex()
                     .w_full()
