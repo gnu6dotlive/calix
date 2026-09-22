@@ -1,6 +1,6 @@
 # UX-05R - Render Lab Interaction Recovery
 
-Status: `CODE_ESTABLISHED` + `RUNTIME_PARTIAL` + `HUMAN_VERIFIED_PENDING`
+Status: `CLOSED` + `RATIFIED`
 
 ## Baseline
 
@@ -35,22 +35,24 @@ had no viewport range. UX-05R clips the flex body with `overflow_hidden()` and
 uses `overflow_y_scroll()` on the catalog viewport. No virtualization,
 renderer, or navigation change was needed.
 
-## Runtime Boundary
+## Human Runtime Validation
 
 The repaired binary starts on native Wayland with `xwayland=false`, one known
 experimental Shelly process, and the exact isolated executable recorded in the
 JSON evidence. Existing CLI commands opened Render Lab and Settings; these are
 legitimate control-path checks, not proof of mouse/wheel interaction.
 
-No synthetic input was used for UX closure. Consequently the following remain
-open until an operator validates them directly:
+The operator validated the repaired binary directly. No synthetic input was
+used to manufacture this evidence. The following gates are closed:
 
 ```text
-Ledger mouse collapse/expand: NOT VERIFIED
-Ledger Enter/Space: NOT VERIFIED
-Catalog wheel/deep scrolling: NOT VERIFIED
-Selection position preservation: NOT VERIFIED
-Continuous scroll smoothness: HUMAN_VERIFIED_PENDING
+Ledger mouse collapse/expand: HUMAN_VERIFIED PASS
+Ledger Enter/Space: HUMAN_VERIFIED PASS
+Catalog wheel scrolling: HUMAN_VERIFIED PASS
+Lower fixture boards reachable: HUMAN_VERIFIED PASS
+Selection position preservation: HUMAN_VERIFIED PASS
+Continuous scroll smoothness: HUMAN_VERIFIED PASS
+Settings ↔ Render Lab: HUMAN_VERIFIED PASS
 ```
 
 ## Quality Gates

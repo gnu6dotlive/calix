@@ -1,7 +1,7 @@
 {
   "id": "ux05r-render-lab-interactions",
   "baseline_commit": "fd882bac",
-  "status": "CODE_ESTABLISHED_RUNTIME_PARTIAL_HUMAN_VERIFIED_PENDING",
+  "status": "CLOSED_RATIFIED",
   "worktree": "/mnt/workbench/workspaces/gnu.in.labs/shelly-gpui-ux05r",
   "binary": {
     "path": "/mnt/workbench/pkgbuild/ux-05r-render-lab/target/debug/shelly-gpui",
@@ -24,15 +24,15 @@
     "catalog_root_cause": "ESTABLISHED"
   },
   "gates": {
-    "ledger_mouse_collapse": "NOT VERIFIED",
-    "ledger_mouse_expand": "NOT VERIFIED",
-    "ledger_enter_space": "NOT VERIFIED",
-    "catalog_wheel_scrolling": "NOT VERIFIED",
-    "lower_fixture_boards_reachable": "NOT VERIFIED",
-    "scroll_position_survives_selection": "NOT VERIFIED",
-    "scroll_smoothness": "HUMAN_VERIFIED_PENDING",
-    "settings_to_render_lab": "CLI_PATH_VERIFIED_UI_NOT_VERIFIED",
-    "render_lab_to_settings": "CLI_PATH_VERIFIED_UI_NOT_VERIFIED",
+    "ledger_mouse_collapse": "HUMAN_VERIFIED_PASS",
+    "ledger_mouse_expand": "HUMAN_VERIFIED_PASS",
+    "ledger_enter_space": "HUMAN_VERIFIED_PASS",
+    "catalog_wheel_scrolling": "HUMAN_VERIFIED_PASS",
+    "lower_fixture_boards_reachable": "HUMAN_VERIFIED_PASS",
+    "scroll_position_survives_selection": "HUMAN_VERIFIED_PASS",
+    "scroll_smoothness": "HUMAN_VERIFIED_PASS",
+    "settings_to_render_lab": "HUMAN_VERIFIED_PASS",
+    "render_lab_to_settings": "HUMAN_VERIFIED_PASS",
     "renderer_modified": false,
     "p2_mixed": false,
     "persistence_added": false,
