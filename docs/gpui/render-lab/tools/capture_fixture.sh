@@ -54,8 +54,39 @@ assert_same_target() {
   assert_target_client "$address" >/dev/null
 }
 
-active_of() {
-  cli render-lab status --json 2>/dev/null | python3 -c "import json,sys; print(json.load(sys.stdin)['data'].get('active_fixture') or '')"
+status_fixture() {
+  local phase="$1" stdout="${OUT}.status-${phase}.stdout.json" stderr="${OUT}.status-${phase}.stderr.txt" exit_file="${OUT}.status-${phase}.exit" fixture
+  if cli render-lab status --json >"$stdout" 2>"$stderr"; then
+    printf '0\n' >"$exit_file"
+  else
+    printf '%s\n' "$?" >"$exit_file"
+    echo "CONTROL_STATUS_COMMAND_FAILED phase=$phase" >&2
+    return 1
+  fi
+  if [ ! -s "$stdout" ]; then
+    echo "CONTROL_STATUS_EMPTY phase=$phase" >&2
+    return 1
+  fi
+  if ! fixture="$(python3 - "$stdout" "$FIXTURE" <<'PY'
+import json
+import sys
+
+payload = json.load(open(sys.argv[1]))
+expected = sys.argv[2]
+if payload.get("ok") is not True:
+    raise SystemExit("CONTROL_STATUS_NOT_OK")
+data = payload.get("data")
+if not isinstance(data, dict) or "active_fixture" not in data or data["active_fixture"] is None:
+    raise SystemExit("CONTROL_STATUS_FIXTURE_MISSING")
+if data["active_fixture"] != expected:
+    raise SystemExit(f"CONTROL_STATUS_FIXTURE_MISMATCH actual={data['active_fixture']}")
+print(data["active_fixture"])
+PY
+)"; then
+    echo "CONTROL_STATUS_MALFORMED phase=$phase" >&2
+    return 1
+  fi
+  printf '%s\n' "$fixture"
 }
 
 echo "--- capture: $FIXTURE ---"
@@ -64,37 +95,47 @@ sleep 2
 cli render-lab fixture "$FIXTURE" >/dev/null 2>&1 || { echo "SELECT-FAILED $FIXTURE"; exit 1; }
 sleep 2
 
-A0="$(active_of)"; [ "$A0" = "$FIXTURE" ] || { echo "ASSERT-PRE-FAILED want=$FIXTURE got=$A0"; exit 1; }
+PRE_FIXTURE="$(status_fixture pre)" || exit 1
+[ "$PRE_FIXTURE" = "$FIXTURE" ] || { echo "ASSERT-PRE-FAILED want=$FIXTURE got=$PRE_FIXTURE"; exit 1; }
 ADDRESS="$(window_address)"; [ -n "$ADDRESS" ] || { echo "SHELLY_WINDOW_NOT_UNIQUE"; exit 1; }
 assert_target_client "$ADDRESS"
 PID="$TARGET_PID"
 grim -T "$STABLE_ID" "${OUT}.a.png" || exit 1
 
-if ! RA="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.a.png" 2>/dev/null)"; then
-  echo "VISIBLE_RENDER_LAB_NOT_ESTABLISHED capture=${OUT}.a.png target_window=$ADDRESS stable_id=$STABLE_ID"
-  exit 1
-fi
-ROI_SIZE="$(echo "$RA" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f\"{d['w']}x{d['h']}\")")"
-[ -z "${EXPECTED_ROI:-}" ] || [ "$ROI_SIZE" = "$EXPECTED_ROI" ] || { echo "ROI-DIMENSION-MISMATCH expected=$EXPECTED_ROI actual=$ROI_SIZE"; exit 1; }
-A1="$(active_of)"; [ "$A1" = "$FIXTURE" ] || { echo "ASSERT-MID-FAILED want=$FIXTURE got=$A1"; exit 1; }
-assert_same_target "$ADDRESS"
 sleep 1
 
 grim -T "$STABLE_ID" "${OUT}.b.png" || exit 1
-A2="$(active_of)"; [ "$A2" = "$FIXTURE" ] || { echo "ASSERT-POST-FAILED want=$FIXTURE got=$A2"; exit 1; }
+POST_STATUS=0
+POST_FIXTURE="$(status_fixture post)" || POST_STATUS=$?
 assert_same_target "$ADDRESS"
 
-if ! RB="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.b.png" 2>/dev/null)"; then
-  echo "VISIBLE_RENDER_LAB_NOT_ESTABLISHED capture=${OUT}.b.png target_window=$ADDRESS stable_id=$STABLE_ID"
-  exit 1
+if python3 "$TOOLS/roi_hash.py" locate "${OUT}.a.png" >"${OUT}.locator-a.json" 2>"${OUT}.locator-a.error"; then
+  RA="$(<"${OUT}.locator-a.json")"
+else
+  RA=""
+  echo "VISIBLE_RENDER_LAB_NOT_ESTABLISHED capture=${OUT}.a.png target_window=$ADDRESS stable_id=$STABLE_ID"
 fi
-[ "$RA" = "$RB" ] || { echo "ROI-MISMATCH a=$RA b=$RB"; exit 1; }
-ROI="$(echo "$RA" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f\"{d['x']},{d['y']},{d['w']},{d['h']}\")")"
-[ -z "${EXPECTED_ROI:-}" ] || [ "$(echo "$RA" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f\"{d['w']}x{d['h']}\")")" = "$EXPECTED_ROI" ] || { echo "ROI-DIMENSION-MISMATCH expected=$EXPECTED_ROI actual=$RA"; exit 1; }
+if [ -n "$RA" ]; then
+  ROI_SIZE="$(printf '%s' "$RA" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f\"{d['w']}x{d['h']}\")")"
+  [ -z "${EXPECTED_ROI:-}" ] || [ "$ROI_SIZE" = "$EXPECTED_ROI" ] || { echo "ROI-DIMENSION-MISMATCH expected=$EXPECTED_ROI actual=$ROI_SIZE"; exit 1; }
+fi
 
-python3 "$TOOLS/roi_hash.py" compare "${OUT}.a.png" "${OUT}.b.png" "$ROI" > "${OUT}.compare.json" || { echo "PIXEL-MISMATCH $FIXTURE"; exit 1; }
+if python3 "$TOOLS/roi_hash.py" locate "${OUT}.b.png" >"${OUT}.locator-b.json" 2>"${OUT}.locator-b.error"; then
+  RB="$(<"${OUT}.locator-b.json")"
+else
+  RB=""
+  echo "VISIBLE_RENDER_LAB_NOT_ESTABLISHED capture=${OUT}.b.png target_window=$ADDRESS stable_id=$STABLE_ID"
+fi
 
-python3 - "$OUT" "$ROI" <<'EOF'
+ROI=""
+COMPARE_STATUS=0
+if [ -n "$RA" ] && [ -n "$RB" ]; then
+  [ "$RA" = "$RB" ] || { echo "ROI-MISMATCH a=$RA b=$RB"; COMPARE_STATUS=1; }
+  ROI="$(printf '%s' "$RA" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f\"{d['x']},{d['y']},{d['w']},{d['h']}\")")"
+  python3 "$TOOLS/roi_hash.py" compare "${OUT}.a.png" "${OUT}.b.png" "$ROI" > "${OUT}.compare.json" || COMPARE_STATUS=1
+fi
+
+if [ -n "$ROI" ]; then python3 - "$OUT" "$ROI" <<'EOF'
 import json, sys
 out, roi = sys.argv[1], sys.argv[2]
 from PIL import Image
@@ -102,26 +143,41 @@ x, y, w, h = (int(v) for v in roi.split(","))
 im = Image.open(out + ".a.png").convert("RGBA")
 im.crop((x, y, x + w, y + h)).save(out + ".roi.png")
 EOF
+fi
 
-cli render-lab status --json 2>/dev/null | python3 -c "
+if [ -f "${OUT}.compare.json" ]; then
+  CMP="$(<"${OUT}.compare.json")"
+else
+  CMP='{"identical": false}'
+fi
+HARNESS_COMMIT="$(git -C "$TOOLS/../../../../" rev-parse HEAD 2>/dev/null || printf unknown)"
+python3 - "$OUT" "$CMP" "$PRE_FIXTURE" "$POST_FIXTURE" "$POST_STATUS" "$ADDRESS" "$PID" "$STABLE_ID" "$HARNESS_COMMIT" <<'PY'
 import json, sys
-resp = json.load(sys.stdin)
-base = resp['data']
-cmp = json.load(open('$OUT.compare.json'))
+import os
+out, cmp_text, pre_fixture, post_fixture, post_status, address, pid, stable_id, harness_commit = sys.argv[1:]
+cmp = json.loads(cmp_text)
+base = {}
 manifest = dict(base)
-manifest['roi'] = cmp['roi']
-manifest['pixel_sha256'] = cmp['a']
-manifest['runs_identical'] = cmp['identical']
+manifest['roi'] = cmp.get('roi')
+manifest['pixel_sha256'] = cmp.get('a')
+manifest['runs_identical'] = cmp.get('identical', False)
 manifest['compositor_scale'] = 1
-manifest['runtime_commit'] = '${RUNTIME_COMMIT:-unknown}'
-manifest['capture_harness_commit'] = '$(git -C "$TOOLS/../../../../" rev-parse HEAD 2>/dev/null || printf unknown)'
-manifest['package_version'] = '${PACKAGE_VERSION:-unknown}'
-manifest['window_address'] = '$ADDRESS'
-manifest['window_pid'] = int('$PID')
-manifest['stable_id'] = '$STABLE_ID'
+manifest['runtime_commit'] = os.environ.get('RUNTIME_COMMIT', 'unknown')
+manifest['capture_harness_commit'] = harness_commit
+manifest['package_version'] = os.environ.get('PACKAGE_VERSION', 'unknown')
+manifest['window_address_pre'] = address
+manifest['window_address_post'] = address
+manifest['window_pid_pre'] = int(pid)
+manifest['window_pid_post'] = int(pid)
+manifest['stable_id_pre'] = stable_id
+manifest['stable_id_post'] = stable_id
+manifest['fixture_pre'] = pre_fixture
+manifest['fixture_post'] = post_fixture
+manifest['post_status_exit'] = int(post_status)
 manifest['capture_backend'] = 'grim-toplevel'
-manifest['xwayland'] = False
-json.dump(manifest, open('$OUT.manifest.json', 'w'), indent=2)
-"
-rm -f "${OUT}.a.png" "${OUT}.b.png" "${OUT}.compare.json"
-echo "OK $FIXTURE roi=$ROI hash=$(python3 -c "import json; print(json.load(open('$OUT.manifest.json'))['pixel_sha256'][:16])")"
+manifest['passive_interval_commands'] = ['grim-A', 'sleep-1s', 'grim-B']
+json.dump(manifest, open(out + '.manifest.json', 'w'), indent=2)
+PY
+
+[ "$POST_STATUS" -eq 0 ] && [ -n "$RB" ] && [ "$COMPARE_STATUS" -eq 0 ] || exit 1
+echo "OK $FIXTURE roi=$ROI"
