@@ -55,7 +55,10 @@ assert_same_target() {
 }
 
 status_fixture() {
-  local phase="$1" stdout="${OUT}.status-${phase}.stdout.json" stderr="${OUT}.status-${phase}.stderr.txt" exit_file="${OUT}.status-${phase}.exit" fixture
+  local phase="$1" stdout stderr exit_file fixture
+  stdout="${OUT}.status-${phase}.stdout.json"
+  stderr="${OUT}.status-${phase}.stderr.txt"
+  exit_file="${OUT}.status-${phase}.exit"
   if cli render-lab status --json >"$stdout" 2>"$stderr"; then
     printf '0\n' >"$exit_file"
   else
