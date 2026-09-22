@@ -43,7 +43,7 @@ assert_target_client() {
   }
   STABLE_ID="$(printf '%s' "$client" | jq -r '.stableId')"
   [ -n "$STABLE_ID" ] && [ "$STABLE_ID" != "null" ] || { echo "SHELLY_STABLE_ID_ABSENT address=$address"; exit 1; }
-  printf '%s\n' "$pid"
+  TARGET_PID="$pid"
 }
 assert_same_target() {
   local address="$1" current pid exe stable_id
@@ -66,7 +66,8 @@ sleep 2
 
 A0="$(active_of)"; [ "$A0" = "$FIXTURE" ] || { echo "ASSERT-PRE-FAILED want=$FIXTURE got=$A0"; exit 1; }
 ADDRESS="$(window_address)"; [ -n "$ADDRESS" ] || { echo "SHELLY_WINDOW_NOT_UNIQUE"; exit 1; }
-PID="$(assert_target_client "$ADDRESS")"
+assert_target_client "$ADDRESS"
+PID="$TARGET_PID"
 grim -T "$STABLE_ID" "${OUT}.a.png" || exit 1
 
 if ! RA="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.a.png" 2>/dev/null)"; then
