@@ -110,8 +110,8 @@ pub fn plan_for_recipe(recipe_id: &str) -> Option<RecipePlan> {
                     .h(Dim::Full)
                     .linear_gradient(
                         90.0,
-                        ColorSpec::rgb(0x18, 0x00, 0x04),
-                        ColorSpec::rgb(0x82, 0x0c, 0x08),
+                        ColorSpec::rgb(0xff, 0xfe, 0xf5),
+                        ColorSpec::rgb(0xfb, 0x92, 0x29),
                     )
                     .build(),
             )
@@ -121,8 +121,8 @@ pub fn plan_for_recipe(recipe_id: &str) -> Option<RecipePlan> {
                     .h(Dim::Full)
                     .linear_gradient(
                         90.0,
-                        ColorSpec::rgb(0x82, 0x0c, 0x08),
-                        ColorSpec::rgb(0xf2, 0x64, 0x19),
+                        ColorSpec::rgb(0xfb, 0x92, 0x29),
+                        ColorSpec::rgb(0xfb, 0x76, 0x29),
                     )
                     .build(),
             )
@@ -132,8 +132,8 @@ pub fn plan_for_recipe(recipe_id: &str) -> Option<RecipePlan> {
                     .h(Dim::Full)
                     .linear_gradient(
                         90.0,
-                        ColorSpec::rgb(0xf2, 0x64, 0x19),
-                        ColorSpec::rgb(0xff, 0xe1, 0x69),
+                        ColorSpec::rgb(0xfb, 0x76, 0x29),
+                        ColorSpec::rgb(0xfa, 0x60, 0x2a),
                     )
                     .build(),
             )
