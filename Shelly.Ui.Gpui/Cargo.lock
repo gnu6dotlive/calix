@@ -5096,6 +5096,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "base64",
+ "blade-graphics",
  "chrono",
  "dirs 6.0.0",
  "env_logger",
