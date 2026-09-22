@@ -1,0 +1,120 @@
+diff --git a/Shelly.Ui.Gpui/src/render_lab/experimental.rs b/Shelly.Ui.Gpui/src/render_lab/experimental.rs
+index 36fa7f72..98101938 100644
+--- a/Shelly.Ui.Gpui/src/render_lab/experimental.rs
++++ b/Shelly.Ui.Gpui/src/render_lab/experimental.rs
+@@ -4,6 +4,7 @@ use blade_graphics::{
+     TextureFormat, TextureSubresources, TextureUsage, ViewDimension,
+ };
+ use gpui::RenderImage;
++use gpui::*;
+ use image::{Frame, RgbaImage};
+ use std::sync::{Arc, OnceLock};
+ use std::time::Instant;
+@@ -30,6 +31,85 @@ fn fs_main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
+ }
+ "#;
+ 
++const GPUI_FRAME_SHADER: &str = r#"
++struct VertexOutput {
++    @builtin(position) position: vec4<f32>,
++}
++
++@vertex
++fn vs_main(@builtin(vertex_index) vertex_index: u32) -> VertexOutput {
++    var positions = array<vec2<f32>, 3>(
++        vec2<f32>(-1.0, -1.0),
++        vec2<f32>(3.0, -1.0),
++        vec2<f32>(-1.0, 3.0),
++    );
++    return VertexOutput(vec4<f32>(positions[vertex_index], 0.0, 1.0));
++}
++
++@fragment
++fn fs_main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
++    let gx = fract(position.x / 32.0);
++    let gy = fract(position.y / 32.0);
++    let checker = step(0.5, gx) == step(0.5, gy);
++    return vec4<f32>(gx, gy, select(0.25, 0.75, checker), 1.0);
++}
++"#;
++
++pub fn gpui_frame_probe() -> impl IntoElement {
++    div()
++        .id("render04_i05_gpui_frame_probe")
++        .size(px(128.0))
++        .bg(rgb(0x121722))
++        .child(canvas(
++            |_bounds, _window, _cx| {},
++            |bounds, _, window, _cx| {
++                let scale = window.scale_factor();
++                let x = (f32::from(bounds.origin.x) * scale).max(0.0) as u32;
++                let y = (f32::from(bounds.origin.y) * scale).max(0.0) as u32;
++                let width = (f32::from(bounds.size.width) * scale).max(1.0) as u32;
++                let height = (f32::from(bounds.size.height) * scale).max(1.0) as u32;
++
++                window.enqueue_gpu_frame_callback(move |frame| {
++                    let shader = match frame
++                        .context()
++                        .try_create_shader(ShaderDesc {
++                            source: GPUI_FRAME_SHADER,
++                        })
++                    {
++                        Ok(shader) => shader,
++                        Err(error) => {
++                            log::error!("I05 provenance shader creation failed: {error}");
++                            return;
++                        }
++                    };
++                    let color_targets = [ColorTargetState::from(frame.target_format())];
++                    let mut pipeline = frame.context().create_render_pipeline(RenderPipelineDesc {
++                        name: "render04-p0-i05-gpui-frame-provenance",
++                        data_layouts: &[],
++                        vertex: shader.at("vs_main"),
++                        vertex_fetches: &[],
++                        primitive: Default::default(),
++                        depth_stencil: None,
++                        fragment: Some(shader.at("fs_main")),
++                        color_targets: &color_targets,
++                        multisample_state: Default::default(),
++                    });
++                    frame.set_scissor_rect(blade_graphics::ScissorRect {
++                        x: x as i32,
++                        y: y as i32,
++                        w: width,
++                        h: height,
++                    });
++                    let mut encoder = frame.render_pass().with(&pipeline);
++                    encoder.draw(0, 3, 0, 1);
++                    drop(encoder);
++                    frame.context().destroy_render_pipeline(&mut pipeline);
++                });
++            },
++        )
++        .size_full())
++}
++
+ #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+ pub struct ShaderProbeSample {
+     pub x: u32,
+diff --git a/Shelly.Ui.Gpui/src/views/render_lab.rs b/Shelly.Ui.Gpui/src/views/render_lab.rs
+index b57d1663..2b4060e1 100644
+--- a/Shelly.Ui.Gpui/src/views/render_lab.rs
++++ b/Shelly.Ui.Gpui/src/views/render_lab.rs
+@@ -3,7 +3,7 @@ use crate::render_lab::confront::{
+     comparison_canvas_spec, recipe_for, render_confrontation, CONFRONT_BOX_HEIGHT_PX,
+     FIDUCIAL_MARKER_RGB,
+ };
+-use crate::render_lab::experimental::shader_present_probe;
++use crate::render_lab::experimental::{gpui_frame_probe, shader_present_probe};
+ use crate::render_lab::fixture::{FixtureGroup, FixtureId};
+ use crate::render_lab::ledger::CapabilityLedger;
+ use crate::render_lab::state::{ClockMode, RenderLabState};
+@@ -119,7 +119,7 @@ impl RenderLabView {
+                 );
+             }
+         }
+-        probe
++        probe.child(gpui_frame_probe())
+     }
+ 
+     fn render_catalog(

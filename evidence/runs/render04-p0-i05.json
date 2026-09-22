@@ -1,0 +1,62 @@
+{
+  "run_id": "render04-p0-i05",
+  "status": "SAME_CONTEXT_CUSTOM_DRAW_ESTABLISHED",
+  "commit_base": "42ab6c11",
+  "target": "GPUI 0.2.2 Blade renderer",
+  "hook": "frame-scoped callback consumed after GPUI scene batches inside BladeRenderer::draw",
+  "custom_draw": {
+    "shader": "WGSL fullscreen triangle with fract(position.xy / 32.0) checker provenance",
+    "target": "live GPUI swapchain render pass",
+    "scissor": { "x": 501, "y": 291, "width": 128, "height": 128 },
+    "readback": false,
+    "second_context": false,
+    "cpu_composite": false,
+    "direct_frame_target": true,
+    "bounded_region": true,
+    "visible_provenance": true
+  },
+  "verification": {
+    "gpui_copy_check": "passed",
+    "shelly_check_with_workbench_patch": "passed",
+    "runtime_wayland": "passed",
+    "stock_cargo_check_locked": "passed",
+    "stock_cargo_test_render_lab": {
+      "status": "passed",
+      "passed": 37,
+      "failed": 0,
+      "ignored": 0,
+      "measured": 0,
+      "filtered_out": 141
+    },
+    "callback_log": "/mnt/workbench/pkgbuild/render-04-p0-i05/shelly-i05-provenance-runtime.log",
+    "screenshot": "/mnt/workbench/pkgbuild/render-04-p0-i05/shelly-i05-provenance.png"
+  },
+  "first_shader_attempt": {
+    "status": "SHADER_COMPILE_BLOCKED",
+    "cause": "Blade/Naga rejected direct vec4 vertex output shape",
+    "iteration": "explicit VertexOutput struct",
+    "result": "shader compilation succeeded"
+  },
+  "patches": {
+    "gpui_hook": {
+      "path": "evidence/patches/render04-p0-i05-gpui-0.2.2.patch",
+      "sha256": "38e88fc43c17ae1755a2aeb95fadc6ec86a1d0d7fff2c789ae145b22347dd629"
+    },
+    "gpui_resolution_adjustment": {
+      "path": "evidence/patches/render04-p0-i05-gpui-resolution-adjustment.patch",
+      "sha256": "a775dc0a57641d5dd5a9eade101199c0200bce1b92c22ff77d8a6c915e15fc17"
+    },
+    "shelly_consumer": {
+      "path": "evidence/patches/render04-p0-i05-shelly.patch",
+      "sha256": "3a49ca66cadf95be286a4fcca7938d6aefcbbbedf93c1ce83a5f94dede2d967c"
+    }
+  },
+  "composition_order": "POST_SCENE_PRE_SUBMIT_PRESENT",
+  "pipeline_lifetime_after_encoding": "NOT_ESTABLISHED",
+  "persistent_pipeline_lifetime": "NOT_ESTABLISHED",
+  "stable_gpui_api": false,
+  "canonical_patch_adopted": false,
+  "stock_checkout_restored": true,
+  "parity_deviation": "Temporary Cargo CLI patch points Shelly at an isolated and hashed workbench GPUI copy; no patch remains in the repository manifest.",
+  "remaining_limit": "Vulkan 0.7.1 destroy_render_pipeline calls vkDestroyPipeline immediately; no proof was found that destruction is deferred until queued commands complete."
+}

@@ -1,0 +1,46 @@
+COMMAND cargo check --features wayland
+RESULT gpui workbench copy compiled successfully
+
+COMMAND cargo check --config 'patch.crates-io.gpui.path="/mnt/workbench/pkgbuild/render-04-p0-i05/upstream/gpui-0.2.2"'
+RESULT shelly-gpui compiled successfully with the temporary workbench GPUI patch
+
+RUNTIME 2026-09-22T05:46:22Z
+INFO I05 probe bounds x=501 y=291 w=128 h=128 scale=1
+INFO I05 same-context frame callback executed
+INFO I05 same-context frame callback executed
+INFO blade_graphics::hal::init Adapter: "NVIDIA GeForce RTX 3070"
+INFO gpui::platform::blade::blade_renderer Initializing Blade pipelines for surface SurfaceInfo { format: Bgra8Unorm, alpha: Ignored }
+
+VISUAL /mnt/workbench/pkgbuild/render-04-p0-i05/shelly-i05.png
+OBSERVED bounded cyan custom-shader square rendered below the existing I03 image in the live Render Lab window
+
+PROVENANCE RUNTIME /mnt/workbench/pkgbuild/render-04-p0-i05/shelly-i05-provenance.png
+OBSERVED bounded 128x128 visibly non-uniform checker/coordinate shader output in the same GPUI bounds
+
+FIRST SHADER ATTEMPT
+STATUS SHADER_COMPILE_BLOCKED
+CAUSE Blade/Naga rejected direct vec4 vertex output shape
+ITERATION explicit VertexOutput struct
+RESULT shader compilation succeeded
+
+LIFETIME AUDIT blade-graphics 0.7.1 Vulkan
+destroy_render_pipeline calls vkDestroyPipeline immediately after destroying the pipeline layout
+PIPELINE_LIFETIME_AFTER_ENCODING NOT ESTABLISHED
+No deferred-destruction or completion guarantee was found in the audited source
+
+PATCHES
+evidence/patches/render04-p0-i05-gpui-0.2.2.patch sha256=38e88fc43c17ae1755a2aeb95fadc6ec86a1d0d7fff2c789ae145b22347dd629
+evidence/patches/render04-p0-i05-gpui-resolution-adjustment.patch sha256=a775dc0a57641d5dd5a9eade101199c0200bce1b92c22ff77d8a6c915e15fc17
+evidence/patches/render04-p0-i05-shelly.patch sha256=3a49ca66cadf95be286a4fcca7938d6aefcbbbedf93c1ce83a5f94dede2d967c
+
+STOCK RESTORATION GATES
+cargo fmt --check PASS
+cargo check --locked PASS
+cargo test --locked render_lab PASS
+TESTS 37 passed; 0 failed; 0 ignored; 0 measured; 141 filtered out
+git diff --check PASS
+jq empty evidence/runs/render04-p0-i05.json PASS
+git diff -- Shelly.Ui.Gpui/Cargo.toml Shelly.Ui.Gpui/Cargo.lock NO DIFF
+patch --dry-run GPUI hook PASS
+patch --dry-run GPUI resolution adjustment PASS
+patch --dry-run Shelly consumer PASS
