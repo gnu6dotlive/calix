@@ -25,27 +25,13 @@ cli() { XDG_RUNTIME_DIR="$RUNTIME_DIR" "$SHELLY_BIN" "$@"; }
 window_address() {
   hyprctl clients -j | jq -r 'map(select(.class=="shelly-gpui" and .mapped == true and .xwayland == false)) | if length == 1 then .[0].address else empty end'
 }
-focus_window() {
+raise_window() {
   local address="$1"
-  hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })" >/dev/null || {
-    echo "WINDOW_FOCUS_FAILED address=$address"
-    exit 1
-  }
   hyprctl dispatch "hl.dsp.window.alter_zorder({ window = \"address:$address\", mode = \"top\" })" >/dev/null || {
     echo "WINDOW_RAISE_FAILED address=$address"
     exit 1
   }
   sleep 0.2
-  local active
-  active="$(hyprctl activewindow -j)"
-  local active_address active_class active_xwayland
-  active_address="$(printf '%s' "$active" | jq -r '.address')"
-  active_class="$(printf '%s' "$active" | jq -r '.class')"
-  active_xwayland="$(printf '%s' "$active" | jq -r '.xwayland')"
-  [ "$active_address" = "$address" ] && [ "$active_class" = "shelly-gpui" ] && [ "$active_xwayland" = "false" ] || {
-    echo "WINDOW_FOCUS_ASSERTION_FAILED target=$address active=$active_address"
-    exit 1
-  }
 }
 window_geom() {
   local address="$1"
@@ -64,14 +50,21 @@ assert_runtime_executable() {
   }
   printf '%s\n' "$pid"
 }
-assert_window() {
-  local address="$1" active active_address active_class active_xwayland
-  active="$(hyprctl activewindow -j)"
-  active_address="$(printf '%s' "$active" | jq -r '.address')"
-  active_class="$(printf '%s' "$active" | jq -r '.class')"
-  active_xwayland="$(printf '%s' "$active" | jq -r '.xwayland')"
-  [ "$active_address" = "$address" ] && [ "$active_class" = "shelly-gpui" ] && [ "$active_xwayland" = "false" ] || {
-    echo "ACTIVE_WINDOW_CHANGED target=$address active=$active_address"
+assert_visible_client() {
+  local address="$1" client monitor workspace active_workspace
+  client="$(hyprctl clients -j | jq -c --arg address "$address" '.[] | select(.address==$address)')"
+  [ -n "$client" ] || { echo "TARGET_CLIENT_MISSING address=$address"; exit 1; }
+  [ "$(printf '%s' "$client" | jq -r '.class')" = "shelly-gpui" ] || { echo "TARGET_CLASS_CHANGED address=$address"; exit 1; }
+  [ "$(printf '%s' "$client" | jq -r '.mapped')" = "true" ] || { echo "TARGET_NOT_MAPPED address=$address"; exit 1; }
+  [ "$(printf '%s' "$client" | jq -r '.hidden')" = "false" ] || { echo "TARGET_HIDDEN address=$address"; exit 1; }
+  [ "$(printf '%s' "$client" | jq -r '.visible')" = "true" ] || { echo "TARGET_NOT_VISIBLE address=$address"; exit 1; }
+  [ "$(printf '%s' "$client" | jq -r '.xwayland')" = "false" ] || { echo "TARGET_NOT_NATIVE_WAYLAND address=$address"; exit 1; }
+  monitor="$(printf '%s' "$client" | jq -r '.monitor')"
+  workspace="$(printf '%s' "$client" | jq -r '.workspace.id')"
+  active_workspace="$(hyprctl monitors -j | jq -r --argjson monitor "$monitor" '.[] | select(.id==$monitor) | .activeWorkspace.id')"
+  [ -n "$active_workspace" ] || { echo "TARGET_MONITOR_NOT_FOUND address=$address monitor=$monitor"; exit 1; }
+  [ "$workspace" = "$active_workspace" ] || {
+    echo "TARGET_WORKSPACE_NOT_VISIBLE address=$address workspace=$workspace active_workspace=$active_workspace monitor=$monitor"
     exit 1
   }
 }
@@ -89,7 +82,8 @@ sleep 2
 A0="$(active_of)"; [ "$A0" = "$FIXTURE" ] || { echo "ASSERT-PRE-FAILED want=$FIXTURE got=$A0"; exit 1; }
 ADDRESS="$(window_address)"; [ -n "$ADDRESS" ] || { echo "SHELLY_WINDOW_NOT_UNIQUE"; exit 1; }
 PID="$(assert_runtime_executable "$ADDRESS")"
-focus_window "$ADDRESS"
+assert_visible_client "$ADDRESS"
+raise_window "$ADDRESS"
 GEOM_A="$(window_geom "$ADDRESS")"; [ -n "$GEOM_A" ] || { echo "WINDOW-GEOMETRY-FAILED address=$ADDRESS"; exit 1; }
 GEOM="$GEOM_A"
 grim -g "$GEOM" "${OUT}.a.png" || exit 1
@@ -101,13 +95,13 @@ fi
 ROI_SIZE="$(echo "$RA" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f\"{d['w']}x{d['h']}\")")"
 [ -z "${EXPECTED_ROI:-}" ] || [ "$ROI_SIZE" = "$EXPECTED_ROI" ] || { echo "ROI-DIMENSION-MISMATCH expected=$EXPECTED_ROI actual=$ROI_SIZE"; exit 1; }
 A1="$(active_of)"; [ "$A1" = "$FIXTURE" ] || { echo "ASSERT-MID-FAILED want=$FIXTURE got=$A1"; exit 1; }
-assert_window "$ADDRESS"
+assert_visible_client "$ADDRESS"
 sleep 1
 GEOM_B="$(window_geom "$ADDRESS")"; [ "$GEOM_B" = "$GEOM_A" ] || { echo "WINDOW_GEOMETRY_CHANGED a=$GEOM_A b=$GEOM_B"; exit 1; }
 
 grim -g "$GEOM" "${OUT}.b.png" || exit 1
 A2="$(active_of)"; [ "$A2" = "$FIXTURE" ] || { echo "ASSERT-POST-FAILED want=$FIXTURE got=$A2"; exit 1; }
-assert_window "$ADDRESS"
+assert_visible_client "$ADDRESS"
 GEOM_POST="$(window_geom "$ADDRESS")"; [ "$GEOM_POST" = "$GEOM_A" ] || { echo "WINDOW_GEOMETRY_CHANGED a=$GEOM_A b=$GEOM_POST"; exit 1; }
 
 if ! RB="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.b.png" 2>/dev/null)"; then
