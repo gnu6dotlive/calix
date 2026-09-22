@@ -1,0 +1,49 @@
+{
+  "probe": "RENDER-04-P0-I04",
+  "status": [
+    "PUBLIC_HOST_INTEROP_BLOCKED",
+    "MINIMAL_GPUI_HOOK_IDENTIFIED",
+    "MEMORY_SHARING_ESTABLISHED_SYNC_BLOCKED"
+  ],
+  "base_commit": "2bd60d852637698fcf5321804190c695de0fa6d7",
+  "worktree_at_start": "clean",
+  "gpui": {
+    "version": "0.2.2",
+    "renderer_context_access": "NO",
+    "renderer_context_reuse": "NOT EXPRESSIBLE",
+    "external_texture_import": "PRIVATE_ONLY"
+  },
+  "compile_probes": [
+    {
+      "id": "I04-A01",
+      "attempt": "gpui::Window::renderer()",
+      "result": "COMPILE_BLOCKED",
+      "diagnostic": "no method named renderer found for mutable reference &mut gpui::Window"
+    },
+    {
+      "id": "I04-A02",
+      "attempt": "gpui::Window::gpu_context() from Element::paint",
+      "result": "COMPILE_BLOCKED",
+      "diagnostic": "no method named gpu_context found for mutable reference &mut gpui::Window"
+    }
+  ],
+  "external_blade": {
+    "export": "AVAILABLE",
+    "import_other_blade_context": "AVAILABLE",
+    "source": "Fd(Some(31))",
+    "export_device": "NVIDIA GeForce RTX 3070",
+    "import_device": "NVIDIA GeForce RTX 3070",
+    "gpui_import": "PRIVATE_ONLY",
+    "synchronization": "NOT_ESTABLISHED"
+  },
+  "integration_burden": {
+    "new_direct_dependencies": 0,
+    "new_retained_unsafe_blocks": 0,
+    "new_native_handles": 1,
+    "new_synchronization_primitives": 0,
+    "new_retained_lifetime_state": 0,
+    "renderer_fork": false
+  },
+  "minimal_missing_hook": "frame-scoped renderer-owned custom draw seam using GPUI's existing Blade context and active command encoding stage",
+  "next_probe": "RENDER-04-P0-I05"
+}

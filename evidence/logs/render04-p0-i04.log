@@ -1,0 +1,20 @@
+RENDER-04-P0-I04 evidence log
+============================
+
+base_commit=2bd60d852637698fcf5321804190c695de0fa6d7
+worktree_at_start=clean
+
+I04-A01 compile probe:
+error[E0599]: no method named `renderer` found for mutable reference `&mut gpui::Window` in the current scope
+
+I04-A02 compile probe:
+error[E0599]: no method named `gpu_context` found for mutable reference `&mut gpui::Window` in the current scope
+
+I04-C01 public Blade external memory runtime:
+EXPORTED_SOURCE=Fd(Some(31))
+EXPORT_DEVICE=DeviceInformation { is_software_emulated: false, device_name: "NVIDIA GeForce RTX 3070", driver_name: "NVIDIA", driver_info: "615.71.09" }
+IMPORT_DEVICE=DeviceInformation { is_software_emulated: false, device_name: "NVIDIA GeForce RTX 3070", driver_name: "NVIDIA", driver_info: "615.71.09" }
+IMPORTED_SOURCE=Some(Fd(Some(31)))
+
+No GPUI import or synchronization was attempted after the public-boundary audit.
+Temporary probe sources were deleted after evidence capture.
