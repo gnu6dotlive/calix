@@ -22,7 +22,6 @@ OUT="$2"
 TOOLS="$(cd "$(dirname "$0")" && pwd)"
 
 cli() { XDG_RUNTIME_DIR="$RUNTIME_DIR" "$SHELLY_BIN" "$@"; }
-park() { hyprctl eval 'return hl.dispatch(hl.dsp.cursor.move({x=50, y=50}))' >/dev/null 2>&1; }
 window_address() {
   hyprctl clients -j | jq -r 'map(select(.class=="shelly-gpui" and .mapped == true and .xwayland == false)) | if length == 1 then .[0].address else empty end'
 }
@@ -87,7 +86,6 @@ sleep 4
 A0="$(active_of)"; [ "$A0" = "$FIXTURE" ] || { echo "ASSERT-PRE-FAILED want=$FIXTURE got=$A0"; exit 1; }
 ADDRESS="$(window_address)"; [ -n "$ADDRESS" ] || { echo "SHELLY_WINDOW_NOT_UNIQUE"; exit 1; }
 assert_runtime_executable "$ADDRESS"
-park; sleep 1
 focus_window "$ADDRESS"
 GEOM_A="$(window_geom "$ADDRESS")"; [ -n "$GEOM_A" ] || { echo "WINDOW-GEOMETRY-FAILED address=$ADDRESS"; exit 1; }
 GEOM="$GEOM_A"
