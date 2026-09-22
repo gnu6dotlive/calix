@@ -23,35 +23,10 @@ TOOLS="$(cd "$(dirname "$0")" && pwd)"
 
 cli() { XDG_RUNTIME_DIR="$RUNTIME_DIR" "$SHELLY_BIN" "$@"; }
 window_address() {
-  hyprctl clients -j | jq -r 'map(select(.class=="shelly-gpui" and .mapped == true and .xwayland == false)) | if length == 1 then .[0].address else empty end'
+  hyprctl clients -j | jq -r 'map(select(.class=="shelly-gpui")) | if length == 1 then .[0].address else empty end'
 }
-raise_window() {
-  local address="$1"
-  hyprctl dispatch "hl.dsp.window.alter_zorder({ window = \"address:$address\", mode = \"top\" })" >/dev/null || {
-    echo "WINDOW_RAISE_FAILED address=$address"
-    exit 1
-  }
-  sleep 0.2
-}
-window_geom() {
-  local address="$1"
-  hyprctl clients -j | jq -r --arg address "$address" 'map(select(.address==$address and .class=="shelly-gpui" and .mapped == true and .xwayland == false)) | if length == 1 then (.[0].at[0] | tostring) + "," + (.[0].at[1] | tostring) + " " + (.[0].size[0] | tostring) + "x" + (.[0].size[1] | tostring) else empty end'
-}
-assert_runtime_executable() {
-  local address="$1"
-  local pid exe expected
-  pid="$(hyprctl clients -j | jq -r --arg address "$address" '.[] | select(.address==$address) | .pid')"
-  [ -n "$pid" ] || { echo "RUNTIME_PID_NOT_FOUND address=$address"; exit 1; }
-  exe="$(readlink -f "/proc/$pid/exe")"
-  expected="$(readlink -f "$SHELLY_BIN")"
-  [ "$exe" = "$expected" ] || {
-    echo "RUNTIME_EXECUTABLE_MISMATCH pid=$pid expected=$expected actual=$exe"
-    exit 1
-  }
-  printf '%s\n' "$pid"
-}
-assert_visible_client() {
-  local address="$1" client monitor workspace active_workspace
+assert_target_client() {
+  local address="$1" client pid exe expected
   client="$(hyprctl clients -j | jq -c --arg address "$address" '.[] | select(.address==$address)')"
   [ -n "$client" ] || { echo "TARGET_CLIENT_MISSING address=$address"; exit 1; }
   [ "$(printf '%s' "$client" | jq -r '.class')" = "shelly-gpui" ] || { echo "TARGET_CLASS_CHANGED address=$address"; exit 1; }
@@ -59,14 +34,24 @@ assert_visible_client() {
   [ "$(printf '%s' "$client" | jq -r '.hidden')" = "false" ] || { echo "TARGET_HIDDEN address=$address"; exit 1; }
   [ "$(printf '%s' "$client" | jq -r '.visible')" = "true" ] || { echo "TARGET_NOT_VISIBLE address=$address"; exit 1; }
   [ "$(printf '%s' "$client" | jq -r '.xwayland')" = "false" ] || { echo "TARGET_NOT_NATIVE_WAYLAND address=$address"; exit 1; }
-  monitor="$(printf '%s' "$client" | jq -r '.monitor')"
-  workspace="$(printf '%s' "$client" | jq -r '.workspace.id')"
-  active_workspace="$(hyprctl monitors -j | jq -r --argjson monitor "$monitor" '.[] | select(.id==$monitor) | .activeWorkspace.id')"
-  [ -n "$active_workspace" ] || { echo "TARGET_MONITOR_NOT_FOUND address=$address monitor=$monitor"; exit 1; }
-  [ "$workspace" = "$active_workspace" ] || {
-    echo "TARGET_WORKSPACE_NOT_VISIBLE address=$address workspace=$workspace active_workspace=$active_workspace monitor=$monitor"
+  pid="$(printf '%s' "$client" | jq -r '.pid')"
+  exe="$(readlink -f "/proc/$pid/exe")"
+  expected="$(readlink -f "$SHELLY_BIN")"
+  [ "$exe" = "$expected" ] || {
+    echo "RUNTIME_EXECUTABLE_MISMATCH pid=$pid expected=$expected actual=$exe"
     exit 1
   }
+  STABLE_ID="$(printf '%s' "$client" | jq -r '.stableId')"
+  [ -n "$STABLE_ID" ] && [ "$STABLE_ID" != "null" ] || { echo "SHELLY_STABLE_ID_ABSENT address=$address"; exit 1; }
+  printf '%s\n' "$pid"
+}
+assert_same_target() {
+  local address="$1" current pid exe stable_id
+  current="$(hyprctl clients -j | jq -c --arg address "$address" '.[] | select(.address==$address)')"
+  [ -n "$current" ] || { echo "TARGET_CLIENT_MISSING address=$address"; exit 1; }
+  [ "$(printf '%s' "$current" | jq -r '.pid')" = "$PID" ] || { echo "TARGET_PID_CHANGED address=$address"; exit 1; }
+  [ "$(printf '%s' "$current" | jq -r '.stableId')" = "$STABLE_ID" ] || { echo "TARGET_STABLE_ID_CHANGED address=$address"; exit 1; }
+  assert_target_client "$address" >/dev/null
 }
 
 active_of() {
@@ -81,31 +66,25 @@ sleep 2
 
 A0="$(active_of)"; [ "$A0" = "$FIXTURE" ] || { echo "ASSERT-PRE-FAILED want=$FIXTURE got=$A0"; exit 1; }
 ADDRESS="$(window_address)"; [ -n "$ADDRESS" ] || { echo "SHELLY_WINDOW_NOT_UNIQUE"; exit 1; }
-PID="$(assert_runtime_executable "$ADDRESS")"
-assert_visible_client "$ADDRESS"
-raise_window "$ADDRESS"
-GEOM_A="$(window_geom "$ADDRESS")"; [ -n "$GEOM_A" ] || { echo "WINDOW-GEOMETRY-FAILED address=$ADDRESS"; exit 1; }
-GEOM="$GEOM_A"
-grim -g "$GEOM" "${OUT}.a.png" || exit 1
+PID="$(assert_target_client "$ADDRESS")"
+grim -T "$STABLE_ID" "${OUT}.a.png" || exit 1
 
 if ! RA="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.a.png" 2>/dev/null)"; then
-  echo "VISIBLE_RENDER_LAB_NOT_ESTABLISHED capture=${OUT}.a.png target_window=$ADDRESS geometry=$GEOM"
+  echo "VISIBLE_RENDER_LAB_NOT_ESTABLISHED capture=${OUT}.a.png target_window=$ADDRESS stable_id=$STABLE_ID"
   exit 1
 fi
 ROI_SIZE="$(echo "$RA" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f\"{d['w']}x{d['h']}\")")"
 [ -z "${EXPECTED_ROI:-}" ] || [ "$ROI_SIZE" = "$EXPECTED_ROI" ] || { echo "ROI-DIMENSION-MISMATCH expected=$EXPECTED_ROI actual=$ROI_SIZE"; exit 1; }
 A1="$(active_of)"; [ "$A1" = "$FIXTURE" ] || { echo "ASSERT-MID-FAILED want=$FIXTURE got=$A1"; exit 1; }
-assert_visible_client "$ADDRESS"
+assert_same_target "$ADDRESS"
 sleep 1
-GEOM_B="$(window_geom "$ADDRESS")"; [ "$GEOM_B" = "$GEOM_A" ] || { echo "WINDOW_GEOMETRY_CHANGED a=$GEOM_A b=$GEOM_B"; exit 1; }
 
-grim -g "$GEOM" "${OUT}.b.png" || exit 1
+grim -T "$STABLE_ID" "${OUT}.b.png" || exit 1
 A2="$(active_of)"; [ "$A2" = "$FIXTURE" ] || { echo "ASSERT-POST-FAILED want=$FIXTURE got=$A2"; exit 1; }
-assert_visible_client "$ADDRESS"
-GEOM_POST="$(window_geom "$ADDRESS")"; [ "$GEOM_POST" = "$GEOM_A" ] || { echo "WINDOW_GEOMETRY_CHANGED a=$GEOM_A b=$GEOM_POST"; exit 1; }
+assert_same_target "$ADDRESS"
 
 if ! RB="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.b.png" 2>/dev/null)"; then
-  echo "VISIBLE_RENDER_LAB_NOT_ESTABLISHED capture=${OUT}.b.png target_window=$ADDRESS geometry=$GEOM"
+  echo "VISIBLE_RENDER_LAB_NOT_ESTABLISHED capture=${OUT}.b.png target_window=$ADDRESS stable_id=$STABLE_ID"
   exit 1
 fi
 [ "$RA" = "$RB" ] || { echo "ROI-MISMATCH a=$RA b=$RB"; exit 1; }
@@ -132,13 +111,14 @@ manifest = dict(base)
 manifest['roi'] = cmp['roi']
 manifest['pixel_sha256'] = cmp['a']
 manifest['runs_identical'] = cmp['identical']
-manifest['window_geom'] = '$GEOM'
 manifest['compositor_scale'] = 1
 manifest['runtime_commit'] = '${RUNTIME_COMMIT:-unknown}'
 manifest['capture_harness_commit'] = '$(git -C "$TOOLS/../../../../" rev-parse HEAD 2>/dev/null || printf unknown)'
 manifest['package_version'] = '${PACKAGE_VERSION:-unknown}'
 manifest['window_address'] = '$ADDRESS'
 manifest['window_pid'] = int('$PID')
+manifest['stable_id'] = '$STABLE_ID'
+manifest['capture_backend'] = 'grim-toplevel'
 manifest['xwayland'] = False
 json.dump(manifest, open('$OUT.manifest.json', 'w'), indent=2)
 "
