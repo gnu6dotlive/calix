@@ -1,18 +1,22 @@
-RENDER-04-P0-I03 runtime log
-============================
+RENDER-04-P0-I03 normalized exact-commit runtime log
+====================================================
 
 command: cargo run --example render04_p0_i03_blade_readback --locked
 binary: /mnt/workbench/target/debug/examples/render04_p0_i03_blade_readback
+commit: c8c6c577fb1eb71464c8db5732ff258a6fe3aa43
+worktree: clean
 exit: 0
 
 CPU_READBACK_PRESENTATION_READY
 bytes_copied=256
-encode_submit_micros=159283
-completion_readback_micros=159425
-total_micros=159848
+elapsed_to_submit_micros=244461
+elapsed_to_readback_micros=244596
+elapsed_to_image_micros=245247
+timing_semantics=cumulative from one-shot start; not independent phase durations
 sample=(0, 0) rgba=[16, 16, 64, 255]
 sample=(4, 4) rgba=[143, 143, 64, 255]
 sample=(7, 7) rgba=[239, 239, 64, 255]
 image_bytes=256
 
+presentation capture: /mnt/workbench/pkgbuild/render-04-p0-i03-exact/render-lab.png
 compile/test note: proc-macro-error2 v2.0.1 emitted the known future-incompatibility warning; no warning suppression or dependency upgrade was performed.

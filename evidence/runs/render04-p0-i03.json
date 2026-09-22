@@ -2,7 +2,8 @@
   "probe": "RENDER-04-P0-I03",
   "status": "CPU_READBACK_PRESENTATION_ESTABLISHED",
   "gpu_native": "GPU_NATIVE_INTEROP_BLOCKED",
-  "pre_commit_head": "9b12b4e280df667a20d4d450985ce3bf623351fc",
+  "runtime_commit": "c8c6c577fb1eb71464c8db5732ff258a6fe3aa43",
+  "runtime_worktree": "clean",
   "renderer": {
     "crate": "blade-graphics",
     "version": "0.7.1",
@@ -22,16 +23,17 @@
       {"x": 4, "y": 4, "rgba": [143, 143, 64, 255]},
       {"x": 7, "y": 7, "rgba": [239, 239, 64, 255]}
     ],
-    "encode_submit_micros": 159283,
-    "completion_readback_micros": 159425,
-    "total_micros": 159848
+    "elapsed_to_submit_micros": 244461,
+    "elapsed_to_readback_micros": 244596,
+    "elapsed_to_image_micros": 245247,
+    "timing_semantics": "cumulative from one-shot start; not independent phase durations"
   },
   "gpui": {
     "image": "RenderImage from CPU RgbaImage",
     "fixture": "experiment.render04-i03-shader-present",
     "presentation": "PASS",
     "native_wayland": true,
-    "capture": "/mnt/workbench/pkgbuild/render-04-p0-i03/render-lab-final.png"
+    "capture": "/mnt/workbench/pkgbuild/render-04-p0-i03-exact/render-lab.png"
   },
   "commands": [
     "cargo fmt --check",

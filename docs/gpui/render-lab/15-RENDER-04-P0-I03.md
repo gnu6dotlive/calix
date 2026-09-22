@@ -116,9 +116,10 @@ Result:
 ```text
 CPU_READBACK_PRESENTATION_READY
 bytes_copied=256
-encode_submit_micros=159283
-completion_readback_micros=159425
-total_micros=159848
+elapsed_to_submit_micros=244461
+elapsed_to_readback_micros=244596
+elapsed_to_image_micros=245247
+timing_semantics=cumulative from one-shot start; not independent phase durations
 image_bytes=256
 exit code: 0
 ```
@@ -133,8 +134,9 @@ Runtime binary:
 /mnt/workbench/target/debug/examples/render04_p0_i03_blade_readback
 ```
 
-The Shelly presentation run used the current checkout before the I03 commit,
-with native Wayland confirmed by the mapped `shelly-gpui` client (`xwayland: false`).
+The normalized Shelly presentation run used clean commit
+`c8c6c577fb1eb71464c8db5732ff258a6fe3aa43`, with native Wayland confirmed by
+the mapped `shelly-gpui` client (`xwayland: false`).
 
 ## Pixel Provenance Evidence
 
@@ -160,10 +162,10 @@ hard-coded image or external PNG.
 
 ## Presentation Evidence
 
-Capture:
+Capture from the exact commit:
 
 ```text
-/mnt/workbench/pkgbuild/render-04-p0-i03/render-lab-final.png
+/mnt/workbench/pkgbuild/render-04-p0-i03-exact/render-lab.png
 ```
 
 The native Wayland Shelly window visibly contains the UV gradient under the
@@ -176,13 +178,15 @@ substituted for a canonical fixture.
 ```text
 render target: 8x8 Rgba8Unorm
 CPU bytes copied: 256
-encode + submit measurement: 159283 us
-completion + readback measurement: 159425 us
-total one-shot measurement: 159848 us
+elapsed from start through encode + submit: 244461 us
+elapsed from start through completion + readback: 244596 us
+elapsed from start through image construction: 245247 us
 ```
 
-The measurements include initialization and are coarse infrastructure data,
-not a performance claim. Optimization is out of scope.
+These are cumulative timestamps from the start of the one-shot, not independent
+phase durations. They include context, shader, pipeline, target, and buffer
+initialization and are coarse infrastructure data, not a performance claim.
+I04 must use phase deltas for cost comparisons. Optimization is out of scope.
 
 ## Observed Constraints
 
