@@ -1,18 +1,19 @@
 #!/usr/bin/env bash
 # RENDER-01 evidence capture for one fixture.
 #
-# Hardened protocol (shared-display safe):
-#   1. select fixture, assert active via status before AND after each capture
-#   2. park cursor out of the way before each capture
-#   3. capture twice back-to-back, locate fiducial ROI in EACH capture
-#   4. require identical ROIs and identical pixel hashes, else FAIL loudly
+# Passive repeat protocol (shared-display safe):
+#   1. select fixture and prepare the exact native window once
+#   2. capture A, then make read-only assertions only
+#   3. capture B, locate fiducial ROI in EACH capture
+#   4. require unchanged fixture/window/geometry and identical pixel hashes
 #   5. emit <out>.roi.png + <out>.manifest.json
 #
 # Env:
 #   SHELLY_BIN       shelly-gpui binary (required)
 #   RUNTIME_DIR      XDG_RUNTIME_DIR of the lab instance (required)
-#   WIN_GEOM         deprecated; observed geometry is always read from Hyprland
 #   EXPECTED_ROI     optional exact ROI dimensions "WxH" (fails on mismatch)
+#   RUNTIME_COMMIT   exact runtime source commit recorded in the manifest
+#   PACKAGE_VERSION  exact package version recorded in the manifest
 #
 # Usage: capture_fixture.sh <fixture-id> <out-prefix>
 set -u
@@ -48,7 +49,31 @@ focus_window() {
   }
 }
 window_geom() {
-  hyprctl clients -j | jq -r 'map(select(.class=="shelly-gpui" and .mapped == true and .xwayland == false)) | if length == 1 then (.[0].at[0] | tostring) + "," + (.[0].at[1] | tostring) + " " + (.[0].size[0] | tostring) + "x" + (.[0].size[1] | tostring) else empty end'
+  local address="$1"
+  hyprctl clients -j | jq -r --arg address "$address" 'map(select(.address==$address and .class=="shelly-gpui" and .mapped == true and .xwayland == false)) | if length == 1 then (.[0].at[0] | tostring) + "," + (.[0].at[1] | tostring) + " " + (.[0].size[0] | tostring) + "x" + (.[0].size[1] | tostring) else empty end'
+}
+assert_runtime_executable() {
+  local address="$1"
+  local pid exe expected
+  pid="$(hyprctl clients -j | jq -r --arg address "$address" '.[] | select(.address==$address) | .pid')"
+  [ -n "$pid" ] || { echo "RUNTIME_PID_NOT_FOUND address=$address"; exit 1; }
+  exe="$(readlink -f "/proc/$pid/exe")"
+  expected="$(readlink -f "$SHELLY_BIN")"
+  [ "$exe" = "$expected" ] || {
+    echo "RUNTIME_EXECUTABLE_MISMATCH pid=$pid expected=$expected actual=$exe"
+    exit 1
+  }
+}
+assert_window() {
+  local address="$1" active active_address active_class active_xwayland
+  active="$(hyprctl activewindow -j)"
+  active_address="$(printf '%s' "$active" | jq -r '.address')"
+  active_class="$(printf '%s' "$active" | jq -r '.class')"
+  active_xwayland="$(printf '%s' "$active" | jq -r '.xwayland')"
+  [ "$active_address" = "$address" ] && [ "$active_class" = "shelly-gpui" ] && [ "$active_xwayland" = "false" ] || {
+    echo "ACTIVE_WINDOW_CHANGED target=$address active=$active_address"
+    exit 1
+  }
 }
 
 active_of() {
@@ -61,17 +86,21 @@ sleep 4
 
 A0="$(active_of)"; [ "$A0" = "$FIXTURE" ] || { echo "ASSERT-PRE-FAILED want=$FIXTURE got=$A0"; exit 1; }
 ADDRESS="$(window_address)"; [ -n "$ADDRESS" ] || { echo "SHELLY_WINDOW_NOT_UNIQUE"; exit 1; }
+assert_runtime_executable "$ADDRESS"
 park; sleep 1
 focus_window "$ADDRESS"
-GEOM="$(window_geom)"; [ -n "$GEOM" ] || { echo "WINDOW-GEOMETRY-FAILED address=$ADDRESS"; exit 1; }
+GEOM_A="$(window_geom "$ADDRESS")"; [ -n "$GEOM_A" ] || { echo "WINDOW-GEOMETRY-FAILED address=$ADDRESS"; exit 1; }
+GEOM="$GEOM_A"
 grim -g "$GEOM" "${OUT}.a.png" || exit 1
 A1="$(active_of)"; [ "$A1" = "$FIXTURE" ] || { echo "ASSERT-MID-FAILED want=$FIXTURE got=$A1"; exit 1; }
+assert_window "$ADDRESS"
+sleep 1
+GEOM_B="$(window_geom "$ADDRESS")"; [ "$GEOM_B" = "$GEOM_A" ] || { echo "WINDOW_GEOMETRY_CHANGED a=$GEOM_A b=$GEOM_B"; exit 1; }
 
-park; sleep 1
-focus_window "$ADDRESS"
-GEOM="$(window_geom)"; [ -n "$GEOM" ] || { echo "WINDOW-GEOMETRY-FAILED address=$ADDRESS"; exit 1; }
 grim -g "$GEOM" "${OUT}.b.png" || exit 1
 A2="$(active_of)"; [ "$A2" = "$FIXTURE" ] || { echo "ASSERT-POST-FAILED want=$FIXTURE got=$A2"; exit 1; }
+assert_window "$ADDRESS"
+GEOM_POST="$(window_geom "$ADDRESS")"; [ "$GEOM_POST" = "$GEOM_A" ] || { echo "WINDOW_GEOMETRY_CHANGED a=$GEOM_A b=$GEOM_POST"; exit 1; }
 
 if ! RA="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.a.png")"; then
   echo "FIDUCIAL_NOT_FOUND capture=${OUT}.a.png target_window=$ADDRESS geometry=$GEOM"
@@ -107,6 +136,9 @@ manifest['pixel_sha256'] = cmp['a']
 manifest['runs_identical'] = cmp['identical']
 manifest['window_geom'] = '$GEOM'
 manifest['compositor_scale'] = 1
+manifest['runtime_commit'] = '${RUNTIME_COMMIT:-unknown}'
+manifest['capture_harness_commit'] = '$(git -C "$TOOLS/../../../../" rev-parse HEAD 2>/dev/null || printf unknown)'
+manifest['package_version'] = '${PACKAGE_VERSION:-unknown}'
 json.dump(manifest, open('$OUT.manifest.json', 'w'), indent=2)
 "
 rm -f "${OUT}.a.png" "${OUT}.b.png" "${OUT}.compare.json"
