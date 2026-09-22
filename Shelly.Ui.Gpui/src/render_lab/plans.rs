@@ -54,10 +54,13 @@ pub fn plan_for_recipe(recipe_id: &str) -> Option<RecipePlan> {
             .size_full()
             .solid(ColorSpec::rgb(0x12, 0x17, 0x1d))
             .center()
-            .child(RecipeNode::streamlines(
-                16,
-                1.2,
-                ColorSpec::hsla(196.0 / 360.0, 0.75, 0.65, 0.75),
+            .child(RecipeNode::direction_arrows(
+                5,
+                4.0,
+                ColorSpec::hsla(0.0, 0.0, 0.92, 0.72),
+                70.0,
+                24.0,
+                18.0,
             ))
             .build(),
 

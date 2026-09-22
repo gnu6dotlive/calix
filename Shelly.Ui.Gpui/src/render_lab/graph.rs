@@ -136,6 +136,14 @@ pub enum RecipeNode {
         stroke_width: f32,
         color: ColorSpec,
     },
+    DirectionArrows {
+        count: usize,
+        stroke_width: f32,
+        color: ColorSpec,
+        shaft_length: f32,
+        head_length: f32,
+        head_width: f32,
+    },
 }
 
 impl RecipeNode {
@@ -148,6 +156,24 @@ impl RecipeNode {
             lines,
             stroke_width,
             color,
+        }
+    }
+
+    pub fn direction_arrows(
+        count: usize,
+        stroke_width: f32,
+        color: ColorSpec,
+        shaft_length: f32,
+        head_length: f32,
+        head_width: f32,
+    ) -> Self {
+        Self::DirectionArrows {
+            count,
+            stroke_width,
+            color,
+            shaft_length,
+            head_length,
+            head_width,
         }
     }
 }
@@ -348,6 +374,9 @@ pub struct RecipeStructuralMetrics {
     pub texture_count: usize,
     pub texture_pixels: usize,
     pub texture_rgba_bytes: usize,
+    pub painted_paths: usize,
+    pub path_segments: usize,
+    pub sampled_points: usize,
 }
 
 fn measure_node(node: &RecipeNode, depth: usize, metrics: &mut RecipeStructuralMetrics) {
@@ -404,6 +433,15 @@ fn measure_node(node: &RecipeNode, depth: usize, metrics: &mut RecipeStructuralM
         }
         RecipeNode::Streamlines { lines, .. } => {
             metrics.expanded_ops += lines;
+            metrics.painted_paths += lines;
+            metrics.path_segments += lines * 119;
+            metrics.sampled_points += lines * 120;
+        }
+        RecipeNode::DirectionArrows { count, .. } => {
+            metrics.expanded_ops += count * 3;
+            metrics.painted_paths += count * 3;
+            metrics.path_segments += count * 3;
+            metrics.sampled_points += count * 6;
         }
     }
 }
@@ -424,6 +462,9 @@ pub fn compile_stock_gpui(plan: &RecipePlan) -> AnyElement {
             Action::Expand(node) => match node {
                 RecipeNode::Streamlines { .. } => {
                     results.push(compile_streamlines(node));
+                }
+                RecipeNode::DirectionArrows { .. } => {
+                    results.push(compile_direction_arrows(node));
                 }
                 RecipeNode::Rect {
                     fill: Some(FillSpec::Texture { .. }),
@@ -660,6 +701,68 @@ fn compile_streamlines(node: &RecipeNode) -> AnyElement {
                     }
                     if let Ok(built) = p.build() {
                         window.paint_path(built, c);
+                    }
+                }
+            },
+        )
+        .size_full()
+        .into_any_element()
+    } else {
+        unreachable!()
+    }
+}
+
+fn compile_direction_arrows(node: &RecipeNode) -> AnyElement {
+    if let RecipeNode::DirectionArrows {
+        count,
+        stroke_width,
+        color,
+        shaft_length,
+        head_length,
+        head_width,
+    } = node
+    {
+        let count = *count;
+        let sw = *stroke_width;
+        let c = color.to_gpui_hsla();
+        let shaft = *shaft_length;
+        let head = *head_length;
+        let head_width = *head_width;
+        canvas(
+            |_bounds, _window, _cx| {},
+            move |bounds, _, window, _cx| {
+                let w: f32 = bounds.size.width.into();
+                let h: f32 = bounds.size.height.into();
+                let ox: f32 = bounds.origin.x.into();
+                let oy: f32 = bounds.origin.y.into();
+                let spacing = w / (count.max(1) as f32 + 1.0);
+                let center_y = oy + h * 0.5;
+                for index in 0..count {
+                    let center_x = ox + spacing * (index as f32 + 1.0);
+                    let tip_x = center_x + shaft * 0.5;
+                    let base_x = tip_x - head;
+                    let shaft_start = center_x - shaft * 0.5;
+                    let mut paths = [
+                        (
+                            point(px(shaft_start), px(center_y)),
+                            point(px(base_x), px(center_y)),
+                        ),
+                        (
+                            point(px(base_x), px(center_y - head_width)),
+                            point(px(tip_x), px(center_y)),
+                        ),
+                        (
+                            point(px(base_x), px(center_y + head_width)),
+                            point(px(tip_x), px(center_y)),
+                        ),
+                    ];
+                    for (start, end) in &mut paths {
+                        let mut path = PathBuilder::stroke(px(sw));
+                        path.move_to(*start);
+                        path.line_to(*end);
+                        if let Ok(built) = path.build() {
+                            window.paint_path(built, c);
+                        }
                     }
                 }
             },
