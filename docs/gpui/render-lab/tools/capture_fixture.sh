@@ -62,6 +62,7 @@ assert_runtime_executable() {
     echo "RUNTIME_EXECUTABLE_MISMATCH pid=$pid expected=$expected actual=$exe"
     exit 1
   }
+  printf '%s\n' "$pid"
 }
 assert_window() {
   local address="$1" active active_address active_class active_xwayland
@@ -80,16 +81,25 @@ active_of() {
 }
 
 echo "--- capture: $FIXTURE ---"
+cli render-lab open >/dev/null 2>&1 || { echo "OPEN-FAILED"; exit 1; }
+sleep 2
 cli render-lab fixture "$FIXTURE" >/dev/null 2>&1 || { echo "SELECT-FAILED $FIXTURE"; exit 1; }
-sleep 4
+sleep 2
 
 A0="$(active_of)"; [ "$A0" = "$FIXTURE" ] || { echo "ASSERT-PRE-FAILED want=$FIXTURE got=$A0"; exit 1; }
 ADDRESS="$(window_address)"; [ -n "$ADDRESS" ] || { echo "SHELLY_WINDOW_NOT_UNIQUE"; exit 1; }
-assert_runtime_executable "$ADDRESS"
+PID="$(assert_runtime_executable "$ADDRESS")"
 focus_window "$ADDRESS"
 GEOM_A="$(window_geom "$ADDRESS")"; [ -n "$GEOM_A" ] || { echo "WINDOW-GEOMETRY-FAILED address=$ADDRESS"; exit 1; }
 GEOM="$GEOM_A"
 grim -g "$GEOM" "${OUT}.a.png" || exit 1
+
+if ! RA="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.a.png" 2>/dev/null)"; then
+  echo "VISIBLE_RENDER_LAB_NOT_ESTABLISHED capture=${OUT}.a.png target_window=$ADDRESS geometry=$GEOM"
+  exit 1
+fi
+ROI_SIZE="$(echo "$RA" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f\"{d['w']}x{d['h']}\")")"
+[ -z "${EXPECTED_ROI:-}" ] || [ "$ROI_SIZE" = "$EXPECTED_ROI" ] || { echo "ROI-DIMENSION-MISMATCH expected=$EXPECTED_ROI actual=$ROI_SIZE"; exit 1; }
 A1="$(active_of)"; [ "$A1" = "$FIXTURE" ] || { echo "ASSERT-MID-FAILED want=$FIXTURE got=$A1"; exit 1; }
 assert_window "$ADDRESS"
 sleep 1
@@ -100,12 +110,8 @@ A2="$(active_of)"; [ "$A2" = "$FIXTURE" ] || { echo "ASSERT-POST-FAILED want=$FI
 assert_window "$ADDRESS"
 GEOM_POST="$(window_geom "$ADDRESS")"; [ "$GEOM_POST" = "$GEOM_A" ] || { echo "WINDOW_GEOMETRY_CHANGED a=$GEOM_A b=$GEOM_POST"; exit 1; }
 
-if ! RA="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.a.png")"; then
-  echo "FIDUCIAL_NOT_FOUND capture=${OUT}.a.png target_window=$ADDRESS geometry=$GEOM"
-  exit 1
-fi
-if ! RB="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.b.png")"; then
-  echo "FIDUCIAL_NOT_FOUND capture=${OUT}.b.png target_window=$ADDRESS geometry=$GEOM"
+if ! RB="$(python3 "$TOOLS/roi_hash.py" locate "${OUT}.b.png" 2>/dev/null)"; then
+  echo "VISIBLE_RENDER_LAB_NOT_ESTABLISHED capture=${OUT}.b.png target_window=$ADDRESS geometry=$GEOM"
   exit 1
 fi
 [ "$RA" = "$RB" ] || { echo "ROI-MISMATCH a=$RA b=$RB"; exit 1; }
@@ -137,6 +143,9 @@ manifest['compositor_scale'] = 1
 manifest['runtime_commit'] = '${RUNTIME_COMMIT:-unknown}'
 manifest['capture_harness_commit'] = '$(git -C "$TOOLS/../../../../" rev-parse HEAD 2>/dev/null || printf unknown)'
 manifest['package_version'] = '${PACKAGE_VERSION:-unknown}'
+manifest['window_address'] = '$ADDRESS'
+manifest['window_pid'] = int('$PID')
+manifest['xwayland'] = False
 json.dump(manifest, open('$OUT.manifest.json', 'w'), indent=2)
 "
 rm -f "${OUT}.a.png" "${OUT}.b.png" "${OUT}.compare.json"
