@@ -2,7 +2,7 @@
 
 You are taking over Shelly GPUI at:
 
-    tension-atoi/shelly-gpui
+    tension-atoi/calix
     main
     e43b03ffa4aaab5d99a151d6a2491370e1f65161
 
