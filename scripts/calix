@@ -51,8 +51,8 @@ EOF
 }
 
 count_entries() {
-  # Count JSON array/dict entries in a state file without pulling in python.
-  local file="$1" key="$2"
+  # Count JSON array/dict entries in a state file.
+  local file="$1"
   [ -f "$file" ] || { echo "0"; return; }
   "$PYTHON_BIN" -c "
 import json, sys
@@ -104,9 +104,14 @@ print(json.load(open('$CALIX_STATE/status.json')).get('timestamp','unknown'))
     echo "  Last State Sync:    · Never"
   fi
 
-  local timer_state
-  timer_state="$(systemctl --user is-enabled calix-sync.timer 2>/dev/null || echo disabled)"
-  echo "  calix-sync.timer:   · $timer_state"
+  local timer_enabled timer_active
+  timer_enabled="$(systemctl --user is-enabled calix-sync.timer 2>/dev/null || echo disabled)"
+  timer_active="$(systemctl --user is-active calix-sync.timer 2>/dev/null || echo inactive)"
+  if [ "$timer_enabled" = "enabled" ] && [ "$timer_active" = "active" ]; then
+    echo "  calix-sync.timer:   ✓ Enabled and active"
+  else
+    echo "  calix-sync.timer:   · $timer_enabled / $timer_active"
+  fi
   echo ""
 }
 
