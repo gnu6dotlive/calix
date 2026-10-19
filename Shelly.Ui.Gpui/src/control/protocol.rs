@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Control protocol version:
-/// - v1: Initial Shelly GPUI runtime control (navigation, search, view mode, inspection)
+/// - v1: Initial Calix GPUI runtime control (navigation, search, view mode, inspection)
 /// - v2: Render Lab baseline surface commands (open, fixture, material, topology, motion, quality, time, status)
 /// - v3: RenderLabStyle command & schema v2 manifest fields (recipe, seed, diagnostics) for RENDER-01 confrontation
 /// - v4: RenderLabMetrics, RenderLabRecipes, RenderLabRecipe for RENDER-02 structural telemetry
@@ -116,7 +116,7 @@ impl ControlStatus {
     pub fn not_running() -> Self {
         let exe = std::env::current_exe()
             .map(|p| p.to_string_lossy().to_string())
-            .unwrap_or_else(|_| "/usr/lib/shelly/shelly-gpui-bin".to_string());
+            .unwrap_or_else(|_| "/usr/lib/calix/calix-gpui".to_string());
         Self {
             protocol_version: CONTROL_PROTOCOL_VERSION,
             gui_running: false,
@@ -164,7 +164,7 @@ mod tests {
             protocol_version: CONTROL_PROTOCOL_VERSION,
             gui_running: true,
             pid: 12345,
-            executable: "/usr/lib/shelly/shelly-gpui-bin".to_string(),
+            executable: "/usr/lib/calix/calix-gpui".to_string(),
             destination: "browse".to_string(),
             query: "ripgrep".to_string(),
             view_mode: "table".to_string(),

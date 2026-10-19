@@ -236,7 +236,7 @@ impl SettingsView {
                                 .text_2xl()
                                 .font_weight(FontWeight::BOLD)
                                 .text_color(theme.text_primary)
-                                .child("Shelly Settings"),
+                                .child("Calix Settings"),
                         )
                         .child(if is_dirty {
                             div()

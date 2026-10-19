@@ -1,0 +1,17 @@
+[2026-10-19T15:47:00-0400] === Calix branding slice — live verification ===
+[2026-10-19T15:47:00-0400] branch: feature/calix-branding
+[2026-10-19T15:47:00-0400] cargo build --release  -> Finished `release` profile (23.60s), no crate warnings
+[2026-10-19T15:47:00-0400] cargo test  --release  -> 178 passed; 0 failed
+[2026-10-19T15:47:00-0400] binary: /mnt/sandbox/builds/cargo/release/calix-gpui
+[2026-10-19T15:47:00-0400] $ calix-gpui --version
+calix-gpui 0.1.0 (control protocol v4)
+[2026-10-19T15:47:00-0400] $ calix-gpui --help
+Calix GPUI — GPU-Accelerated Universal Package Manager
+Usage: calix-gpui [OPTIONS] [SUBCOMMAND]
+[2026-10-19T15:47:30-0400] $ calix-gpui focus
+Calix window focused
+[2026-10-19T15:47:30-0400] hyprctl clients -> class=calix-gpui mapped=True xwayland=False size=1041x1342
+[2026-10-19T15:48:00-0400] $ calix-gpui navigate browse
+Navigated to browse
+[2026-10-19T15:48:00-0400] grim capture -> settings-view.png, browse-view.png
+[2026-10-19T15:48:00-0400] observed: sidebar label "CALIX GPUI", page title "Calix Settings", search header "Unified Search in Calix"

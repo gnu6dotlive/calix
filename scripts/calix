@@ -111,16 +111,32 @@ print(json.load(open('$CALIX_STATE/status.json')).get('timestamp','unknown'))
 }
 
 cmd_gui() {
+  # Locate the Calix GPUI binary. The cargo target directory can be
+  # redirected by ~/.cargo/config.toml, so ask cargo rather than guessing.
+  local cargo_target=""
+  local manifest="$CALIX_HOME/Shelly.Ui.Gpui/Cargo.toml"
+  if command -v cargo >/dev/null 2>&1 && [ -f "$manifest" ]; then
+    cargo_target="$(cargo metadata --format-version 1 --no-deps \
+      --manifest-path "$manifest" 2>/dev/null \
+      | "$PYTHON_BIN" -c 'import json,sys; print(json.load(sys.stdin)["target_directory"])' \
+      2>/dev/null)"
+  fi
+
   local candidates=(
     "$CALIX_HOME/Shelly.Ui.Gpui/target/release/calix-gpui"
-    "$CALIX_HOME/Shelly.Ui.Gpui/target/release/shelly-gpui"
+    "${cargo_target:+$cargo_target/release/calix-gpui}"
+    "/usr/lib/calix/calix-gpui"
+    "/usr/bin/calix-gpui"
   )
   for candidate in "${candidates[@]}"; do
     if [ -x "$candidate" ]; then
       exec "$candidate" "$@"
     fi
   done
-  echo "No compiled Calix UI found — falling back to the system Shelly (Phase 7 pending)."
+
+  echo "No compiled Calix UI found. Build it with:" >&2
+  echo "  (cd $CALIX_HOME/Shelly.Ui.Gpui && cargo build --release)" >&2
+  echo "Falling back to the system Shelly (not the same product)." >&2
   exec /usr/bin/shelly "$@"
 }
 

@@ -9,7 +9,7 @@
 #   5. emit <out>.roi.png + <out>.manifest.json
 #
 # Env:
-#   SHELLY_BIN       shelly-gpui binary (required)
+#   SHELLY_BIN       calix-gpui binary (required)
 #   RUNTIME_DIR      XDG_RUNTIME_DIR of the lab instance (required)
 #   EXPECTED_ROI     optional exact ROI dimensions "WxH" (fails on mismatch)
 #   RUNTIME_COMMIT   exact runtime source commit recorded in the manifest
@@ -23,13 +23,13 @@ TOOLS="$(cd "$(dirname "$0")" && pwd)"
 
 cli() { XDG_RUNTIME_DIR="$RUNTIME_DIR" "$SHELLY_BIN" "$@"; }
 window_address() {
-  hyprctl clients -j | jq -r 'map(select(.class=="shelly-gpui")) | if length == 1 then .[0].address else empty end'
+  hyprctl clients -j | jq -r 'map(select(.class=="calix-gpui")) | if length == 1 then .[0].address else empty end'
 }
 assert_target_client() {
   local address="$1" client pid exe expected
   client="$(hyprctl clients -j | jq -c --arg address "$address" '.[] | select(.address==$address)')"
   [ -n "$client" ] || { echo "TARGET_CLIENT_MISSING address=$address"; exit 1; }
-  [ "$(printf '%s' "$client" | jq -r '.class')" = "shelly-gpui" ] || { echo "TARGET_CLASS_CHANGED address=$address"; exit 1; }
+  [ "$(printf '%s' "$client" | jq -r '.class')" = "calix-gpui" ] || { echo "TARGET_CLASS_CHANGED address=$address"; exit 1; }
   [ "$(printf '%s' "$client" | jq -r '.mapped')" = "true" ] || { echo "TARGET_NOT_MAPPED address=$address"; exit 1; }
   [ "$(printf '%s' "$client" | jq -r '.hidden')" = "false" ] || { echo "TARGET_HIDDEN address=$address"; exit 1; }
   [ "$(printf '%s' "$client" | jq -r '.visible')" = "true" ] || { echo "TARGET_NOT_VISIBLE address=$address"; exit 1; }

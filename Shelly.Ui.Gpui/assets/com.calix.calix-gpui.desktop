@@ -1,18 +1,18 @@
 [Desktop Entry]
 Type=Application
-Name=Shelly
-Name[fr]=Shelly
+Name=Calix
+Name[fr]=Calix
 GenericName=Package Manager
 GenericName[en]=Package Manager
 GenericName[fr]=Gestionnaire de paquets Arch Linux
 Comment=Universal package manager for Arch Linux, AUR, Flatpak, and AppImage
 Comment[en]=Universal package manager for Arch Linux, AUR, Flatpak, and AppImage
 Comment[fr]=Gestionnaire de paquets universel pour Arch Linux, AUR, Flatpak et AppImage
-Exec=shelly-gpui
-Icon=shelly-gpui
+Exec=calix-gpui
+Icon=calix-gpui
 Terminal=false
 Categories=System;PackageManager;
-Keywords=pacman;package;manager;aur;flatpak;arch;linux;shelly;alpm;appimage;
-StartupWMClass=shelly-gpui
+Keywords=pacman;package;manager;aur;flatpak;arch;linux;calix;alpm;appimage;
+StartupWMClass=calix-gpui
 StartupNotify=true
 X-GNOME-UsesNotifications=false

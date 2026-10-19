@@ -1,9 +1,9 @@
 [package]
-name = "shelly-gpui"
+name = "calix-gpui"
 version = "0.1.0"
 edition = "2021"
 authors = ["Tension Atoi", "Seafoam Labs"]
-description = "High-performance GPU-accelerated package manager frontend for Shelly and Arch Linux"
+description = "High-performance GPU-accelerated package manager frontend for Calix and Arch Linux"
 license = "GPL-3.0-only"
 
 [dependencies]

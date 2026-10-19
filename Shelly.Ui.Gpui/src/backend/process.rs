@@ -11,7 +11,7 @@ pub fn runtime() -> &'static tokio::runtime::Runtime {
     TOKIO_RT.get_or_init(|| {
         tokio::runtime::Builder::new_multi_thread()
             .enable_all()
-            .thread_name("shelly-tokio-worker")
+            .thread_name("calix-tokio-worker")
             .build()
             .expect("Échec de l'initialisation du runtime Tokio")
     })

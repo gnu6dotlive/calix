@@ -72,5 +72,5 @@ body:
     id: logs
     attributes:
       label: Logs / Terminal Output
-      description: Run `RUST_LOG=debug shelly-gpui` or paste logs from the terminal drawer.
+      description: Run `RUST_LOG=debug calix-gpui` or paste logs from the terminal drawer.
       render: shell

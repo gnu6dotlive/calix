@@ -28,7 +28,7 @@ impl UnifiedSearch {
                     .font_weight(FontWeight::BOLD)
                     .text_color(theme.text_primary)
                     .mb_2()
-                    .child("Unified Search in Shelly"),
+                    .child("Unified Search in Calix"),
             )
             .child(
                 div()

@@ -396,7 +396,7 @@ impl LogDrawer {
                             .text_xs()
                             .font_weight(FontWeight::BOLD)
                             .text_color(theme.text_primary)
-                            .child("SHELLY OPERATION LOG"),
+                            .child("CALIX OPERATION LOG"),
                     )
                     .child(status_badge),
             )
@@ -507,7 +507,7 @@ impl LogDrawer {
                 log_content = log_content.child(
                     div()
                         .text_color(theme.text_muted)
-                        .child("No operation logs yet. Shelly stdout and stderr execution output will appear here."),
+                        .child("No operation logs yet. Calix stdout and stderr execution output will appear here."),
                 );
             } else {
                 for (idx, entry) in props.logs.iter().enumerate() {

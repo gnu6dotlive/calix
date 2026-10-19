@@ -419,15 +419,15 @@ impl WorkspaceView {
                 cx.activate(true);
                 if std::env::var("HYPRLAND_INSTANCE_SIGNATURE").is_ok() {
                     let _ = std::process::Command::new("hyprctl")
-                        .args(["dispatch", "focuswindow", "class:shelly-gpui"])
+                        .args(["dispatch", "focuswindow", "class:calix-gpui"])
                         .output();
                 }
-                ControlResponse::ok("Shelly window focused")
+                ControlResponse::ok("Calix window focused")
             }
             ControlCommand::Quit => {
                 crate::control::socket::ControlSocket::cleanup();
                 cx.quit();
-                ControlResponse::ok("Shelly GUI exiting")
+                ControlResponse::ok("Calix GUI exiting")
             }
             ControlCommand::Status => {
                 let session = self.session.read(cx);
@@ -438,7 +438,7 @@ impl WorkspaceView {
                     pid: std::process::id(),
                     executable: std::env::current_exe()
                         .map(|p| p.to_string_lossy().to_string())
-                        .unwrap_or_else(|_| "/usr/lib/shelly/shelly-gpui-bin".to_string()),
+                        .unwrap_or_else(|_| "/usr/lib/calix/calix-gpui".to_string()),
                     destination: session.destination.label().to_lowercase(),
                     query: session.search_query.clone(),
                     view_mode: match session.view_mode {
