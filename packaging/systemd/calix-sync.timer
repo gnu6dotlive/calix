@@ -1,0 +1,12 @@
+[Unit]
+Description=Calix Periodic Package State Sync Timer
+Documentation=file:///home/tension_atoi/Projects/calix/README.md
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=4h
+Persistent=true
+RandomizedDelaySec=5min
+
+[Install]
+WantedBy=timers.target

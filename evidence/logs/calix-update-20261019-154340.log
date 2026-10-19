@@ -1,0 +1,7 @@
+[2026-10-19T15:43:40-0400] update requested for 'artcraft-launcher' (repo=storytold/craft-launcher, canal=stable)
+[2026-10-19T15:43:40-0400] step probe -> ok {'releases': 10, 'provider': 'github'}
+[2026-10-19T15:43:40-0400] step resolve -> ok {'installed': '0.4.1', 'latest': '0.5.1'}
+[2026-10-19T15:43:41-0400] step updpkgsums -> ok {'returncode': 0}
+[2026-10-19T15:43:41-0400] known gap: upstream SHA256SUMS manifest found but no local artifact matched a declared PKGBUILD source name
+[2026-10-19T15:43:41-0400] PKGBUILD restored from backup
+[2026-10-19T15:43:41-0400] step dry-run -> ok {'pkgver': '0.5.1', 'pkgbuild_restored': True}

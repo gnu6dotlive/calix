@@ -1,0 +1,170 @@
+#!/usr/bin/env bash
+# calix — Universal package manager CLI for the gnosix desktop.
+#
+# Thin dispatcher over the Calix engine (scripts/calix-sync.py,
+# scripts/calix-release.py) plus health reporting.
+#
+# Installed to ~/.local/bin/calix as a symlink to this file so the CLI is
+# version-controlled alongside the engine it drives.
+
+set -u
+
+CALIX_HOME="${CALIX_HOME:-$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)}"
+CALIX_STATE="${XDG_STATE_HOME:-$HOME/.local/state}/calix"
+PYTHON_BIN="${CALIX_BIN:-/usr/bin/python3}"
+SYNC="$CALIX_HOME/scripts/calix-sync.py"
+RELEASE="$CALIX_HOME/scripts/calix-release.py"
+
+show_help() {
+  cat <<'EOF'
+🏺 Calix — Universal Package Manager (gnosix desktop)
+
+Usage:
+  calix <command> [options]
+
+Commands:
+  sync                 Synchronize real system state across all package channels:
+                       ALPM, AUR, AppImages, Cargo (~/.cargo/bin), NPM global,
+                       and tracked GitHub/GitLab/Gitea releases.
+  list [all|appimage|cargo|npm|alpm|releases]
+                       List installed packages in a unified table.
+  probe <repo_or_url> [--canal stable|beta|canary|nightly|all]
+                       Probe a repository's releases, channels and binary assets.
+  check                Check for pending updates across release-managed repositories.
+  update <package>     Build and install a newer release through its PKGBUILD
+                       (elevation via pkexec — never sudo).
+  registry [list|add|remove]
+                       Manage the set of release-tracked packages.
+  verify <package>     Audit a tracked package against its upstream release
+                       (version + checksum manifest).
+  health               Audit system health: pacman db.lck, conflicting notifiers.
+  gui                  Launch the GPU-accelerated Calix UI (GPUI/Blade).
+
+Options:
+  -j, --json           Structured JSON output (machine-readable for agents).
+  -h, --help           This help message.
+
+Environment:
+  CALIX_HOME           Repository root (default: parent of this script).
+  CALIX_BIN            Python interpreter (default: /usr/bin/python3).
+EOF
+}
+
+count_entries() {
+  # Count JSON array/dict entries in a state file without pulling in python.
+  local file="$1" key="$2"
+  [ -f "$file" ] || { echo "0"; return; }
+  "$PYTHON_BIN" -c "
+import json, sys
+try:
+    data = json.load(open(sys.argv[1]))
+except Exception:
+    print(0); sys.exit()
+if isinstance(data, dict):
+    print(len(data))
+elif isinstance(data, list):
+    print(len(data))
+else:
+    print(0)
+" "$file" 2>/dev/null || echo "0"
+}
+
+cmd_health() {
+  echo "🏺 Calix System Health Check — $(date -Is)"
+  echo ""
+
+  if [ -f /var/lib/pacman/db.lck ]; then
+    echo "  Pacman DB Lock:     ✗ LOCKED (/var/lib/pacman/db.lck exists)"
+  else
+    echo "  Pacman DB Lock:     ✓ Free"
+  fi
+
+  local cachy_state
+  cachy_state="$(systemctl --user is-active cachy-update.service 2>/dev/null || echo inactive)"
+  if [ "$cachy_state" = "active" ]; then
+    echo "  cachy-update:       ✗ Running (may contend for the pacman DB lock)"
+  else
+    echo "  cachy-update:       ✓ Inactive / clean"
+  fi
+
+  local appimage_count cargo_count
+  appimage_count="$(count_entries "$CALIX_STATE/appimages.json")"
+  cargo_count="$(count_entries "$CALIX_STATE/cargo.json")"
+  echo "  AppImages Indexed:  ✓ $appimage_count registered in state"
+  echo "  Cargo Crates:       ✓ $cargo_count crates registered"
+
+  if [ -f "$CALIX_STATE/status.json" ]; then
+    local ts
+    ts="$("$PYTHON_BIN" -c "
+import json
+print(json.load(open('$CALIX_STATE/status.json')).get('timestamp','unknown'))
+" 2>/dev/null || echo unknown)"
+    echo "  Last State Sync:    ✓ $ts"
+  else
+    echo "  Last State Sync:    · Never"
+  fi
+
+  local timer_state
+  timer_state="$(systemctl --user is-enabled calix-sync.timer 2>/dev/null || echo disabled)"
+  echo "  calix-sync.timer:   · $timer_state"
+  echo ""
+}
+
+cmd_gui() {
+  local candidates=(
+    "$CALIX_HOME/Shelly.Ui.Gpui/target/release/calix-gpui"
+    "$CALIX_HOME/Shelly.Ui.Gpui/target/release/shelly-gpui"
+  )
+  for candidate in "${candidates[@]}"; do
+    if [ -x "$candidate" ]; then
+      exec "$candidate" "$@"
+    fi
+  done
+  echo "No compiled Calix UI found — falling back to the system Shelly (Phase 7 pending)."
+  exec /usr/bin/shelly "$@"
+}
+
+case "${1:-help}" in
+  sync)
+    shift
+    exec "$PYTHON_BIN" "$SYNC" "$@"
+    ;;
+  probe)
+    shift
+    exec "$PYTHON_BIN" "$RELEASE" probe "$@"
+    ;;
+  check)
+    shift
+    exec "$PYTHON_BIN" "$RELEASE" check "$@"
+    ;;
+  update|upgrade)
+    shift
+    exec "$PYTHON_BIN" "$RELEASE" update "$@"
+    ;;
+  registry)
+    shift
+    exec "$PYTHON_BIN" "$RELEASE" registry "$@"
+    ;;
+  verify)
+    shift
+    exec "$PYTHON_BIN" "$RELEASE" verify "$@"
+    ;;
+  list)
+    shift
+    exec "$PYTHON_BIN" "$SYNC" list "${1:-all}"
+    ;;
+  health)
+    cmd_health
+    ;;
+  gui)
+    shift
+    cmd_gui "$@"
+    ;;
+  -h|--help|help)
+    show_help
+    ;;
+  *)
+    echo "Unknown command '$1'. Run 'calix --help' for usage." >&2
+    exit 1
+    ;;
+esac

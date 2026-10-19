@@ -1,0 +1,14 @@
+[Unit]
+Description=Calix Universal Package State Synchronizer
+Documentation=file:///home/tension_atoi/Projects/calix/README.md
+After=default.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/calix sync --quiet
+StandardOutput=journal
+StandardError=journal
+Nice=10
+
+[Install]
+WantedBy=default.target

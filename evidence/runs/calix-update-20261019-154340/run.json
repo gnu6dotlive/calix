@@ -1,0 +1,54 @@
+{
+  "run_id": "calix-update-20261019-154340",
+  "kind": "calix-update",
+  "status": "ok",
+  "started_at": "2026-10-19T19:43:40Z",
+  "finished_at": "2026-10-19T19:43:41Z",
+  "duration_ms": 1649,
+  "tool_version": "2.0.0",
+  "host": {
+    "kernel": "7.2.9-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "python": "3.14.8"
+  },
+  "steps": [
+    {
+      "name": "probe",
+      "status": "ok",
+      "at": "2026-10-19T19:43:40Z",
+      "releases": 10,
+      "provider": "github"
+    },
+    {
+      "name": "resolve",
+      "status": "ok",
+      "at": "2026-10-19T19:43:40Z",
+      "installed": "0.4.1",
+      "latest": "0.5.1"
+    },
+    {
+      "name": "updpkgsums",
+      "status": "ok",
+      "at": "2026-10-19T19:43:41Z",
+      "returncode": 0
+    },
+    {
+      "name": "dry-run",
+      "status": "ok",
+      "at": "2026-10-19T19:43:41Z",
+      "pkgver": "0.5.1",
+      "pkgbuild_restored": true
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "../artcraft-launcher-bin/PKGBUILD.calix-bak",
+      "sha256": "f95120611d41085a8276b9b449745b2263f4c1b3f84918376099b413dcf1ad90"
+    }
+  ],
+  "known_gaps": [
+    "upstream SHA256SUMS manifest found but no local artifact matched a declared PKGBUILD source name"
+  ],
+  "dry_run": true,
+  "target_version": "0.5.1"
+}

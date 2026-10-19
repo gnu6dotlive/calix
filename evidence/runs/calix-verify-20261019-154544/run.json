@@ -1,0 +1,33 @@
+{
+  "run_id": "calix-verify-20261019-154544",
+  "kind": "calix-verify",
+  "status": "ok",
+  "started_at": "2026-10-19T19:45:44Z",
+  "finished_at": "2026-10-19T19:45:45Z",
+  "duration_ms": 557,
+  "tool_version": "2.0.0",
+  "host": {
+    "kernel": "7.2.9-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "python": "3.14.8"
+  },
+  "steps": [
+    {
+      "name": "version",
+      "status": "ok",
+      "at": "2026-10-19T19:45:45Z",
+      "installed": "0.5.1",
+      "latest": "0.5.1",
+      "ok": true
+    },
+    {
+      "name": "checksum",
+      "status": "ok",
+      "at": "2026-10-19T19:45:45Z",
+      "ok": true
+    }
+  ],
+  "artifacts": [],
+  "known_gaps": [],
+  "ok": true
+}
