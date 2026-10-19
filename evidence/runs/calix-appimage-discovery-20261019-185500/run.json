@@ -1,0 +1,48 @@
+{
+  "run_id": "calix-appimage-discovery-20261019-185500",
+  "kind": "calix-appimage-discovery",
+  "status": "ok",
+  "started_at": "2026-10-19T22:00:00Z",
+  "finished_at": "2026-10-19T22:45:23Z",
+  "duration_ms": 3600000,
+  "tool_version": "1.0.0",
+  "host": {
+    "kernel": "7.2.9-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "zig": "0.16.0"
+  },
+  "scope": "Tranche 1 (a) \u2014 AppImage discovery in the Zig backend, and the defects it exposed",
+  "delivered": [
+    "appimage/discovery.zig: scans the installation directory, correlates the XDG desktop entries, merges into the database without degrading any record.",
+    "AppImageManager.discoverAppImages(): the backend reads its own directory; the Python engine no longer writes a file it does not own.",
+    "shelly sync appimage --discover: the scan alone, without the metadata refresh."
+  ],
+  "defects_fixed": [
+    "copyFile did not preserve the mode; a rename during the sync dropped the AppImage's executable bit.",
+    "Upstream's commits past v3.1.8 removed the setExecutable call that repaired it; the metadata extraction runs the AppImage, so spawn returned AccessDenied and aborted the whole synchronisation. Both restored.",
+    "The sync renamed a file without touching the desktop entries that referenced it, leaving twenty broken menu entries. The backend now clears them, as it already did on install and removal.",
+    "Seventeen AppImage test sites ran with the real process environment and wrote into the user's own ~/.local/share/applications. They now use an environment rooted in a temporary directory.",
+    "The Python engine listed X-AppImage-Name among the version keys, so the openwork AppImage reported its version as \"OpenWork\" instead of \"0.18.42\"."
+  ],
+  "verification": {
+    "zig_discovery_vs_python_discovery": "identical over 16 records, every field",
+    "desktop_entries_before_after_test_run": "76 / 76",
+    "broken_appimage_references": "20 -> 0",
+    "appimages_without_executable_bit": "1 -> 0",
+    "tests": {
+      "Shelly.PackageManager": "19/19 steps, 1332/1336 passed (4 skipped)",
+      "Shelly.Cli.Zig": "17/17 steps, 376/376 passed",
+      "Shelly.Ui.Gpui (Rust)": "190 passed",
+      "Python engine": "27 passed"
+    }
+  },
+  "known_gaps": [
+    "The AppImage backend still renames files to <Name>.AppImage during a sync, which changes the vendor's desktop entries. The backend now clears the stale ones, but the crafts launcher may recreate its own entries with the old paths on its next run.",
+    "Discovery reads the desktop entries; the version in the database is still refreshed by the metadata extraction, which runs the AppImage binary."
+  ],
+  "artifacts": [],
+  "git": {
+    "branch": "main",
+    "base_commit": "2989542423cb9f0cf396c7b096dcfe353455b198"
+  }
+}

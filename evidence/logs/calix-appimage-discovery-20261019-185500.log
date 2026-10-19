@@ -1,0 +1,28 @@
+[2026-10-19T18:00:00-0400] === Tranche 1 (a) — AppImage discovery in the Zig backend ===
+[2026-10-19T18:00:00-0400] Problem: the backend owned the AppImage database but only refreshed
+[2026-10-19T18:00:00-0400] entries it already knew. An AppImage dropped in by hand was invisible,
+[2026-10-19T18:00:00-0400] and the Python engine filled the gap by writing into a file it did not own.
+[2026-10-19T18:00:00-0400]
+[2026-10-19T18:00:00-0400] --- Defects found by live verification, not by the tests ---
+[2026-10-19T18:00:00-0400] 1. copyFile did not preserve the mode: a rename during the sync dropped
+[2026-10-19T18:00:00-0400]    the executable bit of the AppImage.
+[2026-10-19T18:00:00-0400] 2. upstream's two commits past v3.1.8 removed the setExecutable call that
+[2026-10-19T18:00:00-0400]    repaired exactly that. The metadata extraction runs the AppImage, so
+[2026-10-19T18:00:00-0400]    std.process.spawn returned AccessDenied and aborted the whole sync.
+[2026-10-19T18:00:00-0400] 3. the sync renamed a file without touching the desktop entries that
+[2026-10-19T18:00:00-0400]    referenced it: twenty broken menu entries were left behind.
+[2026-10-19T18:00:00-0400] 4. the AppImage tests ran with the real process environment and wrote
+[2026-10-19T18:00:00-0400]    into the user's own ~/.local/share/applications, leaving entries that
+[2026-10-19T18:00:00-0400]    pointed at build temporaries.
+[2026-10-19T18:00:00-0400] 5. the Python engine listed X-AppImage-Name among the version keys, so
+[2026-10-19T18:00:00-0400]    the openwork AppImage reported its version as "OpenWork".
+[2026-10-19T18:00:00-0400]
+[2026-10-19T18:00:00-0400] --- Verification ---
+[2026-10-19T18:00:00-0400] Zig discovery vs Python discovery: IDENTICAL over 16 records, every field.
+[2026-10-19T18:00:00-0400] Desktop directory: 76 entries before a test run, 76 after.
+[2026-10-19T18:00:00-0400] Broken AppImage references in desktop entries: 20 -> 0.
+[2026-10-19T18:00:00-0400] AppImages without the executable bit: 1 -> 0.
+[2026-10-19T18:00:00-0400] zig build test (PackageManager): 19/19 steps, 1332/1336 (4 skipped)
+[2026-10-19T18:00:00-0400] zig build test (CLI):          17/17 steps, 376/376
+[2026-10-19T18:00:00-0400] cargo test --release (Rust):   190 passed
+[2026-10-19T18:00:00-0400] python3 -m unittest:          27 passed

@@ -264,11 +264,20 @@ Tranche 0 (Completed): Deux bugs vivants du backend Zig corrigés
                           l'escalade silencieuse par sudo (findElevator → pkexec).
                           Preuve de régression : avec la logique d'origine, exactement 4 des nouveaux
                           tests échouent et tous les tests préexistants passent.
-Tranche 1 (Next)     : Absorption du moteur Python dans le Zig
-                        → backends Cargo et NPM, discovery ~/Applications dans le manager appimage
-                          Zig, registre de releases, vérification de provenance amont, flux
-                          d'application, helper root + polkit, inventaire unifié versionné,
-                          calix-daemon, calix CLI, UI sur daemon, suppression du Python.
+Tranche 1a (Done)   : Discovery AppImage dans le backend Zig
+                        → le backend lit son propre répertoire ; le moteur Python n'écrit plus
+                          un fichier qu'il ne possède pas. Vérifié : la base produite par le Zig
+                          est identique, champ par champ, à celle du Python (16 enregistrements).
+                          Trois défauts révélés par la vérification live et corrigés : copyFile ne
+                          préservait pas le mode, les commits upstream post-v3.1.8 avaient
+                          supprimé le setExecutable qui le réparait (spawn → AccessDenied →
+                          sync entier avorté), et le renommage laissait 20 entrées .desktop
+                          cassées. Plus : les tests AppImage écrivaient dans le
+                          ~/.local/share/applications de l'utilisateur (17 sites isolés).
+Tranche 1b (Next)   : Backends Cargo et NPM en Zig, registre de releases, vérification de
+                        provenance amont, flux d'application, helper root + polkit, inventaire
+                        unifié versionné, calix-daemon, calix CLI, UI sur daemon, suppression
+                        du moteur Python.
 ```
 
 ---
@@ -463,8 +472,8 @@ Travail réellement nouveau, en Zig :
 
 1. **Backend Cargo** — lecture de `~/.cargo/.crates2.json`.
 2. **Backend NPM** — `npm list -g`.
-3. **Discovery `~/Applications`** — à intégrer au manager appimage Zig existant. Supprime la course à
-   deux propriétaires sur `appimage-metadata-v2.db` (le Python y écrit aujourd'hui).
+3. ~~**Discovery `~/Applications`**~~ — **fait** (tranche 1a). Le backend lit son propre répertoire ;
+   la course à deux propriétaires sur `appimage-metadata-v2.db` a disparu.
 4. **Registre de releases** + état (JSON, répertoire d'état du daemon).
 5. **Vérification de provenance amont** — récupérer le `SHA256SUMS.txt` du forge et le comparer à
    l'artefact téléchargé. *Cette capacité n'existe pas dans le Zig aujourd'hui* : `checksums.zig`
