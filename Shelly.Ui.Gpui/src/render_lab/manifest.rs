@@ -76,7 +76,7 @@ impl RenderLabManifest {
             clock_time: None,
             catalog_count: FixtureCatalog::count(),
             diagnostics: vec![DiagnosticEntry::info(
-                "Shelly GUI offline; static catalog manifest",
+                "Calix GUI offline; static catalog manifest",
             )],
         }
     }

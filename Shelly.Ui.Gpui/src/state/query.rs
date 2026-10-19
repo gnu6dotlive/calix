@@ -71,6 +71,9 @@ impl SourceScope {
                     self.appimage = !self.appimage;
                 }
             }
+            // Les écosystèmes Calix ne sont pas des sources de recherche
+            // interrogeables : ils ne sont pas activables dans la requête.
+            PackageSourceKind::Cargo | PackageSourceKind::Npm | PackageSourceKind::Release => {}
         }
         // Invariant strict : interdiction absolue d'avoir zéro source sélectionnée
         if !self.alpm && !self.aur && !self.flatpak && !self.appimage {

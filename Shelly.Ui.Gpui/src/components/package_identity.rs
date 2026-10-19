@@ -37,7 +37,7 @@ fn get_resolver_sender() -> &'static std::sync::mpsc::SyncSender<UnifiedPackage>
     RESOLVER_SENDER.get_or_init(|| {
         let (tx, rx) = std::sync::mpsc::sync_channel::<UnifiedPackage>(2048);
         std::thread::Builder::new()
-            .name("shelly-identity-resolver".to_string())
+            .name("calix-identity-resolver".to_string())
             .spawn(move || {
                 while let Ok(pkg) = rx.recv() {
                     let key = pkg.key();
@@ -111,6 +111,11 @@ impl PackageIdentity {
             UnifiedPackageSource::Standard(_) | UnifiedPackageSource::Aur(_) => {
                 Self::probe_alpm_or_aur_icon(pkg)
             }
+            // Les écosystèmes Calix n'exposent pas d'icône de fichier :
+            // ils retombent sur leur icône symbolique de source.
+            UnifiedPackageSource::Cargo(_)
+            | UnifiedPackageSource::Npm(_)
+            | UnifiedPackageSource::Release(_) => None,
         }
     }
 
@@ -343,6 +348,9 @@ impl PackageIdentity {
             "AUR" => ResolvedIdentity::Symbolic(AppIcon::SourceAur),
             "FLATPAK" => ResolvedIdentity::Symbolic(AppIcon::SourceFlatpak),
             "APPIMAGE" => ResolvedIdentity::Symbolic(AppIcon::SourceAppImage),
+            "CARGO" => ResolvedIdentity::Symbolic(AppIcon::SourceCargo),
+            "NPM" => ResolvedIdentity::Symbolic(AppIcon::SourceNpm),
+            "RELEASE" => ResolvedIdentity::Symbolic(AppIcon::SourceRelease),
             _ => ResolvedIdentity::Fallback(AppIcon::PackageGeneric),
         }
     }
@@ -423,6 +431,9 @@ impl PackageIdentity {
             "AUR" => theme.badge_aur,
             "FLATPAK" => theme.badge_flatpak,
             "APPIMAGE" => theme.badge_appimage,
+            "CARGO" => theme.badge_cargo,
+            "NPM" => theme.badge_npm,
+            "RELEASE" => theme.badge_release,
             _ => theme.text_muted,
         }
     }
@@ -551,7 +562,7 @@ mod tests {
 
         // Tier 1: Authentic icon from existing file on disk
         let mut temp_icon = std::env::temp_dir();
-        temp_icon.push("shelly_test_authentic_icon.png");
+        temp_icon.push("calix_test_authentic_icon.png");
         std::fs::write(&temp_icon, b"dummy png content").unwrap();
 
         let appimage_with_icon = UnifiedPackage {
@@ -720,14 +731,14 @@ mod tests {
     #[test]
     fn test_alpm_exact_name_match() {
         let temp_dir = std::env::temp_dir().join(format!(
-            "shelly_test_pacman_exact_{}",
+            "calix_test_pacman_exact_{}",
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_nanos()
         ));
         let pacman_local = temp_dir.join("var/lib/pacman/local");
-        let pkg_dir = pacman_local.join("shelly-gpui-git-r4699.ga172c43e-1");
+        let pkg_dir = pacman_local.join("calix-gpui-git-r4699.ga172c43e-1");
         let app_dir = temp_dir.join("usr/share/applications");
         let pixmaps_dir = temp_dir.join("usr/share/pixmaps");
 
@@ -736,23 +747,23 @@ mod tests {
         std::fs::create_dir_all(&pixmaps_dir).unwrap();
 
         // Write desc with %NAME% and %VERSION% where version starts with a letter 'r'
-        let desc_content = "%NAME%\nshelly-gpui-git\n\n%VERSION%\nr4699.ga172c43e-1\n";
+        let desc_content = "%NAME%\ncalix-gpui-git\n\n%VERSION%\nr4699.ga172c43e-1\n";
         std::fs::write(pkg_dir.join("desc"), desc_content).unwrap();
 
         // Write files list
-        let files_content = "%FILES%\nusr/share/applications/shelly.desktop\n";
+        let files_content = "%FILES%\nusr/share/applications/calix.desktop\n";
         std::fs::write(pkg_dir.join("files"), files_content).unwrap();
 
         // Write desktop file
-        let desktop_content = "[Desktop Entry]\nType=Application\nName=Shelly\nIcon=shelly-logo\n";
-        std::fs::write(app_dir.join("shelly.desktop"), desktop_content).unwrap();
+        let desktop_content = "[Desktop Entry]\nType=Application\nName=Calix\nIcon=calix-logo\n";
+        std::fs::write(app_dir.join("calix.desktop"), desktop_content).unwrap();
 
         // Write icon
-        let icon_path = pixmaps_dir.join("shelly-logo.png");
+        let icon_path = pixmaps_dir.join("calix-logo.png");
         std::fs::write(&icon_path, b"test-icon-bytes").unwrap();
 
         let pkg = UnifiedPackage {
-            name: "shelly-gpui-git".into(),
+            name: "calix-gpui-git".into(),
             version: "r4699.ga172c43e-1".into(),
             description: "Modern package manager".into(),
             source_type: "ALPM".into(),
@@ -773,7 +784,7 @@ mod tests {
     #[test]
     fn test_alpm_no_false_prefix_candidate() {
         let temp_dir = std::env::temp_dir().join(format!(
-            "shelly_test_pacman_prefix_{}",
+            "calix_test_pacman_prefix_{}",
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()

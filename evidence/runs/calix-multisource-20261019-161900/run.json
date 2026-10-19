@@ -1,0 +1,91 @@
+{
+  "run_id": "calix-multisource-20261019-161900",
+  "kind": "calix-multisource",
+  "status": "ok",
+  "started_at": "2026-10-19T20:14:00Z",
+  "finished_at": "2026-10-19T20:18:51Z",
+  "duration_ms": 300000,
+  "tool_version": "1.0.0",
+  "host": {
+    "kernel": "7.2.9-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "python": "3.14.8"
+  },
+  "scope": "Phase 7b \u2014 multi-source view (Cargo, NPM, releases) in the Calix GPUI frontend",
+  "build": {
+    "cargo_build_release": "ok, no crate warnings",
+    "cargo_test_release": "190 passed; 0 failed"
+  },
+  "steps": [
+    {
+      "name": "state-reader",
+      "status": "ok",
+      "detail": "backend/calix_state.rs reads $XDG_STATE_HOME/calix/{cargo,npm,releases}.json, fault-tolerant on missing or malformed files"
+    },
+    {
+      "name": "model",
+      "status": "ok",
+      "detail": "UnifiedPackageSource::Cargo/Npm/Release + UnifiedPackage::from_cargo/from_npm/from_release"
+    },
+    {
+      "name": "merge",
+      "status": "ok",
+      "detail": "calix_state::merge_installed() is the single merge point used by the initial load and the reload path"
+    },
+    {
+      "name": "source-kinds",
+      "status": "ok",
+      "detail": "PackageSourceKind::Cargo/Npm/Release so an ecosystem package is never keyed as ALPM"
+    },
+    {
+      "name": "semantics",
+      "status": "ok",
+      "detail": "ecosystem packages expose no install/remove action and no dependency resolution; they are not ALPM"
+    },
+    {
+      "name": "presentation",
+      "status": "ok",
+      "detail": "source-cargo.svg, source-npm.svg, source-release.svg + badge colours + dedicated inspector panels"
+    },
+    {
+      "name": "live",
+      "status": "ok",
+      "detail": "Installed view shows 1906 packages; cargo/release/npm inspectors render their own metadata"
+    }
+  ],
+  "defects_found_during_live_verification": [
+    "The ecosystem merge was applied only to the reload path; the initial load still returned 1876 packages. Fixed by extracting merge_installed() and using it in both call sites, with a unit test.",
+    "PackageKey::from_unified mapped unknown source types to ALPM, so a cargo crate fetched the ALPM details of a same-named AUR package (wrong upstream URL, 'INSTALL REASON: Not Installed'). Fixed with dedicated source kinds, with a unit test."
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/runs/calix-multisource-20261019-161900/installed-view.png",
+      "sha256": "877b5e5d8d34cfb4563ed7253e97733a81d0d83ff53bd493d1bf5edbff8f2423",
+      "bytes": 261823
+    },
+    {
+      "path": "evidence/runs/calix-multisource-20261019-161900/cargo-inspector.png",
+      "sha256": "9937c18c33ff145b2a4628021287991e459998167e5b7047ecb778c8d37e776d",
+      "bytes": 286271
+    },
+    {
+      "path": "evidence/runs/calix-multisource-20261019-161900/release-inspector.png",
+      "sha256": "2bc5d330501b2f8fded64210f02f9764ed5781877196d4cc379d0cc7468a1fd9",
+      "bytes": 148279
+    },
+    {
+      "path": "evidence/runs/calix-multisource-20261019-161900/npm-inspector.png",
+      "sha256": "8f06c41cf8ab08ce28f8128847cb245253fd807ddb53e9e75017d2b160fdf735",
+      "bytes": 135286
+    }
+  ],
+  "known_gaps": [
+    "The Calix ecosystems are listed, not searchable: the search backends remain ALPM/AUR/Flatpak/AppImage only.",
+    "The ecosystem packages have no install or remove action, because no backend path manages them yet.",
+    "AppImages are still served by the Shelly CLI backend; only Cargo, NPM and releases are read from the Calix inventory."
+  ],
+  "git": {
+    "branch": "feature/calix-branding",
+    "base_commit": "8b051c49951eef568cffbe081deafa2a7640e558"
+  }
+}

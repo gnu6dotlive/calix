@@ -10,7 +10,7 @@ pub struct InstanceLock {
 }
 
 impl InstanceLock {
-    /// Attempts to acquire the exclusive non-blocking lifetime lock for the Shelly GUI instance.
+    /// Attempts to acquire the exclusive non-blocking lifetime lock for the Calix GUI instance.
     /// Returns Ok(Some(lock)) if this process is the sole authoritative instance.
     /// Returns Ok(None) if another process already holds the lock.
     pub fn try_acquire() -> Result<Option<Self>> {
@@ -71,7 +71,7 @@ impl ControlSocket {
                     .unwrap_or(1000);
                 PathBuf::from(format!("/run/user/{}", uid))
             })
-            .join("shelly-gpui")
+            .join("calix-gpui")
     }
 
     pub fn socket_path() -> PathBuf {
@@ -172,7 +172,7 @@ mod tests {
     #[test]
     fn test_socket_path_resolution() {
         let path = ControlSocket::socket_path();
-        assert!(path.ends_with("shelly-gpui/control.sock"));
+        assert!(path.ends_with("calix-gpui/control.sock"));
     }
 
     #[test]

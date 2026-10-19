@@ -819,7 +819,7 @@ impl RenderLabView {
                                     .text_xs()
                                     .font_weight(FontWeight::SEMIBOLD)
                                     .text_color(cell_theme.text_primary)
-                                    .child("Shelly Content Plane"),
+                                    .child("Calix Content Plane"),
                             )
                             .child(
                                 div()

@@ -381,7 +381,7 @@ impl CliInvocation {
             }
             unknown => {
                 return Err(format!(
-                    "Unknown command '{unknown}'. Run 'shelly-gpui --help' for usage."
+                    "Unknown command '{unknown}'. Run 'calix-gpui --help' for usage."
                 ))
             }
         };
@@ -395,8 +395,8 @@ impl CliInvocation {
 
     pub fn print_help() {
         println!(
-            r#"Shelly GPUI — GPU-Accelerated Universal Package Manager
-Usage: shelly-gpui [OPTIONS] [SUBCOMMAND]
+            r#"Calix GPUI — GPU-Accelerated Universal Package Manager
+Usage: calix-gpui [OPTIONS] [SUBCOMMAND]
 
 Options:
   -j, --json     Output machine-readable JSON
@@ -404,10 +404,10 @@ Options:
   -V, --version  Print version and exit
 
 Runtime Control Commands:
-  open                       Focus existing Shelly window, or launch GUI if offline
-  focus                      Focus running Shelly window
+  open                       Focus existing Calix window, or launch GUI if offline
+  focus                      Focus running Calix window
   status                     Print runtime status and health
-  quit                       Cleanly terminate running Shelly instance
+  quit                       Cleanly terminate running Calix instance
   navigate <dest>            Navigate to 'updates', 'installed', 'browse', 'news', 'settings'
   search <query>             Search for packages in the browse workstation
   view <table|cards>         Switch package workstation view mode
@@ -447,13 +447,13 @@ Render Lab Commands (RENDER-00, CLI-only developer surface):
 
     pub fn print_version() {
         println!(
-            "shelly-gpui 0.1.0 (control protocol v{})",
+            "calix-gpui 0.1.0 (control protocol v{})",
             CONTROL_PROTOCOL_VERSION
         );
     }
 }
 
-/// Ensures that a background Shelly GPUI instance is running and listening on the socket.
+/// Ensures that a background Calix GPUI instance is running and listening on the socket.
 /// Spawns the GUI in detached mode with `--internal-gui` and waits bounded time for socket readiness.
 pub async fn ensure_gui_running() -> Result<()> {
     if ControlSocket::is_instance_running().await {
@@ -485,7 +485,7 @@ pub async fn ensure_gui_running() -> Result<()> {
         }
     }
 
-    anyhow::bail!("Timed out waiting for Shelly GPUI instance to initialize socket")
+    anyhow::bail!("Timed out waiting for Calix GPUI instance to initialize socket")
 }
 
 pub async fn run_cli_invocation(invocation: CliInvocation) -> Result<CliOutcome> {
@@ -543,7 +543,7 @@ pub async fn run_cli_invocation(invocation: CliInvocation) -> Result<CliOutcome>
                 let resp = ControlSocket::send_command(ControlCommand::Focus).await?;
                 outcome_from_response(&resp, json)
             } else {
-                let resp = ControlResponse::error("Shelly GUI is not running");
+                let resp = ControlResponse::error("Calix GUI is not running");
                 outcome_from_response(&resp, json)
             }
         }
@@ -557,7 +557,7 @@ pub async fn run_cli_invocation(invocation: CliInvocation) -> Result<CliOutcome>
                     );
                 } else if let Some(ref data) = resp.data {
                     if let Ok(st) = serde_json::from_value::<ControlStatus>(data.clone()) {
-                        println!("Shelly GPUI Status:");
+                        println!("Calix GPUI Status:");
                         println!("  Running:        yes (PID {})", st.pid);
                         println!("  Executable:     {}", st.executable);
                         println!("  Protocol:       v{}", st.protocol_version);
@@ -571,10 +571,10 @@ pub async fn run_cli_invocation(invocation: CliInvocation) -> Result<CliOutcome>
                         );
                         println!("  Active Task:    {}", st.operation_running);
                     } else {
-                        println!("Shelly GUI is running (status data available via --json)");
+                        println!("Calix GUI is running (status data available via --json)");
                     }
                 } else {
-                    println!("Shelly GUI is running");
+                    println!("Calix GUI is running");
                 }
                 Ok(CliOutcome::Exit(if resp.ok { 0 } else { 1 }))
             } else {
@@ -589,7 +589,7 @@ pub async fn run_cli_invocation(invocation: CliInvocation) -> Result<CliOutcome>
                         serde_json::to_string_pretty(&resp).unwrap_or_default()
                     );
                 } else {
-                    println!("Shelly GPUI Status:");
+                    println!("Calix GPUI Status:");
                     println!("  Running:        no (offline)");
                     println!("  Executable:     {}", offline_status.executable);
                     println!("  Protocol:       v{}", offline_status.protocol_version);
@@ -602,7 +602,7 @@ pub async fn run_cli_invocation(invocation: CliInvocation) -> Result<CliOutcome>
                 let resp = ControlSocket::send_command(ControlCommand::Quit).await?;
                 outcome_from_response(&resp, json)
             } else {
-                let resp = ControlResponse::error("Shelly GUI is not running");
+                let resp = ControlResponse::error("Calix GUI is not running");
                 outcome_from_response(&resp, json)
             }
         }
@@ -666,7 +666,7 @@ pub async fn run_cli_invocation(invocation: CliInvocation) -> Result<CliOutcome>
                 outcome_from_response(&resp, json)
             } else {
                 let resp = ControlResponse::error(
-                    "Shelly GUI is not running (cannot clear in-memory logs)",
+                    "Calix GUI is not running (cannot clear in-memory logs)",
                 );
                 outcome_from_response(&resp, json)
             }
@@ -1296,7 +1296,7 @@ mod tests {
 
     #[test]
     fn test_parse_empty_args_launches_gui() {
-        let args = vec!["shelly-gpui".to_string()];
+        let args = vec!["calix-gpui".to_string()];
         let parsed = CliInvocation::parse_from_args(&args).expect("Should parse empty args");
         assert!(!parsed.json);
         assert_eq!(parsed.command, None);
@@ -1305,7 +1305,7 @@ mod tests {
     #[test]
     fn test_parse_json_flag_anywhere() {
         let args1 = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "--json".to_string(),
             "status".to_string(),
         ];
@@ -1314,7 +1314,7 @@ mod tests {
         assert_eq!(parsed1.command, Some(CliCommand::Status));
 
         let args2 = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "status".to_string(),
             "-j".to_string(),
         ];
@@ -1326,82 +1326,82 @@ mod tests {
     #[test]
     fn test_parse_subcommands() {
         let cases = vec![
-            (vec!["shelly-gpui", "open"], Some(CliCommand::Open)),
-            (vec!["shelly-gpui", "focus"], Some(CliCommand::Focus)),
-            (vec!["shelly-gpui", "status"], Some(CliCommand::Status)),
-            (vec!["shelly-gpui", "quit"], Some(CliCommand::Quit)),
+            (vec!["calix-gpui", "open"], Some(CliCommand::Open)),
+            (vec!["calix-gpui", "focus"], Some(CliCommand::Focus)),
+            (vec!["calix-gpui", "status"], Some(CliCommand::Status)),
+            (vec!["calix-gpui", "quit"], Some(CliCommand::Quit)),
             (
-                vec!["shelly-gpui", "navigate", "installed"],
+                vec!["calix-gpui", "navigate", "installed"],
                 Some(CliCommand::Navigate {
                     destination: "installed".to_string(),
                 }),
             ),
             (
-                vec!["shelly-gpui", "search", "ripgrep"],
+                vec!["calix-gpui", "search", "ripgrep"],
                 Some(CliCommand::Search {
                     query: "ripgrep".to_string(),
                 }),
             ),
             (
-                vec!["shelly-gpui", "view", "table"],
+                vec!["calix-gpui", "view", "table"],
                 Some(CliCommand::View {
                     mode: "table".to_string(),
                 }),
             ),
             (
-                vec!["shelly-gpui", "inspect", "aalib"],
+                vec!["calix-gpui", "inspect", "aalib"],
                 Some(CliCommand::Inspect {
                     package: "aalib".to_string(),
                 }),
             ),
             (
-                vec!["shelly-gpui", "inspector", "overview"],
+                vec!["calix-gpui", "inspector", "overview"],
                 Some(CliCommand::Inspector {
                     tab: "overview".to_string(),
                 }),
             ),
             (
-                vec!["shelly-gpui", "logs", "clear"],
+                vec!["calix-gpui", "logs", "clear"],
                 Some(CliCommand::Logs {
                     operation: "clear".to_string(),
                 }),
             ),
             (
-                vec!["shelly-gpui", "settings", "list"],
+                vec!["calix-gpui", "settings", "list"],
                 Some(CliCommand::Settings(CliSettingsCommand::List)),
             ),
             (
-                vec!["shelly-gpui", "settings", "get", "theme"],
+                vec!["calix-gpui", "settings", "get", "theme"],
                 Some(CliCommand::Settings(CliSettingsCommand::Get {
                     key: "theme".to_string(),
                 })),
             ),
             (
-                vec!["shelly-gpui", "settings", "set", "theme", "dark"],
+                vec!["calix-gpui", "settings", "set", "theme", "dark"],
                 Some(CliCommand::Settings(CliSettingsCommand::Set {
                     key: "theme".to_string(),
                     value: "dark".to_string(),
                 })),
             ),
             (
-                vec!["shelly-gpui", "settings", "reset", "theme"],
+                vec!["calix-gpui", "settings", "reset", "theme"],
                 Some(CliCommand::Settings(CliSettingsCommand::Reset {
                     key: Some("theme".to_string()),
                 })),
             ),
             (
-                vec!["shelly-gpui", "settings", "reset", "all"],
+                vec!["calix-gpui", "settings", "reset", "all"],
                 Some(CliCommand::Settings(CliSettingsCommand::Reset {
                     key: None,
                 })),
             ),
             (
-                vec!["shelly-gpui", "render-lab", "open"],
+                vec!["calix-gpui", "render-lab", "open"],
                 Some(CliCommand::RenderLab(CliRenderLabCommand::Open)),
             ),
             (
                 vec![
-                    "shelly-gpui",
+                    "calix-gpui",
                     "render-lab",
                     "fixture",
                     "field.signed-voltage",
@@ -1412,7 +1412,7 @@ mod tests {
             ),
             (
                 vec![
-                    "shelly-gpui",
+                    "calix-gpui",
                     "render-lab",
                     "material",
                     "painted-metal.signal-orange",
@@ -1422,52 +1422,52 @@ mod tests {
                 })),
             ),
             (
-                vec!["shelly-gpui", "render-lab", "topology", "floating-island"],
+                vec!["calix-gpui", "render-lab", "topology", "floating-island"],
                 Some(CliCommand::RenderLab(CliRenderLabCommand::Topology {
                     variant: "floating-island".to_string(),
                 })),
             ),
             (
-                vec!["shelly-gpui", "render-lab", "motion", "smooth"],
+                vec!["calix-gpui", "render-lab", "motion", "smooth"],
                 Some(CliCommand::RenderLab(CliRenderLabCommand::Motion {
                     variant: "smooth".to_string(),
                 })),
             ),
             (
-                vec!["shelly-gpui", "render-lab", "quality", "stock"],
+                vec!["calix-gpui", "render-lab", "quality", "stock"],
                 Some(CliCommand::RenderLab(CliRenderLabCommand::Quality {
                     level: "stock".to_string(),
                 })),
             ),
             (
-                vec!["shelly-gpui", "render-lab", "time", "0.500"],
+                vec!["calix-gpui", "render-lab", "time", "0.500"],
                 Some(CliCommand::RenderLab(CliRenderLabCommand::Time {
                     seconds: 0.5,
                 })),
             ),
             (
-                vec!["shelly-gpui", "render-lab", "status"],
+                vec!["calix-gpui", "render-lab", "status"],
                 Some(CliCommand::RenderLab(CliRenderLabCommand::Status)),
             ),
             (
-                vec!["shelly-gpui", "render-lab", "style", "transparency"],
+                vec!["calix-gpui", "render-lab", "style", "transparency"],
                 Some(CliCommand::RenderLab(CliRenderLabCommand::Style {
                     style: "transparency".to_string(),
                 })),
             ),
             (
-                vec!["shelly-gpui", "render-lab", "ledger"],
+                vec!["calix-gpui", "render-lab", "ledger"],
                 Some(CliCommand::RenderLab(CliRenderLabCommand::Ledger)),
             ),
             (
-                vec!["shelly-gpui", "render-lab", "metrics"],
+                vec!["calix-gpui", "render-lab", "metrics"],
                 Some(CliCommand::RenderLab(CliRenderLabCommand::Metrics {
                     fixture: None,
                 })),
             ),
             (
                 vec![
-                    "shelly-gpui",
+                    "calix-gpui",
                     "render-lab",
                     "metrics",
                     "field.zero-positive-scalar",
@@ -1477,12 +1477,12 @@ mod tests {
                 })),
             ),
             (
-                vec!["shelly-gpui", "render-lab", "recipes"],
+                vec!["calix-gpui", "render-lab", "recipes"],
                 Some(CliCommand::RenderLab(CliRenderLabCommand::Recipes)),
             ),
             (
                 vec![
-                    "shelly-gpui",
+                    "calix-gpui",
                     "render-lab",
                     "recipe",
                     "g01-linear-scalar-gradient/r1",
@@ -1492,27 +1492,27 @@ mod tests {
                 })),
             ),
             (
-                vec!["shelly-gpui", "appearance", "style", "get"],
+                vec!["calix-gpui", "appearance", "style", "get"],
                 Some(CliCommand::Appearance(CliAppearanceCommand::StyleGet)),
             ),
             (
-                vec!["shelly-gpui", "appearance", "style", "set", "transparency"],
+                vec!["calix-gpui", "appearance", "style", "set", "transparency"],
                 Some(CliCommand::Appearance(CliAppearanceCommand::StyleSet {
                     value: "transparency".to_string(),
                 })),
             ),
             (
-                vec!["shelly-gpui", "appearance", "status"],
+                vec!["calix-gpui", "appearance", "status"],
                 Some(CliCommand::Appearance(CliAppearanceCommand::Status)),
             ),
             (
-                vec!["shelly-gpui", "appearance", "resolve"],
+                vec!["calix-gpui", "appearance", "resolve"],
                 Some(CliCommand::Appearance(CliAppearanceCommand::Resolve {
                     role: None,
                 })),
             ),
             (
-                vec!["shelly-gpui", "appearance", "resolve", "menu"],
+                vec!["calix-gpui", "appearance", "resolve", "menu"],
                 Some(CliCommand::Appearance(CliAppearanceCommand::Resolve {
                     role: Some("menu".to_string()),
                 })),
@@ -1529,30 +1529,30 @@ mod tests {
     #[test]
     fn test_parse_validation_failures() {
         let bad_view = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "view".to_string(),
             "banana".to_string(),
         ];
         assert!(CliInvocation::parse_from_args(&bad_view).is_err());
 
-        let missing_nav = vec!["shelly-gpui".to_string(), "navigate".to_string()];
+        let missing_nav = vec!["calix-gpui".to_string(), "navigate".to_string()];
         assert!(CliInvocation::parse_from_args(&missing_nav).is_err());
 
-        let missing_search = vec!["shelly-gpui".to_string(), "search".to_string()];
+        let missing_search = vec!["calix-gpui".to_string(), "search".to_string()];
         assert!(CliInvocation::parse_from_args(&missing_search).is_err());
 
-        let missing_render_lab_sub = vec!["shelly-gpui".to_string(), "render-lab".to_string()];
+        let missing_render_lab_sub = vec!["calix-gpui".to_string(), "render-lab".to_string()];
         assert!(CliInvocation::parse_from_args(&missing_render_lab_sub).is_err());
 
         let invalid_render_lab_sub = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "render-lab".to_string(),
             "unknown".to_string(),
         ];
         assert!(CliInvocation::parse_from_args(&invalid_render_lab_sub).is_err());
 
         let invalid_time = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "render-lab".to_string(),
             "time".to_string(),
             "abc".to_string(),
@@ -1560,7 +1560,7 @@ mod tests {
         assert!(CliInvocation::parse_from_args(&invalid_time).is_err());
 
         let negative_time = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "render-lab".to_string(),
             "time".to_string(),
             "-1.0".to_string(),
@@ -1568,7 +1568,7 @@ mod tests {
         assert!(CliInvocation::parse_from_args(&negative_time).is_err());
 
         let invalid_lab_style = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "render-lab".to_string(),
             "style".to_string(),
             "neon".to_string(),
@@ -1576,31 +1576,31 @@ mod tests {
         assert!(CliInvocation::parse_from_args(&invalid_lab_style).is_err());
 
         let missing_lab_style = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "render-lab".to_string(),
             "style".to_string(),
         ];
         assert!(CliInvocation::parse_from_args(&missing_lab_style).is_err());
 
         let missing_recipe_id = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "render-lab".to_string(),
             "recipe".to_string(),
         ];
         assert!(CliInvocation::parse_from_args(&missing_recipe_id).is_err());
 
-        let missing_appearance_sub = vec!["shelly-gpui".to_string(), "appearance".to_string()];
+        let missing_appearance_sub = vec!["calix-gpui".to_string(), "appearance".to_string()];
         assert!(CliInvocation::parse_from_args(&missing_appearance_sub).is_err());
 
         let invalid_appearance_sub = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "appearance".to_string(),
             "theme".to_string(),
         ];
         assert!(CliInvocation::parse_from_args(&invalid_appearance_sub).is_err());
 
         let invalid_style_value = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "appearance".to_string(),
             "style".to_string(),
             "set".to_string(),
@@ -1609,7 +1609,7 @@ mod tests {
         assert!(CliInvocation::parse_from_args(&invalid_style_value).is_err());
 
         let missing_style_value = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "appearance".to_string(),
             "style".to_string(),
             "set".to_string(),
@@ -1617,7 +1617,7 @@ mod tests {
         assert!(CliInvocation::parse_from_args(&missing_style_value).is_err());
 
         let invalid_role = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "appearance".to_string(),
             "resolve".to_string(),
             "glass-card".to_string(),
@@ -1627,14 +1627,14 @@ mod tests {
 
     #[test]
     fn test_parse_internal_gui_flag() {
-        let args = vec!["shelly-gpui".to_string(), "--internal-gui".to_string()];
+        let args = vec!["calix-gpui".to_string(), "--internal-gui".to_string()];
         let parsed = CliInvocation::parse_from_args(&args).expect("Should parse --internal-gui");
         assert!(parsed.internal_gui);
         assert_eq!(parsed.command, None);
         assert!(!parsed.json);
 
         let args_with_extra = vec![
-            "shelly-gpui".to_string(),
+            "calix-gpui".to_string(),
             "--internal-gui".to_string(),
             "something".to_string(),
         ];

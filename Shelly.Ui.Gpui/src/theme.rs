@@ -24,6 +24,9 @@ pub struct Theme {
     pub badge_aur: Rgba,
     pub badge_flatpak: Rgba,
     pub badge_appimage: Rgba,
+    pub badge_cargo: Rgba,
+    pub badge_npm: Rgba,
+    pub badge_release: Rgba,
 }
 
 impl Default for Theme {
@@ -57,6 +60,9 @@ impl Theme {
             badge_aur: rgb(0xa855f7),         // Vivid Violet (AUR)
             badge_flatpak: rgb(0x06b6d4),     // Cyan (Flatpak)
             badge_appimage: rgb(0xf97316),    // Warm Orange (AppImage)
+            badge_cargo: rgb(0xd97757),       // Burnt Sienna (Cargo)
+            badge_npm: rgb(0xcb3837),         // NPM Red
+            badge_release: rgb(0x10b981),     // Emerald (Release)
         }
     }
 
@@ -84,6 +90,9 @@ impl Theme {
             badge_aur: rgb(0x7c3aed),
             badge_flatpak: rgb(0x0891b2),
             badge_appimage: rgb(0xea580c),
+            badge_cargo: rgb(0xb45309),
+            badge_npm: rgb(0x9f1239),
+            badge_release: rgb(0x047857),
         }
     }
 

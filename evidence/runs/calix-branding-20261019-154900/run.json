@@ -1,0 +1,73 @@
+{
+  "run_id": "calix-branding-20261019-154900",
+  "kind": "calix-branding",
+  "status": "ok",
+  "started_at": "2026-10-19T19:47:00Z",
+  "finished_at": "2026-10-19T19:51:00Z",
+  "duration_ms": 60000,
+  "tool_version": "1.0.0",
+  "host": {
+    "kernel": "7.2.9-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "python": "3.14.8"
+  },
+  "scope": "Phase 7a \u2014 Calix branding of the Rust GPUI frontend",
+  "build": {
+    "cargo_build_release": "ok (23.60s, no crate warnings)",
+    "cargo_test_release": "178 passed; 0 failed",
+    "binary": "/mnt/sandbox/builds/cargo/release/calix-gpui"
+  },
+  "steps": [
+    {
+      "name": "crate-rename",
+      "status": "ok",
+      "detail": "Cargo package shelly-gpui -> calix-gpui; binary and app_id follow"
+    },
+    {
+      "name": "asset-rename",
+      "status": "ok",
+      "detail": "icons/shelly.svg -> icons/calix.svg; assets/{shelly-gpui.svg, com.shellyorg.shelly-gpui.{desktop,policy}} -> Calix equivalents"
+    },
+    {
+      "name": "surface-strings",
+      "status": "ok",
+      "detail": "15 Rust files updated: window title, sidebar, settings, search header, CLI help/version, control responses"
+    },
+    {
+      "name": "runtime-identity",
+      "status": "ok",
+      "detail": "control socket dir shelly-gpui -> calix-gpui (no collision with the installed Shelly), window class calix-gpui"
+    },
+    {
+      "name": "packaging",
+      "status": "ok",
+      "detail": "PKGBUILD-gpui -> PKGBUILD-calix (calix-gpui-git, /usr/lib/calix/calix-gpui)"
+    },
+    {
+      "name": "live-launch",
+      "status": "ok",
+      "detail": "native Wayland client class=calix-gpui mapped=True xwayland=False; control protocol focus + navigate responded"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/runs/calix-branding-20261019-154900/settings-view.png",
+      "sha256": "dd158b06261d701b43ae4bf69be01ced78ad2eec6c9621effd22f6f203f71b33",
+      "bytes": 231434
+    },
+    {
+      "path": "evidence/runs/calix-branding-20261019-154900/browse-view.png",
+      "sha256": "4c68f0a366fe2a2faaa4962c650f035b34a12089fb9971b0dfdd7fdb6be81fbe",
+      "bytes": 204016
+    }
+  ],
+  "known_gaps": [
+    "The Zig CLI backend is still built and installed as `shelly` (Shelly.Cli.Zig); the frontend keeps talking to it through SHELLY_BIN. Renaming the backend is the next slice.",
+    "The GitHub remote is still tension-atoi/shelly-gpui; the repository rename upstream is still a manual step.",
+    "The icon glyph assets/calix-gpui.svg still carries the original Shelly artwork."
+  ],
+  "git": {
+    "branch": "feature/calix-branding",
+    "base_commit": "d97f667b7e30fe2824a9e47f81341d222a4624cf"
+  }
+}

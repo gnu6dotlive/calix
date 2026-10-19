@@ -1,11 +1,16 @@
 # Maintainer: tension-atoi <tension-atoi@users.noreply.github.com>
 # Forked from: Seafoam-Labs/Shelly-ALPM
-# Paquet: frontend GPUI natif Rust pour le gestionnaire de paquets Shelly (ALPM + AUR + Flatpak + AppImage)
+# Paquet: frontend GPUI natif Rust pour Calix — gestionnaire de paquets Arch Linux
+#          (ALPM, AUR, Flatpak, AppImage, Cargo, NPM, releases GitHub/GitLab)
+#
+# Le backend CLI Zig reste installé sous /usr/lib/shelly/shelly tant que la
+# migration du backend (Shelly.Cli.Zig → calix.cli.zig) n'est pas terminée ;
+# le frontend Calix l'atteint via la variable SHELLY_BIN.
 
-pkgname=shelly-gpui-git
+pkgname=calix-gpui-git
 pkgver=r0.git
 pkgrel=1
-pkgdesc="Frontend GPUI natif Rust pour Shelly — gestionnaire de paquets Arch Linux (ALPM, AUR, Flatpak, AppImage)"
+pkgdesc="Frontend GPUI natif Rust pour Calix — gestionnaire de paquets Arch Linux (ALPM, AUR, Flatpak, AppImage)"
 arch=('x86_64')
 url="https://github.com/tension-atoi/shelly-gpui"
 license=('GPL-3.0-only')
@@ -38,8 +43,8 @@ optdepends=(
     'paru: support AUR via Shelly'
     'yay: support AUR alternatif'
 )
-provides=('shelly-gpui')
-conflicts=('shelly-gpui')
+provides=('calix-gpui')
+conflicts=('calix-gpui' 'shelly-gpui')
 source=("${pkgname}::git+https://github.com/tension-atoi/shelly-gpui.git#branch=main")
 sha256sums=('SKIP')
 
@@ -56,14 +61,14 @@ prepare() {
 build() {
     cd "${srcdir}/${pkgname}"
 
-    # 1. Compile Shelly CLI backend (Zig)
-    echo ">>> Compiling Shelly CLI backend (Zig)..."
+    # 1. Compile the Zig CLI backend (still shipped as `shelly` for now)
+    echo ">>> Compiling the Zig CLI backend..."
     cd Shelly.Cli.Zig
     zig build -Doptimize=ReleaseSafe
     cd ..
 
-    # 2. Compile Shelly GPUI frontend (Rust)
-    echo ">>> Compiling Shelly GPUI frontend (Rust)..."
+    # 2. Compile the Calix GPUI frontend (Rust)
+    echo ">>> Compiling the Calix GPUI frontend (Rust)..."
     cd Shelly.Ui.Gpui
     export CARGO_TARGET_DIR="target"
     SHELLY_BIN="${srcdir}/${pkgname}/Shelly.Cli.Zig/zig-out/bin/shelly" \
@@ -84,24 +89,24 @@ package() {
     install -Dm755 "Shelly.Cli.Zig/zig-out/bin/shelly" \
         "${pkgdir}/usr/lib/shelly/shelly"
 
-    install -Dm755 "Shelly.Ui.Gpui/target/release/shelly-gpui" \
-        "${pkgdir}/usr/lib/shelly/shelly-gpui-bin"
+    install -Dm755 "Shelly.Ui.Gpui/target/release/calix-gpui" \
+        "${pkgdir}/usr/lib/calix/calix-gpui"
 
-    # Wrapper /usr/bin/shelly-gpui setting SHELLY_BIN and executing binary
+    # Wrapper /usr/bin/calix-gpui setting SHELLY_BIN and executing the binary
     install -dm755 "${pkgdir}/usr/bin"
-    cat > "${pkgdir}/usr/bin/shelly-gpui" << 'EOF'
+    cat > "${pkgdir}/usr/bin/calix-gpui" << 'EOF'
 #!/bin/sh
-SHELLY_BIN=/usr/lib/shelly/shelly exec /usr/lib/shelly/shelly-gpui-bin "$@"
+SHELLY_BIN=/usr/lib/shelly/shelly exec /usr/lib/calix/calix-gpui "$@"
 EOF
-    chmod 755 "${pkgdir}/usr/bin/shelly-gpui"
+    chmod 755 "${pkgdir}/usr/bin/calix-gpui"
 
     # ── Desktop Entry ────────────────────────────────────────────────────────
-    install -Dm644 "Shelly.Ui.Gpui/assets/com.shellyorg.shelly-gpui.desktop" \
-        "${pkgdir}/usr/share/applications/com.shellyorg.shelly-gpui.desktop"
+    install -Dm644 "Shelly.Ui.Gpui/assets/com.calix.calix-gpui.desktop" \
+        "${pkgdir}/usr/share/applications/com.calix.calix-gpui.desktop"
 
     # ── SVG Icon ─────────────────────────────────────────────────────────────
-    install -Dm644 "Shelly.Ui.Gpui/assets/shelly-gpui.svg" \
-        "${pkgdir}/usr/share/icons/hicolor/scalable/apps/shelly-gpui.svg"
+    install -Dm644 "Shelly.Ui.Gpui/assets/calix-gpui.svg" \
+        "${pkgdir}/usr/share/icons/hicolor/scalable/apps/calix-gpui.svg"
 
     # ── License ──────────────────────────────────────────────────────────────
     if [ -f LICENSE ]; then
@@ -110,6 +115,6 @@ EOF
     fi
 
     # ── Polkit Policy ────────────────────────────────────────────────────────
-    install -Dm644 "Shelly.Ui.Gpui/assets/com.shellyorg.shelly-gpui.policy" \
-        "${pkgdir}/usr/share/polkit-1/actions/com.shellyorg.shelly-gpui.policy"
+    install -Dm644 "Shelly.Ui.Gpui/assets/com.calix.calix-gpui.policy" \
+        "${pkgdir}/usr/share/polkit-1/actions/com.calix.calix-gpui.policy"
 }

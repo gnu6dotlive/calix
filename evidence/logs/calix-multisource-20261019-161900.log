@@ -1,0 +1,19 @@
+[2026-10-19T16:14:00-0400] === Phase 7b — multi-source view in the Calix GPUI frontend ===
+[2026-10-19T16:14:00-0400] cargo build --release -> Finished, no crate warnings
+[2026-10-19T16:14:00-0400] cargo test  --release -> 190 passed; 0 failed
+[2026-10-19T16:15:00-0400] defect found during live verification:
+[2026-10-19T16:15:00-0400]   the ecosystem merge was applied only to the reload path, not the
+[2026-10-19T16:15:00-0400]   initial load -> 1876 packages instead of 1906. Fixed by extracting
+[2026-10-19T16:15:00-0400]   calix_state::merge_installed() and using it in both call sites.
+[2026-10-19T16:16:00-0400] defect found during live verification:
+[2026-10-19T16:16:00-0400]   PackageKey::from_unified mapped unknown source types to ALPM, so a
+[2026-10-19T16:16:00-0400]   cargo crate was keyed as ALPM and fetched the ALPM details of a
+[2026-10-19T16:17:00-0400]   same-named AUR package (wrong upstream URL, "Not Installed").
+[2026-10-19T16:17:00-0400]   Fixed by adding PackageSourceKind::Cargo/Npm/Release.
+[2026-10-19T16:18:00-0400] $ calix-gpui inspect cargo:cargo-edit
+Inspecting package 'cargo-edit' (cargo)
+[2026-10-19T16:18:00-0400] $ calix-gpui inspect release:artcraft-launcher
+Inspecting package 'artcraft-launcher' (release)
+[2026-10-19T16:18:00-0400] $ calix-gpui inspect npm:node-gyp
+Inspecting package 'node-gyp' (npm)
+[2026-10-19T16:18:00-0400] Installed view header: "1906 packages" (1876 ALPM + 20 cargo + 9 npm + 1 release)

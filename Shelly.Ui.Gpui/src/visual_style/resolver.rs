@@ -130,7 +130,7 @@ pub struct AppearanceStatus {
     pub effects: Vec<EffectResolution>,
 }
 
-pub const APPEARANCE_STATUS_SCHEMA: &str = "shelly.appearance-status/1";
+pub const APPEARANCE_STATUS_SCHEMA: &str = "calix.appearance-status/1";
 
 /// Deterministically resolves a style projection for one surface role.
 ///
@@ -171,7 +171,7 @@ pub fn status_for_config(visual_style: VisualStyleId, dark_theme: bool) -> Appea
         visual_style,
         color_scheme: ColorScheme::from_dark_theme(dark_theme),
         active_profile_revision: profile.revision,
-        source: "committed-shelly-local-config",
+        source: "committed-calix-local-config",
         effects: profile
             .requests
             .iter()
@@ -292,12 +292,12 @@ mod tests {
         assert_eq!(status.visual_style, VisualStyleId::Transparency);
         assert_eq!(status.color_scheme, ColorScheme::Dark);
         assert_eq!(status.active_profile_revision, 1);
-        assert_eq!(status.source, "committed-shelly-local-config");
+        assert_eq!(status.source, "committed-calix-local-config");
         assert_eq!(status.effects.len(), 4);
         let json = serde_json::to_string(&status).expect("Serialize status");
         assert!(json.contains("\"transparency\""));
         assert!(json.contains(APPEARANCE_STATUS_SCHEMA));
-        assert!(json.contains("\"committed-shelly-local-config\""));
+        assert!(json.contains("\"committed-calix-local-config\""));
 
         let standard = status_for_config(VisualStyleId::Standard, false);
         assert_eq!(standard.color_scheme, ColorScheme::Light);

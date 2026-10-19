@@ -182,6 +182,8 @@ pub struct AppImageItem {
     pub path: Option<String>,
 }
 
+use crate::backend::calix_state::{CargoCrate, NpmPackage, ReleasePackage};
+
 /// Représentation unifiée d'un paquet affiché dans la liste GPUI
 #[derive(Debug, Clone, PartialEq)]
 pub enum UnifiedPackageSource {
@@ -189,6 +191,9 @@ pub enum UnifiedPackageSource {
     Aur(AurPackage),
     Flatpak(FlatpakHit),
     AppImage(AppImageItem),
+    Cargo(CargoCrate),
+    Npm(NpmPackage),
+    Release(ReleasePackage),
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -268,6 +273,86 @@ impl UnifiedPackage {
             has_update: false,
             new_version: None,
             inner: UnifiedPackageSource::AppImage(item),
+        }
+    }
+
+    /// Construit un paquet unifié à partir d'une crate Cargo lue par l'inventaire Calix.
+    pub fn from_cargo(name: String, crate_: CargoCrate) -> Self {
+        let description = if crate_.bins.is_empty() {
+            "Cargo crate".to_string()
+        } else {
+            format!("Cargo crate — binaries: {}", crate_.bins.join(", "))
+        };
+        let origin = if crate_.source.is_empty() {
+            "crates.io".to_string()
+        } else {
+            crate_.source.clone()
+        };
+        Self {
+            name,
+            version: crate_.version.clone(),
+            description,
+            source_type: "Cargo".to_string(),
+            repository_or_remote: origin,
+            is_installed: true,
+            has_update: false,
+            new_version: None,
+            inner: UnifiedPackageSource::Cargo(crate_),
+        }
+    }
+
+    /// Construit un paquet unifié à partir d'un paquet NPM global lu par l'inventaire Calix.
+    pub fn from_npm(name: String, package: NpmPackage) -> Self {
+        let description = if package.overridden {
+            "NPM global package (version overridden)".to_string()
+        } else {
+            "NPM global package".to_string()
+        };
+        Self {
+            name,
+            version: package.version.clone(),
+            description,
+            source_type: "NPM".to_string(),
+            repository_or_remote: "npm".to_string(),
+            is_installed: true,
+            has_update: false,
+            new_version: None,
+            inner: UnifiedPackageSource::Npm(package),
+        }
+    }
+
+    /// Construit un paquet unifié à partir d'un paquet suivi par le backend de releases Calix.
+    pub fn from_release(name: String, release: ReleasePackage) -> Self {
+        let installed = release
+            .installed_version
+            .clone()
+            .unwrap_or_else(|| "unknown".to_string());
+        let latest = release.latest_version.clone();
+        let has_update = release.update_available
+            && latest
+                .as_deref()
+                .map(|value| value != installed)
+                .unwrap_or(false);
+        let origin = release
+            .repo
+            .clone()
+            .unwrap_or_else(|| "release".to_string());
+        let description = match (&release.provider, &release.canal) {
+            (Some(provider), Some(canal)) => {
+                format!("Release-managed package — {} channel, {}", provider, canal)
+            }
+            _ => "Release-managed package".to_string(),
+        };
+        Self {
+            name,
+            version: installed,
+            description,
+            source_type: "Release".to_string(),
+            repository_or_remote: origin,
+            is_installed: true,
+            has_update,
+            new_version: if has_update { latest } else { None },
+            inner: UnifiedPackageSource::Release(release),
         }
     }
 

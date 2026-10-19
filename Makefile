@@ -1,5 +1,5 @@
 # ──────────────────────────────────────────────────────────────────────────────
-# Shelly GPUI — Makefile de développement
+# Calix GPUI — Makefile de développement
 # Usage:
 #   make run       — compile (dev) et lance l'app avec le CLI Zig local
 #   make build     — cargo build --release
@@ -18,8 +18,8 @@ TARGET_DIR  := $(shell cd $(RUST_SRC) && cargo metadata --format-version 1 --no-
 ifeq ($(TARGET_DIR),)
   TARGET_DIR := $(RUST_SRC)/target
 endif
-RUST_BIN    := $(TARGET_DIR)/release/shelly-gpui
-PKGBUILD    := $(REPO_ROOT)PKGBUILD-gpui
+RUST_BIN    := $(TARGET_DIR)/release/calix-gpui
+PKGBUILD    := $(REPO_ROOT)PKGBUILD-calix
 
 # Préfère le CLI Zig local ; tombe en arrière sur le CLI système si absent
 ifeq ($(wildcard $(ZIG_BIN)),)
@@ -37,7 +37,7 @@ export SHELLY_BIN
 ## Lance l'application en mode développement (cargo run)
 run: zig
 	@echo ">>> SHELLY_BIN = $(SHELLY_BIN)"
-	@echo ">>> Lancement de shelly-gpui..."
+	@echo ">>> Lancement de calix-gpui..."
 	cd $(RUST_SRC) && SHELLY_BIN=$(SHELLY_BIN) cargo run 2>&1
 
 ## Compile le binaire de release Rust
@@ -70,24 +70,24 @@ zig-rebuild:
 
 ## Lance makepkg dans /tmp pour tester le PKGBUILD complet
 package:
-	@echo ">>> Test PKGBUILD dans /tmp/shelly-gpui-pkg..."
-	rm -rf /tmp/shelly-gpui-pkg
-	mkdir -p /tmp/shelly-gpui-pkg
-	cp $(PKGBUILD) /tmp/shelly-gpui-pkg/PKGBUILD
-	cd /tmp/shelly-gpui-pkg && makepkg -si --noconfirm
+	@echo ">>> Test PKGBUILD dans /tmp/calix-gpui-pkg..."
+	rm -rf /tmp/calix-gpui-pkg
+	mkdir -p /tmp/calix-gpui-pkg
+	cp $(PKGBUILD) /tmp/calix-gpui-pkg/PKGBUILD
+	cd /tmp/calix-gpui-pkg && makepkg -si --noconfirm
 
 ## Installe directement sans PKGBUILD (pour dev rapide)
 install: build
 	@echo ">>> Installation dans /usr/local..."
-	install -Dm755 $(RUST_BIN) /usr/local/lib/shelly/shelly-gpui-bin
+	install -Dm755 $(RUST_BIN) /usr/local/lib/calix/calix-gpui
 	install -Dm755 $(ZIG_BIN)  /usr/local/lib/shelly/shelly
-	@printf '#!/bin/sh\nSHELLY_BIN=/usr/local/lib/shelly/shelly exec /usr/local/lib/shelly/shelly-gpui-bin "$$@"\n' \
-		| install -Dm755 /dev/stdin /usr/local/bin/shelly-gpui
-	install -Dm644 $(RUST_SRC)/assets/com.shellyorg.shelly-gpui.desktop \
-		/usr/local/share/applications/com.shellyorg.shelly-gpui.desktop
-	install -Dm644 $(RUST_SRC)/assets/shelly-gpui.svg \
-		/usr/local/share/icons/hicolor/scalable/apps/shelly-gpui.svg
-	@echo ">>> Installé. Lance : shelly-gpui"
+	@printf '#!/bin/sh\nSHELLY_BIN=/usr/local/lib/shelly/shelly exec /usr/local/lib/calix/calix-gpui "$$@"\n' \
+		| install -Dm755 /dev/stdin /usr/local/bin/calix-gpui
+	install -Dm644 $(RUST_SRC)/assets/com.calix.calix-gpui.desktop \
+		/usr/local/share/applications/com.calix.calix-gpui.desktop
+	install -Dm644 $(RUST_SRC)/assets/calix-gpui.svg \
+		/usr/local/share/icons/hicolor/scalable/apps/calix-gpui.svg
+	@echo ">>> Installé. Lance : calix-gpui"
 
 ## Nettoie tous les artefacts compilés
 clean:

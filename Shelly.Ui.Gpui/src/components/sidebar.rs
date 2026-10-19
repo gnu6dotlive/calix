@@ -249,7 +249,7 @@ impl Sidebar {
                 .flex()
                 .flex_col()
                 .gap(px(4.0))
-                // Header de la barre latérale avec logo Shelly SVG
+                // Header de la barre latérale avec logo Calix SVG
                 .child(
                     div()
                         .flex()
@@ -261,7 +261,7 @@ impl Sidebar {
                         .border_color(theme.border)
                         .child(
                             svg()
-                                .path(AppIcon::Shelly.path())
+                                .path(AppIcon::Calix.path())
                                 .size_5()
                                 .text_color(theme.accent),
                         )
@@ -270,7 +270,7 @@ impl Sidebar {
                                 .text_xs()
                                 .font_weight(FontWeight::BOLD)
                                 .text_color(theme.text_primary)
-                                .child("SHELLY GPUI")
+                                .child("CALIX GPUI")
                         } else {
                             div()
                         }),

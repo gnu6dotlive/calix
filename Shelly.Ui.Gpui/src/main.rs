@@ -89,7 +89,7 @@ fn main() {
         }
     };
 
-    log::info!("Starting Shelly GPUI desktop session...");
+    log::info!("Starting Calix GPUI desktop session...");
 
     let shelly_settings = crate::config::ConfigManager::load_shelly_settings();
     let gpui_config = crate::config::ConfigManager::load_gpui_config_sanitized();
@@ -129,11 +129,11 @@ fn main() {
                     px(crate::config::MIN_WINDOW_HEIGHT),
                 )),
                 titlebar: Some(TitlebarOptions {
-                    title: Some("Shelly — Universal Package Manager".into()),
+                    title: Some("Calix — Universal Package Manager".into()),
                     appears_transparent: false,
                     traffic_light_position: None,
                 }),
-                app_id: Some("shelly-gpui".into()),
+                app_id: Some("calix-gpui".into()),
                 ..Default::default()
             };
 
