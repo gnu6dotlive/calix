@@ -252,8 +252,12 @@ Phase 7a (Completed) : Calix branding of the Rust GPUI frontend
                         → crate `shelly-gpui` → `calix-gpui`, app_id/socket/class renommés, 15 fichiers
                           de surface mis à jour, PKGBUILD-calix, 178 tests verts, lancement Wayland natif
                           vérifié en direct (evidence/runs/calix-branding-20261019-154900/).
-Phase 7b (Next)      : Multi-source view dans l'UI GPUI (AppImage / Cargo / NPM / releases)
-Phase 8 (Final)      : Transition from Shelly to Calix (pacman -R shelly, install calix-bin)
+Phase 7b (Completed) : Vue multi-source dans l'UI GPUI
+                        → 30 paquets invisibles sont maintenant listés : 20 crates Cargo, 9 paquets NPM
+                          globaux, 1 paquet suivi par le backend de releases. La vue « Installed » passe
+                          de 1876 à 1906 paquets. Trois défauts trouvés en vérification live et corrigés
+                          (voir §0). 190 tests verts.
+Phase 8 (Next)       : Transition from Shelly to Calix (pacman -R shelly, install calix-bin)
                         ⚠️ Prérequis : le backend Zig doit d'abord passer de `shelly` à `calix`.
 ```
 
@@ -308,6 +312,31 @@ Phase 8 (Final)      : Transition from Shelly to Calix (pacman -R shelly, instal
   polkit renommés ; `calix gui` résout désormais le vrai binaire (y compris via un `target-dir` cargo
   redirigé) et ne retombe plus que de façon explicite et signalée.
 
+### 6. Les écosystèmes Calix étaient invisibles dans l'UI (RÉSOLU ✓ — Phase 7b)
+- **Constat** : le moteur Calix inventoriait 20 crates Cargo, 9 paquets NPM globaux et 1 paquet suivi
+  par le backend de releases, mais le frontend GPUI n'affichait que ce que le CLI Shelly rapporte :
+  30 paquets installés étaient invisibles.
+- **Défauts trouvés en vérification live** (les tests ne les attrapaient pas) :
+  1. La fusion de l'inventaire n'était câblée que sur le chemin de rechargement, pas sur le chargement
+     initial → la vue affichait encore 1876 paquets au lieu de 1906.
+  2. `PackageKey::from_unified` classait toute source inconnue comme ALPM → une crate Cargo héritait
+     de la clé ALPM et récupérait les détails ALPM d'un paquet homonyme (l'AUR `cargo-edit`), affichant
+     une URL amont et un motif d'installation qui ne concernaient pas la crate inspectée.
+  3. `is_alpm` reposait sur un repli « source inconnue = ALPM » : une crate Cargo héritait des
+     capacités ALPM (dépendances, build, suppression).
+- **Solution** : `backend/calix_state.rs` (lecture à tolérance de panne), `merge_installed()` comme
+  point de fusion unique, `PackageSourceKind::Cargo/Npm/Release`, et une sémantique dédiée aux
+  écosystèmes Calix (ni installation, ni suppression, ni résolution de dépendances).
+- **Preuve** : la vue « Installed » affiche **1906 paquets** ; les inspecteurs cargo / release / npm
+  affichent chacun leurs propres métadonnées. 190 tests verts, avec un test de régression pour chacun
+  des trois défauts (`evidence/runs/calix-multisource-20261019-161900/`).
+
+### 7. Aucun filet de sécurité sur les transactions pacman (RÉSOLU ✓)
+- **Constat** : le plan affirmait que `snap-pac` créait des snapshots pré/post sur chaque transaction
+  pacman. Le hook n'était **pas installé** — aucune transaction n'était protégée.
+- **Solution** : `snap-pac` installé depuis `extra` (3.0.1-3) ; le hook post-transaction a créé le
+  snapshot **#2224** dès l'installation. Le filet automatique est désormais réel.
+
 ---
 
 ## 📁 Structure Repo Cible (post-renommage)
@@ -351,24 +380,26 @@ Phase 8 (Final)      : Transition from Shelly to Calix (pacman -R shelly, instal
 
 **Déjà fait** ✔ — research CachyOS, renommage du repo, `PKGBUILD-calix`, moteur `calix-release` avec
 dispatch GitHub/GitLab/Gitea, CLI unifiée versionnée, `calix-sync.service`/`.timer` installés **et
-activés**, branding Calix du frontend GPUI.
+activés**, branding Calix du frontend GPUI (Phase 7a), vue multi-source Cargo/NPM/releases (Phase 7b),
+`snap-pac` installé.
 
 **À faire, par ordre de valeur :**
 
-1. **[ ] Phase 7b — Vue multi-source dans l'UI GPUI.** L'interface ne montre aujourd'hui que les
-   sources gérées par le backend Shelly (ALPM/AUR/Flatpak/AppImage). L'index Calix sait déjà produire
-   l'inventaire unifié (`calix list all` : 16 AppImages, 20 crates Cargo, 9 NPM globaux, 1875 ALPM).
-   Il faut exposer cet état à l'UI — soit via le backend Zig, soit via le socket de contrôle.
-2. **[ ] Décider du stockage.** L'architecture prévoit SurrealDB embedded ; l'implémentation actuelle
+1. **[ ] Renommer le backend Zig** `Shelly.Cli.Zig` → `calix.cli.zig` (binaire `shelly` → `calix`).
+   C'est le prérequis de la Phase 8 : le frontend parle encore au CLI via `SHELLY_BIN`.
+   Le codebase Zig fait ~69 000 lignes avec 408 références à `shelly` — prévoir des étapes (identifiants
+   d'action polkit, chemins XDG, protocole IPC, noms de snapshots de test) plutôt qu'un remplacement global.
+2. **[ ] Brancher les actions d'installation/suppression sur les écosystèmes Calix.** Les paquets Cargo,
+   NPM et releases sont listés mais aucune action n'est proposée : il faut un chemin d'exécution pour
+   `cargo install --locked`, `npm i -g`, et la reconstruction PKGBUILD du backend de releases.
+3. **[ ] Étendre la recherche aux écosystèmes Calix.** Le rail de recherche ne couvre encore que
+   ALPM/AUR/Flatpak/AppImage ; l'inventaire Calix n'est pas interrogeable.
+4. **[ ] Décider du stockage.** L'architecture prévoit SurrealDB embedded ; l'implémentation actuelle
    utilise des JSON (`~/.local/state/calix/*.json`) avec un registre de suivi dans
    `~/.config/calix/releases.json`. SurrealDB reste un objectif, pas une obligation : le JSON est
    versionnable, diffable et suffisant à l'échelle actuelle.
-3. **[ ] Renommer le backend Zig** `Shelly.Cli.Zig` → `calix.cli.zig` (binaire `shelly` → `calix`).
-   C'est le prérequis de la Phase 8 : le frontend parle encore au CLI via `SHELLY_BIN`.
-4. **[ ] Installer `snap-pac`** pour rétablir les snapshots automatiques pré/post pacman, ou intégrer
-   la création de snapshot au chemin `calix update` (aujourd'hui c'est une étape manuelle).
 5. **[ ] Phase 8 — Transition** : `pacman -R shelly` + installation de `calix-bin`. Ne pas le faire
-   avant l'étape 3 : le frontend dépend encore du CLI Shelly.
+   avant l'étape 1 : le frontend dépend encore du CLI Shelly.
 6. **[ ] Renommer le dépôt GitHub** `tension-atoi/shelly-gpui` → `tension-atoi/calix` (action manuelle,
    hors de portée de l'agent).
 
