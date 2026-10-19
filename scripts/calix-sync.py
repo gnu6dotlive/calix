@@ -80,7 +80,6 @@ SHELLY_APPIMAGE_DB = os.path.join(SHELLY_CONFIG_DIR, "appimage-metadata-v2.db")
 VERSION_KEYS = (
     "X-AppImage-Version",
     "X-OpenWork-Version",
-    "X-AppImage-Name",
     "X-Craft-Version",
 )
 

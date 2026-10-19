@@ -48,6 +48,11 @@ pub const variants = [_]types.Variant{
                 .description = "Select the AppImage update-configuration overload",
                 .hidden = true,
             },
+            .{
+                .name = "--discover",
+                .description = "Only scan the installation directory for AppImages and commit what is found, without refreshing the extracted metadata",
+                .hidden = true,
+            },
         },
     },
     .{

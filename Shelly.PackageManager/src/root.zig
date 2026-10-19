@@ -127,9 +127,13 @@ pub const appimage = struct {
     pub const update_manager = @import("appimage/update_manager.zig");
     pub const bindings = @import("appimage/bindings.zig");
     pub const events = @import("appimage/events.zig");
+    pub const discovery = @import("appimage/discovery.zig");
 
     pub const Manager = manager.AppImageManager;
     pub const UpdateManager = update_manager.UpdateManager;
+    // Flattened alias: referencing the module here is what makes Zig
+    // analyse it, and therefore run the tests it carries.
+    pub const AppImageDiscovery = discovery;
     pub const AppImage = bindings.appimage.AppImage;
     pub const AppImageUpdate = bindings.appimage.AppImageUpdate;
     pub const UpdateType = bindings.appimage.UpdateType;
@@ -338,6 +342,7 @@ test "public library surface exposes package manager APIs" {
     _ = appimage.EventDispatcher;
     _ = appimage.StatusHandler;
     _ = appimage.DownloadProgressHandler;
+    _ = appimage.AppImageDiscovery;
     _ = pkgbuild.Parser;
     _ = pkgbuild.HomographValidator;
     _ = pkgbuild.PostInstallValidator;

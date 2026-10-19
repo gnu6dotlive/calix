@@ -239,6 +239,31 @@ fn runRealAppImageSync(
     try manager.setOperationContext(operation_context);
     defer manager.setOperationContext(null) catch {};
 
+    // Discovery: pick up AppImages that are present in the installation
+    // directory but unknown to the database. Without this the database only
+    // ever held what the backend itself had installed, and an AppImage
+    // dropped in by hand was invisible.
+    const applications_directory = try std.fs.path.join(
+        context.allocator,
+        &.{ try xdg.dataHome(context), "applications" },
+    );
+    defer context.allocator.free(applications_directory);
+
+    _ = try manager.discoverAppImages(applications_directory);
+
+    if (optionEnabled(invocation, "--discover")) {
+        const app_images_after = try manager.getAppImagesFromLocalDb();
+        defer manager.freeAppImages(app_images_after);
+        const message = try std.fmt.allocPrint(
+            context.allocator,
+            "Discovered {d} AppImage(s) in {s}.",
+            .{ app_images_after.len, install_directory },
+        );
+        defer context.allocator.free(message);
+        emitAppImageInfo(operation_context, message);
+        return;
+    }
+
     const app_images = try manager.getAppImagesFromLocalDb();
     defer manager.freeAppImages(app_images);
 

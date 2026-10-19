@@ -1,0 +1,59 @@
+{
+  "run_id": "calix-sync-20261019-181718",
+  "kind": "calix-sync",
+  "status": "ok",
+  "destination": "repo",
+  "started_at": "2026-10-19T22:17:18Z",
+  "finished_at": "2026-10-19T22:17:19Z",
+  "duration_ms": 1092,
+  "tool_version": "2.0.0",
+  "host": {
+    "kernel": "7.2.9-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "python": "3.14.8"
+  },
+  "steps": [
+    {
+      "name": "appimages",
+      "status": "ok",
+      "at": "2026-10-19T22:17:18Z",
+      "count": 16
+    },
+    {
+      "name": "cargo",
+      "status": "ok",
+      "at": "2026-10-19T22:17:18Z",
+      "count": 20
+    },
+    {
+      "name": "npm",
+      "status": "ok",
+      "at": "2026-10-19T22:17:18Z",
+      "count": 9
+    },
+    {
+      "name": "alpm",
+      "status": "ok",
+      "at": "2026-10-19T22:17:19Z",
+      "installed": 1876,
+      "aur": 22
+    },
+    {
+      "name": "releases",
+      "status": "ok",
+      "at": "2026-10-19T22:17:19Z",
+      "count": 1
+    }
+  ],
+  "artifacts": [],
+  "known_gaps": [],
+  "counts": {
+    "alpm_total": 1876,
+    "aur_total": 22,
+    "appimages": 16,
+    "cargo": 20,
+    "npm": 9,
+    "releases": 1
+  },
+  "db_locked": false
+}

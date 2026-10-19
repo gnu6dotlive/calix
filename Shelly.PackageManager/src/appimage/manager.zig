@@ -1,8 +1,10 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const appimage = @import("bindings.zig").appimage;
+const discovery = @import("discovery.zig");
 const launch_environment = @import("environment.zig");
 const events = @import("events.zig");
+const test_support = @import("test_support.zig");
 const xdg_paths = @import("../shared/xdg_paths.zig").xdg_paths;
 const operation_api = @import("operation_context");
 
@@ -189,7 +191,13 @@ pub const AppImageManager = struct {
         try self.checkCancelled();
         var src = try std.Io.Dir.cwd().openFile(self.io, src_path, .{});
         defer src.close(self.io);
-        var dst = try std.Io.Dir.cwd().createFile(self.io, dest_path, .{ .exclusive = true });
+        // The executable bit has to survive the copy: an AppImage that lost
+        // it can no longer be run, and the metadata extraction runs it.
+        const src_stat = try src.stat(self.io);
+        var dst = try std.Io.Dir.cwd().createFile(self.io, dest_path, .{
+            .exclusive = true,
+            .permissions = src_stat.permissions,
+        });
         defer dst.close(self.io);
 
         var read_buf: [1024 * 64]u8 = undefined;
@@ -1125,6 +1133,49 @@ pub const AppImageManager = struct {
         operation_scope.finish(.success);
     }
 
+    /// Scans the installation directory and commits the result to the database.
+    ///
+    /// The database used to hold only what the backend itself had installed:
+    /// an AppImage dropped into the installation directory by hand, or by
+    /// another tool, was invisible. Discovery closes that gap and is the
+    /// backend's own responsibility — it owns the database, so it reads its
+    /// own directory.
+    ///
+    /// The fields a scan cannot supply — the update URL and type, the forge
+    /// coordinates, the prerelease opt-in — are carried over untouched.
+    ///
+    /// Returns the number of records in the database after the scan.
+    pub fn discoverAppImages(
+        self: AppImageManager,
+        applications_directory: []const u8,
+    ) !usize {
+        const discovered = try discovery.discover(self.allocator, self.io, .{
+            .install_directory = self.install_directory,
+            .applications_directory = applications_directory,
+        });
+        defer {
+            for (discovered) |item| discovery.freeAppImage(self.allocator, item);
+            self.allocator.free(discovered);
+        }
+
+        const known = try self.getAppImagesFromLocalDb();
+        defer self.freeAppImages(known);
+
+        const merged = try discovery.merge(self.allocator, known, discovered);
+        defer self.freeAppImages(merged);
+        try self.persistAppImages(merged);
+        return merged.len;
+    }
+
+    /// Commits a full set of AppImage records to the local database.
+    ///
+    /// Discovery rebuilds the set from the installation directory and must
+    /// write it in one pass; committing one record at a time would re-read
+    /// and re-write the whole database for every record.
+    pub fn commitAppImages(self: AppImageManager, items: []const appimage.AppImage) !void {
+        try self.persistAppImages(items);
+    }
+
     pub fn removeAppImageFromLocalDb(self: AppImageManager, app_name: []const u8) !void {
         var operation_scope = events.OperationScope.init(self.operation_context, self.dispatcher, .configure, app_name);
         operation_scope.attach();
@@ -1275,6 +1326,15 @@ pub const AppImageManager = struct {
                             break :blk false;
                         };
                         std.Io.Dir.cwd().deleteFile(self.io, ex.path) catch {};
+                        // The file moved: every desktop entry that
+                        // launched the old path is now broken. The backend
+                        // replaces them with its own entry below, exactly
+                        // as it does on install and on removal, so the
+                        // stale ones are cleared here rather than left
+                        // pointing at a file that no longer exists.
+                        if (self.cleanDesktopEntries(app_name, ex.path) catch null) |cleaned| {
+                            self.allocator.free(cleaned);
+                        }
                         break :blk true;
                     }
                     break :blk false;
@@ -1289,6 +1349,17 @@ pub const AppImageManager = struct {
                     continue;
                 }
             }
+
+            // The AppImage has to be executable before it can be asked for
+            // its own metadata: the extraction runs it. A file that lost the
+            // bit — a copy, a restored backup, a file dropped in by hand —
+            // would otherwise abort the whole synchronisation with
+            // AccessDenied instead of being repaired.
+            self.setExecutable(appimage_path) catch |err| {
+                std.log.warn("Could not make the AppImage executable. {0f}\n\nTechnical details: {1s}", .{ @import("diagnostics").safe(app_name), @errorName(err) });
+                success = false;
+                continue;
+            };
 
             var content = (try self.extractMetadataPure(appimage_path, null, null)) orelse {
                 std.log.err("Could not extract metadata for AppImage {0f}.", .{@import("diagnostics").safe(app_name)});
@@ -2446,7 +2517,7 @@ test "cleanInvalidNames lowercases and replaces separators" {
     const manager = AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = db_path,
         .local_db_path = full_db_path,
     };
@@ -2480,7 +2551,7 @@ test "cleanInvalidNames handles empty string" {
     const manager = AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = db_path,
         .local_db_path = full_db_path,
     };
@@ -2506,7 +2577,7 @@ test "getAppImagesFromLocalDb returns empty when db file does not exist" {
     const manager = AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = db_path,
         .local_db_path = full_db_path,
     };
@@ -2533,7 +2604,7 @@ test "getAppImagesFromLocalDb leaves native database unchanged" {
     const manager = AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = dir_path,
         .local_db_path = db_path,
     };
@@ -2564,7 +2635,7 @@ test "getAppImagesFromLocalDb leaves a malformed database unchanged" {
     const manager = AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = dir_path,
         .local_db_path = db_path,
     };
@@ -2592,7 +2663,7 @@ test "addAppImageToLocalDb then getAppImagesFromLocalDb round-trips a single ent
     const manager = AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = dir_path,
         .local_db_path = db_path,
     };
@@ -2643,7 +2714,7 @@ test "getAppImagesFromLocalDb ignores unknown fields from a newer database" {
     const manager = AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = dir_path,
         .local_db_path = db_path,
     };
@@ -2672,7 +2743,7 @@ test "addAppImageToLocalDb overwrites entry with matching desktop_name" {
     const manager = AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = dir_path,
         .local_db_path = db_path,
     };
@@ -2713,7 +2784,7 @@ test "addAppImageToLocalDb keeps distinct desktop_name entries separate" {
     const manager = AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = dir_path,
         .local_db_path = db_path,
     };
@@ -2742,7 +2813,7 @@ test "removeAppImageFromLocalDb removes an orphaned entry by name" {
     const manager = AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = dir_path,
         .local_db_path = db_path,
     };
@@ -2783,7 +2854,7 @@ test "removeAppImage removes matching entry from db by name" {
     const manager = AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = dir_path,
         .local_db_path = db_path,
     };
@@ -2890,7 +2961,7 @@ test "copyFile duplicates file contents" {
     const manager = AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = dir_path,
         .local_db_path = "unused",
     };

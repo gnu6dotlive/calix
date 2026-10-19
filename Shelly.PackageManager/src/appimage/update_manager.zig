@@ -4,6 +4,7 @@ const appimage = @import("bindings.zig").appimage;
 const builtin = @import("builtin");
 const appimage_manager = @import("manager.zig");
 const events = @import("events.zig");
+const test_support = @import("test_support.zig");
 
 const downloader = @import("../shared/downloader.zig");
 const release_version = @import("../shared/release_version.zig");
@@ -2037,7 +2038,7 @@ fn makeUpdateManager(allocator: std.mem.Allocator, install_dir: []const u8, db_p
     return .{
         .allocator = allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = install_dir,
         .local_db_path = db_path,
     };
@@ -2084,7 +2085,7 @@ test "configure_updates persists a normalized Forgejo release-page URL" {
     const database = appimage_manager.AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = root,
         .local_db_path = db_path,
     };
@@ -2273,7 +2274,7 @@ test "AppImage updates honor shared cancellation" {
     var manager = UpdateManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = "/tmp/shelly-appimage-cancelled",
         .local_db_path = "/tmp/shelly-appimage-cancelled.json",
     };
@@ -2406,7 +2407,7 @@ test "update: downloads real AppImage and returns true" {
     const manager = appimage_manager.AppImageManager{
         .allocator = std.testing.allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = dir_path,
         .local_db_path = db_path,
     };
@@ -2502,7 +2503,7 @@ fn makeStagedUpdateManager(
     return .{
         .allocator = allocator,
         .io = std.testing.io,
-        .environ = std.testing.environ,
+        .environ = test_support.isolatedEnviron(),
         .install_directory = install_dir,
         .local_db_path = db_path,
         .staged_download_path = staged_download_path,
