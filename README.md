@@ -1,4 +1,4 @@
-# ⚡ Shelly GPUI
+# ⚡ Calix GPUI
 
 <div align="center">
 
@@ -81,8 +81,8 @@ sudo pacman -S --needed base-devel git rust cargo zig pacman libglvnd fontconfig
 The repository provides a root `Makefile` that automatically compiles the Zig backend and launches the GPUI frontend:
 
 ```bash
-git clone https://github.com/tension-atoi/shelly-gpui.git
-cd shelly-gpui
+git clone https://github.com/tension-atoi/calix.git
+cd calix
 
 # Launch directly in development mode
 make run
@@ -93,7 +93,7 @@ make build
 
 Available `make` targets:
 - `make run`: Compiles the Zig backend (if needed) and starts `cargo run` with the local CLI.
-- `make build`: Generates the optimized release binary (`shelly-gpui`).
+- `make build`: Generates the optimized release binary (`calix-gpui`).
 - `make check`: Runs fast static compilation checks without linking.
 - `make install`: Installs the binaries and desktop integration files into `/usr/local`.
 - `make package`: Builds and tests the Arch Linux package via `makepkg`.
@@ -116,7 +116,9 @@ Available `make` targets:
 
 ## 📦 Arch Linux Packaging (AUR)
 
-Both [`PKGBUILD-gpui`](PKGBUILD-gpui) and [`packaging/aur/PKGBUILD`](packaging/aur/PKGBUILD) are provided for clean Arch Linux packaging:
+The [`PKGBUILD-calix`](PKGBUILD-calix) is provided for clean Arch Linux packaging, and
+[`packaging/aur/PKGBUILD`](packaging/aur/PKGBUILD) is a symlink to it so the AUR copy can never drift
+from the in-tree one:
 
 ```bash
 # Build the package locally
@@ -124,12 +126,12 @@ makepkg -si --noconfirm
 ```
 
 The package installs:
-- `/usr/bin/shelly-gpui`: System wrapper script with automated environment discovery
+- `/usr/bin/calix-gpui`: System wrapper script with automated environment discovery
 - `/usr/lib/shelly/shelly`: Native Zig CLI engine
-- `/usr/lib/shelly/shelly-gpui-bin`: GPU-accelerated Rust frontend binary
-- `/usr/share/applications/com.shellyorg.shelly-gpui.desktop`: XDG desktop application entry
-- `/usr/share/icons/hicolor/scalable/apps/shelly-gpui.svg`: Scalable Catppuccin vector icon
-- `/usr/share/polkit-1/actions/com.shellyorg.shelly-gpui.policy`: Polkit authorization rules for seamless system operations
+- `/usr/lib/calix/calix-gpui`: GPU-accelerated Rust frontend binary
+- `/usr/share/applications/com.calix.calix-gpui.desktop`: XDG desktop application entry
+- `/usr/share/icons/hicolor/scalable/apps/calix-gpui.svg`: Scalable Catppuccin vector icon
+- `/usr/share/polkit-1/actions/com.calix.calix-gpui.policy`: Polkit authorization rules for seamless system operations
 
 ---
 

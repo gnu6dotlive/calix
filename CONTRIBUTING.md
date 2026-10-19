@@ -37,7 +37,7 @@ sudo pacman -S --needed base-devel git rust cargo zig pacman libglvnd fontconfig
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/tension-atoi/shelly-gpui.git
+   git clone https://github.com/tension-atoi/calix.git
    cd shelly-gpui
    ```
 

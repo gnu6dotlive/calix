@@ -12,7 +12,7 @@ pkgver=r0.git
 pkgrel=1
 pkgdesc="Frontend GPUI natif Rust pour Calix — gestionnaire de paquets Arch Linux (ALPM, AUR, Flatpak, AppImage)"
 arch=('x86_64')
-url="https://github.com/tension-atoi/shelly-gpui"
+url="https://github.com/tension-atoi/calix"
 license=('GPL-3.0-only')
 depends=(
     'glibc'
@@ -45,7 +45,7 @@ optdepends=(
 )
 provides=('calix-gpui')
 conflicts=('calix-gpui' 'shelly-gpui')
-source=("${pkgname}::git+https://github.com/tension-atoi/shelly-gpui.git#branch=main")
+source=("${pkgname}::git+https://github.com/tension-atoi/calix.git#branch=main")
 sha256sums=('SKIP')
 
 pkgver() {

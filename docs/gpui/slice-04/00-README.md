@@ -49,7 +49,7 @@ It purposefully delivers:
 
 Repository:
 
-    tension-atoi/shelly-gpui
+    tension-atoi/calix
 
 Canonical branch:
 

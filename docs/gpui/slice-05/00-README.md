@@ -61,7 +61,7 @@ This slice builds upon the Slice-04 interaction and motion layer, executing a co
 
 Repository:
 
-    tension-atoi/shelly-gpui
+    tension-atoi/calix
 
 Canonical branch:
 

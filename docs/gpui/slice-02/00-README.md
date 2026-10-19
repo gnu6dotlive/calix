@@ -36,7 +36,7 @@ This is the architectural foundation for the future Shelly GPUI workstation.
 
 Repository:
 
-    tension-atoi/shelly-gpui
+    tension-atoi/calix
 
 Canonical branch:
 

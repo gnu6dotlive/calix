@@ -382,6 +382,17 @@ Tranche 1 (Next)     : Absorption du moteur Python dans le Zig
 └── evidence/              ← logs de tests (conforme AGENTS.md)
 ```
 
+### 9. La copie AUR du PKGBUILD avait divergé (RÉSOLU ✓)
+- **Constat** : `packaging/aur/PKGBUILD` était une **copie périmée** de l'ancien `PKGBUILD-gpui`. Elle
+  installait encore `shelly-gpui`, l'ancienne desktop entry `com.shellyorg.shelly-gpui.desktop` et
+  l'ancienne icône — c'est-à-dire que le branding de la Phase 7a n'avait jamais atteint la copie
+  publiée sur l'AUR. Le README pointait en outre vers `PKGBUILD-gpui`, un fichier supprimé : lien mort.
+- **Solution** : `packaging/aur/PKGBUILD` est désormais un **lien symbolique** vers `PKGBUILD-calix`.
+  Une seule définition de paquet, donc aucune dérive possible — la copie AUR ne peut plus.publishier
+  autre chose que l'in-tree.
+- **Preuve** : `packaging/aur/PKGBUILD` et `PKGBUILD-calix` sont désormais le même fichier, par
+  construction.
+
 ### 8. Deux bugs vivants dans le backend Zig (RÉSOLU ✓ — tranche 0)
 - **Défaut 1 — ordering des tags de release** : `updateIsAvailable()` ne comparait les versions que si
   **les deux** étaient purement numériques pointés. Toute autre paire retombait sur « toute différence
@@ -481,8 +492,12 @@ Travail réellement nouveau, en Zig :
 - **Recherche étendue** aux écosystèmes Calix — le rail de recherche ne couvre encore qu'ALPM/AUR/Flatpak/AppImage.
 - **Phase 8 — transition** : le frontend ne dépendant plus du `shelly` installé, le backend peut être
   renommé `calix` ; le `shelly` installé peut alors être retiré.
-- **[ ] Renommer le dépôt GitHub** `tension-atoi/shelly-gpui` → `tension-atoi/calix` (action manuelle,
-  hors de portée de l'agent).
+- **[x] Renommer le dépôt GitHub** `tension-atoi/shelly-gpui` → `tension-atoi/calix` — fait par
+  l'opérateur le 2026-10-19 ; l'historique est préservé et le remote local pointe désormais sur la
+  nouvelle URL. Toutes les références vivantes du dépôt (PKGBUILD, README, CONTRIBUTING, SECURITY,
+  templates d'issue, contrats de slice) ont été mises à jour. Les rapports d'acceptation signés et
+  leurs captures de sortie brute n'ont volontairement pas été réécrits : ce sont des enregistrements
+  datés, assortis de hashes de commit, et le lien GitHub redirige de toute façon.
 
 ---
 
