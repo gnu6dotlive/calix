@@ -9,6 +9,12 @@ pub enum PackageSourceKind {
     Aur,
     Flatpak,
     AppImage,
+    /// Crate Cargo exposée par l'inventaire du moteur Calix.
+    Cargo,
+    /// Paquet NPM global exposé par l'inventaire du moteur Calix.
+    Npm,
+    /// Paquet suivi par le backend de releases Calix.
+    Release,
 }
 
 impl PackageSourceKind {
@@ -18,6 +24,9 @@ impl PackageSourceKind {
             PackageSourceKind::Aur => "aur",
             PackageSourceKind::Flatpak => "flatpak",
             PackageSourceKind::AppImage => "appimage",
+            PackageSourceKind::Cargo => "cargo",
+            PackageSourceKind::Npm => "npm",
+            PackageSourceKind::Release => "release",
         }
     }
 }
@@ -29,6 +38,9 @@ impl std::fmt::Display for PackageSourceKind {
             PackageSourceKind::Aur => write!(f, "AUR"),
             PackageSourceKind::Flatpak => write!(f, "Flatpak"),
             PackageSourceKind::AppImage => write!(f, "AppImage"),
+            PackageSourceKind::Cargo => write!(f, "Cargo"),
+            PackageSourceKind::Npm => write!(f, "NPM"),
+            PackageSourceKind::Release => write!(f, "Release"),
         }
     }
 }
@@ -59,6 +71,9 @@ impl PackageKey {
             "AUR" => PackageSourceKind::Aur,
             "Flatpak" => PackageSourceKind::Flatpak,
             "AppImage" => PackageSourceKind::AppImage,
+            "Cargo" => PackageSourceKind::Cargo,
+            "NPM" => PackageSourceKind::Npm,
+            "Release" => PackageSourceKind::Release,
             _ => PackageSourceKind::Alpm,
         };
         PackageKey {
@@ -650,5 +665,70 @@ mod tests {
             session.last_workspace_destination,
             NavDestination::Installed
         );
+    }
+
+    /// Une crate Cargo ne doit pas être cléifiée comme un paquet ALPM.
+    ///
+    /// Le repli « toute source inconnue est ALPM » faisait récupérer les
+    /// détails ALPM d'un homonyme (une crate `cargo-edit` et le paquet AUR
+    /// `cargo-edit` partagent le même nom), affichant une URL amont et un
+    /// motif d'installation qui ne concernent pas la crate inspectée.
+    #[test]
+    fn ecosystem_packages_get_their_own_source_kind() {
+        use crate::backend::calix_state::{CargoCrate, NpmPackage, ReleasePackage};
+        use crate::backend::models::UnifiedPackageSource;
+
+        let cases = vec![
+            (
+                "Cargo",
+                UnifiedPackageSource::Cargo(CargoCrate {
+                    version: "0.13.11".into(),
+                    source: "crates.io".into(),
+                    bins: vec!["cargo-add".into()],
+                }),
+                PackageSourceKind::Cargo,
+            ),
+            (
+                "NPM",
+                UnifiedPackageSource::Npm(NpmPackage {
+                    version: "5.6.3".into(),
+                    overridden: false,
+                }),
+                PackageSourceKind::Npm,
+            ),
+            (
+                "Release",
+                UnifiedPackageSource::Release(ReleasePackage {
+                    installed_version: Some("0.5.1".into()),
+                    latest_version: Some("0.5.1".into()),
+                    update_available: false,
+                    repo: Some("storytold/craft-launcher".into()),
+                    provider: Some("github".into()),
+                    canal: Some("stable".into()),
+                    pkgname: Some("artcraft-launcher-bin".into()),
+                }),
+                PackageSourceKind::Release,
+            ),
+        ];
+
+        for (source_type, inner, expected) in cases {
+            let pkg = UnifiedPackage {
+                name: "cargo-edit".into(),
+                version: "1.0.0".into(),
+                description: "test".into(),
+                source_type: source_type.into(),
+                repository_or_remote: "origin".into(),
+                is_installed: true,
+                has_update: false,
+                new_version: None,
+                inner,
+            };
+            let key = PackageKey::from_unified(&pkg);
+            assert_eq!(
+                key.source, expected,
+                "{} must not be keyed as ALPM",
+                source_type
+            );
+        }
     }
 }

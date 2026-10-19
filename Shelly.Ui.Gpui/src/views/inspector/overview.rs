@@ -53,6 +53,15 @@ impl OverviewView {
                 .as_ref()
                 .map(|id| format!("https://flathub.org/apps/{}", id)),
             UnifiedPackageSource::AppImage(ai) => ai.update_url.clone(),
+            UnifiedPackageSource::Cargo(_) => None,
+            UnifiedPackageSource::Npm(_) => None,
+            UnifiedPackageSource::Release(r) => r.repo.as_ref().map(|repo| {
+                match r.provider.as_deref() {
+                    Some("github") => format!("https://github.com/{}", repo),
+                    Some("gitlab") => format!("https://gitlab.com/{}", repo),
+                    _ => repo.clone(),
+                }
+            }),
         }
         .or_else(|| alpm.and_then(|a| a.url.clone()));
 
@@ -69,6 +78,9 @@ impl OverviewView {
             }
             UnifiedPackageSource::Flatpak(_) => "Unknown / Flathub".to_string(),
             UnifiedPackageSource::AppImage(_) => "Unknown / Bundle".to_string(),
+            UnifiedPackageSource::Cargo(_) => "Unknown / Crates.io".to_string(),
+            UnifiedPackageSource::Npm(_) => "Unknown / npm".to_string(),
+            UnifiedPackageSource::Release(_) => "Unknown / Release".to_string(),
         };
 
         let installed_size_str = match &pkg.inner {
@@ -79,6 +91,9 @@ impl OverviewView {
             UnifiedPackageSource::Flatpak(fp) => fp.installed_size.map(PackageTable::format_bytes),
             UnifiedPackageSource::AppImage(ai) => ai.size_on_disk.map(PackageTable::format_bytes),
             UnifiedPackageSource::Aur(_) => None,
+            UnifiedPackageSource::Cargo(_)
+            | UnifiedPackageSource::Npm(_)
+            | UnifiedPackageSource::Release(_) => None,
         };
 
         let download_size_str = match &pkg.inner {

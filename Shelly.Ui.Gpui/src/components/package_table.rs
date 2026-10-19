@@ -32,6 +32,10 @@ impl PackageTable {
             UnifiedPackageSource::Flatpak(fp) => fp.installed_size.or(fp.download_size),
             UnifiedPackageSource::AppImage(ai) => ai.size_on_disk,
             UnifiedPackageSource::Aur(_) => None,
+            // Les écosystèmes Calix n'exposent pas de taille d'installation.
+            UnifiedPackageSource::Cargo(_)
+            | UnifiedPackageSource::Npm(_)
+            | UnifiedPackageSource::Release(_) => None,
         };
 
         match opt_size {

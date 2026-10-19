@@ -282,6 +282,129 @@ impl FilesBuildView {
                     .child(info)
             }
 
+            UnifiedPackageSource::Cargo(crate_) => {
+                let binaries = if crate_.bins.is_empty() {
+                    "—".to_string()
+                } else {
+                    crate_.bins.join(", ")
+                };
+                let info = div()
+                    .flex()
+                    .flex_col()
+                    .p_4()
+                    .rounded_md()
+                    .bg(theme.bg_surface)
+                    .border_1()
+                    .border_color(theme.border)
+                    .gap_2()
+                    .child(Self::render_info_row("CRATE", pkg.name.clone(), theme))
+                    .child(Self::render_info_row("VERSION", crate_.version.clone(), theme))
+                    .child(Self::render_info_row("BINARIES", binaries, theme))
+                    .child(Self::render_info_row(
+                        "REGISTRY",
+                        if crate_.source.is_empty() {
+                            "crates.io".to_string()
+                        } else {
+                            crate_.source.clone()
+                        },
+                        theme,
+                    ));
+
+                div()
+                    .flex()
+                    .flex_col()
+                    .py_4()
+                    .gap_4()
+                    .child(
+                        div()
+                            .text_xs()
+                            .font_weight(FontWeight::BOLD)
+                            .text_color(theme.text_muted)
+                            .child("CARGO ECOSYSTEM METADATA"),
+                    )
+                    .child(info)
+            }
+
+            UnifiedPackageSource::Npm(package) => {
+                let info = div()
+                    .flex()
+                    .flex_col()
+                    .p_4()
+                    .rounded_md()
+                    .bg(theme.bg_surface)
+                    .border_1()
+                    .border_color(theme.border)
+                    .gap_2()
+                    .child(Self::render_info_row("PACKAGE", pkg.name.clone(), theme))
+                    .child(Self::render_info_row("VERSION", package.version.clone(), theme))
+                    .child(Self::render_info_row(
+                        "OVERRIDDEN",
+                        if package.overridden { "yes" } else { "no" }.to_string(),
+                        theme,
+                    ));
+
+                div()
+                    .flex()
+                    .flex_col()
+                    .py_4()
+                    .gap_4()
+                    .child(
+                        div()
+                            .text_xs()
+                            .font_weight(FontWeight::BOLD)
+                            .text_color(theme.text_muted)
+                            .child("NPM ECOSYSTEM METADATA"),
+                    )
+                    .child(info)
+            }
+
+            UnifiedPackageSource::Release(release) => {
+                let info = div()
+                    .flex()
+                    .flex_col()
+                    .p_4()
+                    .rounded_md()
+                    .bg(theme.bg_surface)
+                    .border_1()
+                    .border_color(theme.border)
+                    .gap_2()
+                    .child(Self::render_info_row("PACKAGE", pkg.name.clone(), theme))
+                    .child(Self::render_info_row(
+                        "INSTALLED",
+                        release.installed_version.clone().unwrap_or_else(|| "—".into()),
+                        theme,
+                    ))
+                    .child(Self::render_info_row(
+                        "LATEST",
+                        release.latest_version.clone().unwrap_or_else(|| "—".into()),
+                        theme,
+                    ))
+                    .child(Self::render_info_row(
+                        "UPSTREAM",
+                        release.repo.clone().unwrap_or_else(|| "—".into()),
+                        theme,
+                    ))
+                    .child(Self::render_info_row(
+                        "CHANNEL",
+                        release.canal.clone().unwrap_or_else(|| "—".into()),
+                        theme,
+                    ));
+
+                div()
+                    .flex()
+                    .flex_col()
+                    .py_4()
+                    .gap_4()
+                    .child(
+                        div()
+                            .text_xs()
+                            .font_weight(FontWeight::BOLD)
+                            .text_color(theme.text_muted)
+                            .child("RELEASE ECOSYSTEM METADATA"),
+                    )
+                    .child(info)
+            }
+
             UnifiedPackageSource::Standard(_) => {
                 let build_date = alpm
                     .and_then(|d| d.build_date.clone())

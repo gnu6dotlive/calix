@@ -111,6 +111,11 @@ impl PackageIdentity {
             UnifiedPackageSource::Standard(_) | UnifiedPackageSource::Aur(_) => {
                 Self::probe_alpm_or_aur_icon(pkg)
             }
+            // Les écosystèmes Calix n'exposent pas d'icône de fichier :
+            // ils retombent sur leur icône symbolique de source.
+            UnifiedPackageSource::Cargo(_)
+            | UnifiedPackageSource::Npm(_)
+            | UnifiedPackageSource::Release(_) => None,
         }
     }
 
@@ -343,6 +348,9 @@ impl PackageIdentity {
             "AUR" => ResolvedIdentity::Symbolic(AppIcon::SourceAur),
             "FLATPAK" => ResolvedIdentity::Symbolic(AppIcon::SourceFlatpak),
             "APPIMAGE" => ResolvedIdentity::Symbolic(AppIcon::SourceAppImage),
+            "CARGO" => ResolvedIdentity::Symbolic(AppIcon::SourceCargo),
+            "NPM" => ResolvedIdentity::Symbolic(AppIcon::SourceNpm),
+            "RELEASE" => ResolvedIdentity::Symbolic(AppIcon::SourceRelease),
             _ => ResolvedIdentity::Fallback(AppIcon::PackageGeneric),
         }
     }
@@ -423,6 +431,9 @@ impl PackageIdentity {
             "AUR" => theme.badge_aur,
             "FLATPAK" => theme.badge_flatpak,
             "APPIMAGE" => theme.badge_appimage,
+            "CARGO" => theme.badge_cargo,
+            "NPM" => theme.badge_npm,
+            "RELEASE" => theme.badge_release,
             _ => theme.text_muted,
         }
     }

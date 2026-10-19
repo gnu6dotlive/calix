@@ -146,6 +146,11 @@ pub fn format_status_rail(args: FormatStatusRailArgs<'_>) -> StatusRailState {
             PackageSourceKind::Aur => aur_enabled,
             PackageSourceKind::Flatpak => flatpak_enabled,
             PackageSourceKind::AppImage => appimage_enabled,
+            // Les écosystèmes Calix ne sont pas des sources de recherche :
+            // ils n'ont pas de rail de santé dans la station de recherche.
+            PackageSourceKind::Cargo | PackageSourceKind::Npm | PackageSourceKind::Release => {
+                false
+            }
         };
         is_enabled
             && source_health
@@ -170,6 +175,9 @@ pub fn format_status_rail(args: FormatStatusRailArgs<'_>) -> StatusRailState {
             PackageSourceKind::Aur => "AUR",
             PackageSourceKind::Flatpak => "Flatpak",
             PackageSourceKind::AppImage => "AppImage",
+            PackageSourceKind::Cargo => "Cargo",
+            PackageSourceKind::Npm => "NPM",
+            PackageSourceKind::Release => "Release",
         };
         return StatusRailState {
             left_text: format!("{count_str} {plural}  •  {failed_label} unavailable"),

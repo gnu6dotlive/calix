@@ -84,17 +84,23 @@ impl SourceHealthMap {
         }
     }
 
-    pub fn for_source(&self, source: PackageSourceKind) -> &SourceHealth {
+    /// Rail de santé d'une source de recherche.
+    ///
+    /// Les écosystèmes Calix (Cargo, NPM, releases) n'ont pas de rail : ils
+    /// ne sont pas interrogeables par le backend de recherche, seulement
+    /// listés dans l'inventaire installé.
+    pub fn for_source(&self, source: PackageSourceKind) -> Option<&SourceHealth> {
         match source {
-            PackageSourceKind::Alpm => &self.alpm,
-            PackageSourceKind::Aur => &self.aur,
-            PackageSourceKind::Flatpak => &self.flatpak,
-            PackageSourceKind::AppImage => &self.appimage,
+            PackageSourceKind::Alpm => Some(&self.alpm),
+            PackageSourceKind::Aur => Some(&self.aur),
+            PackageSourceKind::Flatpak => Some(&self.flatpak),
+            PackageSourceKind::AppImage => Some(&self.appimage),
+            PackageSourceKind::Cargo | PackageSourceKind::Npm | PackageSourceKind::Release => None,
         }
     }
 
     pub fn get(&self, source: &PackageSourceKind) -> Option<&SourceHealth> {
-        Some(self.for_source(*source))
+        self.for_source(*source)
     }
 
     pub fn set_source(&mut self, source: PackageSourceKind, health: SourceHealth) {
@@ -103,6 +109,7 @@ impl SourceHealthMap {
             PackageSourceKind::Aur => self.aur = health,
             PackageSourceKind::Flatpak => self.flatpak = health,
             PackageSourceKind::AppImage => self.appimage = health,
+            PackageSourceKind::Cargo | PackageSourceKind::Npm | PackageSourceKind::Release => {}
         }
     }
 }

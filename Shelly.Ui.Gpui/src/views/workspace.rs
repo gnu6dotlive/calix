@@ -529,6 +529,9 @@ impl WorkspaceView {
                             "aur" => Some(PackageSourceKind::Aur),
                             "flatpak" => Some(PackageSourceKind::Flatpak),
                             "appimage" => Some(PackageSourceKind::AppImage),
+                            "cargo" => Some(PackageSourceKind::Cargo),
+                            "npm" => Some(PackageSourceKind::Npm),
+                            "release" => Some(PackageSourceKind::Release),
                             _ => None,
                         };
                         if let Some(src) = src_kind {
@@ -1023,10 +1026,9 @@ impl WorkspaceView {
             let _ = this.update(cx, |view, cx| {
                 view.store.update(cx, |st, cx| match res {
                     Ok(installed) => {
-                        let unified: Vec<UnifiedPackage> = installed
-                            .into_iter()
-                            .map(|p| UnifiedPackage::from_alpm(p, true))
-                            .collect();
+                        let inventory = crate::backend::calix_state::EcosystemInventory::load();
+                        let unified =
+                            crate::backend::calix_state::merge_installed(installed, &inventory);
                         crate::components::package_identity::PackageIdentity::preload(&unified);
                         st.set_installed_packages(unified, cx);
                     }
@@ -1074,7 +1076,8 @@ impl WorkspaceView {
         }
     }
 
-    /// Charge les paquets installés localement via le backend Shelly
+    /// Charge les paquets installés localement via le backend Shelly,
+    /// complétés par l'inventaire multi-écosystèmes maintained par le moteur Calix
     fn load_installed_packages(&mut self, cx: &mut Context<Self>) {
         let client = self.store.read(cx).client.clone();
         cx.spawn(async move |this, cx| {
@@ -1082,10 +1085,9 @@ impl WorkspaceView {
             let _ = this.update(cx, |view, cx| {
                 view.store.update(cx, |st, cx| match res {
                     Ok(packages) => {
-                        let unified: Vec<UnifiedPackage> = packages
-                            .into_iter()
-                            .map(|p| UnifiedPackage::from_alpm(p, true))
-                            .collect();
+                        let inventory = crate::backend::calix_state::EcosystemInventory::load();
+                        let unified =
+                            crate::backend::calix_state::merge_installed(packages, &inventory);
                         crate::components::package_identity::PackageIdentity::preload(&unified);
                         st.set_installed_packages(unified, cx);
                     }
@@ -1314,6 +1316,12 @@ impl WorkspaceView {
                         Ok(Vec::new())
                     }
                 }
+                // Les écosystèmes Calix ne sont pas des backends de recherche :
+                // leurs paquets sont déjà installés et n'apparaissent que dans
+                // l'inventaire, jamais parmi les résultats de recherche.
+                PackageSourceKind::Cargo
+                | PackageSourceKind::Npm
+                | PackageSourceKind::Release => Ok(Vec::new()),
                 PackageSourceKind::AppImage => {
                     if appimage_enabled {
                         client

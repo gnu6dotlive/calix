@@ -101,10 +101,15 @@ impl PackageCapabilities {
         let is_appimage = pkg.source_type == "AppImage";
         let is_aur = pkg.source_type == "AUR";
         let is_flatpak = pkg.source_type == "Flatpak";
-        let is_alpm = pkg.source_type == "ALPM" || (!is_appimage && !is_aur && !is_flatpak);
+        // Écosystèmes maintenus par le moteur Calix : ils ne passent pas par
+        // le backend Shelly, donc aucune commande d'installation ou de
+        // suppression n'est disponible pour eux.
+        let is_ecosystem = matches!(pkg.source_type.as_str(), "Cargo" | "NPM" | "Release");
+        let is_alpm = pkg.source_type == "ALPM"
+            || (!is_appimage && !is_aur && !is_flatpak && !is_ecosystem);
 
-        let can_install = !pkg.is_installed && !is_appimage;
-        let can_remove = pkg.is_installed && !is_appimage;
+        let can_install = !pkg.is_installed && !is_appimage && !is_ecosystem;
+        let can_remove = pkg.is_installed && !is_appimage && !is_ecosystem;
         let can_update = pkg.has_update;
 
         let has_dependencies = is_alpm || is_aur;
@@ -125,6 +130,18 @@ impl PackageCapabilities {
                 .update_url
                 .as_ref()
                 .map(|u| !u.trim().is_empty())
+                .unwrap_or(false),
+            UnifiedPackageSource::Cargo(_) => false,
+            UnifiedPackageSource::Npm(_) => false,
+            UnifiedPackageSource::Release(r) => r
+                .repo
+                .as_ref()
+                .map(|repo| match r.provider.as_deref() {
+                    Some("github") => format!("https://github.com/{}", repo),
+                    Some("gitlab") => format!("https://gitlab.com/{}", repo),
+                    _ => repo.clone(),
+                })
+                .map(|url| !url.trim().is_empty())
                 .unwrap_or(false),
         } || alpm_detail
             .and_then(|a| a.url.as_ref())
@@ -157,6 +174,9 @@ pub fn canonical_install_command(pkg: &UnifiedPackage) -> Option<String> {
         "Flatpak" => Some(format!("shelly install flatpak {}", pkg.name)),
         "ALPM" => Some(format!("shelly install standard {}", pkg.name)),
         "AppImage" => None,
+        // Les écosystèmes Calix ne sont pas gérés par le backend Shelly :
+        // aucune commande d'installation n'existe pour eux.
+        "Cargo" | "NPM" | "Release" => None,
         _ => Some(format!("shelly install standard {}", pkg.name)),
     }
 }
@@ -164,6 +184,7 @@ pub fn canonical_install_command(pkg: &UnifiedPackage) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::backend::calix_state::{CargoCrate, NpmPackage, ReleasePackage};
     use core::prelude::v1::test;
 
     #[test]
@@ -246,6 +267,112 @@ mod tests {
 
         pkg.source_type = "AppImage".into();
         assert_eq!(canonical_install_command(&pkg), None);
+
+        // Les écosystèmes Calix ne passent pas par le backend Shelly.
+        for source in ["Cargo", "NPM", "Release"] {
+            pkg.source_type = source.into();
+            assert_eq!(
+                canonical_install_command(&pkg),
+                None,
+                "{} must not produce a Shelly install command",
+                source
+            );
+        }
+    }
+
+    /// Un paquet d'un écosystème Calix ne doit jamais être classé comme ALPM.
+    ///
+    /// `is_alpm` repose sur un repli « toute source inconnue est ALPM ».
+    /// Sans l'exclusion explicite des écosystèmes Calix, une crate Cargo
+    /// héritait des capacités ALPM (dépendances, build, suppression).
+    #[test]
+    fn test_ecosystem_packages_are_not_classified_as_alpm() {
+        for (source, inner) in [
+            (
+                "Cargo",
+                UnifiedPackageSource::Cargo(CargoCrate {
+                    version: "14.1.1".into(),
+                    source: "crates.io".into(),
+                    bins: vec!["rg".into()],
+                }),
+            ),
+            (
+                "NPM",
+                UnifiedPackageSource::Npm(NpmPackage {
+                    version: "5.6.3".into(),
+                    overridden: false,
+                }),
+            ),
+            (
+                "Release",
+                UnifiedPackageSource::Release(ReleasePackage {
+                    installed_version: Some("0.5.1".into()),
+                    latest_version: Some("0.5.1".into()),
+                    update_available: false,
+                    repo: Some("storytold/craft-launcher".into()),
+                    provider: Some("github".into()),
+                    canal: Some("stable".into()),
+                    pkgname: Some("artcraft-launcher-bin".into()),
+                }),
+            ),
+        ] {
+            let pkg = UnifiedPackage {
+                name: "ecosystem-pkg".into(),
+                version: "1.0.0".into(),
+                description: "test".into(),
+                source_type: source.into(),
+                repository_or_remote: "origin".into(),
+                is_installed: true,
+                has_update: false,
+                new_version: None,
+                inner,
+            };
+
+            let caps = PackageCapabilities::derive(&pkg, None);
+            assert!(
+                !caps.has_dependencies,
+                "{} must not expose dependency resolution",
+                source
+            );
+            assert!(
+                !caps.can_install,
+                "{} must not offer an install action",
+                source
+            );
+            assert!(
+                !caps.can_remove,
+                "{} must not offer a remove action",
+                source
+            );
+        }
+    }
+
+    /// Une release suivie par Calix expose son URL amont et son état de mise à jour.
+    #[test]
+    fn test_release_package_exposes_upstream_url_and_update_state() {
+        let pkg = UnifiedPackage {
+            name: "artcraft-launcher".into(),
+            version: "0.5.1".into(),
+            description: "test".into(),
+            source_type: "Release".into(),
+            repository_or_remote: "storytold/craft-launcher".into(),
+            is_installed: true,
+            has_update: true,
+            new_version: Some("0.5.2".into()),
+            inner: UnifiedPackageSource::Release(ReleasePackage {
+                installed_version: Some("0.5.1".into()),
+                latest_version: Some("0.5.2".into()),
+                update_available: true,
+                repo: Some("storytold/craft-launcher".into()),
+                provider: Some("github".into()),
+                canal: Some("stable".into()),
+                pkgname: Some("artcraft-launcher-bin".into()),
+            }),
+        };
+
+        let caps = PackageCapabilities::derive(&pkg, None);
+        assert!(caps.has_upstream_url);
+        assert!(caps.can_update);
     }
 
     #[test]
