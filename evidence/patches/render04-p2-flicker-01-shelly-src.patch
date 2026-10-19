@@ -1,0 +1,340 @@
+diff -ruN /home/tension_atoi/Projects/shelly-gpui/Shelly.Ui.Gpui/src/render_lab/experimental.rs /mnt/workbench/pkgbuild/render-04-p2/Shelly.Ui.Gpui/src/render_lab/experimental.rs
+--- /home/tension_atoi/Projects/shelly-gpui/Shelly.Ui.Gpui/src/render_lab/experimental.rs	2026-09-22 02:43:40.708007674 -0400
++++ /mnt/workbench/pkgbuild/render-04-p2/Shelly.Ui.Gpui/src/render_lab/experimental.rs	2026-09-22 08:41:55.462860852 -0400
+@@ -3,8 +3,9 @@
+     RenderTarget, RenderTargetSet, ShaderDesc, TextureColor, TextureDesc, TextureDimension,
+     TextureFormat, TextureSubresources, TextureUsage, ViewDimension,
+ };
+-use gpui::RenderImage;
++use gpui::*;
+ use image::{Frame, RgbaImage};
++use std::sync::atomic::{AtomicU64, Ordering};
+ use std::sync::{Arc, OnceLock};
+ use std::time::Instant;
+ 
+@@ -48,11 +49,183 @@
+ }
+ 
+ static PROBE: OnceLock<Result<ShaderProbeOutput, String>> = OnceLock::new();
++static P2_B_PAINT_SEQ: AtomicU64 = AtomicU64::new(0);
++static P2_C_PAINT_SEQ: AtomicU64 = AtomicU64::new(0);
++
++pub fn p2_flicker_mode() -> &'static str {
++    static MODE: OnceLock<String> = OnceLock::new();
++    MODE.get_or_init(|| {
++        std::env::var("SHELLY_P2_FLICKER_MODE").unwrap_or_else(|_| "F3".to_string())
++    })
++    .as_str()
++}
+ 
+ pub fn shader_present_probe() -> &'static Result<ShaderProbeOutput, String> {
+     PROBE.get_or_init(render_shader_once)
+ }
+ 
++pub fn energized_wire_reference() -> Result<Arc<RenderImage>, String> {
++    let bytes = include_bytes!(
++        "../../../docs/gpui/render-lab/references/atlas/crops/optical.energized-wire-glow.png"
++    );
++    let image = image::load_from_memory(bytes)
++        .map_err(|error| format!("energized-wire reference decode failed: {error}"))?
++        .to_rgba8();
++    Ok(Arc::new(RenderImage::new(vec![Frame::new(image)])))
++}
++
++pub fn energized_wire_shader_probe(width: f32, height: f32) -> impl IntoElement {
++    div()
++        .id(SharedString::from(format!(
++            "render04_p2_energized_wire_{width}x{height}"
++        )))
++        .relative()
++        .w(px(width))
++        .h(px(height))
++        .bg(rgb(0x140f0a))
++        .child(
++            canvas(
++                |_bounds, _window, _cx| {},
++                move |bounds, _, window, _cx| {
++                    let paint_seq = P2_B_PAINT_SEQ.fetch_add(1, Ordering::Relaxed) + 1;
++                    log::info!("P2_B_PAINT seq={paint_seq}");
++                    let points = [
++                        [0.81_f32, 0.21_f32],
++                        [0.81_f32, 0.47_f32],
++                        [0.79_f32, 0.53_f32],
++                        [0.67_f32, 0.71_f32],
++                        [0.43_f32, 1.00_f32],
++                    ];
++                    let width: f32 = bounds.size.width.into();
++                    let height: f32 = bounds.size.height.into();
++                    let ox: f32 = bounds.origin.x.into();
++                    let oy: f32 = bounds.origin.y.into();
++
++                    let mut path = PathBuilder::stroke(px(3.0));
++                    path.move_to(point(
++                        px(ox + width * points[0][0]),
++                        px(oy + height * points[0][1]),
++                    ));
++                    for p in points.iter().skip(1) {
++                        path.line_to(point(px(ox + width * p[0]), px(oy + height * p[1])));
++                    }
++                    if let Ok(core) = path.build() {
++                        window.paint_path(core, rgb(0xfff8d0));
++                    }
++
++                    let scale = window.scale_factor();
++                    let origin = [ox * scale, oy * scale];
++                    let size = [width * scale, height * scale];
++                    let scissor = blade_graphics::ScissorRect {
++                        x: origin[0].max(0.0) as i32,
++                        y: origin[1].max(0.0) as i32,
++                        w: size[0].max(1.0) as u32,
++                        h: size[1].max(1.0) as u32,
++                    };
++                    log::info!(
++                        "P2 energized-wire B bounds x={} y={} w={} h={} scale={}",
++                        origin[0],
++                        origin[1],
++                        size[0],
++                        size[1],
++                        scale
++                    );
++                    window.enqueue_gpu_frame_callback(move |frame| {
++                        log::info!("P2_B_CALLBACK seq={paint_seq}");
++                        frame.set_scissor_rect(scissor);
++                        frame.draw_energized_wire(
++                            origin,
++                            size,
++                            points,
++                            1.5 * scale,
++                            32.0 * scale,
++                            0.72,
++                            [1.0, 0.52, 0.08],
++                        );
++                    });
++                    log::info!("P2_B_ENQUEUE seq={paint_seq}");
++                },
++            )
++            .size_full(),
++        )
++}
++
++pub fn energized_wire_ordered_probe(width: f32, height: f32) -> impl IntoElement {
++    div()
++        .id(SharedString::from(format!(
++            "render04_p2_energized_wire_ordered_{width}x{height}"
++        )))
++        .relative()
++        .w(px(width))
++        .h(px(height))
++        .bg(rgb(0x140f0a))
++        .child(
++            canvas(
++                |_bounds, _window, _cx| {},
++                move |bounds, _, window, _cx| {
++                    let paint_seq = P2_C_PAINT_SEQ.fetch_add(1, Ordering::Relaxed) + 1;
++                    log::info!("P2_C_PAINT seq={paint_seq}");
++                    let points = [
++                        [0.81_f32, 0.21_f32],
++                        [0.81_f32, 0.47_f32],
++                        [0.79_f32, 0.53_f32],
++                        [0.67_f32, 0.71_f32],
++                        [0.43_f32, 1.00_f32],
++                    ];
++                    let width: f32 = bounds.size.width.into();
++                    let height: f32 = bounds.size.height.into();
++                    let ox: f32 = bounds.origin.x.into();
++                    let oy: f32 = bounds.origin.y.into();
++                    let scale = window.scale_factor();
++                    let origin = [ox * scale, oy * scale];
++                    let size = [width * scale, height * scale];
++                    let scissor = blade_graphics::ScissorRect {
++                        x: origin[0].max(0.0) as i32,
++                        y: origin[1].max(0.0) as i32,
++                        w: size[0].max(1.0) as u32,
++                        h: size[1].max(1.0) as u32,
++                    };
++                    log::info!(
++                        "P2 energized-wire C bounds x={} y={} w={} h={} scale={}",
++                        origin[0],
++                        origin[1],
++                        size[0],
++                        size[1],
++                        scale
++                    );
++
++                    window.enqueue_ordered_gpu_frame_callback(bounds, move |frame| {
++                        log::info!("P2_C_CALLBACK seq={paint_seq}");
++                        frame.set_scissor_rect(scissor);
++                        frame.draw_energized_wire(
++                            origin,
++                            size,
++                            points,
++                            1.5 * scale,
++                            32.0 * scale,
++                            0.72,
++                            [1.0, 0.52, 0.08],
++                        );
++                    });
++                    log::info!("P2_C_ENQUEUE seq={paint_seq}");
++
++                    let mut path = PathBuilder::stroke(px(3.0));
++                    path.move_to(point(
++                        px(ox + width * points[0][0]),
++                        px(oy + height * points[0][1]),
++                    ));
++                    for p in points.iter().skip(1) {
++                        path.line_to(point(px(ox + width * p[0]), px(oy + height * p[1])));
++                    }
++                    if let Ok(core) = path.build() {
++                        window.paint_path(core, rgb(0xfff8d0));
++                    }
++                },
++            )
++            .size_full(),
++        )
++}
++
+ fn render_shader_once() -> Result<ShaderProbeOutput, String> {
+     let started = Instant::now();
+     let context = unsafe {
+diff -ruN /home/tension_atoi/Projects/shelly-gpui/Shelly.Ui.Gpui/src/views/render_lab.rs /mnt/workbench/pkgbuild/render-04-p2/Shelly.Ui.Gpui/src/views/render_lab.rs
+--- /home/tension_atoi/Projects/shelly-gpui/Shelly.Ui.Gpui/src/views/render_lab.rs	2026-09-22 02:43:40.707161017 -0400
++++ /mnt/workbench/pkgbuild/render-04-p2/Shelly.Ui.Gpui/src/views/render_lab.rs	2026-09-22 08:42:04.874996069 -0400
+@@ -3,7 +3,10 @@
+     comparison_canvas_spec, recipe_for, render_confrontation, CONFRONT_BOX_HEIGHT_PX,
+     FIDUCIAL_MARKER_RGB,
+ };
+-use crate::render_lab::experimental::shader_present_probe;
++use crate::render_lab::experimental::{
++    energized_wire_ordered_probe, energized_wire_reference, energized_wire_shader_probe,
++    p2_flicker_mode, shader_present_probe,
++};
+ use crate::render_lab::fixture::{FixtureGroup, FixtureId};
+ use crate::render_lab::ledger::CapabilityLedger;
+ use crate::render_lab::state::{ClockMode, RenderLabState};
+@@ -47,7 +50,9 @@
+             .w_full()
+             .flex_none()
+             .flex()
+-            .justify_center()
++            .flex_col()
++            .items_center()
++            .gap_2()
+             .py_2();
+         if let Some(f) = selected_def {
+             if let Some(spec) = comparison_canvas_spec(f) {
+@@ -63,7 +68,8 @@
+                 measurement_stage = measurement_stage.child(controlled);
+             }
+         }
+-        measurement_stage = measurement_stage.child(Self::render_shader_experiment(&theme));
++        measurement_stage =
++            measurement_stage.child(Self::render_shader_experiment(&theme, selected_def));
+ 
+         let body = div()
+             .id("render_lab_body")
+@@ -88,7 +94,104 @@
+             .child(body)
+     }
+ 
+-    fn render_shader_experiment(theme: &Theme) -> impl IntoElement {
++    fn render_shader_experiment(
++        theme: &Theme,
++        selected_def: Option<&crate::render_lab::fixture::FixtureDef>,
++    ) -> impl IntoElement {
++        if let Some(def) = selected_def {
++            if def.id.as_str() == "optical.energized-wire-glow" {
++                let reference = match energized_wire_reference() {
++                    Ok(image) => img(image)
++                        .w(px(200.0))
++                        .h(px(170.0))
++                        .object_fit(ObjectFit::Fill)
++                        .into_any_element(),
++                    Err(error) => div().text_xs().child(error).into_any_element(),
++                };
++                let stock = render_confrontation(def).unwrap_or_else(|| {
++                    div()
++                        .text_xs()
++                        .child("stock recipe unavailable")
++                        .into_any_element()
++                });
++                let mode = p2_flicker_mode();
++                let show_b = mode == "F1" || mode == "F3";
++                let show_c = mode == "F2" || mode == "F3";
++                let first_row = div()
++                    .flex()
++                    .flex_row()
++                    .gap_2()
++                    .items_start()
++                    .child(
++                        div()
++                            .flex()
++                            .flex_col()
++                            .gap_1()
++                            .child(
++                                div()
++                                    .text_xs()
++                                    .text_color(theme.text_secondary)
++                                    .child("REFERENCE"),
++                            )
++                            .child(reference),
++                    )
++                    .child(
++                        div()
++                            .flex()
++                            .flex_col()
++                            .gap_1()
++                            .child(
++                                div()
++                                    .text_xs()
++                                    .text_color(theme.text_secondary)
++                                    .child("A - STOCK GPUI"),
++                            )
++                            .child(div().w(px(200.0)).h(px(170.0)).child(stock)),
++                    );
++                let first_row = if show_b {
++                    first_row.child(
++                        div()
++                            .flex()
++                            .flex_col()
++                            .gap_1()
++                            .child(
++                                div()
++                                    .text_xs()
++                                    .text_color(theme.warning_text)
++                                    .child("B - SAME-CONTEXT SHADER / POST-SCENE"),
++                            )
++                            .child(energized_wire_shader_probe(200.0, 170.0)),
++                    )
++                } else {
++                    first_row
++                };
++
++                let comparison = div()
++                    .id("render04_p2_energized_wire_comparison")
++                    .flex()
++                    .flex_col()
++                    .gap_2()
++                    .items_center()
++                    .child(first_row);
++                if show_c {
++                    return comparison.child(
++                        div()
++                            .flex()
++                            .flex_col()
++                            .gap_1()
++                            .items_center()
++                            .child(
++                                div()
++                                    .text_xs()
++                                    .text_color(theme.accent)
++                                    .child("C - ORDERED SAME-CONTEXT HALO / NATIVE CORE"),
++                            )
++                            .child(energized_wire_ordered_probe(200.0, 170.0)),
++                    );
++                }
++                return comparison;
++            }
++        }
+         let mut probe = div()
+             .id("render04_i03_shader_probe")
+             .flex()

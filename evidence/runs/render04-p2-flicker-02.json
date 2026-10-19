@@ -1,0 +1,72 @@
+{
+  "id": "render04-p2-flicker-02",
+  "status": "SCISSOR_LEAK_ESTABLISHED",
+  "canonical_start_head": "6fce3747fa0e1254efd4a37d32ba1d29b6a708dd",
+  "canonical_main_changed": false,
+  "push": false,
+  "worktree": "/mnt/workbench/workspaces/gnu.in.labs/shelly-gpui-render04-p2-flicker02",
+  "fixture": "optical.energized-wire-glow",
+  "binary": {
+    "path": "/mnt/workbench/target/debug/shelly-gpui",
+    "sha256": "42ae829a3898fcd38db3f565590130a07d36cbfe56b06b9f2f12142fda3e45af"
+  },
+  "topology": {
+    "duplicate_window_cause": false,
+    "native_wayland": true,
+    "xwayland": false,
+    "known_experimental_processes": 1
+  },
+  "geometry": {
+    "F2-A": {
+      "path": "/mnt/workbench/pkgbuild/render-04-p2/flicker-02/F2-A-controlled.geometry.json",
+      "sha256": "1c5b484a5f649200c77d4ecb27eadc859f988692062882f4f0f82b273b53d81b",
+      "client": {"class": "shelly-gpui", "at": [1939, 399], "size": [1062, 1902], "workspace": 11, "xwayland": false}
+    },
+    "F2-B": {
+      "path": "/mnt/workbench/pkgbuild/render-04-p2/flicker-02/F2-B-controlled.geometry.json",
+      "sha256": "187916fa0170f18f1f6efb13f96aa8c5413e92d823b3940918bfb85d272600fb",
+      "client": {"class": "shelly-gpui", "at": [1939, 399], "size": [1062, 1902], "workspace": 11, "xwayland": false}
+    },
+    "F1": {
+      "path": "/mnt/workbench/pkgbuild/render-04-p2/flicker-02/F1-frozen.geometry.json",
+      "sha256": "6acb97ec31e0f17ca6c0770c1196f71af7486b798972d96f9bc920a0dfe0dcbc"
+    }
+  },
+  "modes": {
+    "F2-A": {"reset": false, "frame_draw": 80, "c_paint": 76, "c_enqueue": 76, "c_callback": 76, "native_corruption_reproduced": true},
+    "F2-B": {"reset": true, "frame_draw": 281, "c_paint": 76, "c_enqueue": 76, "c_callback": 76, "scissor_reset": 76, "native_corruption_reproduced": false},
+    "F1-frozen": {"reset": true, "scene_draw": 79, "b_paint": 79, "b_callback": 78, "same_scene_no_callback_draws": 1, "shader_visible_absent_transition": false}
+  },
+  "residency": {
+    "scene_ptr": "0x56359d7fae20",
+    "same_scene_rendered_after_callback_consumption": true,
+    "callback_frame_residency_mismatch_established": true,
+    "shader_callback_cadence_flicker_established": false,
+    "correlation": "frame 24 callback, frame 25 same Scene with no post callback, frame 26 callback"
+  },
+  "classification": {
+    "scissor_leak_established": true,
+    "gpu_dynamic_state_leak": "SCISSOR",
+    "scissor_only_causality_rejected": false,
+    "draw_order_insufficient_as_insertion_key": true,
+    "multiple_causes": false,
+    "operator_state_a_mapped": "PARTIAL",
+    "operator_state_b_mapped": "PARTIAL",
+    "current_ordered_callback_safe_for_canonical_adoption": "NO"
+  },
+  "source": {
+    "scissor_patch": {"path": "evidence/patches/render04-p2-flicker-02-scissor.patch", "sha256": "99f3ab97d092bf96778ea182e7901736b1e7b23b7d5d32ea2f0ce422fe622d91"},
+    "residency_probe_patch": {"path": "evidence/patches/render04-p2-flicker-02-residency-probe.patch", "sha256": "336c9ef441766b5459ca04fa5cc924639a6fb6d7a11e705c5ccbb8370345df7d"},
+    "production_renderer_changed": false
+  },
+  "captures": [
+    {"path": "/mnt/workbench/pkgbuild/render-04-p2/flicker-02/F2-A.png", "sha256": "e00ddb55e3ec0907c87333b0bc9b69ee98c89ba99f7feffee914b53588e3c70e"},
+    {"path": "/mnt/workbench/pkgbuild/render-04-p2/flicker-02/F2-B.png", "sha256": "178498b077a0aa6614894e49d924c2fd4d2b7e841e7f393234bd3a2cc3e2eaf7"},
+    {"path": "/mnt/workbench/pkgbuild/render-04-p2/flicker-02/F2-A-vs-B-diff.png", "sha256": "31655d7ece06b58c3192691eb5df9362c696bdc2c29ad58a5a5371f4287aff7a", "metric_ae": "10119.3"}
+  ],
+  "flicker_01": {
+    "evidence_preserved": true,
+    "manifest": "/mnt/workbench/pkgbuild/render-04-p2/flicker-02/flicker-01-artifacts.sha256",
+    "artifact_count": 10
+  }
+}

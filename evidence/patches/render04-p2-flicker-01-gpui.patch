@@ -1,0 +1,621 @@
+diff -ruN /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/Cargo.toml /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/Cargo.toml
+--- /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/Cargo.toml	2006-07-23 21:21:28.000000000 -0400
++++ /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/Cargo.toml	2026-09-22 02:55:03.817267188 -0400
+@@ -239,7 +239,7 @@
+ optional = true
+ 
+ [dependencies.blade-graphics]
+-version = "0.7.0"
++version = "=0.7.1"
+ optional = true
+ 
+ [dependencies.blade-macros]
+@@ -461,7 +461,7 @@
+ default-features = false
+ 
+ [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies.blade-graphics]
+-version = "0.7.0"
++version = "=0.7.1"
+ optional = true
+ 
+ [target.'cfg(any(target_os = "linux", target_os = "freebsd"))'.dependencies.blade-macros]
+diff -ruN /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/platform/blade/blade_renderer.rs /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/platform/blade/blade_renderer.rs
+--- /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/platform/blade/blade_renderer.rs	2006-07-23 21:21:28.000000000 -0400
++++ /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/platform/blade/blade_renderer.rs	2026-09-22 09:04:14.227913455 -0400
+@@ -1,7 +1,7 @@
+ // Doing `if let` gives you nice scoping with passes/encoders
+ #![allow(irrefutable_let_patterns)]
+ 
+-use super::{BladeAtlas, BladeContext};
++use super::{BladeAtlas, BladeContext, GpuFrame};
+ use crate::{
+     Background, Bounds, DevicePixels, GpuSpecs, MonochromeSprite, Path, Point, PolychromeSprite,
+     PrimitiveBatch, Quad, ScaledPixels, Scene, Shadow, Size, Underline,
+@@ -11,9 +11,15 @@
+ use bytemuck::{Pod, Zeroable};
+ #[cfg(target_os = "macos")]
+ use media::core_video::CVMetalTextureCache;
++use std::sync::atomic::{AtomicU64, Ordering};
+ use std::sync::Arc;
+ 
+ const MAX_FRAME_TIME_MS: u32 = 10000;
++static P2_FRAME_DRAW_SEQ: AtomicU64 = AtomicU64::new(0);
++
++fn p2_scissor_reset_enabled() -> bool {
++    std::env::var_os("SHELLY_P2_SCISSOR_RESET").is_some()
++}
+ 
+ #[repr(C)]
+ #[derive(Clone, Copy, Pod, Zeroable)]
+@@ -131,6 +137,8 @@
+     mono_sprites: gpu::RenderPipeline,
+     poly_sprites: gpu::RenderPipeline,
+     surfaces: gpu::RenderPipeline,
++    local_focus: gpu::RenderPipeline,
++    energized_wire: gpu::RenderPipeline,
+ }
+ 
+ impl BladePipelines {
+@@ -166,6 +174,14 @@
+             write_mask: gpu::ColorWrites::default(),
+         }];
+ 
++        let local_focus_shader = gpu.create_shader(gpu::ShaderDesc {
++            source: include_str!("local_focus.wgsl"),
++        });
++        log::info!("Initializing experimental local-focus pipeline once per renderer");
++        let energized_wire_shader = gpu.create_shader(gpu::ShaderDesc {
++            source: include_str!("energized_wire.wgsl"),
++        });
++        log::info!("Initializing experimental energized-wire pipeline once per renderer");
+         Self {
+             quads: gpu.create_render_pipeline(gpu::RenderPipelineDesc {
+                 name: "quads",
+@@ -300,6 +316,28 @@
+                 color_targets,
+                 multisample_state: gpu::MultisampleState::default(),
+             }),
++            local_focus: gpu.create_render_pipeline(gpu::RenderPipelineDesc {
++                name: "render04-p1-local-focus",
++                data_layouts: &[&super::LocalFocusData::layout()],
++                vertex: local_focus_shader.at("vs_main"),
++                vertex_fetches: &[],
++                primitive: Default::default(),
++                depth_stencil: None,
++                fragment: Some(local_focus_shader.at("fs_main")),
++                color_targets,
++                multisample_state: gpu::MultisampleState::default(),
++            }),
++            energized_wire: gpu.create_render_pipeline(gpu::RenderPipelineDesc {
++                name: "render04-p2-energized-wire",
++                data_layouts: &[&super::EnergizedWireData::layout()],
++                vertex: energized_wire_shader.at("vs_main"),
++                vertex_fetches: &[],
++                primitive: Default::default(),
++                depth_stencil: None,
++                fragment: Some(energized_wire_shader.at("fs_main")),
++                color_targets,
++                multisample_state: gpu::MultisampleState::default(),
++            }),
+         }
+     }
+ 
+@@ -312,6 +350,10 @@
+         gpu.destroy_render_pipeline(&mut self.mono_sprites);
+         gpu.destroy_render_pipeline(&mut self.poly_sprites);
+         gpu.destroy_render_pipeline(&mut self.surfaces);
++        log::info!("Destroying experimental local-focus pipeline with renderer");
++        gpu.destroy_render_pipeline(&mut self.local_focus);
++        log::info!("Destroying experimental energized-wire pipeline with renderer");
++        gpu.destroy_render_pipeline(&mut self.energized_wire);
+     }
+ }
+ 
+@@ -641,6 +683,8 @@
+     }
+ 
+     pub fn draw(&mut self, scene: &Scene) {
++        let frame_seq = P2_FRAME_DRAW_SEQ.fetch_add(1, Ordering::Relaxed) + 1;
++        log::info!("P2_FRAME_DRAW seq={frame_seq}");
+         self.command_encoder.start();
+         self.atlas.before_frame(&mut self.command_encoder);
+ 
+@@ -675,7 +719,51 @@
+         );
+ 
+         profiling::scope!("render pass");
++        let mut ordered_gpu_callbacks = scene
++            .take_ordered_gpu_frame_callbacks()
++            .into_iter()
++            .peekable();
++
+         for batch in scene.batches() {
++            let batch_order = batch.order();
++            log::info!("P2_NATIVE_BATCH order={batch_order}");
++            loop {
++                let should_dispatch = ordered_gpu_callbacks
++                    .peek()
++                    .map(|(order, _)| *order <= batch_order)
++                    .unwrap_or(false);
++                if !should_dispatch {
++                    break;
++                }
++
++                let (order, callback) = ordered_gpu_callbacks
++                    .next()
++                    .expect("ordered callback disappeared after peek");
++                log::info!(
++                    "P2 ordered GPU callback dispatch order={} before batch order={}",
++                    order,
++                    batch_order
++                );
++                let mut gpu_frame = GpuFrame::new(
++                    &self.gpu,
++                    &mut pass,
++                    &self.pipelines.local_focus,
++                    &self.pipelines.energized_wire,
++                    self.surface_config.size,
++                    self.surface.info().format,
++                );
++                callback(&mut gpu_frame);
++                if p2_scissor_reset_enabled() {
++                    pass.set_scissor_rect(&gpu::ScissorRect {
++                        x: 0,
++                        y: 0,
++                        w: self.surface_config.size.width,
++                        h: self.surface_config.size.height,
++                    });
++                    log::info!("P2_SCISSOR_RESET frame={frame_seq} ordered=true");
++                }
++            }
++
+             match batch {
+                 PrimitiveBatch::Quads(quads) => {
+                     let instance_buf = unsafe { self.instance_belt.alloc_typed(quads, &self.gpu) };
+@@ -904,6 +992,60 @@
+                 }
+             }
+         }
++
++        for (order, callback) in ordered_gpu_callbacks {
++            log::info!(
++                "P2 ordered GPU callback dispatch order={} after native batches",
++                order
++            );
++            let mut gpu_frame = GpuFrame::new(
++                &self.gpu,
++                &mut pass,
++                &self.pipelines.local_focus,
++                &self.pipelines.energized_wire,
++                self.surface_config.size,
++                self.surface.info().format,
++            );
++            callback(&mut gpu_frame);
++            if p2_scissor_reset_enabled() {
++                pass.set_scissor_rect(&gpu::ScissorRect {
++                    x: 0,
++                    y: 0,
++                    w: self.surface_config.size.width,
++                    h: self.surface_config.size.height,
++                });
++                log::info!("P2_SCISSOR_RESET frame={frame_seq} ordered=true");
++            }
++        }
++
++        for (callback_index, callback) in scene
++            .take_gpu_frame_callbacks()
++            .into_iter()
++            .enumerate()
++        {
++            log::info!(
++                "P2_POST_CALLBACK_DISPATCH frame={} index={callback_index}",
++                frame_seq
++            );
++            let mut gpu_frame = GpuFrame::new(
++                &self.gpu,
++                &mut pass,
++                &self.pipelines.local_focus,
++                &self.pipelines.energized_wire,
++                self.surface_config.size,
++                self.surface.info().format,
++            );
++            callback(&mut gpu_frame);
++            if p2_scissor_reset_enabled() {
++                pass.set_scissor_rect(&gpu::ScissorRect {
++                    x: 0,
++                    y: 0,
++                    w: self.surface_config.size.width,
++                    h: self.surface_config.size.height,
++                });
++                log::info!("P2_SCISSOR_RESET frame={frame_seq} ordered=false");
++            }
++        }
+         drop(pass);
+ 
+         self.command_encoder.present(frame);
+diff -ruN /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/platform/blade/energized_wire.wgsl /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/platform/blade/energized_wire.wgsl
+--- /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/platform/blade/energized_wire.wgsl	1969-12-31 19:00:00.000000000 -0500
++++ /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/platform/blade/energized_wire.wgsl	2026-09-22 03:32:01.058425396 -0400
+@@ -0,0 +1,60 @@
++struct Params {
++    bounds: vec4<f32>,
++    points_a: vec4<f32>,
++    points_b: vec4<f32>,
++    points_c: vec4<f32>,
++    style: vec4<f32>,
++};
++
++var<uniform> params: Params;
++
++struct VertexOutput {
++    @builtin(position) position: vec4<f32>,
++};
++
++@vertex
++fn vs_main(@builtin(vertex_index) index: u32) -> VertexOutput {
++    var positions = array<vec2<f32>, 3>(
++        vec2<f32>(-1.0, -1.0),
++        vec2<f32>(3.0, -1.0),
++        vec2<f32>(-1.0, 3.0),
++    );
++    var output: VertexOutput;
++    output.position = vec4<f32>(positions[index], 0.0, 1.0);
++    return output;
++}
++
++fn distance_to_segment(point: vec2<f32>, a: vec2<f32>, b: vec2<f32>) -> f32 {
++    let delta = b - a;
++    let denominator = max(dot(delta, delta), 0.000001);
++    let t = clamp(dot(point - a, delta) / denominator, 0.0, 1.0);
++    return distance(point, a + delta * t);
++}
++
++@fragment
++fn fs_main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
++    let bounds = params.bounds;
++    let uv = (position.xy - bounds.xy) / max(bounds.zw, vec2<f32>(1.0, 1.0));
++    let aspect = bounds.z / max(bounds.w, 1.0);
++    let sample = vec2<f32>(uv.x * aspect, uv.y);
++
++    let a = params.points_a;
++    let b = params.points_b;
++    let c = params.points_c;
++    let p0 = vec2<f32>(a.x * aspect, a.y);
++    let p1 = vec2<f32>(a.z * aspect, a.w);
++    let p2 = vec2<f32>(b.x * aspect, b.y);
++    let p3 = vec2<f32>(b.z * aspect, b.w);
++    let p4 = vec2<f32>(c.x * aspect, c.y);
++    let core_radius = c.z / max(bounds.w, 1.0);
++    let glow_radius = c.w / max(bounds.w, 1.0);
++
++    let distance_to_wire = min(
++        min(distance_to_segment(sample, p0, p1), distance_to_segment(sample, p1, p2)),
++        min(distance_to_segment(sample, p2, p3), distance_to_segment(sample, p3, p4)),
++    );
++    let halo = 1.0 - smoothstep(core_radius, glow_radius, distance_to_wire);
++    let alpha = clamp(halo * params.style.x, 0.0, 1.0);
++    let color = params.style.yzw;
++    return vec4<f32>(color, alpha);
++}
+diff -ruN /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/platform/blade/local_focus.wgsl /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/platform/blade/local_focus.wgsl
+--- /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/platform/blade/local_focus.wgsl	1969-12-31 19:00:00.000000000 -0500
++++ /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/platform/blade/local_focus.wgsl	2026-09-22 02:55:03.816379820 -0400
+@@ -0,0 +1,32 @@
++struct LocalFocusParams {
++    bounds: vec4<f32>,
++    focus: vec4<f32>,
++    color: vec4<f32>,
++}
++
++var<uniform> params: LocalFocusParams;
++
++struct VertexOutput {
++    @builtin(position) position: vec4<f32>,
++}
++
++@vertex
++fn vs_main(@builtin(vertex_index) vertex_index: u32) -> VertexOutput {
++    var positions = array<vec2<f32>, 3>(
++        vec2<f32>(-1.0, -1.0),
++        vec2<f32>(3.0, -1.0),
++        vec2<f32>(-1.0, 3.0),
++    );
++    return VertexOutput(vec4<f32>(positions[vertex_index], 0.0, 1.0));
++}
++
++@fragment
++fn fs_main(@builtin(position) position: vec4<f32>) -> @location(0) vec4<f32> {
++    let uv = (position.xy - params.bounds.xy) / params.bounds.zw;
++    let aspect = params.bounds.z / params.bounds.w;
++    let local = (uv - params.focus.xy) * vec2<f32>(aspect, 1.0);
++    let distance = length(local);
++    let focus = 1.0 - smoothstep(params.focus.z, params.focus.w, distance);
++    let color = params.color.yzw + vec3<f32>(focus * params.color.x);
++    return vec4<f32>(color, 1.0);
++}
+diff -ruN /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/platform/blade.rs /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/platform/blade.rs
+--- /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/platform/blade.rs	2006-07-23 21:21:28.000000000 -0400
++++ /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/platform/blade.rs	2026-09-22 03:31:34.230012800 -0400
+@@ -4,8 +4,140 @@
+ mod blade_context;
+ mod blade_renderer;
+ 
++use blade_graphics as gpu;
++
++#[repr(C)]
++#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
++struct LocalFocusParams {
++    bounds: [f32; 4],
++    focus: [f32; 4],
++    color: [f32; 4],
++}
++
++#[derive(blade_macros::ShaderData)]
++struct LocalFocusData {
++    params: LocalFocusParams,
++}
++
++#[repr(C)]
++#[derive(Clone, Copy, bytemuck::Pod, bytemuck::Zeroable)]
++struct EnergizedWireParams {
++    bounds: [f32; 4],
++    points_a: [f32; 4],
++    points_b: [f32; 4],
++    points_c: [f32; 4],
++    style: [f32; 4],
++}
++
++#[derive(blade_macros::ShaderData)]
++struct EnergizedWireData {
++    params: EnergizedWireParams,
++}
++
+ #[cfg(target_os = "macos")]
+ pub(crate) use apple_compat::*;
+ pub(crate) use blade_atlas::*;
+ pub(crate) use blade_context::*;
+ pub(crate) use blade_renderer::*;
++
++/// A borrowed command-encoding capability for one GPUI frame.
++pub struct GpuFrame<'ctx, 'pass> {
++    gpu: &'ctx gpu::Context,
++    pass: &'pass mut gpu::RenderCommandEncoder<'ctx>,
++    local_focus_pipeline: &'pass gpu::RenderPipeline,
++    energized_wire_pipeline: &'pass gpu::RenderPipeline,
++    extent: gpu::Extent,
++    format: gpu::TextureFormat,
++}
++
++impl<'ctx, 'pass> GpuFrame<'ctx, 'pass> {
++    pub(crate) fn new(
++        gpu: &'ctx gpu::Context,
++        pass: &'pass mut gpu::RenderCommandEncoder<'ctx>,
++        local_focus_pipeline: &'pass gpu::RenderPipeline,
++        energized_wire_pipeline: &'pass gpu::RenderPipeline,
++        extent: gpu::Extent,
++        format: gpu::TextureFormat,
++    ) -> Self {
++        Self {
++            gpu,
++            pass,
++            local_focus_pipeline,
++            energized_wire_pipeline,
++            extent,
++            format,
++        }
++    }
++
++    /// Returns the existing GPUI Blade context for this frame only.
++    pub fn context(&self) -> &gpu::Context {
++        self.gpu
++    }
++
++    /// Returns the active render pass for this frame only.
++    pub fn render_pass(&mut self) -> &mut gpu::RenderCommandEncoder<'ctx> {
++        self.pass
++    }
++
++    /// Returns the active frame extent.
++    pub fn extent(&self) -> gpu::Extent {
++        self.extent
++    }
++
++    /// Returns the active frame color format.
++    pub fn target_format(&self) -> gpu::TextureFormat {
++        self.format
++    }
++
++    /// Applies a GPU scissor to subsequent custom draws.
++    pub fn set_scissor_rect(&mut self, rect: gpu::ScissorRect) {
++        self.pass.set_scissor_rect(&rect);
++    }
++
++    /// Draws the P1 local-focus specimen using the renderer-owned pipeline.
++    pub fn draw_local_focus(
++        &mut self,
++        origin: [f32; 2],
++        size: [f32; 2],
++        center: [f32; 2],
++        inner_radius: f32,
++        outer_radius: f32,
++        intensity: f32,
++        base: [f32; 3],
++    ) {
++        let params = LocalFocusParams {
++            bounds: [origin[0], origin[1], size[0], size[1]],
++            focus: [center[0], center[1], inner_radius, outer_radius],
++            color: [intensity, base[0], base[1], base[2]],
++        };
++        let mut encoder = self.pass.with(self.local_focus_pipeline);
++        encoder.bind(0, &LocalFocusData { params });
++        encoder.draw(0, 3, 0, 1);
++    }
++
++    /// Draws the P2 energized-wire halo around one reference-derived four-segment polyline.
++    pub fn draw_energized_wire(
++        &mut self,
++        origin: [f32; 2],
++        size: [f32; 2],
++        points: [[f32; 2]; 5],
++        core_radius: f32,
++        glow_radius: f32,
++        intensity: f32,
++        color: [f32; 3],
++    ) {
++        let params = EnergizedWireParams {
++            bounds: [origin[0], origin[1], size[0], size[1]],
++            points_a: [points[0][0], points[0][1], points[1][0], points[1][1]],
++            points_b: [points[2][0], points[2][1], points[3][0], points[3][1]],
++            points_c: [points[4][0], points[4][1], core_radius, glow_radius],
++            style: [intensity, color[0], color[1], color[2]],
++        };
++        let mut encoder = self.pass.with(self.energized_wire_pipeline);
++        encoder.bind(0, &EnergizedWireData { params });
++        encoder.draw(0, 3, 0, 1);
++    }
++}
++
++/// Work submitted by an application for one renderer frame.
++pub type GpuFrameCallback = Box<dyn for<'ctx, 'pass> FnOnce(&mut GpuFrame<'ctx, 'pass>) + 'static>;
+diff -ruN /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/platform.rs /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/platform.rs
+--- /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/platform.rs	2006-07-23 21:21:28.000000000 -0400
++++ /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/platform.rs	2026-09-22 02:55:03.816318090 -0400
+@@ -17,6 +17,15 @@
+ ))]
+ mod blade;
+ 
++#[cfg(any(
++    all(
++        any(target_os = "linux", target_os = "freebsd"),
++        any(feature = "x11", feature = "wayland")
++    ),
++    all(target_os = "macos", feature = "macos-blade")
++))]
++pub use blade::{GpuFrame, GpuFrameCallback};
++
+ #[cfg(any(test, feature = "test-support"))]
+ mod test;
+ 
+diff -ruN /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/scene.rs /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/scene.rs
+--- /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/scene.rs	2006-07-23 21:21:28.000000000 -0400
++++ /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/scene.rs	2026-09-22 08:12:50.583908184 -0400
+@@ -9,6 +9,7 @@
+     Point, Radians, ScaledPixels, Size, bounds_tree::BoundsTree, point,
+ };
+ use std::{
++    cell::RefCell,
+     fmt::Debug,
+     iter::Peekable,
+     ops::{Add, Range, Sub},
+@@ -32,6 +33,8 @@
+     pub(crate) monochrome_sprites: Vec<MonochromeSprite>,
+     pub(crate) polychrome_sprites: Vec<PolychromeSprite>,
+     pub(crate) surfaces: Vec<PaintSurface>,
++    gpu_frame_callbacks: RefCell<Vec<crate::GpuFrameCallback>>,
++    ordered_gpu_frame_callbacks: RefCell<Vec<(DrawOrder, crate::GpuFrameCallback)>>,
+ }
+ 
+ impl Scene {
+@@ -46,6 +49,41 @@
+         self.monochrome_sprites.clear();
+         self.polychrome_sprites.clear();
+         self.surfaces.clear();
++        self.gpu_frame_callbacks.borrow_mut().clear();
++        self.ordered_gpu_frame_callbacks.borrow_mut().clear();
++    }
++
++    pub(crate) fn push_gpu_frame_callback(&self, callback: crate::GpuFrameCallback) {
++        self.gpu_frame_callbacks.borrow_mut().push(callback);
++    }
++
++    pub(crate) fn take_gpu_frame_callbacks(&self) -> Vec<crate::GpuFrameCallback> {
++        std::mem::take(&mut *self.gpu_frame_callbacks.borrow_mut())
++    }
++
++    pub(crate) fn push_ordered_gpu_frame_callback(
++        &mut self,
++        bounds: Bounds<ScaledPixels>,
++        callback: crate::GpuFrameCallback,
++    ) -> DrawOrder {
++        let order = self
++            .layer_stack
++            .last()
++            .copied()
++            .unwrap_or_else(|| self.primitive_bounds.insert(bounds));
++        self.ordered_gpu_frame_callbacks
++            .borrow_mut()
++            .push((order, callback));
++        order
++    }
++
++    pub(crate) fn take_ordered_gpu_frame_callbacks(
++        &self,
++    ) -> Vec<(DrawOrder, crate::GpuFrameCallback)> {
++        let mut callbacks =
++            std::mem::take(&mut *self.ordered_gpu_frame_callbacks.borrow_mut());
++        callbacks.sort_by_key(|(order, _)| *order);
++        callbacks
+     }
+ 
+     pub fn len(&self) -> usize {
+@@ -448,6 +486,20 @@
+     Surfaces(&'a [PaintSurface]),
+ }
+ 
++impl PrimitiveBatch<'_> {
++    pub(crate) fn order(&self) -> DrawOrder {
++        match self {
++            PrimitiveBatch::Shadows(items) => items[0].order,
++            PrimitiveBatch::Quads(items) => items[0].order,
++            PrimitiveBatch::Paths(items) => items[0].order,
++            PrimitiveBatch::Underlines(items) => items[0].order,
++            PrimitiveBatch::MonochromeSprites { sprites, .. } => sprites[0].order,
++            PrimitiveBatch::PolychromeSprites { sprites, .. } => sprites[0].order,
++            PrimitiveBatch::Surfaces(items) => items[0].order,
++        }
++    }
++}
++
+ #[derive(Default, Debug, Clone)]
+ #[repr(C)]
+ pub(crate) struct Quad {
+diff -ruN /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/window.rs /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/window.rs
+--- /home/tension_atoi/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/gpui-0.2.2/src/window.rs	2006-07-23 21:21:28.000000000 -0400
++++ /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/window.rs	2026-09-22 08:13:03.661160266 -0400
+@@ -1980,6 +1980,36 @@
+         ArenaClearNeeded
+     }
+ 
++    /// Enqueues a callback that records custom commands into the current GPUI frame.
++    pub fn enqueue_gpu_frame_callback(
++        &mut self,
++        callback: impl for<'ctx, 'pass> FnOnce(&mut crate::GpuFrame<'ctx, 'pass>) + 'static,
++    ) {
++        self.next_frame
++            .scene
++            .push_gpu_frame_callback(Box::new(callback));
++    }
++
++    /// Enqueues frame-scoped GPU work at the current GPUI draw order for the supplied bounds.
++    pub fn enqueue_ordered_gpu_frame_callback(
++        &mut self,
++        bounds: Bounds<Pixels>,
++        callback: impl for<'ctx, 'pass> FnOnce(&mut crate::GpuFrame<'ctx, 'pass>) + 'static,
++    ) {
++        self.invalidator.debug_assert_paint();
++
++        let clipped_bounds = bounds.intersect(&self.content_mask().bounds);
++        if clipped_bounds.is_empty() {
++            return;
++        }
++
++        let scale_factor = self.scale_factor();
++        self.next_frame.scene.push_ordered_gpu_frame_callback(
++            clipped_bounds.scale(scale_factor),
++            Box::new(callback),
++        );
++    }
++
+     fn record_entities_accessed(&mut self, cx: &mut App) {
+         let mut entities_ref = cx.entities.accessed_entities.borrow_mut();
+         let mut entities = mem::take(entities_ref.deref_mut());

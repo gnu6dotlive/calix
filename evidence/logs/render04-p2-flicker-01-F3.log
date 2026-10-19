@@ -1,0 +1,1464 @@
+[2026-09-22T13:00:44Z INFO  shelly_gpui] Starting Shelly GPUI desktop session...
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::init] Presentation support: "VK_KHR_wayland_surface"
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::init] Presentation support: "VK_KHR_xcb_surface"
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::init] Presentation support: "VK_KHR_xlib_surface"
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::init] Presentation support: "VK_EXT_swapchain_colorspace"
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::init] Enabling Vulkan Portability
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::init] Adapter: "NVIDIA GeForce RTX 3070"
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::init] Ray tracing is supported
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T13:00:45Z INFO  gpui::platform::blade::blade_renderer] Initializing Blade pipelines for surface SurfaceInfo { format: Bgra8Unorm, alpha: PreMultiplied }
+[2026-09-22T13:00:45Z INFO  gpui::platform::blade::blade_renderer] Initializing experimental local-focus pipeline once per renderer
+[2026-09-22T13:00:45Z INFO  gpui::platform::blade::blade_renderer] Initializing experimental energized-wire pipeline once per renderer
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::resource] Creating texture 0x564874401c20 of size 1440x960x1 and format Bgra8Unorm, name 'path intermediate', handle 0
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::resource] Creating texture 0x564871f5f730 of size 1440x960x1 and format Bgra8Unorm, name 'path intermediate msaa', handle 1
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T13:00:45Z INFO  blade_graphics::hal::surface] Retaining current format: Bgra8Unorm
+[2026-09-22T13:00:45Z INFO  gpui::platform::blade::blade_renderer] Destroying experimental local-focus pipeline with renderer
+[2026-09-22T13:00:45Z INFO  gpui::platform::blade::blade_renderer] Destroying experimental energized-wire pipeline with renderer
+[2026-09-22T13:00:45Z INFO  gpui::platform::blade::blade_renderer] Initializing Blade pipelines for surface SurfaceInfo { format: Bgra8Unorm, alpha: Ignored }
+[2026-09-22T13:00:45Z INFO  gpui::platform::blade::blade_renderer] Initializing experimental local-focus pipeline once per renderer
+[2026-09-22T13:00:45Z INFO  gpui::platform::blade::blade_renderer] Initializing experimental energized-wire pipeline once per renderer
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T13:00:45Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T13:00:45Z INFO  shelly_gpui::backend::client] ShellyClient initialisé avec le binaire : ../Shelly.Cli.Zig/zig-out/bin/shelly
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::resource] Creating texture 0x564874435620 of size 1024x1024x1 and format R8Unorm, name 'atlas', handle 2
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::resource] Creating buffer 0x564871f5cac0 of size 65536, name 'chunk-0', handle 3
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::resource] Creating buffer 0x5648743d0480 of size 4096, name 'chunk-0', handle 4
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::resource] Creating buffer 0x5648743d6250 of size 12320, name 'chunk-1', handle 5
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::resource] Creating buffer 0x56487471ab30 of size 4480, name 'chunk-2', handle 6
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::resource] Creating buffer 0x564874159bc0 of size 35280, name 'chunk-3', handle 7
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::resource] Creating buffer 0x56487443eb20 of size 4096, name 'chunk-4', handle 8
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::resource] Creating buffer 0x564871f59b50 of size 14336, name 'chunk-5', handle 9
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::surface] Retaining current format: Bgra8Unorm
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::resource] Destroying texture 0x564874401c20, handle 0
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::resource] Destroying texture 0x564871f5f730, handle 1
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::resource] Creating texture 0x564874401c20 of size 1062x943x1 and format Bgra8Unorm, name 'path intermediate', handle 1
+[2026-09-22T13:00:46Z INFO  blade_graphics::hal::resource] Creating texture 0x56487439aea0 of size 1062x943x1 and format Bgra8Unorm, name 'path intermediate msaa', handle 0
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=2
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=3
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=4
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=5
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=6
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=7
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=8
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=9
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=10
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=11
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=12
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=13
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=14
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=15
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=16
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=17
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=18
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=19
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=20
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=21
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=22
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=23
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=24
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=25
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=26
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=27
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=28
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=29
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=30
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=31
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=32
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=33
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=34
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=35
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=36
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=37
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=38
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=39
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=40
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=41
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=42
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=43
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=44
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=45
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=46
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=47
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=48
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=49
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=50
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=51
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=52
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=53
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=54
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=55
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=56
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=57
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=58
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=59
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=60
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=61
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=62
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=63
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=64
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=65
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=66
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=67
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=68
+[2026-09-22T13:00:46Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=69
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=70
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=71
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=72
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=73
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=74
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=75
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=76
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=77
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=78
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=79
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=80
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=81
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=82
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=83
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=84
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=85
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=86
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=87
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=88
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=89
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=90
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=91
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=92
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=93
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=94
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=95
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=96
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=97
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=98
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=99
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=100
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=101
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=102
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=103
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=104
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=105
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=106
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=107
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=108
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=109
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=110
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=111
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=112
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=113
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=114
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=115
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=116
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=117
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=118
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=119
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=120
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=121
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=122
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=123
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=124
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=125
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=126
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=127
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=128
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=129
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=130
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=131
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=132
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=133
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=134
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=135
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=136
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=137
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=138
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=139
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=140
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=141
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=142
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=143
+[2026-09-22T13:00:47Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=144
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=145
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=146
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=147
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=148
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=149
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=150
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=151
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=152
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=153
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=154
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=155
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=156
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=157
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=158
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=159
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=160
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=161
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=162
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=163
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=164
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=165
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=166
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=167
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=168
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=169
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=170
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=171
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=172
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=173
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=174
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=175
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=176
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=177
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=178
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=179
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=180
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=181
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=182
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=183
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=184
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=185
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=186
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=187
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=188
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=189
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=190
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=191
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=192
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=193
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=194
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=195
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=196
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=197
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=198
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=199
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=200
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=201
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=202
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=203
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=204
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=205
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=206
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=207
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=208
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=209
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=210
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=211
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=212
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=213
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=214
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=215
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=216
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=217
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=218
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=219
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=220
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=221
+[2026-09-22T13:00:48Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=222
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=223
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=224
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=225
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=226
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=227
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=228
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=229
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=230
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=231
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=232
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=233
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=234
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=235
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=236
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=237
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=238
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=239
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=240
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=241
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=242
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=243
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=244
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=245
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=246
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=247
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=248
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=249
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=250
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=251
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=252
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=253
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=254
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=255
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=256
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=257
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=258
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=259
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=260
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=261
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=262
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=263
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=264
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=265
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=266
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=267
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=268
+[2026-09-22T13:00:49Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=269
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=270
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=271
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=272
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=273
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=274
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=275
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=276
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=277
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=278
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=279
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=280
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=281
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=282
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=283
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=284
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=285
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=286
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=287
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=288
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=289
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=290
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=291
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=292
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=293
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=294
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=295
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=296
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=297
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=298
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=299
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=300
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=301
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=302
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=303
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=304
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=305
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=306
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=307
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=308
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=309
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=310
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=311
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=312
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=313
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=314
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=315
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=316
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=317
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=318
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=319
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=320
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=321
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=322
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=323
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=324
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=325
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=326
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=327
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=328
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=329
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=330
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=331
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=332
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=333
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=334
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=335
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=336
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=337
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=338
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=339
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=340
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=341
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=342
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=343
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=344
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=345
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=346
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=347
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=348
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=349
+[2026-09-22T13:00:51Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=350
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=351
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=352
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=353
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=354
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=355
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=356
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=357
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=358
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=359
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=360
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=361
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=362
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=363
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=364
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=365
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=366
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=367
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=368
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=369
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=370
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=371
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=372
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=373
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=374
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=375
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=376
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=377
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=378
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=379
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=380
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=381
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=382
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=383
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=384
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=385
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=386
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=387
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=388
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=389
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=390
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=391
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=392
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=393
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=394
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=395
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=396
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=397
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=398
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=399
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=400
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=401
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=402
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=403
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=404
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=405
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=406
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=407
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=408
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=409
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=410
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=411
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=412
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=413
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=414
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=415
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=416
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=417
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=418
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=419
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=420
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=421
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=422
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=423
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=424
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=425
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=426
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=427
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=428
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=429
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=430
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=431
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=432
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=433
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=434
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=435
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=436
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=437
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=438
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=439
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=440
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=441
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=442
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=443
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=444
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=445
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=446
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=447
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=448
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=449
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=450
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=451
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=452
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=453
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=454
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=455
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=456
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=457
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=458
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=459
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=460
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=461
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=462
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=463
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=464
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=465
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=466
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=467
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=468
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=469
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=470
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=471
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=472
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=473
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=474
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=475
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=476
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=477
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=478
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=479
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=480
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=481
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=482
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=483
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=484
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=485
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=486
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=487
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=488
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=489
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=490
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=491
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=492
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=493
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=494
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=495
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=496
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=497
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=498
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=499
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=500
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=501
+[2026-09-22T13:00:52Z WARN  shelly_gpui::views::workspace] Initial updates check failed: Désérialisation de la liste des mises à jour
+    
+    Caused by:
+        invalid type: map, expected a sequence at line 1 column 0
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=502
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=503
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=504
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=505
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=506
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=507
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=508
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=509
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=510
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=511
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=512
+[2026-09-22T13:00:52Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=513
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=514
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=515
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=516
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=517
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=518
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=519
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=520
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=521
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=522
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=523
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=524
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=525
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=526
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=527
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=528
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=529
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=530
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=531
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=532
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=533
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=534
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=535
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=536
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=537
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=538
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=539
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=540
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=541
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=542
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=543
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=544
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=545
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=546
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=547
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=548
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=549
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=550
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=551
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=552
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=553
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=554
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=555
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=556
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=557
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=558
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=559
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=560
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=561
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=562
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=563
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=564
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=565
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=566
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=567
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=568
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=569
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=570
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=571
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=572
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=573
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=574
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=575
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=576
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=577
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=578
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=579
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=580
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=581
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=582
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=583
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=584
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=585
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=586
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=587
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=588
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=589
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=590
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=591
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=592
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=593
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=594
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=595
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=596
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=597
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=598
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=599
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=600
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=601
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=602
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=603
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=604
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=605
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=606
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=607
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=608
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=609
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=610
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=611
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=612
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=613
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=614
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=615
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=616
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=617
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=618
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=619
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=620
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=621
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=622
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=623
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=624
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=625
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=626
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=627
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=628
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=629
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=630
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=631
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=632
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=633
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=634
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=635
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=636
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=637
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=638
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=639
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=640
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=641
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=642
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=643
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=644
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=645
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=646
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=647
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=648
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=649
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=650
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=651
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=652
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=653
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=654
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=655
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=656
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=657
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=658
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=659
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=660
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=661
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=662
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=663
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=664
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=665
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=666
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=667
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=668
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=669
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=670
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=671
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=672
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=673
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=674
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=675
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=676
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=677
+[2026-09-22T13:00:53Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=678
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=679
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=680
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=681
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=682
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=683
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=684
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=685
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=686
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=687
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=688
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=689
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=690
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=691
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=692
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=693
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=694
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=695
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=696
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=697
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=698
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=699
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=700
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=701
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=702
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=703
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=704
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=705
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=706
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=707
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=708
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=709
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=710
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=711
+[2026-09-22T13:00:54Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=712
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=713
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=714
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=715
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=716
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=717
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=718
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=719
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=720
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=721
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=722
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=723
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=724
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=725
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=726
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=727
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=728
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=729
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=730
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=731
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=732
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=733
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=734
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=735
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=736
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=737
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=738
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=739
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=740
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=741
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=742
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=743
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=744
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=745
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=746
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=747
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=748
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=749
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=750
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=751
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=752
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=753
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=754
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=755
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=756
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=757
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=758
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=759
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=760
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=761
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=762
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=763
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=764
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=765
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=766
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=767
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=768
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=769
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=770
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=771
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=772
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=773
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=774
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=775
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=776
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=777
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=778
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=779
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=780
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=781
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=782
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=783
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=784
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=785
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=786
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=787
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=788
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=789
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=790
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=791
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=792
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=793
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=794
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=795
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=796
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=797
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=798
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=799
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=800
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=801
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=802
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=803
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=804
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=805
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=806
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=807
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=808
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=809
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=810
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=811
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=812
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=813
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=814
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=815
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=816
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=817
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=818
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=819
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=820
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=821
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=822
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=823
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=824
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=825
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=826
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=827
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=828
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=829
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=830
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=831
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=832
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=833
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=834
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=835
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=836
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=837
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=838
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=839
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=840
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=841
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=842
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=843
+[2026-09-22T13:00:55Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=844
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=845
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=846
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=847
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=848
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=849
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=850
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=851
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=852
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=853
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=854
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=855
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=856
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=857
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=858
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=859
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=860
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=861
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=862
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=863
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=864
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=865
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=866
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=867
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=868
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=869
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=870
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=871
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=872
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=873
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=874
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=875
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=876
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=877
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=878
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=879
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=880
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=881
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=882
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=883
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=884
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=885
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=886
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=887
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=888
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=889
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=890
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=891
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=892
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=893
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=894
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=895
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=896
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=897
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=898
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=899
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=900
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=901
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=902
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=903
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=904
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=905
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=906
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=907
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=908
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=909
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=910
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=911
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=912
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=913
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=914
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=915
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=916
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=917
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=918
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=919
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=920
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=921
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=922
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=923
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=924
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=925
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=926
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=927
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=928
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=929
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=930
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=931
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=932
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=933
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=934
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=935
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=936
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=937
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=938
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=939
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=940
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=941
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=942
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=943
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=944
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=945
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=946
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=947
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=948
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=949
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=950
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=951
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=952
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=953
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=954
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=955
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=956
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=957
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=958
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=959
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=960
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=961
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=962
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=963
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=964
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=965
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=966
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=967
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=968
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=969
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=970
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=971
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=972
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=973
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=974
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=975
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=976
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=977
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=978
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=979
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=980
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=981
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=982
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=983
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=984
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=985
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=986
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=987
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=988
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=989
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=990
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=991
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=992
+[2026-09-22T13:00:56Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=993
+[2026-09-22T13:00:57Z WARN  blade_graphics::hal::init] Requested layer is not found: "VK_LAYER_KHRONOS_validation"
+[2026-09-22T13:00:57Z INFO  blade_graphics::hal::init] Enabling Vulkan Portability
+[2026-09-22T13:00:57Z INFO  blade_graphics::hal::init] Adapter: "NVIDIA GeForce RTX 3070"
+[2026-09-22T13:00:57Z INFO  blade_graphics::hal::init] Ray tracing is supported
+[2026-09-22T13:00:57Z INFO  blade_graphics::hal::resource] Creating texture 0x564874ee2120 of size 8x8x1 and format Rgba8Unorm, name 'render04-p0-i03-offscreen', handle 0
+[2026-09-22T13:00:57Z INFO  blade_graphics::hal::resource] Creating buffer 0x564874e2cbb0 of size 256, name 'render04-p0-i03-readback', handle 1
+[2026-09-22T13:00:57Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T13:00:57Z INFO  blade_graphics::hal::resource] Creating buffer 0x564874e9cc90 of size 4, name '_marker', handle 2
+[2026-09-22T13:00:57Z INFO  blade_graphics::hal::resource] Destroying buffer 0x564874e9cc90, handle 2
+[2026-09-22T13:00:57Z INFO  blade_graphics::hal::resource] Destroying buffer 0x564874e2cbb0, handle 1
+[2026-09-22T13:00:57Z INFO  blade_graphics::hal::resource] Destroying texture 0x564874ee2120, handle 0
+[2026-09-22T13:00:58Z INFO  blade_graphics::hal::resource] Creating texture 0x5648747f6ce0 of size 1024x1024x1 and format Bgra8Unorm, name 'atlas', handle 10
+[2026-09-22T13:00:58Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=994
+[2026-09-22T13:00:58Z INFO  blade_graphics::hal::resource] Creating buffer 0x564874a3dec0 of size 35840, name 'chunk-6', handle 11
+[2026-09-22T13:00:58Z INFO  blade_graphics::hal::resource] Creating buffer 0x564874e2cbb0 of size 50624, name 'chunk-7', handle 12
+[2026-09-22T13:00:58Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T13:00:58Z INFO  blade_graphics::hal::resource] Creating buffer 0x564874e9cc90 of size 11872, name 'chunk-8', handle 13
+[2026-09-22T13:00:58Z INFO  blade_graphics::hal::resource] Creating buffer 0x564874e849a0 of size 136000, name 'chunk-1', handle 14
+[2026-09-22T13:00:58Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=1
+[2026-09-22T13:00:58Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:00:58Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=1
+[2026-09-22T13:00:58Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=1
+[2026-09-22T13:00:58Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:00:58Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=1
+[2026-09-22T13:00:58Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=995
+[2026-09-22T13:00:58Z INFO  gpui::platform::blade::blade_renderer] P2 ordered GPU callback dispatch order=4 before batch order=4
+[2026-09-22T13:00:58Z INFO  shelly_gpui::render_lab::experimental] P2_C_CALLBACK seq=1
+[2026-09-22T13:00:58Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T13:00:58Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=995 index=0
+[2026-09-22T13:00:58Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=1
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=996
+[2026-09-22T13:01:00Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 256 sets
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=997
+[2026-09-22T13:01:00Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 256 sets
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=998
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=2
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=2
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=2
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=2
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=999
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2 ordered GPU callback dispatch order=4 before batch order=4
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_CALLBACK seq=2
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=999 index=0
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=2
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=3
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=3
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=3
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=3
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1000
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2 ordered GPU callback dispatch order=4 before batch order=4
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_CALLBACK seq=3
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=1000 index=0
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=3
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1001
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1002
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1003
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1004
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1005
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1006
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1007
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1008
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1009
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1010
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1011
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1012
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1013
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1014
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1015
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1016
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1017
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1018
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1019
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1020
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1021
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1022
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1023
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1024
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=4
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=4
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=4
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=4
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1025
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2 ordered GPU callback dispatch order=4 before batch order=4
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_CALLBACK seq=4
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=1025 index=0
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=4
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=5
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=5
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=5
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=5
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1026
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2 ordered GPU callback dispatch order=4 before batch order=4
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_CALLBACK seq=5
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=1026 index=0
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=5
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1027
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1028
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1029
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1030
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1031
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1032
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1033
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1034
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1035
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1036
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1037
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1038
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1039
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1040
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1041
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1042
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1043
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1044
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1045
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1046
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1047
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1048
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1049
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1050
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1051
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1052
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1053
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1054
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1055
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1056
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1057
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1058
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1059
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=6
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=6
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=6
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=6
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1060
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2 ordered GPU callback dispatch order=4 before batch order=4
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_C_CALLBACK seq=6
+[2026-09-22T13:01:00Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=1060 index=0
+[2026-09-22T13:01:00Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=6
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=7
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=7
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=7
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=7
+[2026-09-22T13:01:01Z INFO  blade_graphics::hal::resource] Creating buffer 0x564874e47c40 of size 136000, name 'chunk-2', handle 15
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=8
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=8
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=8
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=8
+[2026-09-22T13:01:01Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1061
+[2026-09-22T13:01:01Z INFO  gpui::platform::blade::blade_renderer] P2 ordered GPU callback dispatch order=4 before batch order=4
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2_C_CALLBACK seq=8
+[2026-09-22T13:01:01Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=1061 index=0
+[2026-09-22T13:01:01Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=8
+[2026-09-22T13:01:01Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1062
+[2026-09-22T13:01:01Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1063
+[2026-09-22T13:01:01Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1064
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1065
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1066
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1067
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1068
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1069
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1070
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1071
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1072
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1073
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1074
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1075
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1076
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1077
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1078
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1079
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1080
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1081
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1082
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1083
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1084
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1085
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1086
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1087
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1088
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1089
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1090
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1091
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1092
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1093
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1094
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1095
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1096
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1097
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1098
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1099
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1100
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1101
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1102
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1103
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1104
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1105
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1106
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1107
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1108
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1109
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1110
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1111
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1112
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1113
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1114
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1115
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1116
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1117
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1118
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1119
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1120
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1121
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1122
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1123
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1124
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1125
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1126
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1127
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1128
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1129
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1130
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1131
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1132
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1133
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1134
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1135
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1136
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1137
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1138
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1139
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1140
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1141
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1142
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1143
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1144
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1145
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1146
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1147
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1148
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1149
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1150
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1151
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1152
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1153
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1154
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1155
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1156
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1157
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1158
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1159
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1160
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1161
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1162
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1163
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1164
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1165
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1166
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1167
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1168
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1169
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1170
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1171
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1172
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1173
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1174
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1175
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1176
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1177
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1178
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1179
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1180
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1181
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1182
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1183
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1184
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1185
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1186
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1187
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1188
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1189
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1190
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1191
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1192
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1193
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1194
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1195
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1196
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1197
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1198
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1199
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1200
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1201
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1202
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1203
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1204
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1205
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1206
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1207
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1208
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1209
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=9
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=9
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=9
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=9
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1210
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2 ordered GPU callback dispatch order=4 before batch order=4
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2_C_CALLBACK seq=9
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=1210 index=0
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=9
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1211
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1212
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=10
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=10
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=10
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=10
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1213
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2 ordered GPU callback dispatch order=4 before batch order=4
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2_C_CALLBACK seq=10
+[2026-09-22T13:01:02Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=1213 index=0
+[2026-09-22T13:01:02Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=10
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=11
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=11
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=11
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=11
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=12
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=12
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=12
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=12
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1214
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2 ordered GPU callback dispatch order=4 before batch order=4
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_C_CALLBACK seq=12
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=1214 index=0
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=12
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1215
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1216
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1217
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1218
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1219
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1220
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1221
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1222
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1223
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1224
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1225
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1226
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=13
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=31 w=200 h=170 scale=1
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=13
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_C_PAINT seq=13
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire C bounds x=527 y=232 w=200 h=170 scale=1
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_C_ENQUEUE seq=13
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1227
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2 ordered GPU callback dispatch order=4 before batch order=4
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_C_CALLBACK seq=13
+[2026-09-22T13:01:06Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=1227 index=0
+[2026-09-22T13:01:06Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=13

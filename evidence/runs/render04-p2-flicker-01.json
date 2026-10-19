@@ -1,0 +1,35 @@
+{
+  "id": "render04-p2-flicker-01",
+  "status": "SCISSOR_LEAK_STRONGLY_INDICATED",
+  "commit": "ab3f581d63d83874f5ca0a4e925739b484b2b059",
+  "fixture": "optical.energized-wire-glow",
+  "workbench": "/mnt/workbench/pkgbuild/render-04-p2/flicker-01",
+  "topology": {
+    "duplicate_window_topology_causal": false,
+    "native_wayland_client": true,
+    "known_experimental_processes": 1
+  },
+  "modes": {
+    "F0": {"frame_draw": 528, "b_paint": 0, "b_enqueue": 0, "b_callback": 0, "c_paint": 0, "c_enqueue": 0, "c_callback": 0},
+    "F1": {"frame_draw": 276, "b_paint": 4, "b_enqueue": 4, "b_callback": 3, "post_callback_dispatch": 3},
+    "F2": {"frame_draw": 264, "c_paint": 1, "c_enqueue": 1, "c_callback": 1},
+    "F2_reset": {"frame_draw": 164, "c_paint": 2, "c_enqueue": 2, "c_callback": 2, "scissor_reset": 2},
+    "F3": {"frame_draw": 1227, "b_paint": 13, "b_enqueue": 13, "b_callback": 11, "c_paint": 13, "c_enqueue": 13, "c_callback": 11, "post_callback_dispatch": 11}
+  },
+  "ordered_audit": {
+    "callback_order": 4,
+    "native_batches_same_order": 2,
+    "insertion_key_unique": false,
+    "classification": "DRAW_ORDER_INSUFFICIENT_AS_INSERTION_KEY"
+  },
+  "classification": {
+    "scissor_leak_established": "STRONGLY_INDICATED",
+    "callback_cadence_flicker": "NOT_ESTABLISHED",
+    "draw_order_insertion_unstable": "NO"
+  },
+  "artifacts": {
+    "gpui_patch": "evidence/patches/render04-p2-flicker-01-gpui.patch",
+    "shelly_patch": "evidence/patches/render04-p2-flicker-01-shelly-src.patch",
+    "binary_sha256": "dec16b1006472a700000dd171af7879e17769ec2f94b8411421ffc175266f625"
+  }
+}

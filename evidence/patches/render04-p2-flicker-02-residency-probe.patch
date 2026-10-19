@@ -1,0 +1,58 @@
+--- /mnt/workbench/pkgbuild/render-04-p2/upstream/gpui-0.2.2/src/platform/blade/blade_renderer.rs	2026-09-22 09:04:14.227913455 -0400
++++ upstream/src/platform/blade/blade_renderer.rs	2026-09-22 11:10:38.997098413 -0400
+@@ -719,10 +719,15 @@
+         );
+ 
+         profiling::scope!("render pass");
+-        let mut ordered_gpu_callbacks = scene
+-            .take_ordered_gpu_frame_callbacks()
+-            .into_iter()
+-            .peekable();
++        let scene_ptr = scene as *const Scene as usize;
++        let ordered_callbacks = scene.take_ordered_gpu_frame_callbacks();
++        let post_callbacks = scene.take_gpu_frame_callbacks();
++        log::info!(
++            "P2_SCENE_DRAW frame={frame_seq} scene_ptr={scene_ptr:#x} ordered_callbacks={} post_callbacks={}",
++            ordered_callbacks.len(),
++            post_callbacks.len()
++        );
++        let mut ordered_gpu_callbacks = ordered_callbacks.into_iter().peekable();
+ 
+         for batch in scene.batches() {
+             let batch_order = batch.order();
+@@ -740,7 +745,7 @@
+                     .next()
+                     .expect("ordered callback disappeared after peek");
+                 log::info!(
+-                    "P2 ordered GPU callback dispatch order={} before batch order={}",
++                    "P2 ordered GPU callback dispatch frame={frame_seq} scene_ptr={scene_ptr:#x} order={} before batch order={}",
+                     order,
+                     batch_order
+                 );
+@@ -995,7 +1000,7 @@
+ 
+         for (order, callback) in ordered_gpu_callbacks {
+             log::info!(
+-                "P2 ordered GPU callback dispatch order={} after native batches",
++                "P2 ordered GPU callback dispatch frame={frame_seq} scene_ptr={scene_ptr:#x} order={} after native batches",
+                 order
+             );
+             let mut gpu_frame = GpuFrame::new(
+@@ -1018,14 +1023,10 @@
+             }
+         }
+ 
+-        for (callback_index, callback) in scene
+-            .take_gpu_frame_callbacks()
+-            .into_iter()
+-            .enumerate()
+-        {
++        for (callback_index, callback) in post_callbacks.into_iter().enumerate() {
+             log::info!(
+-                "P2_POST_CALLBACK_DISPATCH frame={} index={callback_index}",
+-                frame_seq
++                "P2_POST_CALLBACK_DISPATCH frame={} scene_ptr={scene_ptr:#x} index={callback_index}",
++                frame_seq,
+             );
+             let mut gpu_frame = GpuFrame::new(
+                 &self.gpu,

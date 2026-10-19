@@ -1,0 +1,1954 @@
+[2026-09-22T15:13:34Z INFO  shelly_gpui] Starting Shelly GPUI desktop session...
+[2026-09-22T15:13:35Z INFO  blade_graphics::hal::init] Presentation support: "VK_KHR_wayland_surface"
+[2026-09-22T15:13:35Z INFO  blade_graphics::hal::init] Presentation support: "VK_KHR_xcb_surface"
+[2026-09-22T15:13:35Z INFO  blade_graphics::hal::init] Presentation support: "VK_KHR_xlib_surface"
+[2026-09-22T15:13:35Z INFO  blade_graphics::hal::init] Presentation support: "VK_EXT_swapchain_colorspace"
+[2026-09-22T15:13:35Z INFO  blade_graphics::hal::init] Enabling Vulkan Portability
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::init] Adapter: "NVIDIA GeForce RTX 3070"
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::init] Ray tracing is supported
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] Initializing Blade pipelines for surface SurfaceInfo { format: Bgra8Unorm, alpha: PreMultiplied }
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] Initializing experimental local-focus pipeline once per renderer
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] Initializing experimental energized-wire pipeline once per renderer
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating texture 0x56359d444cd0 of size 1440x960x1 and format Bgra8Unorm, name 'path intermediate', handle 0
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating texture 0x56359d445ae0 of size 1440x960x1 and format Bgra8Unorm, name 'path intermediate msaa', handle 1
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::surface] Retaining current format: Bgra8Unorm
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] Destroying experimental local-focus pipeline with renderer
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] Destroying experimental energized-wire pipeline with renderer
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] Initializing Blade pipelines for surface SurfaceInfo { format: Bgra8Unorm, alpha: Ignored }
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] Initializing experimental local-focus pipeline once per renderer
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] Initializing experimental energized-wire pipeline once per renderer
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_impl")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_device_position_transformed")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("to_tile_position")
+[2026-09-22T15:13:36Z INFO  naga::back::spv::writer] Skip function Some("blend_color")
+[2026-09-22T15:13:36Z INFO  shelly_gpui::backend::client] ShellyClient initialisé avec le binaire : /usr/bin/shelly
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating texture 0x56359d47a4b0 of size 1024x1024x1 and format R8Unorm, name 'atlas', handle 2
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359b03a470 of size 65536, name 'chunk-0', handle 3
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating texture 0x56359dac87f0 of size 1024x1024x1 and format Bgra8Unorm, name 'atlas', handle 4
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359b04cb80 of size 136000, name 'chunk-1', handle 5
+[2026-09-22T15:13:36Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=1
+[2026-09-22T15:13:36Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=905 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:36Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=1
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359d5cbb90 of size 65536, name 'chunk-2', handle 6
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=1
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=1 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359d481b30 of size 4096, name 'chunk-0', handle 7
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359d53b740 of size 8320, name 'chunk-1', handle 8
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359d7c7830 of size 13328, name 'chunk-2', handle 9
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359d40f9d0 of size 4096, name 'chunk-3', handle 10
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359d40fb50 of size 61824, name 'chunk-4', handle 11
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359d4b74f0 of size 4096, name 'chunk-5', handle 12
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359d4b7670 of size 29232, name 'chunk-6', handle 13
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359d4b77f0 of size 4096, name 'chunk-7', handle 14
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359d81d8e0 of size 24752, name 'chunk-8', handle 15
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=9
+[2026-09-22T15:13:36Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=9
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=1 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:36Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=1
+[2026-09-22T15:13:36Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=1 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=2
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=905 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=2 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=9
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 16 sets
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=9
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=2 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=2 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=3
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=905 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=3
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::surface] Using surface present mode MAILBOX
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::surface] Retaining current format: Bgra8Unorm
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::resource] Destroying texture 0x56359d444cd0, handle 0
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::resource] Destroying texture 0x56359d445ae0, handle 1
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::resource] Creating texture 0x56359d444cd0 of size 1062x1902x1 and format Bgra8Unorm, name 'path intermediate', handle 1
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::resource] Creating texture 0x56359d445ae0 of size 1062x1902x1 and format Bgra8Unorm, name 'path intermediate msaa', handle 0
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359ddf37f0 of size 136000, name 'chunk-3', handle 16
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=4
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=3 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359dc42400 of size 59360, name 'chunk-9', handle 17
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359dc40860 of size 63952, name 'chunk-10', handle 18
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::resource] Creating buffer 0x56359dc652e0 of size 51520, name 'chunk-11', handle 19
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=3 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=4
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 256 sets
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=3 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=5
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=4 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=4 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=5
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::descriptor] Creating a descriptor pool for at most 256 sets
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=4 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=6
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=5 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=5 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=5 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=7
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=6 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=6 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=6 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=8
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=8
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=7 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=7 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=8
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=7 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=9
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=9
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=8
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=8 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=8 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=9
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=8 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=10
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=10
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=9
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=9 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=9 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=10
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=9 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=11
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=11
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=10
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=10 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=10 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=11
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=10 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=12
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=12
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=11
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=11 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=11 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=12
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=11 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=13
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=13
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=12
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=12 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=12 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=13
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=12 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=14
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=14
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=13
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=13 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=13 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=14
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=13 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=15
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=15
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=14
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=14 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=14 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=15
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=14 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=16
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=16
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=15
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=15 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=15 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=16
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=15 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=17
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=17
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=16
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=16 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=16 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=17
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=16 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=18
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=18
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=17
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=17 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=17 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=18
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=17 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=19
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=19
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=18
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=18 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=18 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=19
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=18 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=20
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=20
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=19
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=19 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=19 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=20
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=19 ordered=false
+[2026-09-22T15:13:37Z INFO  blade_graphics::hal::resource] Creating texture 0x56359dfab3b0 of size 1024x1024x1 and format Bgra8Unorm, name 'atlas', handle 20
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=21
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=21
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=20
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=20 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=20 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=21
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=20 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=22
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=22
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=21
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=21 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=21 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=22
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=21 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=23
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=23
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=22
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=22 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=22 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=23
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=22 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=24
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=24
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=23
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=23 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=23 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=24
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=23 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=25
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=25
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=24
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=24 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=24 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=25
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=24 ordered=false
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=25
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=25 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=0
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=26
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=26
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=26
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=26 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=26 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=26
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=26 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=27
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=27
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=27
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=27 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=27 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=27
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=27 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=28
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=28
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=28
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=28 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=28 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=28
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=28 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=29
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=29
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=29
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=29 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=29 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=29
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=29 ordered=false
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=30
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=30
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=30
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=30 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=30 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:37Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=30
+[2026-09-22T15:13:37Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=30 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=31
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=31
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=31
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=31 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=31 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=31
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=31 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=32
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=32
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=32
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=32 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=32 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=32
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=32 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=33
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=33
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=33
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=33 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=33 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=33
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=33 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=34
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=34
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=34
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=34 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=34 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=34
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=34 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=35
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=35
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=35
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=35 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=35 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=35
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=35 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=36
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=36
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=36
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=36 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=36 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=36
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=36 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=37
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=37
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=37
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=37 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=37 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=37
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=37 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=38
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=38
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=38
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=38 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=38 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=38
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=38 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=39
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=39
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=39
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=39 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=39 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=39
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=39 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=40
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=40
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=40
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=40 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=40 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=40
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=40 ordered=false
+[2026-09-22T15:13:38Z INFO  blade_graphics::hal::resource] Creating texture 0x56359deb8a50 of size 1024x1024x1 and format Bgra8Unorm, name 'atlas', handle 21
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=41
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=41
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=41
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=41 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=41 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=41
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=41 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=42
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=42
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=42
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=42 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=42 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=42
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=42 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=43
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=43
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=43
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=43 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=43 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=43
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=43 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=44
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=44
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=44
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=44 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=44 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=44
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=44 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=45
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=45
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=45
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=45 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=45 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=45
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=45 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=46
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=46
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=46
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=46 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=46 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=46
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=46 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=47
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=47
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=47
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=47 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=47 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=47
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=47 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=48
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=48
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=48
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=48 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=48 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=48
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=48 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=49
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=49
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=49
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=49 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=49 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=49
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=49 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=50
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=50
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=50
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=50 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=50 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=50
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=50 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=51
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=51
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=51
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=51 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=51 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=51
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=51 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=52
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=52
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=52
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=52 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=52 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=52
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=52 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=53
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=53
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=53
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=53 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=53 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=53
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=53 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=54
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=54
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=54
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=54 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=54 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=54
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=54 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=55
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=55
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=55
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=55 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=55 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=55
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=55 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=56
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=56
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=56
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=56 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=56 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=56
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=56 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=57
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=57
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=57
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=57 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=57 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=57
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=57 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=58
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=58
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=58
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=58 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=58 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=58
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=58 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=59
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=59
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=59
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=59 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=59 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=59
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=59 ordered=false
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=60
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=60
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=60
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=60 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=60 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=60
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=60 ordered=false
+[2026-09-22T15:13:38Z INFO  blade_graphics::hal::resource] Creating texture 0x56359e2918e0 of size 1024x1024x1 and format Bgra8Unorm, name 'atlas', handle 22
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=61
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=61
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=61
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=61 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=61 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:38Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=61
+[2026-09-22T15:13:38Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=61 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=62
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=62
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=62
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=62 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=62 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=62
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=62 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=63
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=63
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=63
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=63 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=63 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=63
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=63 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=64
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=64
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=64
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=64 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=64 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=64
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=64 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=65
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=65
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=65
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=65 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=65 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=65
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=65 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=66
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=66
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=66
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=66 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=66 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=66
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=66 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=67
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=67
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=67
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=67 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=67 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=67
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=67 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=68
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=68
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=68
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=68 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=68 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=68
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=68 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=69
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=69
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=69
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=69 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=69 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=69
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=69 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=70
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=70
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=70
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=70 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=70 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=70
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=70 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=71
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=71
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=71
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=71 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=71 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=71
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=71 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=72
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=72
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=72
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=72 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=72 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=72
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=72 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=73
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=73
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=73
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=73 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=73 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=73
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=73 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=74
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=74
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=74
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=74 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=74 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=74
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=74 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=75
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=75
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=75
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=75 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=75 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=75
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=75 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=76
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=76
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=76
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=76 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=76 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=76
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=76 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=77
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=77
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=77
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=77 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=77 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=77
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=77 ordered=false
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=78
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=78
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=78
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=78 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=78 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:39Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=78
+[2026-09-22T15:13:39Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=78 ordered=false
+[2026-09-22T15:13:40Z WARN  shelly_gpui::views::workspace] Initial updates check failed: Désérialisation de la liste des mises à jour
+    
+    Caused by:
+        invalid type: map, expected a sequence at line 1 column 0
+[2026-09-22T15:13:40Z INFO  shelly_gpui::render_lab::experimental] P2_B_PAINT seq=79
+[2026-09-22T15:13:40Z INFO  shelly_gpui::render_lab::experimental] P2 energized-wire B bounds x=716 y=85 w=200 h=170 scale=1
+[2026-09-22T15:13:40Z INFO  shelly_gpui::render_lab::experimental] P2_B_ENQUEUE seq=79
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_FRAME_DRAW seq=79
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_SCENE_DRAW frame=79 scene_ptr=0x56359d7fae20 ordered_callbacks=0 post_callbacks=1
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=1
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=2
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=3
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=4
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=5
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=6
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_NATIVE_BATCH order=7
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_POST_CALLBACK_DISPATCH frame=79 scene_ptr=0x56359d7fae20 index=0
+[2026-09-22T15:13:40Z INFO  shelly_gpui::render_lab::experimental] P2_B_CALLBACK seq=79
+[2026-09-22T15:13:40Z INFO  gpui::platform::blade::blade_renderer] P2_SCISSOR_RESET frame=79 ordered=false
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying texture 0x56359d47a4b0, handle 2
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying texture 0x56359dac87f0, handle 4
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying texture 0x56359dfab3b0, handle 20
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying texture 0x56359deb8a50, handle 21
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying texture 0x56359e2918e0, handle 22
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359d5cbb90, handle 6
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359b03a470, handle 3
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359ddf37f0, handle 16
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359b04cb80, handle 5
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359d4b74f0, handle 12
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359d4b77f0, handle 14
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359d7c7830, handle 9
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359d4b7670, handle 13
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359d40fb50, handle 11
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359d481b30, handle 7
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359d81d8e0, handle 15
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359d53b740, handle 8
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359dc42400, handle 17
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359dc40860, handle 18
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359d40f9d0, handle 10
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying buffer 0x56359dc652e0, handle 19
+[2026-09-22T15:13:48Z INFO  gpui::platform::blade::blade_renderer] Destroying experimental local-focus pipeline with renderer
+[2026-09-22T15:13:48Z INFO  gpui::platform::blade::blade_renderer] Destroying experimental energized-wire pipeline with renderer
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying texture 0x56359d444cd0, handle 1
+[2026-09-22T15:13:48Z INFO  blade_graphics::hal::resource] Destroying texture 0x56359d445ae0, handle 0

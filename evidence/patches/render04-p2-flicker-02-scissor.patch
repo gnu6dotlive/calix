@@ -1,0 +1,17 @@
+--- F2-A (no reset) / upstream/src/platform/blade/blade_renderer.rs
++++ F2-B (full-target reset) / upstream/src/platform/blade/blade_renderer.rs
+@@ callback dispatch boundary @@
+             callback(&mut gpu_frame);
++            if p2_scissor_reset_enabled() {
++                pass.set_scissor_rect(&gpu::ScissorRect {
++                    x: 0,
++                    y: 0,
++                    w: self.surface_config.size.width,
++                    h: self.surface_config.size.height,
++                });
++            }
+
+The reset hook is the existing FLICKER-01 experimental source seam. FLICKER-02
+changes only the runtime mode: F2-A leaves the probe scissor active; F2-B sets
+the full active target scissor after the callback. The ordered and post-scene
+dispatch sites use the same hook. No generic GPU state restore is included.
