@@ -1,0 +1,33 @@
+[2026-10-19T17:10:00-0400] === Tranche 0 — two live bugs fixed in the Zig backend ===
+[2026-10-19T17:10:00-0400] zig 0.16.0 · Shelly.PackageManager · Shelly.Cli.Zig
+[2026-10-19T17:10:00-0400]
+[2026-10-19T17:10:00-0400] --- Fix 1: release tag ordering ---
+[2026-10-19T17:10:00-0400] Defect: updateIsAvailable() ordered versions only when BOTH sides were
+[2026-10-19T17:10:00-0400] purely numeric-dotted. Otherwise it fell back to "any difference is an
+[2026-10-19T17:10:00-0400] update", so a downgrade was offered as an update:
+[2026-10-19T17:10:00-0400]   installed 1.7.4 (stable), forge latest 1.7.4-rc1  -> offered
+[2026-10-19T17:10:00-0400]   installed 2.0.0-rc1, forge latest 1.9.0        -> offered
+[2026-10-19T17:10:00-0400] Fix: new shared/release_version.zig orders forge release tags
+[2026-10-19T17:10:00-0400] (core numeric, prerelease per SemVer) and returns null for tags it
+[2026-10-19T17:10:00-0400] cannot order, preserving the historical fallback for ETags and
+[2026-10-19T17:10:00-0400] calendar tokens. Dead helpers removed: isNumericDottedVersion,
+[2026-10-19T17:10:00-0400] compareNumericVersions.
+[2026-10-19T17:10:00-0400] Regression proof: with the original logic restored, exactly 4 of the
+[2026-10-19T17:10:00-0400] new tests fail and every pre-existing test still passes.
+[2026-10-19T17:10:00-0400]
+[2026-10-19T17:10:00-0400] --- Fix 2: silent sudo escalation ---
+[2026-10-19T17:10:00-0400] Defect: findElevator() scanned PATH for doas / sudo / run0, in that
+[2026-10-19T17:10:00-0400] order, and defaulted to "sudo". The repository's AGENTS.md forbids
+[2026-10-19T17:10:00-0400] sudo, su, doas and equivalent privilege-bypass tools, and requires
+[2026-10-19T17:10:00-0400] pkexec/polkit. The violation was invisible because the Rust UI
+[2026-10-19T17:10:00-0400] injected SHELLY_ELEVATOR=pkexec into the child environment.
+[2026-10-19T17:10:00-0400] Fix: no implicit PATH scan. SHELLY_ELEVATOR (an explicit operator
+[2026-10-19T17:10:00-0400] choice) still wins, including SHELLY_ELEVATOR=run0. The default is
+[2026-10-19T17:10:00-0400] now pkexec. Dead helper removed: isOnPath.
+[2026-10-19T17:10:00-0400] Note: run0's auto-detection was already unreachable on this host
+[2026-10-19T17:10:00-0400] (sudo shadowed it in the precedence), so no caller changes behaviour.
+[2026-10-19T17:10:00-0400]
+[2026-10-19T17:10:00-0400] --- Verification ---
+[2026-10-19T17:10:00-0400] zig build test (Shelly.PackageManager): 19/19 steps, 1323/1327 (4 skipped)
+[2026-10-19T17:10:00-0400] zig build test (Shelly.Cli.Zig):          17/17 steps, 376/376
+[2026-10-19T17:10:00-0400] zig build -Doptimize=ReleaseSafe (Shelly.Cli.Zig): ok

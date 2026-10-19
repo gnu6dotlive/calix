@@ -78,8 +78,10 @@ impl ProcessRunner {
         runtime().spawn(async move {
             let mut cmd = Command::new(&binary_path);
             cmd.args(&args);
-            // Si SHELLY_ELEVATOR n'est pas déjà configuré dans l'environnement, on utilise pkexec
-            // pour garantir une invite d'authentification graphique Polkit sous Wayland/X11
+            // Le backend CLI élève désormais par pkexec par défaut. On fixe
+            // SHELLY_ELEVATOR explicitement quand l'environnement ne le fait
+            // pas, pour garantir une invite d'authentification graphique
+            // Polkit sous Wayland/X11 quel que soit l'ascenseur retenu.
             if std::env::var("SHELLY_ELEVATOR").is_err() {
                 cmd.env("SHELLY_ELEVATOR", "pkexec");
             }

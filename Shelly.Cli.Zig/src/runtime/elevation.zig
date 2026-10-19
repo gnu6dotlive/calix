@@ -411,39 +411,32 @@ pub fn invokingUserIds(context: *const context_module.RuntimeContext) !?UserIds 
     };
 }
 
+/// Selects the mechanism used to escalate privileges.
+///
+/// `SHELLY_ELEVATOR` wins: it is an explicit, deliberate choice by the
+/// operator, and it is how a caller opts into `run0` or any other mechanism.
+///
+/// Failing that, the default is `pkexec`. The previous behaviour scanned
+/// `PATH` and silently selected `doas`, `sudo` or `run0` — in that order.
+/// `sudo` and `doas` are privilege-bypass tools: choosing one implicitly
+/// escalates the product outside the polkit rules this desktop declares,
+/// and the repository's own security policy forbids them outright. The scan
+/// also made the behaviour depend on what happened to be installed on the
+/// host, which is not a property worth inheriting.
+///
+/// `run0` remains available through an explicit `SHELLY_ELEVATOR=run0`.
 fn findElevator(context: *const context_module.RuntimeContext) []const u8 {
     if (context.environment) |environment| {
         if (environment.get("SHELLY_ELEVATOR")) |configured| {
             const trimmed = std.mem.trim(u8, configured, " \t\r\n");
             if (trimmed.len > 0) return trimmed;
         }
-        if (environment.get("PATH")) |path| {
-            if (isOnPath(context, path, "doas")) return "doas";
-            if (isOnPath(context, path, "sudo")) return "sudo";
-            if (isOnPath(context, path, "run0")) return "run0";
-        }
     }
-    return "sudo";
+    return "pkexec";
 }
 
 fn isRun0(elevator: []const u8) bool {
     return std.mem.eql(u8, std.fs.path.basename(elevator), "run0");
-}
-
-fn isOnPath(
-    context: *const context_module.RuntimeContext,
-    path_environment: []const u8,
-    executable: []const u8,
-) bool {
-    var paths = std.mem.splitScalar(u8, path_environment, ':');
-    while (paths.next()) |path| {
-        if (path.len == 0) continue;
-        const candidate = std.fs.path.join(context.allocator, &.{ path, executable }) catch continue;
-        defer context.allocator.free(candidate);
-        std.Io.Dir.accessAbsolute(context.io, candidate, .{}) catch continue;
-        return true;
-    }
-    return false;
 }
 
 fn buildArguments(
@@ -704,7 +697,7 @@ test "run0 root arguments preserve the canonical invocation" {
     for (expected, elevated) |wanted, actual| try std.testing.expectEqualStrings(wanted, actual);
 }
 
-test "automatic elevator precedence honors override and PATH discovery" {
+test "automatic elevator selection honours the override and otherwise defaults to pkexec" {
     var temporary = std.testing.tmpDir(.{});
     defer temporary.cleanup();
     for ([_][]const u8{ "doas", "sudo", "run0" }) |name| {
@@ -730,13 +723,19 @@ test "automatic elevator precedence honors override and PATH discovery" {
         .environment = &environment,
     };
 
-    try std.testing.expectEqualStrings("doas", findElevator(&context));
-    try temporary.dir.deleteFile(std.testing.io, "doas");
-    try std.testing.expectEqualStrings("sudo", findElevator(&context));
+    // Privilege-bypass tools are never selected implicitly, even when they
+    // are the first thing on PATH.
+    try std.testing.expectEqualStrings("pkexec", findElevator(&context));
     try temporary.dir.deleteFile(std.testing.io, "sudo");
-    try std.testing.expectEqualStrings("run0", findElevator(&context));
+    try temporary.dir.deleteFile(std.testing.io, "doas");
+    try std.testing.expectEqualStrings("pkexec", findElevator(&context));
+
+    // An explicit override still wins, including for the mechanisms that are
+    // no longer discovered automatically.
     try environment.put("SHELLY_ELEVATOR", "  pkexec \n");
     try std.testing.expectEqualStrings("pkexec", findElevator(&context));
+    try environment.put("SHELLY_ELEVATOR", "run0");
+    try std.testing.expectEqualStrings("run0", findElevator(&context));
 }
 
 test "elevation child status maps to shell exit codes" {

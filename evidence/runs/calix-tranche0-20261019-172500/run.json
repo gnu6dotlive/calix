@@ -1,0 +1,62 @@
+{
+  "run_id": "calix-tranche0-20261019-172500",
+  "kind": "calix-tranche0",
+  "status": "ok",
+  "started_at": "2026-10-19T21:10:00Z",
+  "finished_at": "2026-10-19T21:27:58Z",
+  "duration_ms": 900000,
+  "tool_version": "1.0.0",
+  "host": {
+    "kernel": "7.2.9-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "zig": "0.16.0"
+  },
+  "scope": "Tranche 0 \u2014 two live bugs in the Zig backend: release tag ordering and silent sudo escalation",
+  "fixes": [
+    {
+      "id": "release-tag-ordering",
+      "file": "Shelly.PackageManager/src/shared/release_version.zig",
+      "defect": "updateIsAvailable() fell back to 'any difference is an update' unless BOTH versions were purely numeric-dotted, offering downgrades (installed 1.7.4 stable with forge latest 1.7.4-rc1; installed 2.0.0-rc1 with forge latest 1.9.0).",
+      "fix": "New module orders forge release tags: numeric core comparison plus SemVer prerelease precedence, and returns null for tags it cannot order so the historical fallback survives for ETags and calendar tokens.",
+      "dead_code_removed": [
+        "isNumericDottedVersion",
+        "compareNumericVersions"
+      ],
+      "regression_proof": "With the original logic restored, exactly 4 new tests fail and every pre-existing test still passes \u2014 the change is strictly additive.",
+      "witness_tests": [
+        "updateIsAvailable: a release is never offered its own prerelease",
+        "updateIsAvailable: prereleases of the same release order among themselves",
+        "updateIsAvailable: refuses downgrades across differing cores",
+        "parse_github_response: a stable release never downgrades to its own prerelease"
+      ],
+      "guard_tests": [
+        "parse_github_response: a maintenance release on an old branch is not offered as an update (already handled by the old code; kept as a guard)"
+      ]
+    },
+    {
+      "id": "silent-sudo-escalation",
+      "file": "Shelly.Cli.Zig/src/runtime/elevation.zig",
+      "defect": "findElevator() scanned PATH for doas/sudo/run0 and defaulted to 'sudo'. The repository AGENTS.md forbids sudo, su, doas and equivalent privilege-bypass tools and requires pkexec/polkit. The violation was invisible because the Rust UI injected SHELLY_ELEVATOR=pkexec into the child environment.",
+      "fix": "No implicit PATH scan. SHELLY_ELEVATOR still wins as an explicit operator choice (including run0); the default is now pkexec.",
+      "dead_code_removed": [
+        "isOnPath"
+      ],
+      "behavioural_impact": "None on this host: run0's auto-detection was already unreachable because sudo shadowed it in the old precedence."
+    }
+  ],
+  "tests": {
+    "Shelly.PackageManager": "19/19 steps, 1323/1327 passed (4 skipped)",
+    "Shelly.Cli.Zig": "17/17 steps, 376/376 passed",
+    "new_tests": 15,
+    "baseline_tests": 1312
+  },
+  "known_gaps": [
+    "The de-escalation path in Shelly.PackageManager/src/aur/builder.zig (invokingUserCommand) still shells out to `sudo -u <user>` when SUDO_USER is set. It only runs from an already-elevated context and never escalates, so it is out of scope here, but it remains a sudo invocation.",
+    "The Rust UI still injects SHELLY_ELEVATOR=pkexec. It is now redundant with the backend default; the comment was corrected rather than the behaviour changed."
+  ],
+  "artifacts": [],
+  "git": {
+    "branch": "main",
+    "base_commit": "ddefbefc8a627efe3a503177fee601290845b3db"
+  }
+}

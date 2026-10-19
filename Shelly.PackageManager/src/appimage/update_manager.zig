@@ -6,6 +6,7 @@ const appimage_manager = @import("manager.zig");
 const events = @import("events.zig");
 
 const downloader = @import("../shared/downloader.zig");
+const release_version = @import("../shared/release_version.zig");
 const operation_api = @import("operation_context");
 
 pub const UpdateManager = struct {
@@ -1070,45 +1071,20 @@ pub const UpdateManager = struct {
         return token;
     }
 
-    fn isNumericDottedVersion(version: []const u8) bool {
-        if (std.mem.indexOfScalar(u8, version, '.') == null) return false;
-        var components = std.mem.splitScalar(u8, version, '.');
-        while (components.next()) |component| {
-            if (component.len == 0) return false;
-            for (component) |character| {
-                if (!std.ascii.isDigit(character)) return false;
-            }
-        }
-        return true;
-    }
-
-    fn compareNumericVersions(a: []const u8, b: []const u8) std.math.Order {
-        var a_components = std.mem.splitScalar(u8, a, '.');
-        var b_components = std.mem.splitScalar(u8, b, '.');
-        while (true) {
-            const a_component = a_components.next();
-            const b_component = b_components.next();
-            if (a_component == null and b_component == null) return .eq;
-            const a_value: u64 = if (a_component) |component|
-                std.fmt.parseInt(u64, component, 10) catch std.math.maxInt(u64)
-            else
-                0;
-            const b_value: u64 = if (b_component) |component|
-                std.fmt.parseInt(u64, component, 10) catch std.math.maxInt(u64)
-            else
-                0;
-            if (a_value != b_value) return std.math.order(a_value, b_value);
-        }
-    }
-
     fn updateIsAvailable(current_version: []const u8, remote_version: []const u8) bool {
         const current = normalizeVersionToken(current_version);
         const remote = normalizeVersionToken(remote_version);
         if (current.len == 0 or std.ascii.eqlIgnoreCase(current, "unknown")) return true;
         if (remote.len == 0) return true;
-        if (isNumericDottedVersion(current) and isNumericDottedVersion(remote)) {
-            return compareNumericVersions(remote, current) == .gt;
+        // Release tags are upstream versions: order them so that a downgrade
+        // is never offered as an update (a stable `1.7.4` must not be offered
+        // its own `1.7.4-rc1` prerelease, and `2.0.0` must not be offered
+        // `1.9.0`).
+        if (release_version.compare(remote, current)) |order| {
+            return order == .gt;
         }
+        // Tags that cannot be ordered (ETags, calendar tokens, exotic tags)
+        // keep the historical behaviour: any change counts as an update.
         return !std.ascii.eqlIgnoreCase(current, remote);
     }
 
@@ -1270,8 +1246,31 @@ test "updateIsAvailable: non-semantic markers keep string comparison" {
     // Calendar tags stay single tokens.
     try std.testing.expect(UpdateManager.updateIsAvailable("20250801", "20250801") == false);
     try std.testing.expect(UpdateManager.updateIsAvailable("20250801", "20250901") == true);
-    // Mixed tokens (e.g. 1.7.4-beta) fall back to string equality.
+    // A mixed token is ordered against a plain release, not compared by equality.
     try std.testing.expect(UpdateManager.updateIsAvailable("1.7.4-beta", "v1.7.4") == true);
+}
+
+test "updateIsAvailable: a release is never offered its own prerelease" {
+    // Installed stable, upstream latest is the prerelease: that is a downgrade.
+    try std.testing.expect(UpdateManager.updateIsAvailable("1.7.4", "1.7.4-rc1") == false);
+    try std.testing.expect(UpdateManager.updateIsAvailable("1.7.4", "1.7.4-beta") == false);
+    try std.testing.expect(UpdateManager.updateIsAvailable("2.0.0", "1.9.0-beta") == false);
+    // The reverse direction stays an update: the release supersedes the prerelease.
+    try std.testing.expect(UpdateManager.updateIsAvailable("1.7.4-rc1", "1.7.4") == true);
+}
+
+test "updateIsAvailable: prereleases of the same release order among themselves" {
+    // The remote tag is the newer prerelease.
+    try std.testing.expect(UpdateManager.updateIsAvailable("1.7.4-rc1", "1.7.4-rc2") == true);
+    try std.testing.expect(UpdateManager.updateIsAvailable("1.7.4-rc2", "1.7.4-rc1") == false);
+    // beta supersedes alpha, so an alpha remote is older than an installed beta.
+    try std.testing.expect(UpdateManager.updateIsAvailable("1.7.4-alpha", "1.7.4-beta") == true);
+    try std.testing.expect(UpdateManager.updateIsAvailable("1.7.4-beta", "1.7.4-alpha") == false);
+}
+
+test "updateIsAvailable: refuses downgrades across differing cores" {
+    // The remote is older even though neither side is purely numeric.
+    try std.testing.expect(UpdateManager.updateIsAvailable("2.0.0-rc1", "1.9.0") == false);
 }
 
 test "releaseTagMatches: guard suppresses re-offering the installed release" {
@@ -1712,6 +1711,31 @@ test "parse_github_response: no assets key returns null" {
     ;
     const result = try UpdateManager.parse_github_response(std.testing.allocator, body, "osu", "0.0.0", false);
     try std.testing.expectEqual(@as(?appimage.AppImageUpdate, null), result);
+}
+
+test "parse_github_response: a maintenance release on an old branch is not offered as an update" {
+    // The project ships 2.0.0, then publishes 1.9.1 as a maintenance release
+    // on the old branch. The forge lists releases newest-first, so 1.9.1
+    // looks like the latest — offering it would be a downgrade.
+    const body =
+        \\[{"tag_name":"1.9.1","prerelease":false,"assets":[{"name":"myapp.AppImage","browser_download_url":"https://example.com/1.9.1/myapp.AppImage"}]}]
+    ;
+    const result = try UpdateManager.parse_github_response(std.testing.allocator, body, "myapp", "2.0.0", false);
+    defer if (result) |r| r.deinit(std.testing.allocator);
+    try std.testing.expect(result != null);
+    try std.testing.expect(!result.?.is_update_available);
+}
+
+test "parse_github_response: a stable release never downgrades to its own prerelease" {
+    // The installed version is the stable 1.7.4; the forge's newest entry is
+    // the 1.7.4 prerelease. That is older, not newer.
+    const body =
+        \\[{"tag_name":"1.7.4-rc1","prerelease":true,"assets":[{"name":"myapp.AppImage","browser_download_url":"https://example.com/rc/myapp.AppImage"}]}]
+    ;
+    const result = try UpdateManager.parse_github_response(std.testing.allocator, body, "myapp", "1.7.4", true);
+    defer if (result) |r| r.deinit(std.testing.allocator);
+    try std.testing.expect(result != null);
+    try std.testing.expect(!result.?.is_update_available);
 }
 
 test "parse_gitlab_response: returns null for empty array" {
