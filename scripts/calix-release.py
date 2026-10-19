@@ -21,6 +21,28 @@ resolved state in ~/.local/state/calix/releases.json (observations). The two
 are separate so that a sync can never erase the recorded installed version.
 """
 
+
+# =============================================================================
+# STATUT : GELÉ — FONCTIONNALITÉ COMPLÈTE, CORRECTIFS UNIQUEMENT
+# =============================================================================
+# Ce module est un PONT vers le backend Zig. Il sera absorbé (tranche 1 de
+# calix-architecture.md) et supprimé. Il ne doit plus recevoir de
+# nouvelles fonctionnalités : une capacité ajoutée ici est une capacité à
+# réécrire deux fois.
+#
+# Ce qui est DÉJÀ dans le Zig et ne doit PAS être porté : client HTTP,
+# E/S JSON, parsing d'arguments, rendu de tableaux, lancement de processus,
+# classification des forges et des assets, et le probing de releases lui-même
+# (6 forges dans shared/ et appimage/update_manager.zig).
+#
+# Ce qui reste à écrire en Zig : backends Cargo et NPM, découverte
+# ~/Applications, registre de releases, vérification de provenance amont,
+# flux d'application, helper root + polkit, inventaire unifié, daemon.
+#
+# L'UI ne lit plus ce moteur : elle lit ~/.local/state/calix/*.json, qu'il
+# écrit. Ce couplage est transitoire et disparaît avec le daemon.
+# =============================================================================
+
 import json
 import os
 import shutil

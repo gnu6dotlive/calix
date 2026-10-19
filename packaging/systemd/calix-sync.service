@@ -5,7 +5,9 @@ After=default.target
 
 [Service]
 Type=oneshot
-ExecStart=%h/.local/bin/calix sync --quiet
+# --runtime records the run in the engine's state directory. The repository's
+# evidence/ tree is a development contract; a timer must not append to it.
+ExecStart=%h/.local/bin/calix sync --quiet --runtime
 StandardOutput=journal
 StandardError=journal
 Nice=10

@@ -6,6 +6,12 @@
 #
 # Installed to ~/.local/bin/calix as a symlink to this file so the CLI is
 # version-controlled alongside the engine it drives.
+#
+# STATUT : GELÉ. This shell dispatcher is a bridge to the Zig backend
+# (`calix` + `calix-daemon`), which replaces it in tranche 1 of
+# calix-architecture.md. It must not gain new features; a capability added
+# here is a capability written twice. It stays only until the Zig CLI
+# exists, and the Rust frontend stops calling the engine directly.
 
 set -u
 
@@ -26,6 +32,8 @@ Commands:
   sync                 Synchronize real system state across all package channels:
                        ALPM, AUR, AppImages, Cargo (~/.cargo/bin), NPM global,
                        and tracked GitHub/GitLab/Gitea releases.
+                       Pass --runtime to record the run in the engine's state
+                       directory instead of the repository's evidence/ tree.
   list [all|appimage|cargo|npm|alpm|releases]
                        List installed packages in a unified table.
   probe <repo_or_url> [--canal stable|beta|canary|nightly|all]

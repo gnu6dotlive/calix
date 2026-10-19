@@ -15,6 +15,28 @@ Responsibilities:
      (`evidence/runs/<run-id>/run.json` + `evidence/logs/<run-id>.log`).
 """
 
+
+# =============================================================================
+# STATUT : GELÉ — FONCTIONNALITÉ COMPLÈTE, CORRECTIFS UNIQUEMENT
+# =============================================================================
+# Ce module est un PONT vers le backend Zig. Il sera absorbé (tranche 1 de
+# calix-architecture.md) et supprimé. Il ne doit plus recevoir de
+# nouvelles fonctionnalités : une capacité ajoutée ici est une capacité à
+# réécrire deux fois.
+#
+# Ce qui est DÉJÀ dans le Zig et ne doit PAS être porté : client HTTP,
+# E/S JSON, parsing d'arguments, rendu de tableaux, lancement de processus,
+# classification des forges et des assets, et le probing de releases lui-même
+# (6 forges dans shared/ et appimage/update_manager.zig).
+#
+# Ce qui reste à écrire en Zig : backends Cargo et NPM, découverte
+# ~/Applications, registre de releases, vérification de provenance amont,
+# flux d'application, helper root + polkit, inventaire unifié, daemon.
+#
+# L'UI ne lit plus ce moteur : elle lit ~/.local/state/calix/*.json, qu'il
+# écrit. Ce couplage est transitoire et disparaît avec le daemon.
+# =============================================================================
+
 import json
 import os
 import platform
@@ -437,12 +459,34 @@ def merge_release_state(registry, checked):
 # 6. Evidence
 # --------------------------------------------------------------------------
 
-class Evidence:
-    """Machine-readable run record + raw log, per the repository AGENTS.md."""
+#: Evidence destinations.
+#:
+#: ``repo``     — the repository's ``evidence/`` tree. This is the
+#:                *development* contract from AGENTS.md: a run performed by an
+#:                operator or an agent, whose record is meant to be reviewed
+#:                and committed.
+#: ``runtime``  — the engine's own state directory. A run performed
+#:                autonomously (the periodic sync timer) is a product
+#:                operation, not a development artefact, and must not append
+#:                to the repository's git tree every few hours.
+DEST_REPO = "repo"
+DEST_RUNTIME = "runtime"
 
-    def __init__(self, kind, run_id=None, repo_root=None):
+#: Where autonomous runs keep their operational journal.
+RUNTIME_JOURNAL_DIR = os.path.join(STATE_DIR, "journal")
+
+
+class Evidence:
+    """Machine-readable run record + raw log.
+
+    Two destinations, one format. A supervised run lands in the repository's
+    ``evidence/`` tree; an autonomous run lands in the engine's state
+    directory. The shape of the record is identical either way.
+    """
+
+    def __init__(self, kind, run_id=None, repo_root=None, destination=DEST_REPO):
         self.kind = kind
-        self.repo_root = repo_root or REPO_ROOT
+        self.destination = destination
         stamp = time.strftime("%Y%m%d-%H%M%S", time.localtime())
         self.run_id = run_id or f"{kind}-{stamp}"
         self.started_at = time.time()
@@ -450,8 +494,15 @@ class Evidence:
         self.artifacts = []
         self.known_gaps = []
         self.status = "ok"
-        self.log_path = os.path.join(self.repo_root, "evidence", "logs", f"{self.run_id}.log")
-        self.run_dir = os.path.join(self.repo_root, "evidence", "runs", self.run_id)
+
+        if destination == DEST_RUNTIME:
+            base = RUNTIME_JOURNAL_DIR
+        else:
+            self.repo_root = repo_root or REPO_ROOT
+            base = os.path.join(self.repo_root, "evidence")
+
+        self.log_path = os.path.join(base, "logs", f"{self.run_id}.log")
+        self.run_dir = os.path.join(base, "runs", self.run_id)
         self.run_json = os.path.join(self.run_dir, "run.json")
         os.makedirs(os.path.dirname(self.log_path), exist_ok=True)
         os.makedirs(self.run_dir, exist_ok=True)
@@ -473,7 +524,10 @@ class Evidence:
     def artifact(self, path, sha256=None):
         if not os.path.exists(path):
             return
-        entry = {"path": os.path.relpath(path, self.repo_root)}
+        if self.destination == DEST_RUNTIME:
+            entry = {"path": path}
+        else:
+            entry = {"path": os.path.relpath(path, self.repo_root)}
         if sha256:
             entry["sha256"] = sha256
         self.artifacts.append(entry)
@@ -492,6 +546,7 @@ class Evidence:
             "run_id": self.run_id,
             "kind": self.kind,
             "status": self.status,
+            "destination": self.destination,
             "started_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(self.started_at)),
             "finished_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "duration_ms": int((time.time() - self.started_at) * 1000),

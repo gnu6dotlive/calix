@@ -14,9 +14,35 @@ Unifies & synchronizes:
   6. Health:    audits locks and conflicting update notifiers.
 
 Usage:
-  calix-sync [--dry-run] [--json] [--quiet]
+  calix-sync [--dry-run] [--json] [--quiet] [--runtime]
   calix-sync list [all|appimage|cargo|npm|alpm|releases]
+
+  --runtime  Record the run in the engine's state directory instead of the
+             repository's evidence/ tree. Used by the periodic timer, which
+             must not append to the git tree.
 """
+
+
+# =============================================================================
+# STATUT : GELÉ — FONCTIONNALITÉ COMPLÈTE, CORRECTIFS UNIQUEMENT
+# =============================================================================
+# Ce module est un PONT vers le backend Zig. Il sera absorbé (tranche 1 de
+# calix-architecture.md) et supprimé. Il ne doit plus recevoir de
+# nouvelles fonctionnalités : une capacité ajoutée ici est une capacité à
+# réécrire deux fois.
+#
+# Ce qui est DÉJÀ dans le Zig et ne doit PAS être porté : client HTTP,
+# E/S JSON, parsing d'arguments, rendu de tableaux, lancement de processus,
+# classification des forges et des assets, et le probing de releases lui-même
+# (6 forges dans shared/ et appimage/update_manager.zig).
+#
+# Ce qui reste à écrire en Zig : backends Cargo et NPM, découverte
+# ~/Applications, registre de releases, vérification de provenance amont,
+# flux d'application, helper root + polkit, inventaire unifié, daemon.
+#
+# L'UI ne lit plus ce moteur : elle lit ~/.local/state/calix/*.json, qu'il
+# écrit. Ce couplage est transitoire et disparaît avec le daemon.
+# =============================================================================
 
 import glob
 import json
@@ -30,6 +56,8 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from calix_core import (  # noqa: E402
+    DEST_REPO,
+    DEST_RUNTIME,
     Evidence,
     STATE_DIR,
     eprint,
@@ -406,9 +434,15 @@ def main():
     dry_run = "--dry-run" in sys.argv
     emit_json = "--json" in sys.argv
     quiet = "--quiet" in sys.argv
+    # An autonomous run (the periodic timer) is a product operation: its
+    # record belongs in the engine's state directory, not in the repository's
+    # git tree.
+    runtime = "--runtime" in sys.argv
 
     ensure_dirs()
-    evidence = Evidence("calix-sync")
+    evidence = Evidence(
+        "calix-sync", destination=DEST_RUNTIME if runtime else DEST_REPO
+    )
 
     start = time.time()
     appimages = sync_appimages(dry_run=dry_run)

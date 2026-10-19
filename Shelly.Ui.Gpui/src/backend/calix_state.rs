@@ -9,6 +9,15 @@
 //! Every read is fault-tolerant: a missing or malformed state file degrades
 //! to an empty section instead of failing the whole load, so a partially
 //! synchronised system still renders.
+//!
+//! # Transitional
+//!
+//! This module reads files directly, which the Calix architecture forbids
+//! for the final shape: the daemon is meant to be the single entry point,
+//! serving a versioned normalised snapshot over a socket. This reader is the
+//! temporary transport, and it disappears when the daemon serves the
+//! inventory. The Python engine that produces these files is frozen and
+//! awaits absorption into the Zig backend.
 
 use serde::Deserialize;
 use std::collections::BTreeMap;
