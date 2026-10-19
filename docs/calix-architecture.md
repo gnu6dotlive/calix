@@ -259,6 +259,16 @@ Phase 7b (Completed) : Vue multi-source dans l'UI GPUI
                           (voir §0). 190 tests verts.
 Phase 8 (Next)       : Transition from Shelly to Calix (pacman -R shelly, install calix-bin)
                         ⚠️ Prérequis : le backend Zig doit d'abord passer de `shelly` à `calix`.
+Tranche 0 (Completed): Deux bugs vivants du backend Zig corrigés
+                        → ordering des tags de release (shared/release_version.zig) et fin de
+                          l'escalade silencieuse par sudo (findElevator → pkexec).
+                          Preuve de régression : avec la logique d'origine, exactement 4 des nouveaux
+                          tests échouent et tous les tests préexistants passent.
+Tranche 1 (Next)     : Absorption du moteur Python dans le Zig
+                        → backends Cargo et NPM, discovery ~/Applications dans le manager appimage
+                          Zig, registre de releases, vérification de provenance amont, flux
+                          d'application, helper root + polkit, inventaire unifié versionné,
+                          calix-daemon, calix CLI, UI sur daemon, suppression du Python.
 ```
 
 ---
@@ -372,6 +382,55 @@ Phase 8 (Next)       : Transition from Shelly to Calix (pacman -R shelly, instal
 └── evidence/              ← logs de tests (conforme AGENTS.md)
 ```
 
+### 8. Deux bugs vivants dans le backend Zig (RÉSOLU ✓ — tranche 0)
+- **Défaut 1 — ordering des tags de release** : `updateIsAvailable()` ne comparait les versions que si
+  **les deux** étaient purement numériques pointés. Toute autre paire retombait sur « toute différence
+  est une mise à jour », donc **les rétrogradations étaient proposées comme mises à jour** : une 1.7.4
+  stable installée avec la 1.7.4-rc1 du forge, ou une 2.0.0-rc1 installée avec la 1.9.0 du forge.
+  Corrigé par `Shelly.PackageManager/src/shared/release_version.zig` : comparaison du core numérique +
+  précédence de prerelease SemVer, et `null` pour les tags non ordonnables (ETags, jetons de date) afin
+  de préserver le repli historique. `isNumericDottedVersion` et `compareNumericVersions` supprimés (morts).
+- **Défaut 2 — escalade silencieuse par sudo** : `findElevator()` scannait le `PATH` pour `doas`, `sudo`,
+  `run0` — dans cet ordre — et retombait sur `"sudo"`. `AGENTS.md` interdit `sudo`, `su`, `doas` et tout
+  équivalent ; l'élévation doit passer par `pkexec`/polkit. **La violation était invisible** parce que
+  l'UI Rust injectait `SHELLY_ELEVATOR=pkexec` dans l'environnement de l'enfant : la politique était
+  masquée par l'appelant, le pire état possible. Le scan implicite est supprimé ; `SHELLY_ELEVATOR`
+  reste prioritaire comme choix explicite de l'opérateur (y compris `run0`) ; le défaut est `pkexec`.
+  `isOnPath` supprimé (mort). Aucun changement de comportement sur cette machine : la détection
+  automatique de `run0` était déjà inatteignable, `sudo` le masquant dans l'ancienne précédence.
+- **Preuve** : avec la logique d'origine restaurée à l'identique, **exactement 4 des nouveaux tests
+  échouent** et tous les tests préexistants passent — le changement est strictement additif.
+  PackageManager 1323/1327 (4 skipped, +15 tests), CLI 376/376.
+  (`evidence/runs/calix-tranche0-20261019-172500/`)
+
+---
+
+## 🧭 Décisions d'architecture (2026-10-19, session de cadrage)
+
+Ces décisions remplacent les hypothèses du plan initial. Elles ont été prises contre l'état réel du
+système, et plusieurs d'entre elles **invalident** des affirmations plus anciennes de ce document.
+
+| # | Décision | Conséquence directe |
+|---|----------|---------------------|
+| 1 | **Zig est la destination.** Le moteur Python est absorbé ; le daemon ne l'exécute jamais, même temporairement | Un « pont temporaire » sans échéance devient permanent. Le plan avait déjà fait ce coup avec Shelly. |
+| 2 | **L'UI ne lit plus aucun fichier d'état.** Le daemon est le point d'entrée unique, y compris pour les actions | La Phase 7b (lecture directe de `~/.local/state/calix/*.json`) est un prototype à re-héberger, pas un acquis. |
+| 3 | **Daemon non privilégié.** La frontière de privilège est un helper root-owned à capacité étroite ; l'artefact est validé (checksum amont + provenance) avant toute installation root | Un daemon qui s'élève transforme un bug en compromission root. |
+| 4 | **Le probing Zig est la référence.** Le correctif prerelease entre en premier dans le Zig | Le Zig a déjà 6 forges contre 3 côté Python, et `aur/version.zig` applique les règles de version Arch. |
+| 5 | **Le défaut `sudo` de `findElevator` est corrigé dans le Zig**, plus contourné par l'appelant | Corrigé — voir §8. |
+| 6 | **Tranche 1 = absorption** (daemon + inventaire unifié, backends Cargo/NPM inclus). Le surveillant de releases vient ensuite | Sans les backends Cargo/NPM dans le Zig, la vue multi-source régresserait de 1906 à 1876 paquets. |
+| 7 | **Le daemon normalise**, l'UI ne fait que rendre. Schéma versionné | Sans version de schéma, l'UI rendra silencieusement faux contre un daemon plus récent — la classe de bug de l'homonymie. |
+| 8 | **L'inventaire est dérivé, pas de l'état.** Registre + « déjà notifié » en JSON dans le répertoire d'état | SurrealDB est mort : pas de SDK Zig, « embedded » inexistant en Zig, jamais écrit, et l'inventaire n'est pas de l'état. |
+| 9 | **Le daemon a son journal opérationnel dans son répertoire d'état**, pas dans le dépôt | Un timer permanent n'écrit pas dans l'arbre git. La preuve (`evidence/`) est un contrat de développement. |
+| 10 | **État final : `calix` + `calix-daemon`**, une bibliothèque de backends partagée ; la CLI fonctionne en autonome *et* contre le daemon | Un one-shot ne doit pas avoir besoin de réveiller un démon. |
+| 11 | **Le renommage du backend avance avec le daemon**, pas « après la preuve » | Le renommage n'est plus bloqué que par le couplage de l'UI au `shelly` installé — et ce couplage disparaît quand le daemon devient le point d'entrée. |
+
+> [!IMPORTANT]
+> **Ce que le plan initial affirmait à tort, et qui est maintenant faux.** Le moteur Python n'était pas
+> « le backend » : c'était un doublon partiel d'un backend Zig de 74 000 lignes, dont ~60 % de la
+> logique existait déjà côté Zig — y compris le probing de releases, en mieux. Le daemon n'existait pas,
+> et la « base SurrealDB embedded » n'avait jamais été écrite. Le plan affirmait aussi que `snap-pac`
+> créait des snapshots automatiques sur chaque transaction pacman : le hook n'était pas installé.
+
 ---
 
 ## ⏳ Prochaines étapes immédiates
@@ -381,27 +440,49 @@ Phase 8 (Next)       : Transition from Shelly to Calix (pacman -R shelly, instal
 **Déjà fait** ✔ — research CachyOS, renommage du repo, `PKGBUILD-calix`, moteur `calix-release` avec
 dispatch GitHub/GitLab/Gitea, CLI unifiée versionnée, `calix-sync.service`/`.timer` installés **et
 activés**, branding Calix du frontend GPUI (Phase 7a), vue multi-source Cargo/NPM/releases (Phase 7b),
-`snap-pac` installé.
+`snap-pac` installé, **tranche 0** (ordering des tags de release + fin de l'escalade `sudo`).
 
-**À faire, par ordre de valeur :**
+### Tranche 1 — l'absorption (le prochain chantier)
 
-1. **[ ] Renommer le backend Zig** `Shelly.Cli.Zig` → `calix.cli.zig` (binaire `shelly` → `calix`).
-   C'est le prérequis de la Phase 8 : le frontend parle encore au CLI via `SHELLY_BIN`.
-   Le codebase Zig fait ~69 000 lignes avec 408 références à `shelly` — prévoir des étapes (identifiants
-   d'action polkit, chemins XDG, protocole IPC, noms de snapshots de test) plutôt qu'un remplacement global.
-2. **[ ] Brancher les actions d'installation/suppression sur les écosystèmes Calix.** Les paquets Cargo,
-   NPM et releases sont listés mais aucune action n'est proposée : il faut un chemin d'exécution pour
-   `cargo install --locked`, `npm i -g`, et la reconstruction PKGBUILD du backend de releases.
-3. **[ ] Étendre la recherche aux écosystèmes Calix.** Le rail de recherche ne couvre encore que
-   ALPM/AUR/Flatpak/AppImage ; l'inventaire Calix n'est pas interrogeable.
-4. **[ ] Décider du stockage.** L'architecture prévoit SurrealDB embedded ; l'implémentation actuelle
-   utilise des JSON (`~/.local/state/calix/*.json`) avec un registre de suivi dans
-   `~/.config/calix/releases.json`. SurrealDB reste un objectif, pas une obligation : le JSON est
-   versionnable, diffable et suffisant à l'échelle actuelle.
-5. **[ ] Phase 8 — Transition** : `pacman -R shelly` + installation de `calix-bin`. Ne pas le faire
-   avant l'étape 1 : le frontend dépend encore du CLI Shelly.
-6. **[ ] Renommer le dépôt GitHub** `tension-atoi/shelly-gpui` → `tension-atoi/calix` (action manuelle,
-   hors de portée de l'agent).
+Le moteur Python (2013 lignes) est absorbé dans le Zig. Inventaire exact de ce qui est **déjà** dans le
+Zig et ne doit donc pas être porté : client HTTP, E/S JSON, parsing d'arguments, rendu de tableaux,
+lancement de processus, classification des forges et des assets, et le probing lui-même.
+
+Travail réellement nouveau, en Zig :
+
+1. **Backend Cargo** — lecture de `~/.cargo/.crates2.json`.
+2. **Backend NPM** — `npm list -g`.
+3. **Discovery `~/Applications`** — à intégrer au manager appimage Zig existant. Supprime la course à
+   deux propriétaires sur `appimage-metadata-v2.db` (le Python y écrit aujourd'hui).
+4. **Registre de releases** + état (JSON, répertoire d'état du daemon).
+5. **Vérification de provenance amont** — récupérer le `SHA256SUMS.txt` du forge et le comparer à
+   l'artefact téléchargé. *Cette capacité n'existe pas dans le Zig aujourd'hui* : `checksums.zig`
+   vérifie l'artefact contre les sommes du PKGBUILD, ce qui est circulaire quand `updpkgsums` régénère
+   ces sommes depuis le fichier qu'il vient de télécharger.
+6. **Flux d'application** — bump PKGBUILD → vérif amont → `makepkg` → helper root → vérif → rollback.
+7. **Helper root** à capacité étroite + règle polkit dédiée.
+8. **Agrégation de l'inventaire** + document versionné (schéma versionné, test de compatibilité Zig↔Rust).
+9. **`calix-daemon`** — socket, scheduler, journal opérationnel, persistance du « déjà notifié ».
+10. **`calix` CLI** en Zig, partageant la bibliothèque, fonctionnant en autonome *et* contre le daemon.
+11. **L'UI passe par le daemon** — la lecture directe de `~/.local/state/calix/*.json` (Phase 7b)
+    disparaît ; le modèle `UnifiedPackage` Rust devient un pur rendu.
+12. **Suppression du moteur Python.**
+
+### Après la tranche 1
+
+- **Tranche 2 — le surveillant de releases** : le daemon interroge les paquets suivis en continu et
+  notifie. C'est la capability qu'aucun CLI invoqué à la demande ne peut porter.
+- **Tranche 3 — l'application automatique** : helper root, fenêtre de mise à jour, notification
+  Wayland avant application, rattrapage après redémarrage.
+- **Tranche 4 — inotify** : détection live des changements (`~/Applications`, `~/.cargo/bin`,
+  `/usr/lib/node_modules`).
+- **Actions d'installation/suppression** demandées par l'UI pour les écosystèmes Calix
+  (`cargo install --locked`, `npm i -g`, reconstruction PKGBUILD de release).
+- **Recherche étendue** aux écosystèmes Calix — le rail de recherche ne couvre encore qu'ALPM/AUR/Flatpak/AppImage.
+- **Phase 8 — transition** : le frontend ne dépendant plus du `shelly` installé, le backend peut être
+  renommé `calix` ; le `shelly` installé peut alors être retiré.
+- **[ ] Renommer le dépôt GitHub** `tension-atoi/shelly-gpui` → `tension-atoi/calix` (action manuelle,
+  hors de portée de l'agent).
 
 ---
 
