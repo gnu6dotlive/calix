@@ -675,7 +675,7 @@ mod tests {
     /// motif d'installation qui ne concernent pas la crate inspectée.
     #[test]
     fn ecosystem_packages_get_their_own_source_kind() {
-        use crate::backend::calix_state::{CargoCrate, NpmPackage, ReleasePackage};
+        use crate::backend::models::{CargoCrate, NpmPackage, ReleasePackage};
         use crate::backend::models::UnifiedPackageSource;
 
         let cases = vec![

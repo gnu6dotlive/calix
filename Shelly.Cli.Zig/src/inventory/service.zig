@@ -16,6 +16,15 @@ const config_manager = @import("../config/manager.zig");
 const config_model = @import("../config/model.zig");
 
 pub const record = Zigalpm.inventory.record;
+const tracked = Zigalpm.release.tracked;
+
+/// What the gatherer needs to know that is not the machine it is looking at.
+pub const Options = struct {
+    /// Where the daemon keeps its state. The standalone CLI leaves this
+    /// unset and gets the same directory the daemon would use, so both
+    /// serve the same document.
+    state_directory: ?[]const u8 = null,
+};
 
 /// A gathered inventory: the records and the time they were gathered.
 pub const Snapshot = struct {
@@ -48,7 +57,7 @@ pub const Snapshot = struct {
 /// whole gathering: Flatpak may not be installed, Cargo may never have
 /// installed a crate, npm may not exist. The inventory is a view of what is
 /// there, not a checklist of what should be.
-pub fn snapshot(context: *runtime.RuntimeContext) !Snapshot {
+pub fn snapshot(context: *runtime.RuntimeContext, options: Options) !Snapshot {
     var records: std.ArrayList(record.Record) = .empty;
     errdefer {
         for (records.items) |*item| item.deinit(context.allocator);
@@ -61,6 +70,7 @@ pub fn snapshot(context: *runtime.RuntimeContext) !Snapshot {
     try appendAppImage(context, &records);
     try appendCargo(context, &records);
     try appendNpm(context, &records);
+    try appendTracked(context, options, &records);
 
     return .{
         .allocator = context.allocator,
@@ -223,6 +233,27 @@ fn appendNpm(context: *runtime.RuntimeContext, records: *std.ArrayList(record.Re
         .{},
     );
     try manager.inventory(records);
+}
+
+/// Appends the packages a release is tracked for.
+///
+/// Transitional: see `release/tracked.zig`. The records exist so the
+/// frontend keeps the row it has today while the file it used to read
+/// disappears from the frontend.
+fn appendTracked(
+    context: *runtime.RuntimeContext,
+    options: Options,
+    records: *std.ArrayList(record.Record),
+) !void {
+    // A stack buffer, not an allocation: `xdg.stateHome` returns either the
+    // environment's string or a fresh one, and there is no way to tell from
+    // the outside which, so there is nothing safe to free.
+    var buffer: [std.fs.max_path_bytes]u8 = undefined;
+    const directory = options.state_directory orelse blk: {
+        const home = try xdg.stateHome(context);
+        break :blk try std.fmt.bufPrint(&buffer, "{s}/calix", .{home});
+    };
+    try tracked.append(context.allocator, context.io, directory, records);
 }
 
 /// The path of the cargo index, under the user's home directory.

@@ -167,6 +167,7 @@ pub const inventory = struct {
 
 pub const release = struct {
     pub const registry = @import("release/registry.zig");
+    pub const tracked = @import("release/tracked.zig");
     pub const Registry = registry.Registry;
     pub const Entry = registry.Entry;
     pub const Probe = registry.Probe;
@@ -375,6 +376,7 @@ test "public library surface exposes package manager APIs" {
     _ = shared.provenance.Verification;
     _ = release.Registry;
     _ = release.Entry;
+    _ = release.tracked;
     _ = inventory.record.Record;
     _ = inventory.record.Source;
     _ = cargo.CargoManager;

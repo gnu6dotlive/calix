@@ -19,7 +19,7 @@ pub fn dispatch(
 ) !?u8 {
     _ = invocation;
 
-    var snapshot = try service.snapshot(context);
+    var snapshot = try service.snapshot(context, .{});
     defer snapshot.deinit();
 
     const json = try snapshot.toJson();

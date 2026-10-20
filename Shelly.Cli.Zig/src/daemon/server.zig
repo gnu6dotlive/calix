@@ -73,7 +73,10 @@ pub const Server = struct {
         // made the journal silently disappear.
         const journal_directory = try std.fs.path.join(allocator, &.{ options.state_directory, "journal" });
         errdefer allocator.free(journal_directory);
-        const registry_path = try std.fs.path.join(allocator, &.{ options.state_directory, "releases.json" });
+        // Not `releases.json`: that name already belongs to the frozen
+        // engine's release observations in the same directory, and a
+        // registry written over it would destroy them.
+        const registry_path = try std.fs.path.join(allocator, &.{ options.state_directory, "release-registry.json" });
         errdefer allocator.free(registry_path);
 
         return .{
@@ -255,7 +258,9 @@ pub const Server = struct {
             .inventory => {
                 var request_context = self.context.*;
                 request_context.allocator = allocator;
-                var snapshot = try service.snapshot(&request_context);
+                var snapshot = try service.snapshot(&request_context, .{
+                    .state_directory = self.options.state_directory,
+                });
                 defer snapshot.deinit();
                 return try snapshot.toJson();
             },

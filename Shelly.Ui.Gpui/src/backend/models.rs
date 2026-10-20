@@ -182,7 +182,46 @@ pub struct AppImageItem {
     pub path: Option<String>,
 }
 
-use crate::backend::calix_state::{CargoCrate, NpmPackage, ReleasePackage};
+use crate::backend::calix_snapshot::{Snapshot, SnapshotPackage};
+
+/// A crate installed by `cargo install`, as the inventory reports it.
+#[derive(Debug, Clone, PartialEq, Default, Deserialize)]
+pub struct CargoCrate {
+    #[serde(default)]
+    pub version: String,
+    #[serde(default)]
+    pub source: String,
+    #[serde(default)]
+    pub bins: Vec<String>,
+}
+
+/// A globally installed npm package, as the inventory reports it.
+#[derive(Debug, Clone, PartialEq, Default, Deserialize)]
+pub struct NpmPackage {
+    #[serde(default)]
+    pub version: String,
+    #[serde(default)]
+    pub overridden: bool,
+}
+
+/// A package tracked by the Calix release backend.
+#[derive(Debug, Clone, PartialEq, Default, Deserialize)]
+pub struct ReleasePackage {
+    #[serde(default)]
+    pub installed_version: Option<String>,
+    #[serde(default)]
+    pub latest_version: Option<String>,
+    #[serde(default)]
+    pub update_available: bool,
+    #[serde(default)]
+    pub repo: Option<String>,
+    #[serde(default)]
+    pub provider: Option<String>,
+    #[serde(default)]
+    pub canal: Option<String>,
+    #[serde(default)]
+    pub pkgname: Option<String>,
+}
 
 /// Représentation unifiée d'un paquet affiché dans la liste GPUI
 #[derive(Debug, Clone, PartialEq)]
@@ -356,6 +395,46 @@ impl UnifiedPackage {
         }
     }
 
+    /// Construit un paquet unifié à partir d'un enregistrement du daemon.
+    ///
+    /// ALPM et AUR sont volontairement ignorés. La liste typée des paquets
+    /// pacman vient du backend CLI, qui porte les champs que l'inspecteur lit
+    /// (dépendances, mainteneur, base du paquet) ; le document normalisé ne
+    /// les a pas, et ses copies ALPM feraient doublon avec cette liste. AUR
+    /// est un sous-ensemble d'ALPM : les mêmes paquets, deux fois.
+    pub fn from_snapshot(package: &SnapshotPackage) -> Option<Self> {
+        match package.source_type.as_str() {
+            "Cargo" => Some(Self::from_cargo(
+                package.name.clone(),
+                CargoCrate {
+                    version: package.version.clone(),
+                    source: package.repository_or_remote.clone(),
+                    bins: package.binaries.clone(),
+                },
+            )),
+            "NPM" => Some(Self::from_npm(
+                package.name.clone(),
+                NpmPackage {
+                    version: package.version.clone(),
+                    overridden: package.overridden,
+                },
+            )),
+            "Release" => Some(Self::from_release(
+                package.name.clone(),
+                ReleasePackage {
+                    installed_version: Some(package.version.clone()),
+                    latest_version: package.new_version.clone(),
+                    update_available: package.has_update,
+                    repo: non_empty(&package.repository_or_remote),
+                    provider: package.provider.clone(),
+                    canal: package.canal.clone(),
+                    pkgname: package.pkgname.clone(),
+                },
+            )),
+            _ => None,
+        }
+    }
+
     pub fn from_update(u: PackageUpdateItem) -> Self {
         Self {
             name: u.name,
@@ -372,5 +451,157 @@ impl UnifiedPackage {
 
     pub fn key(&self) -> crate::state::PackageKey {
         crate::state::PackageKey::from_unified(self)
+    }
+}
+
+/// Fusionne la liste typée du backend CLI avec ce que le daemon sert.
+///
+/// Le backend CLI reste la source des paquets ALPM ; le daemon apporte les
+/// écosystèmes que pacman ne possède pas. C'est une fusion de deux origines,
+/// plus de deux formats de stockage : le frontend ne lit plus aucun fichier.
+pub fn merge_snapshot(alpm: Vec<AlpmPackage>, snapshot: &Snapshot) -> Vec<UnifiedPackage> {
+    let mut packages: Vec<UnifiedPackage> = alpm
+        .into_iter()
+        .map(|pkg| UnifiedPackage::from_alpm(pkg, true))
+        .collect();
+    packages.extend(
+        snapshot
+            .packages
+            .iter()
+            .filter_map(UnifiedPackage::from_snapshot),
+    );
+    packages
+}
+
+fn non_empty(value: &str) -> Option<String> {
+    if value.is_empty() {
+        None
+    } else {
+        Some(value.to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn record(source_type: &str, name: &str, version: &str) -> SnapshotPackage {
+        SnapshotPackage {
+            name: name.to_string(),
+            version: version.to_string(),
+            source_type: source_type.to_string(),
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn a_cargo_record_keeps_its_binaries_and_registry() {
+        let package = UnifiedPackage::from_snapshot(&SnapshotPackage {
+            repository_or_remote: "registry+https://github.com/rust-lang/crates.io-index".into(),
+            binaries: vec!["cargo-add".into(), "cargo-rm".into()],
+            ..record("Cargo", "cargo-edit", "0.13.11")
+        })
+        .expect("a Cargo record becomes a package");
+
+        assert_eq!(package.name, "cargo-edit");
+        assert_eq!(package.version, "0.13.11");
+        assert_eq!(package.source_type, "Cargo");
+        assert!(package.description.contains("cargo-add, cargo-rm"));
+        assert_eq!(package.repository_or_remote, "registry+https://github.com/rust-lang/crates.io-index");
+    }
+
+    #[test]
+    fn an_npm_record_carries_the_overridden_flag() {
+        let package = UnifiedPackage::from_snapshot(&SnapshotPackage {
+            overridden: true,
+            ..record("NPM", "typescript", "5.6.3")
+        })
+        .expect("an NPM record becomes a package");
+
+        assert_eq!(package.source_type, "NPM");
+        assert!(package.description.contains("overridden"));
+        match package.inner {
+            UnifiedPackageSource::Npm(npm) => assert!(npm.overridden),
+            other => panic!("expected the NPM variant, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn a_release_record_carries_the_channel_and_the_newer_version() {
+        let package = UnifiedPackage::from_snapshot(&SnapshotPackage {
+            repository_or_remote: "storytold/craft-launcher".into(),
+            has_update: true,
+            new_version: Some("0.5.2".into()),
+            provider: Some("github".into()),
+            canal: Some("stable".into()),
+            pkgname: Some("artcraft-launcher-bin".into()),
+            ..record("Release", "artcraft-launcher", "0.5.1")
+        })
+        .expect("a Release record becomes a package");
+
+        assert_eq!(package.source_type, "Release");
+        assert_eq!(package.version, "0.5.1");
+        assert!(package.has_update);
+        assert_eq!(package.new_version.as_deref(), Some("0.5.2"));
+        assert_eq!(package.repository_or_remote, "storytold/craft-launcher");
+        assert!(package.description.contains("github"));
+        match package.inner {
+            UnifiedPackageSource::Release(release) => {
+                assert_eq!(release.pkgname.as_deref(), Some("artcraft-launcher-bin"));
+                assert_eq!(release.canal.as_deref(), Some("stable"));
+            }
+            other => panic!("expected the Release variant, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn alpm_and_aur_records_are_not_taken_from_the_daemon() {
+        // The typed pacman list comes from the CLI backend; a second copy
+        // from the snapshot would double every package, and AUR is a subset
+        // of that same list.
+        assert!(UnifiedPackage::from_snapshot(&record("ALPM", "ripgrep", "14.1.1")).is_none());
+        assert!(UnifiedPackage::from_snapshot(&record("AUR", "yay", "12.4.2")).is_none());
+        assert!(UnifiedPackage::from_snapshot(&record("Unknown", "x", "1")).is_none());
+    }
+
+    #[test]
+    fn merging_keeps_the_typed_alpm_rows_and_appends_the_daemon_ecosystems() {
+        let alpm = vec![AlpmPackage {
+            name: "ripgrep".to_string(),
+            version: "14.1.1".to_string(),
+            ..Default::default()
+        }];
+        let snapshot = Snapshot {
+            version: 1,
+            generated_at: 0,
+            packages: vec![
+                record("ALPM", "ripgrep", "14.1.1"),
+                record("AUR", "yay", "12.4.2"),
+                record("Cargo", "cargo-edit", "0.13.11"),
+                record("NPM", "typescript", "5.6.3"),
+            ],
+        };
+
+        let merged = merge_snapshot(alpm, &snapshot);
+        // One ALPM row from the backend, none from the snapshot, plus the
+        // two ecosystems pacman does not own.
+        assert_eq!(merged.len(), 3);
+        assert_eq!(merged.iter().filter(|p| p.name == "ripgrep").count(), 1);
+
+        let sources: Vec<&str> = merged.iter().map(|p| p.source_type.as_str()).collect();
+        assert_eq!(sources, vec!["ALPM", "Cargo", "NPM"]);
+        assert!(merged[0].is_installed);
+    }
+
+    #[test]
+    fn merging_with_no_daemon_keeps_only_the_backend_packages() {
+        let alpm = vec![AlpmPackage {
+            name: "ripgrep".to_string(),
+            version: "14.1.1".to_string(),
+            ..Default::default()
+        }];
+        let merged = merge_snapshot(alpm, &Snapshot::default());
+        assert_eq!(merged.len(), 1);
+        assert_eq!(merged[0].source_type, "ALPM");
     }
 }

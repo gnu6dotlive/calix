@@ -59,6 +59,15 @@ pub struct SnapshotPackage {
     pub overridden: bool,
     #[serde(default)]
     pub binaries: Vec<String>,
+    /// The forge a release-managed package is built from, e.g. `github`.
+    #[serde(default)]
+    pub provider: Option<String>,
+    /// The release channel a package follows, e.g. `stable`.
+    #[serde(default)]
+    pub canal: Option<String>,
+    /// The package a release is built into.
+    #[serde(default)]
+    pub pkgname: Option<String>,
 }
 
 /// The inventory document.
@@ -75,10 +84,14 @@ pub struct Snapshot {
 }
 
 impl Snapshot {
-    /// Parses a snapshot, refusing a format this frontend does not know.
-    pub fn parse(raw: &str) -> Result<Self, String> {
+    /// Validates a document the daemon sent, refusing a format this
+    /// frontend does not know.
+    ///
+    /// This is the only path a snapshot enters by, so it is also the only
+    /// place the version is checked.
+    pub fn from_value(value: serde_json::Value) -> Result<Self, String> {
         let snapshot: Snapshot =
-            serde_json::from_str(raw).map_err(|err| format!("invalid inventory: {err}"))?;
+            serde_json::from_value(value).map_err(|err| format!("invalid inventory: {err}"))?;
         if snapshot.version != SUPPORTED_SNAPSHOT_VERSION {
             return Err(format!(
                 "unsupported inventory version {} (this frontend understands {})",
@@ -86,14 +99,6 @@ impl Snapshot {
             ));
         }
         Ok(snapshot)
-    }
-
-    /// The packages that belong to one ecosystem.
-    pub fn by_source(&self, source_type: &str) -> Vec<&SnapshotPackage> {
-        self.packages
-            .iter()
-            .filter(|package| package.source_type.eq_ignore_ascii_case(source_type))
-            .collect()
     }
 }
 
@@ -107,46 +112,69 @@ mod tests {
 
     const FIXTURE: &str = include_str!("../../tests/fixtures/calix-inventory-sample.json");
 
+    fn parse(raw: &str) -> Result<Snapshot, String> {
+        let value: serde_json::Value =
+            serde_json::from_str(raw).map_err(|err| format!("invalid inventory: {err}"))?;
+        Snapshot::from_value(value)
+    }
+
+    fn of_source<'a>(snapshot: &'a Snapshot, source_type: &str) -> Vec<&'a SnapshotPackage> {
+        snapshot
+            .packages
+            .iter()
+            .filter(|package| package.source_type.eq_ignore_ascii_case(source_type))
+            .collect()
+    }
+
     #[test]
     fn parses_a_snapshot_captured_from_the_backend() {
-        let snapshot = Snapshot::parse(FIXTURE).expect("the fixture must parse");
+        let snapshot = parse(FIXTURE).expect("the fixture must parse");
         assert_eq!(snapshot.version, SUPPORTED_SNAPSHOT_VERSION);
         assert!(!snapshot.packages.is_empty());
     }
 
     #[test]
     fn reads_the_optional_detail_of_every_ecosystem() {
-        let snapshot = Snapshot::parse(FIXTURE).expect("the fixture must parse");
+        let snapshot = parse(FIXTURE).expect("the fixture must parse");
 
-        let cargo = snapshot.by_source("Cargo");
+        let cargo = of_source(&snapshot, "Cargo");
         assert!(!cargo.is_empty(), "the fixture must carry Cargo packages");
         let crate_ = cargo[0];
         assert!(!crate_.version.is_empty());
         assert!(!crate_.repository_or_remote.is_empty());
 
-        let npm = snapshot.by_source("NPM");
+        let npm = of_source(&snapshot, "NPM");
         assert!(!npm.is_empty(), "the fixture must carry NPM packages");
 
-        let appimage = snapshot.by_source("AppImage");
+        let appimage = of_source(&snapshot, "AppImage");
         assert!(!appimage.is_empty(), "the fixture must carry AppImages");
+
+        let releases = of_source(&snapshot, "Release");
+        assert!(!releases.is_empty(), "the fixture must carry a Release package");
+        assert_eq!(releases[0].provider.as_deref(), Some("github"));
+        assert_eq!(releases[0].canal.as_deref(), Some("stable"));
+        assert_eq!(
+            releases[0].pkgname.as_deref(),
+            Some("artcraft-launcher-bin")
+        );
     }
 
     #[test]
     fn a_snapshot_of_an_unknown_version_is_refused() {
         let raw = r#"{"version":99,"packages":[]}"#;
-        let error = Snapshot::parse(raw).expect_err("an unknown version must be refused");
+        let error = parse(raw).expect_err("an unknown version must be refused");
         assert!(error.contains("unsupported inventory version"));
     }
 
     #[test]
     fn a_malformed_snapshot_is_refused() {
-        assert!(Snapshot::parse("{not json").is_err());
+        assert!(parse("{not json").is_err());
     }
 
     #[test]
     fn an_absent_optional_field_is_not_an_error() {
         let raw = r#"{"version":1,"packages":[{"name":"x","version":"1","source_type":"Cargo"}]}"#;
-        let snapshot = Snapshot::parse(raw).expect("a sparse record must parse");
+        let snapshot = parse(raw).expect("a sparse record must parse");
         let package = &snapshot.packages[0];
         assert_eq!(package.name, "x");
         assert!(package.is_installed, "installed defaults to true");

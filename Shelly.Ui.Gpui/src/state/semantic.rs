@@ -184,7 +184,7 @@ pub fn canonical_install_command(pkg: &UnifiedPackage) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::backend::calix_state::{CargoCrate, NpmPackage, ReleasePackage};
+    use crate::backend::models::{CargoCrate, NpmPackage, ReleasePackage};
     use core::prelude::v1::test;
 
     #[test]

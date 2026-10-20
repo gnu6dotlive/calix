@@ -1022,13 +1022,17 @@ impl WorkspaceView {
 
         let client = self.store.read(cx).client.clone();
         cx.spawn(async move |this, cx| {
-            let res = client.search_installed("").await;
+            // The daemon query runs alongside the CLI one: the two answer
+            // different halves of the same list, and the inventory takes
+            // long enough that serialising them would be visible.
+            let (res, snapshot) = tokio::join!(
+                client.search_installed(""),
+                crate::backend::calix_daemon::inventory()
+            );
             let _ = this.update(cx, |view, cx| {
                 view.store.update(cx, |st, cx| match res {
                     Ok(installed) => {
-                        let inventory = crate::backend::calix_state::EcosystemInventory::load();
-                        let unified =
-                            crate::backend::calix_state::merge_installed(installed, &inventory);
+                        let unified = merged_installed(installed, &snapshot);
                         crate::components::package_identity::PackageIdentity::preload(&unified);
                         st.set_installed_packages(unified, cx);
                     }
@@ -1081,13 +1085,17 @@ impl WorkspaceView {
     fn load_installed_packages(&mut self, cx: &mut Context<Self>) {
         let client = self.store.read(cx).client.clone();
         cx.spawn(async move |this, cx| {
-            let res = client.search_installed("").await;
+            // The daemon query runs alongside the CLI one: the two answer
+            // different halves of the same list, and the inventory takes
+            // long enough that serialising them would be visible.
+            let (res, snapshot) = tokio::join!(
+                client.search_installed(""),
+                crate::backend::calix_daemon::inventory()
+            );
             let _ = this.update(cx, |view, cx| {
                 view.store.update(cx, |st, cx| match res {
                     Ok(packages) => {
-                        let inventory = crate::backend::calix_state::EcosystemInventory::load();
-                        let unified =
-                            crate::backend::calix_state::merge_installed(packages, &inventory);
+                        let unified = merged_installed(packages, &snapshot);
                         crate::components::package_identity::PackageIdentity::preload(&unified);
                         st.set_installed_packages(unified, cx);
                     }
@@ -2310,5 +2318,27 @@ impl Render for WorkspaceView {
                     .child(self.console_view.clone()),
             )
             .child(toast_overlay)
+    }
+}
+
+/// Fusionne la liste typée d'ALPM avec l'inventaire que sert le daemon.
+///
+/// Un daemon absent n'est pas un échec de chargement : la fenêtre a encore
+/// des paquets à montrer, et le journal dit pourquoi les autres écosystèmes
+/// manquent. Un frontend qui refuse de démarrer parce qu'un second service
+/// est arrêté est pire qu'un frontend incomplet.
+fn merged_installed(
+    installed: Vec<crate::backend::models::AlpmPackage>,
+    snapshot: &Result<crate::backend::calix_snapshot::Snapshot, String>,
+) -> Vec<crate::backend::models::UnifiedPackage> {
+    match snapshot {
+        Ok(snapshot) => crate::backend::models::merge_snapshot(installed, snapshot),
+        Err(error) => {
+            log::warn!("Calix daemon unavailable, showing backend packages only: {error}");
+            crate::backend::models::merge_snapshot(
+                installed,
+                &crate::backend::calix_snapshot::Snapshot::default(),
+            )
+        }
     }
 }

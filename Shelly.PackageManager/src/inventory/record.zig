@@ -63,6 +63,12 @@ pub const Record = struct {
     overridden: bool = false,
     /// The binaries a Cargo crate installs.
     binaries: []const []const u8 = &.{},
+    /// The forge a release-managed package is built from, e.g. `github`.
+    provider: ?[]const u8 = null,
+    /// The release channel a package follows, e.g. `stable`.
+    canal: ?[]const u8 = null,
+    /// The package the release is built into.
+    pkgname: ?[]const u8 = null,
 
     /// Serialises the record.
     pub fn toJson(self: Record, allocator: std.mem.Allocator) ![]u8 {
@@ -80,6 +86,9 @@ pub const Record = struct {
         if (self.update_url) |value| allocator.free(value);
         if (self.repo_owner) |value| allocator.free(value);
         if (self.repo_name) |value| allocator.free(value);
+        if (self.provider) |value| allocator.free(value);
+        if (self.canal) |value| allocator.free(value);
+        if (self.pkgname) |value| allocator.free(value);
         for (self.binaries) |binary| allocator.free(binary);
         allocator.free(self.binaries);
         self.* = undefined;

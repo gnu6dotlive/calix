@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": 197689,
+  "generated_at": 1792484400,
   "packages": [
     {
       "name": "7zip",
@@ -70,21 +70,9 @@
       ]
     },
     {
-      "name": "@electron/asar",
-      "version": "0.0.0-development",
-      "description": "NPM global package",
-      "source_type": "NPM",
-      "repository_or_remote": "npm",
-      "is_installed": true,
-      "has_update": false,
-      "allow_prerelease": false,
-      "overridden": false,
-      "binaries": []
-    },
-    {
-      "name": "cargo-binstall",
-      "version": "1.18.1",
-      "description": "Cargo crate \u2014 binaries: cargo-binstall",
+      "name": "cargo-deny",
+      "version": "0.20.2",
+      "description": "Cargo crate \u2014 binaries: cargo-deny",
       "source_type": "Cargo",
       "repository_or_remote": "registry+https://github.com/rust-lang/crates.io-index",
       "is_installed": true,
@@ -92,7 +80,7 @@
       "allow_prerelease": false,
       "overridden": false,
       "binaries": [
-        "cargo-binstall"
+        "cargo-deny"
       ]
     },
     {
@@ -106,6 +94,33 @@
       "allow_prerelease": false,
       "overridden": false,
       "binaries": []
+    },
+    {
+      "name": "@playwright/cli",
+      "version": "0.1.17",
+      "description": "NPM global package",
+      "source_type": "NPM",
+      "repository_or_remote": "npm",
+      "is_installed": true,
+      "has_update": false,
+      "allow_prerelease": false,
+      "overridden": false,
+      "binaries": []
+    },
+    {
+      "name": "artcraft-launcher",
+      "version": "0.5.1",
+      "description": "Release-managed package \u2014 github channel, stable",
+      "source_type": "Release",
+      "repository_or_remote": "storytold/craft-launcher",
+      "is_installed": true,
+      "has_update": false,
+      "allow_prerelease": false,
+      "overridden": false,
+      "binaries": [],
+      "provider": "github",
+      "canal": "stable",
+      "pkgname": "artcraft-launcher-bin"
     }
   ]
 }
