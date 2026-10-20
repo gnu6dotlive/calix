@@ -76,6 +76,19 @@ pub fn compute_splitter_width(
 }
 
 /// Bornes légales strictes de la largeur de liste dans le domaine horizontal
+/// La largeur de la zone de contenu : la largeur *mappée* de la fenêtre, moins le rail.
+///
+/// La largeur que l'application a *demandée* (`window.window_bounds()`) n'est pas
+/// celle que le compositeur lui accorde : un compositeur à tuiles redimensionne la
+/// fenêtre quand le focus change, et la demande reste celle du lancement. Mesurer
+/// sur la demande faisait tenir l'inspecteur à $137px$ — sous son plancher de
+/// $320px$ — dans une fenêtre de $1056px$, puis à $1622px$ — au-dessus de son
+/// plafond de $520px$ — dans une fenêtre de $2542px$. C'est la taille mappée,
+/// `viewport_size()`, qui fait foi.
+pub fn content_width(viewport_width: f32, sidebar_width: f32) -> f32 {
+    (viewport_width - sidebar_width).max(0.0)
+}
+
 pub fn compute_splitter_bounds(content_width: f32) -> (f32, f32) {
     let inspector_max =
         (content_width * UiMetrics::INSPECTOR_MAX_RATIO).min(UiMetrics::INSPECTOR_MAX_WIDTH);
@@ -555,8 +568,8 @@ impl Render for PackageWorkstationView {
         } else {
             UiMetrics::SIDEBAR_EXPANDED
         };
-        let window_width = window.window_bounds().get_bounds().size.width / px(1.0);
-        let content_width = (window_width - sidebar_width).max(0.0);
+        let window_width = window.viewport_size().width / px(1.0);
+        let content_width = content_width(window_width, sidebar_width);
         let layout_mode = WorkstationLayoutMode::from_content_width(content_width);
 
         let (list_min, list_max) = compute_splitter_bounds(content_width);
@@ -1332,6 +1345,50 @@ impl Render for PackageWorkstationView {
 mod tests {
     use super::*;
     use core::prelude::v1::test;
+
+    #[test]
+    fn the_content_width_follows_the_mapped_window() {
+        // La largeur mappée moins le rail : c'est elle qui décide du partage
+        // entre la liste et l'inspecteur.
+        assert_eq!(
+            content_width(1056.0, UiMetrics::SIDEBAR_EXPANDED),
+            866.0
+        );
+        assert_eq!(
+            content_width(1056.0, UiMetrics::SIDEBAR_COLLAPSED),
+            1000.0
+        );
+
+        // Un rail plus large que la fenêtre ne donne pas une largeur négative.
+        assert_eq!(content_width(100.0, UiMetrics::SIDEBAR_EXPANDED), 0.0);
+    }
+
+    #[test]
+    fn the_inspector_stays_inside_its_bounds_at_the_widths_a_tiling_compositor_uses() {
+        // Les largeurs que le compositeur à tuiles a données pendant la mesure :
+        // 1056px et 2542px. Dans les deux, l'inspecteur doit rester dans
+        // [320, min(520, 3/7·w_c)] — ce que la largeur *demandée* ne garantissait
+        // pas.
+        for window_width in [1056.0_f32, 2542.0] {
+            let content = content_width(window_width, UiMetrics::SIDEBAR_EXPANDED);
+            let (list_min, list_max) = compute_splitter_bounds(content);
+            let list = 640.0_f32.clamp(list_min, list_max);
+            let inspector = content - UiMetrics::SPLITTER_WIDTH - list;
+
+            assert!(
+                inspector >= UiMetrics::INSPECTOR_MIN_USABLE - 0.01,
+                "l'inspecteur tombe sous son plancher : {inspector}px dans une fenêtre de {window_width}px"
+            );
+            assert!(
+                inspector <= (content * UiMetrics::INSPECTOR_MAX_RATIO).min(UiMetrics::INSPECTOR_MAX_WIDTH) + 0.01,
+                "l'inspecteur dépasse son plafond : {inspector}px dans une fenêtre de {window_width}px"
+            );
+            assert!(
+                list >= UiMetrics::LIST_MIN_USABLE - 0.01,
+                "la liste tombe sous son plancher : {list}px dans une fenêtre de {window_width}px"
+            );
+        }
+    }
 
     #[test]
     fn test_inspector_ratio_pure_math_and_bounds() {

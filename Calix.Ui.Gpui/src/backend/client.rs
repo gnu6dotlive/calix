@@ -126,6 +126,10 @@ impl CalixClient {
     }
 
     /// Liste des mises à jour disponibles pour tous les backends
+    ///
+    /// La variante `all` du CLI répond par un objet groupé par backend : la
+    /// réponse est lue comme telle, puis aplatie. La lire comme un tableau plat
+    /// — ce que faisait cette fonction — faisait échouer le périmètre Updates.
     pub async fn list_updates(&self) -> Result<Vec<PackageUpdateItem>> {
         let raw =
             ProcessRunner::run_json_command(&self.binary_path, &["list-updates", "all", "-j"])
@@ -136,8 +140,10 @@ impl CalixClient {
             return Ok(Vec::new());
         }
 
-        serde_json::from_str::<Vec<PackageUpdateItem>>(trimmed)
-            .context("Désérialisation de la liste des mises à jour")
+        let payload: UpdatesPayload = serde_json::from_str(trimmed)
+            .context("Désérialisation de la liste des mises à jour")?;
+
+        Ok(payload.into_items())
     }
 
     /// Récupère les actualités Arch Linux
@@ -276,6 +282,51 @@ impl CalixClient {
 mod tests {
     use super::*;
     use core::prelude::v1::test;
+
+    /// Le binaire du CLI que le frontend doit savoir lire.
+    ///
+    /// Le premier candidat est la construction locale, que la porte de livraison
+    /// produit avant les tests du frontend ; les suivants sont les installations.
+    fn cli_binary() -> Option<String> {
+        if let Ok(path) = std::env::var("CALIX_BIN") {
+            if Path::new(&path).exists() {
+                return Some(path);
+            }
+        }
+        [
+            "../Calix.Cli.Zig/zig-out/bin/calix",
+            "/usr/lib/calix/calix",
+            "/usr/bin/calix",
+        ]
+        .into_iter()
+        .find(|candidate| Path::new(candidate).exists())
+        .map(str::to_string)
+    }
+
+    #[tokio::test]
+    async fn the_cli_answers_a_payload_the_frontend_reads() {
+        let Some(binary) = cli_binary() else {
+            eprintln!(
+                "le binaire du CLI est absent : la charge utile enregistrée couvre \
+                 la forme de la réponse, mais elle ne prouve pas l'accord avec le CLI"
+            );
+            return;
+        };
+
+        let raw = ProcessRunner::run_json_command(&binary, &["list-updates", "all", "-j"])
+            .await
+            .expect("the CLI answers the updates question");
+
+        let payload: UpdatesPayload = serde_json::from_str(raw.trim())
+            .expect("the frontend reads the grouped answer of the CLI");
+
+        for item in payload.into_items() {
+            assert!(
+                !item.name.is_empty(),
+                "a mise à jour sans nom ne peut pas être affichée"
+            );
+        }
+    }
 
     #[test]
     fn test_build_remove_args_standard_cascade_and_remove_configs() {

@@ -96,12 +96,19 @@ UI can mutate three (ALPM, AUR, Flatpak). The state filter offers
 `Installed / Not installed / Updates available` across a list whose members are not
 uniformly mutable.
 
-## 4. Two findings from the baseline capture
+## 4. Three findings from the baseline capture
 
 The pre-change capture (`evidence/runs/calix-slice-07-baseline-20261020/`) was taken
 on a live Wayland session, driving the application through the control surface. It
-produced two findings that the code reading alone had missed, and both are navigation
-defects rather than visual ones.
+produced three findings that the code reading alone had missed, and all three are
+navigation defects rather than visual ones.
+
+> **Update — 2026-10-20, v0.2.3.** The three findings below are the state at the
+> contract commit. The dead Updates scope (§4.3) and the stale geometry (§4.2) were
+> fixed in the v0.2.3 release, before the requalification started; §4.1 — the
+> filters acting where they cannot be seen — is a property of the contract and is
+> closed by Slice-08. The evidence of the two fixes is in
+> `evidence/runs/calix-v0.2.3-hotfix-20261020/`.
 
 ### 4.1 The filters act where they cannot be seen
 

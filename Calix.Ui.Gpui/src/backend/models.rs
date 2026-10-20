@@ -157,6 +157,169 @@ pub struct PackageUpdateItem {
     pub download_size: Option<u64>,
 }
 
+/// La charge utile groupée de `calix list-updates all -j`.
+///
+/// La variante `all` répond par un objet qui tient un tableau par backend ; les
+/// variantes par backend répondent par un tableau plat. Le frontend lit la
+/// variante `all`, donc il lit l'objet. Lire cette réponse comme une liste plate
+/// est exactement ce qui a fait échouer le périmètre Updates : la désérialisation
+/// refusait un objet là où elle attendait un tableau, et le périmètre n'a jamais
+/// chargé.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[serde(rename_all = "PascalCase")]
+pub struct UpdatesPayload {
+    #[serde(default)]
+    pub packages: Vec<StandardUpdateItem>,
+    #[serde(default)]
+    pub aur: Vec<AurUpdateItem>,
+    /// Le CLI écrit `AppImage` : la casse Pascal automatique donnerait
+    /// `Appimage`, qui ne correspond à rien.
+    #[serde(rename = "AppImage", default)]
+    pub appimage: Vec<AppImageUpdateItem>,
+    #[serde(default)]
+    pub flatpak: Vec<FlatpakUpdateItem>,
+}
+
+/// Mise à jour ALPM : la version installée et la version disponible.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[serde(rename_all = "PascalCase")]
+pub struct StandardUpdateItem {
+    pub name: String,
+    #[serde(default)]
+    pub current_version: String,
+    #[serde(default)]
+    pub new_version: String,
+    #[serde(default)]
+    pub repository: String,
+    #[serde(default)]
+    pub download_size: i64,
+    #[serde(default)]
+    pub description: String,
+}
+
+/// Mise à jour AUR : la version installée est `Version`, pas `CurrentVersion`.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[serde(rename_all = "PascalCase")]
+pub struct AurUpdateItem {
+    pub name: String,
+    #[serde(default)]
+    pub version: String,
+    #[serde(default)]
+    pub new_version: String,
+    #[serde(default)]
+    pub package_base: String,
+    #[serde(default)]
+    pub download_size: i64,
+    #[serde(default)]
+    pub description: String,
+}
+
+/// Mise à jour AppImage : la charge utile ne porte pas de version cible.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[serde(rename_all = "PascalCase")]
+pub struct AppImageUpdateItem {
+    pub name: String,
+    #[serde(default)]
+    pub version: String,
+    #[serde(default)]
+    pub download_url: String,
+    #[serde(default)]
+    pub is_update_available: bool,
+}
+
+/// Mise à jour Flatpak : l'application et son runtime.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+#[serde(rename_all = "PascalCase")]
+pub struct FlatpakUpdateItem {
+    #[serde(default)]
+    pub id: String,
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub version: String,
+    #[serde(default)]
+    pub new_version: String,
+    #[serde(default)]
+    pub remote: String,
+    #[serde(default)]
+    pub download_size: i64,
+    #[serde(default)]
+    pub branch: String,
+}
+
+impl UpdatesPayload {
+    /// Aplatit la charge utile groupée dans la forme unique du frontend.
+    ///
+    /// L'ordre des tableaux est celui de la charge utile : ALPM, AUR, AppImage,
+    /// Flatpak. Chaque backend devient un `PackageUpdateItem`, dont le `package_type`
+    /// est le type de source que le reste de l'interface sait déjà filtrer.
+    pub fn into_items(self) -> Vec<PackageUpdateItem> {
+        let mut items = Vec::with_capacity(
+            self.packages.len() + self.aur.len() + self.appimage.len() + self.flatpak.len(),
+        );
+
+        for update in self.packages {
+            items.push(PackageUpdateItem {
+                name: update.name,
+                old_version: update.current_version,
+                new_version: update.new_version,
+                repository: Some(if update.repository.is_empty() {
+                    "repos".to_string()
+                } else {
+                    update.repository
+                }),
+                package_type: Some("ALPM".to_string()),
+                download_size: Some(update.download_size.max(0) as u64),
+            });
+        }
+
+        for update in self.aur {
+            items.push(PackageUpdateItem {
+                name: update.name,
+                old_version: update.version,
+                new_version: update.new_version,
+                repository: Some("aur".to_string()),
+                package_type: Some("AUR".to_string()),
+                download_size: Some(update.download_size.max(0) as u64),
+            });
+        }
+
+        for update in self.appimage {
+            items.push(PackageUpdateItem {
+                name: update.name,
+                old_version: update.version,
+                // La charge utile AppImage ne porte pas de version cible : elle
+                // porte l'URL de téléchargement et un drapeau.
+                new_version: String::new(),
+                repository: Some(update.download_url),
+                package_type: Some("AppImage".to_string()),
+                download_size: None,
+            });
+        }
+
+        for update in self.flatpak {
+            items.push(PackageUpdateItem {
+                name: if update.name.is_empty() {
+                    update.id
+                } else {
+                    update.name
+                },
+                old_version: update.version,
+                new_version: update.new_version,
+                repository: Some(if update.remote.is_empty() {
+                    "flathub".to_string()
+                } else {
+                    update.remote
+                }),
+                package_type: Some("Flatpak".to_string()),
+                download_size: Some(update.download_size.max(0) as u64),
+            });
+        }
+
+        items
+    }
+}
+
 /// Représentation d'une AppImage gérée localement par Calix
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 #[serde(rename_all = "PascalCase")]
@@ -603,5 +766,124 @@ mod tests {
         let merged = merge_snapshot(alpm, &Snapshot::default());
         assert_eq!(merged.len(), 1);
         assert_eq!(merged[0].source_type, "ALPM");
+    }
+
+    /// La réponse que le CLI donne réellement, enregistrée verbatim le
+    /// 2026-10-20 sur `calix list-updates all -j`. C'est un objet groupé par
+    /// backend, pas un tableau : le lire comme un tableau est ce qui faisait
+    /// échouer le périmètre Updates.
+    const RECORDED_UPDATES_PAYLOAD: &str = r#"{"Packages":[],"Aur":[{"Name":"browseros-neo-bin","Version":"0.50.5-5","NewVersion":"0.51.1.2-2","DownloadSize":0,"Url":"https://github.com/browseros-ai/BrowserOS","PackageBase":"browseros-neo-bin","Description":"BrowserOS neo — AI browser for agents"}],"AppImage":[],"Flatpak":[]}"#;
+
+    /// La réponse que le CLI promet, telle que son propre test la fige
+    /// (`Calix.Cli.Zig/src/commands/list_updates.zig`). Le frontend la lit avec
+    /// la même grammaire : les deux côtés de l'accord sont testés.
+    const CLI_PINNED_UPDATES_PAYLOAD: &str = r#"{"Packages":[],"Aur":[],"AppImage":[{"Name":"Widget","Version":"2.0","DownloadUrl":"https://example.test/widget","IsUpdateAvailable":true}],"Flatpak":[]}"#;
+
+    #[test]
+    fn the_recorded_updates_payload_parses_and_flattens() {
+        let payload: UpdatesPayload = serde_json::from_str(RECORDED_UPDATES_PAYLOAD)
+            .expect("the recorded payload is an object the frontend reads");
+
+        let items = payload.into_items();
+        assert_eq!(items.len(), 1);
+
+        let update = &items[0];
+        assert_eq!(update.name, "browseros-neo-bin");
+        assert_eq!(update.old_version, "0.50.5-5");
+        assert_eq!(update.new_version, "0.51.1.2-2");
+        assert_eq!(update.package_type.as_deref(), Some("AUR"));
+        assert_eq!(update.repository.as_deref(), Some("aur"));
+    }
+
+    #[test]
+    fn the_cli_pinned_payload_is_read_the_same_way() {
+        let payload: UpdatesPayload = serde_json::from_str(CLI_PINNED_UPDATES_PAYLOAD)
+            .expect("the payload the CLI pins is an object the frontend reads");
+
+        let items = payload.into_items();
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0].name, "Widget");
+        assert_eq!(items[0].old_version, "2.0");
+        assert_eq!(items[0].package_type.as_deref(), Some("AppImage"));
+    }
+
+    #[test]
+    fn the_grouped_payload_keeps_one_item_per_backend() {        let payload = UpdatesPayload {
+            packages: vec![StandardUpdateItem {
+                name: "linux".to_string(),
+                current_version: "6.9.1".to_string(),
+                new_version: "6.9.2".to_string(),
+                repository: "core".to_string(),
+                download_size: 1024,
+                description: "The Linux kernel".to_string(),
+            }],
+            aur: vec![AurUpdateItem {
+                name: "qbittorrent-git".to_string(),
+                version: "5.4.0".to_string(),
+                new_version: "5.4.1".to_string(),
+                package_base: "qbittorrent-git".to_string(),
+                download_size: 2048,
+                description: "A BitTorrent client".to_string(),
+            }],
+            appimage: vec![AppImageUpdateItem {
+                name: "Obsidian".to_string(),
+                version: "1.5.3".to_string(),
+                download_url: "https://example.invalid/Obsidian".to_string(),
+                is_update_available: true,
+            }],
+            flatpak: vec![FlatpakUpdateItem {
+                id: "org.mozilla.firefox".to_string(),
+                name: "Firefox".to_string(),
+                version: "127.0".to_string(),
+                new_version: "128.0".to_string(),
+                remote: "flathub".to_string(),
+                download_size: 4096,
+                branch: "stable".to_string(),
+            }],
+        };
+
+        let items = payload.into_items();
+        assert_eq!(items.len(), 4);
+
+        assert_eq!(items[0].package_type.as_deref(), Some("ALPM"));
+        assert_eq!(items[0].old_version, "6.9.1");
+        assert_eq!(items[0].new_version, "6.9.2");
+        assert_eq!(items[0].repository.as_deref(), Some("core"));
+        assert_eq!(items[0].download_size, Some(1024));
+
+        assert_eq!(items[1].package_type.as_deref(), Some("AUR"));
+        assert_eq!(items[1].old_version, "5.4.0");
+        assert_eq!(items[1].new_version, "5.4.1");
+
+        // La charge utile AppImage ne porte pas de version cible.
+        assert_eq!(items[2].package_type.as_deref(), Some("AppImage"));
+        assert_eq!(items[2].old_version, "1.5.3");
+        assert_eq!(items[2].new_version, "");
+
+        assert_eq!(items[3].package_type.as_deref(), Some("Flatpak"));
+        assert_eq!(items[3].name, "Firefox");
+        assert_eq!(items[3].old_version, "127.0");
+        assert_eq!(items[3].new_version, "128.0");
+        assert_eq!(items[3].repository.as_deref(), Some("flathub"));
+    }
+
+    #[test]
+    fn an_update_becomes_a_package_the_list_can_show() {
+        let update = PackageUpdateItem {
+            name: "linux".to_string(),
+            old_version: "6.9.1".to_string(),
+            new_version: "6.9.2".to_string(),
+            repository: Some("core".to_string()),
+            package_type: Some("ALPM".to_string()),
+            download_size: Some(1024),
+        };
+
+        let package = UnifiedPackage::from_update(update);
+        assert_eq!(package.name, "linux");
+        assert_eq!(package.version, "6.9.1");
+        assert_eq!(package.new_version.as_deref(), Some("6.9.2"));
+        assert_eq!(package.source_type, "ALPM");
+        assert!(package.has_update);
+        assert!(package.is_installed);
     }
 }

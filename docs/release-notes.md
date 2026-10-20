@@ -1,21 +1,53 @@
-# Calix v0.2.2
+# Calix v0.2.3
 
-Calix v0.2.2 is a correctness release. It fixes two defects that made the
-v0.2.0 and v0.2.1 artifacts unusable on a normal Arch machine, and it ships
-the optional Flatpak backend in the package.
+Calix v0.2.3 is a correctness release. It revives a rail entry that had never
+loaded, and it makes the layout follow the window the compositor actually
+grants instead of the one the application asked for.
 
-## Read this first: v0.2.0 and v0.2.1 crash on Intel CPUs
+## Read this first: the Updates scope never worked
 
-The v0.2.0 and v0.2.1 release tarballs were built on an AMD machine with
-Zig's native CPU model, so the binaries contain SSE4a instructions that exist
-only on AMD processors. On an Intel CPU the backend CLI dies with `SIGILL` the
-first time it opens a network connection: `calix news`, `calix search`,
-anything that reaches the AUR or the Arch news feed. The frontend was not
-affected, and neither was the Arch package, which is built on the machine
-that installs it.
+One of the five entries in the rail — **Updates** — answered
+*Failed to check for updates: Désérialisation de la liste des mises à jour*
+in every released version, with a Retry button that could never succeed.
 
-v0.2.2 is built for the x86_64 baseline, and the gate now checks every
-shipped binary for instructions above that baseline, so it cannot ship again.
+The cause was a disagreement between the two halves of the product, on the
+shape of one payload. The frontend asked the CLI for every backend's updates
+and read the answer as a flat list:
+
+```rust
+// the frontend, before
+serde_json::from_str::<Vec<PackageUpdateItem>>(trimmed)
+```
+
+The CLI's `all` variant answers with an **object**, one array per backend:
+
+```json
+{"Packages": [], "Aur": [], "AppImage": [], "Flatpak": []}
+```
+
+The flat array is what the per-backend variants return
+(`calix list-updates standard -j`, `list-updates aur -j`). The frontend asked
+for the grouped one and parsed it as the flat one, so the deserialisation
+always failed.
+
+The frontend now reads the grouped answer and flattens it. The scope lists
+the pending updates, the rail entry carries the count badge, and the two
+sides of the agreement are pinned by tests: the CLI's own test already fixed
+the shape of its answer, the frontend now parses that exact string, and a
+third test parses the answer of the real CLI binary when it is present.
+
+## The layout follows the mapped window
+
+The workstation computed its widths from the size the application *requested*
+at launch, not from the size the compositor grants it. A tiling compositor
+resizes the window whenever the focus changes, and the request stays the one
+from the launch. The result was an inspector of **137px** — below its 320px
+floor — in a window of 1056px, and of **1622px** — above its 520px cap — in a
+window of 2542px, in the same session.
+
+The workstation now measures the mapped window (`viewport_size`), which is
+what the compositor really granted, and the inspector stays inside
+`[320, min(520, 3/7·w_c)]` at every width.
 
 ## What is in this release
 
@@ -25,48 +57,25 @@ shipped binary for instructions above that baseline, so it cannot ship again.
 - `calix-notify`, the session-bus notification bridge, packaged with its own user unit.
 - `libcalix-flatpak-backend.so.1`, the optional Flatpak backend, packaged and shipped.
 - The desktop entry, icon and polkit policy under the `live.gnu6.calix` namespace.
-- Packaging through `PKGBUILD-calix`; the package is `calix-gpui-git` and now depends
-  on `dbus`, which the bridge links.
+- Packaging through `PKGBUILD-calix`; the package is `calix-gpui-git`.
 - `pkexec` as the only elevation path. `sudo`, `doas` and `su` are rejected.
 - A single-profile CI gate: the Rust tests and release binary share one release build.
 
-## What changed
+## The front-end requalification has started
 
-### The optional Flatpak backend ships in the package
+The navigation of the application is being requalified before it is redrawn.
+The contract is published in `docs/gpui/slice-07/`: the current state with
+code pointers, the information architecture, the wireframes at three widths,
+fifty-three numbered requirements and the acceptance matrix.
 
-The package declared `flatpak` as an optional dependency but never installed
-`/usr/lib/calix/libcalix-flatpak-backend.so.1`, the library the CLI loads at
-runtime. The package now builds and installs it. The Flatpak runtime stays
-optional: without it the library cannot be loaded, the backend reports itself
-unavailable, and Calix runs with every other ecosystem.
+It is a contract, not a change: no screen moves in this release. It records
+what the next slices are measured against, and the three arbitration points
+it leaves open (the shape of the rail, the meaning of the search box in each
+scope, and when the next release lands) are decisions for the operator.
 
-### Commands are no longer swallowed by the inventory
-
-The dispatcher asks each command in order whether it owns the invocation, and
-`calix inventory` never checked. It built the whole inventory snapshot and
-printed it, so every command listed after it in the dispatcher — list-updates,
-mark, news, search, config, purify, remove, repo-db, run, utility, build and
-resolve — ran the inventory instead of the command. On a machine without the
-Flatpak backend they all failed with `FlatpakBackendUnavailable`; with the
-backend installed they printed an inventory document instead of doing their
-job.
-
-`calix inventory` now claims only its own path, and the daemon serves the
-same document it always did.
-
-### The inventory document degrades instead of failing
-
-An absent optional backend contributes no Flatpak rows, and the rest of the
-document is still a true view of the machine. The service says so once per
-process, so a missing ecosystem is never silently mistaken for a machine
-without Flatpak.
-
-### The binaries are portable
-
-Zig's native CPU model bakes the build machine's instruction set into a
-binary, and Zig emits it without a runtime check. Every Zig build in this
-tree now resolves the x86_64 baseline CPU model, and the local gate fails a
-build that uses an instruction above it.
+Two of the findings that shaped it are the defects fixed in this release: the
+Updates scope that could not load, and the layout that ignored the window it
+was given.
 
 ## Desktop notifications
 
@@ -188,6 +197,12 @@ It is not an installer. Use the package recipe or copy the tree deliberately.
 - `calix-daemon` serves inventory and release state on demand; it has no scheduler yet.
 - The tracked-release observation file is still written by the frozen Python bridge.
 - UI mutations cover ALPM, AUR and Flatpak.
+- The navigation is being requalified: the contract is published, the
+  implementation is not. The rail still mixes a scope switch with page
+  navigation, and the current scope is still not named on screen.
+- The list pane's width is clamped to the window it is drawn in, and the
+  clamped value is kept: narrowing the window and widening it back does not
+  restore the width the user had chosen.
 - `calix-notify` is desktop-only: it needs a session bus and a notification daemon.
   Neither is required for the package manager itself.
 - The bridge was validated against a private D-Bus and then against a live session
@@ -198,5 +213,5 @@ It is not an installer. Use the package recipe or copy the tree deliberately.
 ## Verification
 
 The release commit passed `scripts/verify` and `scripts/ci-replay` locally before the
-tag was pushed, and the published tarball was unpacked and run on a machine whose CPU
-does not have the instructions the old artifacts used. The same gate runs in `ci.yml`.
+tag was pushed, and the published tarball was unpacked and run on the machine that
+found the defects. The same gate runs in `ci.yml`.
