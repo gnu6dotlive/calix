@@ -14,7 +14,7 @@ reinvented: the only new number is the `44px` context header.
   ($746.67 \le w_c < 1090$) and **narrow** ($w_c < 746.67$, the stacked fallback).
 - $w_{window}$ is the width the **compositor** gives the window, not the width the
   application asked for. The two differ whenever a tiling compositor re-tiles the
-  window, and the geometry below is recomputed from the former (N52). Today it is
+  window, and the geometry below is recomputed from the former (N53). Today it is
   not, which is why the baseline capture in `01-CURRENT-STATE.md` §4.2 shows an
   inspector of $137px$ and of $1622px$ in the same session.
 
@@ -156,22 +156,28 @@ content: the rail *is* the way back, and it is one click away.
 ```
 ┌──────────────┬────────────────────────────────────────────────────────────────┐
 │  CALIX       │  Settings                                                       │ 44
-│              ├───────────────────┬────────────────────────────────────────────┤
-│  ⌕ Search    │  ▣ Sources        │  SOURCES                                   │
-│  ▣ Installed │    ☑ Official      │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │
-│  ↻ Updates   │    ☐ AUR           │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │
-│  ▤ News      │    ☑ Flatpak       │                                            │
-│  ⚙ Settings  │    ☐ AppImage      │  (the section list is not a place)         │
-│              │  ▣ Behaviour      │                                            │
-│              │  ▣ Appearance     │                                            │
-│              │  ▣ Advanced       │                                            │
-│              │  260px  400px min  │                                            │
-└──────────────┴───────────────────┴────────────────────────────────────────────┘
+│              ├────────────────────────────────────────────────────────────────┤
+│  ⌕ Search    │  PACKAGE SOURCES                                                │
+│  ▣ Installed │  ┌────────────────────────────────────────────────────────────┐ │
+│  ↻ Updates   │  │ Arch User Repository (AUR)                    [ Enabled ]   │ │
+│  ▤ News      │  │ Enable search and PKGBUILD inspection for AUR packages    │ │
+│  ⚙ Settings  │  └────────────────────────────────────────────────────────────┘ │
+│              │  ┌────────────────────────────────────────────────────────────┐ │
+│              │  │ Flatpak Packages                               [ Enabled ]   │ │
+│              │  │ Enable search and inspection for sandboxed applications   │ │
+│              │  └────────────────────────────────────────────────────────────┘ │
+│              │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │
+│              │  PACKAGE MANAGEMENT                                            │
+│              │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │
+│  ‹ Collapse  │                                                                │
+└──────────────┴────────────────────────────────────────────────────────────────┘
 ```
 
-The section list is internal navigation inside the place. It is not a rail entry, it
-does not appear in the context header, and it is not addressable from the control
-surface — it is a view of the Settings place, not a place of its own.
+The settings surface is a single scrolling column of section cards, as it is today.
+The sections are not places and not scopes: they are not rail entries, they do not
+appear in the context header, and they are not addressable from the control surface.
+The context header is the only addition, and it carries the place name and the state
+of the configuration ("Up to date").
 
 ## 8. W6 — An operation in flight, from any place
 

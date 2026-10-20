@@ -1,7 +1,8 @@
 # 04 — Navigation Contract
 
-Every requirement is numbered so the acceptance matrix can point at it. "Must" is
-binding on Slice-08; "may" is left to the implementation.
+Every requirement is numbered so the acceptance matrix can point at it. They are
+binding on Slice-08; where the implementation has a choice, the choice is written
+down here rather than left to the code.
 
 ## 1. Places and scopes
 
@@ -107,7 +108,7 @@ N17 and the text-editing keys the field owns.
 |---|---|
 | Package surface | rail → scope switcher → search input → query controls → list → inspector → console handle |
 | News | rail → header → feed → console handle |
-| Settings | rail → header → section list → panel → console handle |
+| Settings | rail → header → sections → console handle |
 
 **N24 — A place change moves the focus to the new place's first element**, and the
 scope switcher moves the focus to the list, so the arrow keys reach the rows.
@@ -144,16 +145,23 @@ cannot see, and cannot undo, is a scope the user cannot trust.
 pinned while only its body scrolls. The $3/7$ ratio cap, the $320px$ and $340px$
 floors and the stacked fallback below $746.67px$ of content width are unchanged.
 
-**N33 — News and Settings replace the station inside the frame.** The rail and the
+**N33 — Every scope loads its data.** A scope that cannot read its own data source
+shows the failure in place, with a retry, and never a surface that looks empty. The
+Updates scope is the one that fails today: the frontend reads the CLI's grouped
+payload as if it were a flat list, and the scope has never loaded
+(`01-CURRENT-STATE.md` §4.3). The frontend and the CLI agree on one payload shape,
+and the agreement is asserted by a test that parses a real CLI answer.
+
+**N34 — News and Settings replace the station inside the frame.** The rail and the
 header remain; the list and the inspector are not rendered.
 
-**N34 — The operation console is docked and global.** It opens automatically when an
+**N35 — The operation console is docked and global.** It opens automatically when an
 operation starts, from any place, and it never covers the content area.
 
-**N35 — An error never clears the surface.** The rows the user was looking at stay,
+**N36 — An error never clears the surface.** The rows the user was looking at stay,
 the error is reported in place, and a retry action is offered.
 
-**N36 — The Updates scope states the age of its answer** — when the update set was
+**N37 — The Updates scope states the age of its answer** — when the update set was
 last checked — in the context header and in the empty state.
 
 ## 7. The control surface
@@ -161,7 +169,7 @@ last checked — in the context header and in the empty state.
 The control CLI is an automation surface, not a convenience. Its verbs are part of
 the product contract (`docs/gpui/control-cli/01-COMMAND-SURFACE.md`).
 
-**N37 — The existing verbs keep working, unchanged in meaning:**
+**N38 — The existing verbs keep working, unchanged in meaning:**
 
 | Verb | Behaviour after the change |
 |---|---|
@@ -175,14 +183,14 @@ the product contract (`docs/gpui/control-cli/01-COMMAND-SURFACE.md`).
 | `view table\|cards` | View mode, unchanged |
 | `inspector <tab>` | Inspector tab, unchanged |
 | `logs show\|hide\|clear` | Operation console, unchanged |
-| `status [--json]` | Extended, per N39 |
+| `status [--json]` | Extended, per N40 |
 | `open`, `focus`, `quit` | Unchanged |
 
-**N38 — A new `scope` verb** changes the scope without leaving the package surface:
+**N39 — A new `scope` verb** changes the scope without leaving the package surface:
 `calix-gpui scope installed`. It accepts `results`, `installed` and `updates`, and
 `browse` is accepted as an alias of `results`.
 
-**N39 — `status --json` gains the navigation state.** The envelope is unchanged; the
+**N40 — `status --json` gains the navigation state.** The envelope is unchanged; the
 `data` object gains the fields below, and `protocol_version` becomes `5` when they
 appear, so the control surface reports the version it speaks.
 
@@ -217,19 +225,19 @@ appear, so the control surface reports the version it speaks.
 `destination` is retained as a deprecated alias of `scope`, so existing automation
 keeps working.
 
-**N40 — The control surface never leaves the application in an inconsistent state.**
+**N41 — The control surface never leaves the application in an inconsistent state.**
 Every verb that changes the place or the scope returns only after the frame has been
 re-rendered with the new state, so a `navigate` followed by a `status` always reports
 the new state.
 
 ## 8. Persistence
 
-**N41 — The persisted window state gains the last package scope** (`last_scope`), next
+**N42 — The persisted window state gains the last package scope** (`last_scope`), next
 to the existing `window_width`, `window_height`, `view_mode`, `visual_style`,
 `reduce_motion` and `log_drawer_*` fields. The file keeps its current name and format
 compatibility: a state file without `last_scope` loads with the default scope.
 
-**N42 — The filters are persisted** with the rest of the window state, so a restart
+**N43 — The filters are persisted** with the rest of the window state, so a restart
 returns to the view the user left, filtered the same way.
 
 ## 9. Invariants that must not regress
@@ -239,18 +247,17 @@ These are the measurements the previous phases made. Slice-08 may not weaken the
 
 | # | Invariant |
 |---|---|
-| N43 | $w_{inspector} \le \min(520,\; 3/7\,w_c)$ |
-| N44 | $w_{inspector} \ge 320px$ in horizontal mode |
-| N45 | $w_{list} \ge 340px$ |
-| N46 | Horizontal split at $w_c \ge 746.67px$, stacked below |
-| N47 | The query surface is sticky (N30) |
-| N48 | Zero overlay: the inspector, the menus and the news and settings surfaces never float over the list |
-| N49 | The console is docked, never a modal (N34) |
-| N50 | The splitter resize is a pure differential, invariant to the rail being collapsed or expanded |
-| N51 | The render lab stays out of the rail and keeps its return path to Settings |
-| N52 | The geometry is recomputed when the window bounds change (below) |
+| N44 | $w_{inspector} \le \min(520,\; 3/7\,w_c)$ |
+| N45 | $w_{inspector} \ge 320px$ in horizontal mode |
+| N46 | $w_{list} \ge 340px$ |
+| N47 | Horizontal split at $w_c \ge 746.67px$, stacked below |
+| N48 | The query surface is sticky (N30) |
+| N49 | Zero overlay: the inspector, the menus and the news and settings surfaces never float over the list |
+| N50 | The console is docked, never a modal (N35) |
+| N51 | The splitter resize is a pure differential, invariant to the rail being collapsed or expanded |
+| N52 | The render lab stays out of the rail and keeps its return path to Settings |
 
-**N52 — The geometry follows the window the compositor gives the application.**
+**N53 — The geometry follows the window the compositor gives the application.**
 The workstation's widths are recomputed from the *mapped* window bounds every time
 those bounds change, and not only when the workstation happens to re-render. The
 workspace caches the workstation's element, so a resize of the window does not

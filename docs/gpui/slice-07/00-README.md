@@ -53,8 +53,14 @@ A third finding is not about the navigation but about the layout the navigation 
 drawn on: the workstation's geometry is computed once and never recomputed when the
 compositor resizes the window, so the inspector has been measured at $137px$ — below
 its floor — and at $1622px$ — above its cap — in the same session. The contract now
-requires the geometry to follow the mapped window (N52), because the wireframes
+requires the geometry to follow the mapped window (N53), because the wireframes
 describe a layout the application does not currently produce.
+
+A fourth finding is a dead rail entry: the **Updates** scope has never loaded, in any
+released version. The frontend reads the CLI's grouped updates payload as if it were
+a flat list, so the scope always answers *Failed to check for updates*. The contract
+states the requirement (N33); whether it is closed in the implementation slice or in
+a hotfix release first is a decision for the operator.
 
 ---
 

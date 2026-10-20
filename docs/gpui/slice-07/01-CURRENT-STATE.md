@@ -179,6 +179,54 @@ currently produce. They are a specification of what the layout must be, and one 
 the requirements of Slice-08 is that the geometry is recomputed when the bounds
 change.
 
+### 4.3 One of the five rail entries is dead
+
+The Updates scope does not load. The capture shows the whole of it:
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  ↻ Available System Updates                    [Upgrade All]     │
+│                                                                  │
+│      Failed to check for updates: Désérialisation de la liste    │
+│      des mises à jour                     [ Retry ]              │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+The cause is a disagreement between the two halves of the product, on the shape of
+one payload. The frontend asks the CLI for every backend's updates and reads the
+answer as a flat list:
+
+```rust
+// Calix.Ui.Gpui/src/backend/client.rs:129
+pub async fn list_updates(&self) -> Result<Vec<PackageUpdateItem>> {
+    let raw =
+        ProcessRunner::run_json_command(&self.binary_path, &["list-updates", "all", "-j"])
+            .await?;
+    ...
+    serde_json::from_str::<Vec<PackageUpdateItem>>(trimmed)
+        .context("Désérialisation de la liste des mises à jour")
+}
+```
+
+The CLI answers the `all` variant with a **grouped object**, one array per backend
+(`Calix.Cli.Zig/src/commands/list_updates.zig:362`):
+
+```json
+{"Packages": [], "Aur": [ … ], "AppImage": [ … ], "Flatpak": [ … ]}
+```
+
+The flat array is what the *per-backend* variants return (`list-updates standard -j`,
+`list-updates aur -j`, `list-updates.zig:346-354`); the `all` variant is the one
+that groups. The frontend asks for the grouped one and parses it as the flat one, so
+the deserialisation always fails, and the Updates scope has never loaded in the
+released application. The error is reported honestly, with a retry — but a rail entry
+that always fails is a rail entry that is broken.
+
+This is not a navigation defect, but it is the navigation's first casualty: a scope
+that cannot load cannot be named, counted, filtered or dated, so four requirements of
+the contract (N12, N13, N33, N37) have nothing to say. The contract states the
+requirement (N33) and the implementation slice has to close it.
+
 ## 5. What the documentation has, and what it does not
 
 The repository has an unusually strong measurement record and no information model:

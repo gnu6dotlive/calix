@@ -133,6 +133,17 @@
       ],
       "method": "grim captures of the mapped window, with the vertical edges read from the pixels: the rail's border at 189/190px and the splitter at 914/920px.",
       "note": "The list pane is 724px in both cases: the layout does not depend on the width the window actually has."
+    },
+    {
+      "id": "F3",
+      "summary": "The Updates scope does not load: the frontend reads the CLI's grouped updates payload as a flat list.",
+      "where": "Calix.Ui.Gpui/src/backend/client.rs:129 parses `list-updates all -j` as Vec<PackageUpdateItem>; Calix.Cli.Zig/src/commands/list_updates.zig:362 answers the `all` variant with a grouped object (Packages / Aur / AppImage / Flatpak), while the flat array is what the per-backend variants return (list_updates.zig:346-354).",
+      "symptom": "The scope shows 'Failed to check for updates: Deserialisation de la liste des mises a jour' with a Retry button.",
+      "reproduction": "/usr/lib/calix/calix list-updates all -j | head -c 60  ->  {\"Packages\":[],\"Aur\":[{...}]}",
+      "consequence": "One of the five rail entries is dead in the released application. The scope cannot be named, counted, filtered or dated, so N12, N13, N33 and N37 have nothing to say about it.",
+      "captured_in": [
+        "updates.png"
+      ]
     }
   ],
   "corresponds_to": "docs/gpui/slice-07/01-CURRENT-STATE.md section 4",
