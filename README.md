@@ -1,95 +1,129 @@
 # Calix
 
-**A fast, GPU-accelerated package manager for Arch Linux.** Calix unifies the official
-repositories, the AUR, Flatpak and AppImage sources with your Cargo and NPM installs in
-one native desktop application, backed by a Zig package-management engine.
+**One native desktop surface for every package source on Arch Linux.** Calix unifies
+official repositories, the AUR, Flatpak, AppImages, Cargo and NPM into a single GPU-
+accelerated application, backed by a Zig package-management engine.
 
-Calix is pre-1.0 software under active development. Its scope and internals change
-frequently; [Project status](#project-status) is part of the documentation, not an
-afterthought.
+[![CI](https://github.com/tension-atoi/calix/actions/workflows/ci.yml/badge.svg)](https://github.com/tension-atoi/calix/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/tension-atoi/calix?label=release&color=1793d1)](https://github.com/tension-atoi/calix/releases/latest)
+[![License](https://img.shields.io/badge/license-GPL--3.0--only-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Arch%20Linux%20x86__64-1793d1.svg)](https://archlinux.org/)
+[![UI](https://img.shields.io/badge/UI-Rust%20%2B%20GPUI%200.2-orange.svg)](https://github.com/zed-industries/zed/tree/main/crates/gpui)
+[![Backend](https://img.shields.io/badge/backend-Zig%200.16-f7a41d.svg)](https://ziglang.org/)
 
-[![License: GPL-3.0-only](https://img.shields.io/badge/License-GPL--3.0--only-blue.svg)](LICENSE)
-[![Arch Linux](https://img.shields.io/badge/Arch%20Linux-x86__64-1793d1.svg)](https://archlinux.org/)
-[![Rust](https://img.shields.io/badge/UI-Rust%20%2B%20GPUI%200.2-orange.svg)](https://www.rust-lang.org/)
-[![Zig](https://img.shields.io/badge/backend-Zig%200.16-f7a41d.svg)](https://ziglang.org/)
+![Calix showing the unified inventory of every installed package on the machine](docs/media/calix-installed.png)
 
----
-
-## Overview
-
-Calix is built from three core native pieces, plus an optional desktop-session bridge:
-
-- **`calix-gpui`** — the desktop application. Rust, built on
-  [GPUI 0.2](https://github.com/zed-industries/zed/tree/main/crates/gpui) and Blade.
-  It renders directly on the GPU; there is no web view and no embedded browser.
-- **`calix-daemon`** — the inventory service. Zig, serving a versioned JSON-lines
-  protocol over a Unix socket. The frontend reads the daemon rather than opening state
-  files, so there is one place where installed-package state is assembled.
-- **`calix`** — the package-management CLI and the shared backend library behind it.
-  Zig, talking to `libalpm`, the AUR, Flatpak, AppImages, Cargo and NPM.
-- **`calix-notify`** — the optional session-bus bridge. Zig, listening for Calix's
-  `Refresh` signal and forwarding it to `org.freedesktop.Notifications`. It is installed
-  but not enabled by default.
-
-The UI, the daemon and the notification bridge run unprivileged. Operations that need
-root go through the CLI and polkit (`pkexec`); the project's engineering policy forbids
-`sudo`, `su` and `doas`.
-
-Calix targets Arch Linux on `x86_64`. That is the only architecture `PKGBUILD-calix`
-declares; other Arch-based distributions may work but are not tested.
+<sub>Calix 0.2.1 on Arch Linux: one inventory document covering ALPM, AUR, Flatpak,
+AppImage, Cargo, NPM and tracked releases — 1 881 packages on the machine that took
+this screenshot.</sub>
 
 ---
 
-## History & lineage
+## Contents
 
-Calix is **historically forked from Shelly**, the Arch Linux package manager developed by
-[Seafoam Labs](https://github.com/Seafoam-Labs/Shelly-ALPM). This codebase descends from
-Shelly's Zig package-management backend, its ALPM / AUR / Flatpak / AppImage work, and
-much of its component layout. The full upstream commit history and an `upstream` git
-remote are retained for reference and attribution.
-
-The codebase was developed here under the name `shelly-gpui` and renamed to **Calix** in
-October 2026. Since the fork it has been deeply refactored and redirected:
-
-- the Rust / GPUI frontend became the primary interface;
-- a separate `calix-daemon` became the boundary for installed-package state;
-- the installed-package model was unified across six ecosystems;
-- packaging, naming, protocol and roadmap diverged from upstream.
-
-Calix is not a clone of Shelly, and it is not a live continuation of the Shelly project.
-Upstream Shelly continues independently. Calix maintains historical lineage with it
-without being equivalent to the original fork — the lineage is context for how this
-codebase came to be, not the definition of what it is now.
-
-The rename is complete. The historical mapping and the reasons behind the new
-identifiers are recorded in [`docs/legacy-references.md`](docs/legacy-references.md).
+- [What Calix is](#what-calix-is)
+- [Quick start](#quick-start)
+- [The four components](#the-four-components)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Privilege model](#privilege-model)
+- [Configuration and state](#configuration-and-state)
+- [Command line](#command-line)
+- [Packaging](#packaging)
+- [Development](#development)
+- [Project status](#project-status)
+- [What is next](#what-is-next)
+- [Repository layout](#repository-layout)
+- [Documentation](#documentation)
+- [Credits and lineage](#credits-and-lineage)
+- [License](#license)
 
 ---
 
-## Why Calix
+## What Calix is
 
-Managing software on Arch Linux means moving between `pacman`, an AUR helper, `flatpak`,
-and whatever manages your AppImages — each with its own output, its own idea of what is
-installed, and its own privilege path. Calix exists to make that one coherent surface
-without hiding the differences between sources.
+Managing software on Arch Linux means moving between `pacman`, an AUR helper, `flatpak`
+and whatever handles your AppImages — each with its own output, its own idea of what is
+installed, and its own privilege path. Calix collapses that into one coherent surface
+without pretending the sources are the same.
 
-The design choices that follow from that:
+Five decisions follow from that:
 
 - **Arch-first, not distro-agnostic.** Calix is built against `libalpm` and the Arch
   package model. It does not abstract Arch into a lowest-common-denominator interface.
-- **One inventory, explicit provenance.** Installed packages from ALPM, AUR, Flatpak,
-  AppImage, Cargo and NPM are reported in one document, and every entry says which
-  ecosystem it came from. The document is versioned; a consumer that does not understand
-  the version refuses it instead of rendering it half-understood.
-- **A real privilege boundary.** The UI and the daemon do not run as root. Elevation
-  happens in a narrow, explicit path through polkit.
-- **Native code for the interface and the backend.** Rust for the UI, Zig for the package
-  management, no web view and no embedded browser. The one exception is the frozen Python
-  release-observation bridge described under [Transitional state](#transitional-state),
-  which is being removed.
-- **Honest state.** The frontend reads one service for cross-ecosystem state instead of a
-  pile of state files, and the inventory reports what is installed rather than what
-  should be.
+- **One inventory, explicit provenance.** Every ecosystem lands in one versioned
+  document, and every entry states which ecosystem it came from. A consumer that does
+  not understand the document version refuses it instead of rendering it half-understood.
+- **A real privilege boundary.** The UI, the daemon and the notification bridge run
+  unprivileged. Root happens in one narrow, explicit path through polkit.
+- **Native code end to end.** Rust and GPUI for the interface, Zig for package
+  management. No web view, no embedded browser, no Electron.
+- **Honest state.** The frontend reads one service for cross-ecosystem state, and the
+  inventory reports what is installed rather than what should be.
+
+---
+
+## Quick start
+
+### From a release
+
+Every release publishes a tarball and its checksum:
+
+```bash
+gh release download v0.2.1 --repo tension-atoi/calix \
+  --pattern 'calix-gpui-linux-x86_64.tar.gz*'
+sha256sum -c calix-gpui-linux-x86_64.tar.gz.sha256
+mkdir -p /tmp/calix && tar -xzf calix-gpui-linux-x86_64.tar.gz -C /tmp/calix
+```
+
+The tarball is a `usr/` layout, not an installer: look at it, then copy the pieces you
+want.
+
+### From the Arch package
+
+The package is `calix-gpui-git`. Build it and install it through polkit — this project
+forbids `sudo`, `su` and `doas`:
+
+```bash
+make package
+pkexec pacman -U --noconfirm /tmp/calix-gpui-pkg/*.pkg.tar.zst
+```
+
+Then enable the two per-user services, if you want them:
+
+```bash
+systemctl --user enable --now calix-daemon.service   # inventory service
+systemctl --user enable --now calix-notify.service   # desktop notifications
+```
+
+### From source
+
+Zig **0.16** and a stable Rust toolchain are required:
+
+```bash
+git clone https://github.com/tension-atoi/calix.git
+cd calix
+make zig                    # calix, calix-daemon, calix-notify
+./Calix.Cli.Zig/zig-out/bin/calix-daemon &
+make run                    # the GPUI frontend against the in-tree backend
+```
+
+Full prerequisites, including how to obtain a Zig 0.16 toolchain on a modern Arch
+system, are in [Development](#development).
+
+---
+
+## The four components
+
+| Binary | Language | Role |
+|---|---|---|
+| `calix-gpui` | Rust + [GPUI 0.2](https://github.com/zed-industries/zed/tree/main/crates/gpui) | The desktop application. Renders on the GPU, owns the search UI, the inspector and the operation console. |
+| `calix` | Zig | The package-management CLI and the shared backend library behind it. Talks to `libalpm`, the AUR, Flatpak, AppImages, Cargo and NPM. |
+| `calix-daemon` | Zig | The inventory service. Serves a versioned JSON-lines protocol over a Unix socket; the only writer of Calix state. |
+| `calix-notify` | Zig | The optional session-bus bridge. Turns Calix's `Refresh` signal into one `org.freedesktop.Notifications` notification. |
+
+The daemon is deliberately not part of the UI process: the UI degrades to what the
+backend CLI reports when the daemon is absent, instead of failing to open.
 
 ---
 
@@ -99,32 +133,33 @@ The design choices that follow from that:
 
 - Five destinations: **Browse**, **Installed**, **Updates**, **News** and **Settings**.
 - Concurrent search across official repositories, the AUR and Flatpak, plus a local
-  filter over installed AppImages, with per-source filters and per-source health
-  reporting.
-- Package inspector with three tabs: **Overview**, **Dependencies** (runtime, optional,
+  filter over installed AppImages, with per-source filters and per-source health.
+- A package inspector with three tabs: **Overview**, **Dependencies** (runtime, optional,
   make, conflicts, provides, required-by) and **Files / Build**.
-- Table and card result layouts, compact density, and light and dark themes.
-- A streaming operation console: install, remove and upgrade commands run through the
-  backend CLI and their output is streamed line by line into the UI.
-- Single-instance lifetime with a control socket, plus a small control CLI
-  (`calix-gpui status`, `calix-gpui search …`, `calix-gpui navigate installed`, …).
+- Table and card result layouts, compact density, light and dark themes.
+- A streaming operation console: install, remove and upgrade output arrives line by line
+  while the operation runs.
+- Single-instance lifetime with a control socket, so a second launch focuses the window
+  instead of starting a rival instance.
+- A scriptable control CLI — `calix-gpui status --json`, `calix-gpui search …`,
+  `calix-gpui navigate installed` — with deterministic exit codes.
 
 ### Inventory
 
 - One versioned inventory document covering ALPM, AUR, Flatpak, AppImage, Cargo, NPM and
   tracked release entries.
-- The daemon is the frontend's only source for that document; the UI no longer opens
-  state files.
-- Graceful degradation: if the daemon is not running, the window still opens and shows the
-  ALPM packages the backend CLI reports; the missing ecosystems are logged rather than
-  failing the view.
+- The daemon is the frontend's only source for that document; the UI opens no state
+  files.
+- Graceful degradation: without a running daemon the window still opens and shows the
+  ALPM packages the backend CLI reports, and the missing ecosystems are logged rather
+  than failing the view.
 
 ### Backend operations
 
 - **ALPM** — search, install, remove, partial upgrades, full system upgrade, downgrades,
-  ignore/hold lists, pacnew/pacsave management.
-- **AUR** — search, PKGBUILD review, build and install, updates.
-- **Flatpak** — search, install, remove, update, run, cleanup, with an optional native
+  ignore/hold marks, pacnew/pacsave management, and package repair.
+- **AUR** — search, PKGBUILD review, isolated builds, install, updates.
+- **Flatpak** — search, install, remove, update, run and cleanup, with an optional native
   backend that keeps `libflatpak` out of the base binary.
 - **AppImage** — install, remove, run, metadata synchronisation and update sources.
 - **Cargo / NPM / tracked releases** — reported in the inventory. The UI shows them
@@ -132,8 +167,15 @@ The design choices that follow from that:
 - **Repository and build tooling** — repository database operations, isolated builds
   through `systemd-nspawn`, keyring management and shell completions.
 
-Search in the UI currently covers ALPM, AUR, Flatpak and the local AppImage list. Cargo,
-NPM and tracked releases appear in the installed view, not in search results.
+UI search currently covers ALPM, AUR, Flatpak and the local AppImage list. Cargo, NPM
+and tracked releases appear in the installed view, not in search results.
+
+### Desktop integration
+
+- An XDG desktop entry, an SVG icon and a polkit policy, all under the
+  `live.gnu6.calix` namespace.
+- A notification bridge that turns a completed package operation into one desktop
+  notification, without a `dbus-monitor` pipeline or a `notify-send` subprocess.
 
 ---
 
@@ -158,6 +200,11 @@ graph TD
         Lib["Calix.PackageManager"]
     end
 
+    subgraph Desktop["Desktop session"]
+        Notify["calix-notify — session-bus bridge"]
+        Bus["live.gnu6.calix.Refresh"]
+    end
+
     Workspace -->|inventory| Protocol
     Protocol --> Inventory
     Console -->|streamed operations| CLI
@@ -172,52 +219,199 @@ graph TD
     Lib --> CN["Cargo + NPM indexes"]
     Lib --> REL["Release registry + provenance checks"]
     CLI --> Polkit["polkit / pkexec"]
+    CLI --> Bus
+    Bus --> Notify
+    Notify --> Notifications["org.freedesktop.Notifications"]
 ```
 
 - **`Calix.Ui.Gpui/`** builds `calix-gpui`: GPUI layout and rendering, search
-  orchestration, the inspector, and the operation console. Mutating operations are
-  spawned on a Tokio worker and streamed; the render thread is not blocked by process
+  orchestration, the inspector and the operation console. Mutating operations are
+  spawned on a Tokio worker and streamed, so the render thread never blocks on process
   I/O.
-- **`Calix.Cli.Zig/`** builds two executables from one library: the `calix` CLI and
-  `calix-daemon`. The daemon checks its protocol version before dispatching an action,
-  so a mismatched client is told so rather than misread.
+- **`Calix.Cli.Zig/`** builds three executables from one library: the `calix` CLI, the
+  `calix-daemon` and the `calix-notify` bridge. The daemon checks its protocol version
+  before dispatching, so a mismatched client is told so rather than misread.
 - **`Calix.PackageManager/`** is the backend library (`Zigalpm` to its Zig consumers):
-  ALPM through `libalpm`, AUR, Flatpak, AppImage, Cargo and NPM managers, the flat
-  inventory record shared by every ecosystem, the release registry, and upstream
+  ALPM through `libalpm`, the AUR, Flatpak, AppImage, Cargo and NPM managers, the flat
+  inventory record shared by every ecosystem, the release registry and upstream
   provenance verification.
-- **Flatpak is optional by construction.** `libflatpak` lives in a separate
-  `Calix.Flatpak.Backend` shared library loaded at runtime, so the base CLI starts and
-  works on a system without Flatpak installed.
+- **`Calix.Flatpak.Backend/`** is an optional `libflatpak` shared library loaded at
+  runtime, so the base binary has no hard Flatpak dependency.
+
+### The daemon protocol
+
+One JSON object per line, in both directions:
+
+```json
+{"version":1,"action":"ping"}
+{"version":1,"ok":true,"data":{"pid":4242,"protocol":1,"started_at":1789000000}}
+```
+
+The five actions are `ping`, `status`, `inventory`, `releases` and `mark-notified`.
+
+The socket follows the XDG base directory specification:
+
+```text
+socket   $XDG_RUNTIME_DIR/calix/daemon.sock   (falls back to /tmp/calix-<uid>/daemon.sock)
+state    $XDG_STATE_HOME/calix
+```
+
+`calix-daemon --help` lists the `--socket` and `--state-dir` overrides.
 
 ### Transitional state
 
 The release-observation file the inventory reads for tracked releases is still produced
 by the frozen Python engine in `scripts/`. That engine is a bridge, not the product: it
-receives fixes only, no new features, and the Zig release watcher is intended to replace
-it. The daemon reads that one file as a bounded bridge and does not execute Python.
+receives fixes only, no new features, and the Zig release watcher is meant to replace
+it. The daemon reads that one file as a bounded bridge and never executes Python.
 
 ---
 
-## Installation & building
+## Privilege model
+
+Calix has exactly one elevation path: **polkit**.
+
+| Process | Runs as | Root work |
+|---|---|---|
+| `calix-gpui` | user | none |
+| `calix-daemon` | user | none |
+| `calix-notify` | user | none |
+| `calix` (mutating commands) | user, then `pkexec` | ALPM transactions, AUR builds, keyring changes |
+
+- The project's engineering policy forbids `sudo`, `su` and `doas` — including in
+  scripts, CI and documentation. Elevation is `pkexec`, and the CLI rejects the other
+  mechanisms even when they are explicitly configured.
+- The `live.gnu6.calix.policy` file declares the three polkit actions the UI can
+  request: install, remove and upgrade.
+- The daemon and the notification bridge are unprivileged by construction, and the
+  package installs both units without enabling them, so installing Calix never changes
+  a session it was not asked to change.
+
+---
+
+## Configuration and state
+
+| Path | Contents |
+|---|---|
+| `$XDG_CONFIG_HOME/calix` | User configuration (`config.json`), UI settings (`gpui-ui.json`), the AppImage metadata database |
+| `$XDG_STATE_HOME/calix` | Daemon state: per-ecosystem inventories, release observations, the operation journal and the log |
+| `$XDG_RUNTIME_DIR/calix/daemon.sock` | The daemon socket |
+| `$XDG_RUNTIME_DIR/calix-gpui/` | Control socket and instance lock for the frontend |
+
+Environment variables:
+
+| Variable | Purpose |
+|---|---|
+| `CALIX_BIN` | Path to the `calix` backend binary the frontend should drive |
+| `CALIX_ELEVATOR` | Explicit elevation mechanism; `pkexec` is the default and the only allowed one |
+| `CALIX_CONFIG_DIR` | Overrides the configuration directory |
+| `CALIX_APPIMAGE_DB` | Overrides the AppImage metadata database path |
+
+---
+
+## Command line
+
+The backend CLI is `calix`. It speaks a compact grammar — an uppercase action, a
+lowercase type, then flags — alongside plain subcommands:
+
+```bash
+# Search
+calix search standard firefox
+calix search aur ripgrep
+calix -Ss firefox                    # the same thing, in short form
+
+# Install, remove, upgrade
+calix install standard firefox
+calix install aur ripgrep
+calix remove standard firefox
+calix upgrade all
+
+# The unified inventory document (all six ecosystems, versioned JSON)
+calix inventory standard
+
+# Every command, its flags and its examples
+calix --help
+```
+
+The frontend has its own control surface, with a machine-readable mode:
+
+```bash
+calix-gpui status --json          # protocol version, destination, query, selected package
+calix-gpui search ripgrep         # drive a running window
+calix-gpui navigate installed     # switch destination
+calix-gpui view cards             # table or cards
+calix-gpui inspect firefox        # open the inspector
+calix-gpui quit                   # close the running instance
+```
+
+Exit codes are deterministic: `0` on success, `1` on failure, with the same meaning in
+human and `--json` mode.
+
+---
+
+## Packaging
+
+The Arch package is defined by [`PKGBUILD-calix`](PKGBUILD-calix), with
+[`packaging/aur/PKGBUILD`](packaging/aur/PKGBUILD) as a symlink to it so the AUR copy
+cannot drift from the in-tree one.
+
+Zig 0.16 is required. `make package` selects `vendor/zig-0.16/usr/bin/zig` when it
+exists and exports it as `ZIG`; the PKGBUILD rejects any other Zig version with an
+actionable error.
+
+```bash
+make package
+pkexec pacman -U --noconfirm /tmp/calix-gpui-pkg/*.pkg.tar.zst
+```
+
+The package (`calix-gpui-git`) installs:
+
+| Path | Contents |
+|---|---|
+| `/usr/bin/calix-gpui` | Wrapper that sets `CALIX_BIN` and execs the frontend |
+| `/usr/bin/calix` | Symlink to the backend CLI |
+| `/usr/bin/calix-daemon` | Symlink to the inventory daemon |
+| `/usr/bin/calix-notify` | Symlink to the notification bridge |
+| `/usr/lib/calix/calix-gpui` | GPUI frontend binary |
+| `/usr/lib/calix/calix` | Zig backend CLI (the canonical polkit path) |
+| `/usr/lib/calix/calix-daemon` | Zig inventory daemon |
+| `/usr/lib/calix/calix-notify` | Session-bus notification bridge |
+| `/usr/lib/systemd/user/calix-daemon.service` | Per-user inventory service |
+| `/usr/lib/systemd/user/calix-notify.service` | Per-user notification bridge |
+| `/usr/share/applications/live.gnu6.calix.desktop` | XDG desktop entry |
+| `/usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg` | Application icon |
+| `/usr/share/polkit-1/actions/live.gnu6.calix.policy` | Polkit actions for install / remove / upgrade |
+
+Two boundaries are deliberate:
+
+- **Both user services are installed but not enabled.** Enabling a user unit is a
+  per-account decision; the package leaves it to `systemctl --user enable --now`.
+- **The legacy systemd units in `packaging/systemd/` run the frozen Python engine**
+  (`calix sync`), not the daemon. They are not installed by this package and remain part
+  of the transitional state described above.
+
+---
+
+## Development
 
 ### Prerequisites
 
-Arch Linux (or an Arch-based distribution), `x86_64`. Install the build dependencies
-with pacman — elevated through polkit, per this project's policy:
+Arch Linux (or an Arch-based distribution), `x86_64`:
 
 ```bash
 pkexec pacman -S --needed base-devel git rust cargo pacman clang pkgconf \
   libglvnd fontconfig freetype2 wayland libx11 libxcb libxkbcommon \
-  libxkbcommon-x11 mesa vulkan-icd-loader polkit
+  libxkbcommon-x11 mesa vulkan-icd-loader polkit dbus
 ```
 
 Zig **0.16.0** is required. `Calix.Cli.Zig/build.zig.zon` declares
-`minimum_zig_version = "0.16.0"`; Zig 0.17 changed the build API and this tree does not
-build with it. Arch's `zig` package has moved past 0.16, so check `zig version` before
-building.
+`minimum_zig_version = "0.16.0"`; Zig 0.17 changed the build API and this tree does
+not build with it. Arch's `zig` package has moved past 0.16, so check `zig version`
+before building.
 
 If the system Zig is not 0.16, extract the 0.16.0 package — from the pacman cache or the
-Arch Linux Archive — into the git-ignored `vendor/` directory and put it first on `PATH`:
+Arch Linux Archive — into the git-ignored `vendor/` directory and put it first on
+`PATH`:
 
 ```bash
 mkdir -p vendor/zig-0.16
@@ -231,43 +425,10 @@ That binary is linked against LLVM 21 (`libLLVM.so.21.1`, `libclang-cpp.so.21.1`
 versioned packages — `clang21 lld21 llvm21-libs` — from the same snapshot or the Arch
 Linux Archive, or `zig` will fail to start.
 
-`make zig`, `make run` and `make build` use `zig` from `PATH`, so keep that export in the
-shell that runs them.
-
 Flatpak support additionally needs the Flatpak development files and a separately built
 `Calix.Flatpak.Backend`; the base CLI does not link `libflatpak`.
 
-### Migrating from Shelly
-
-Calix v0.2.1 is a hard cut from the Shelly name. There is no compatibility layer and
-the old state paths are not read. The one-time state move, the renamed surfaces and the
-old package names are in [`docs/release-notes.md`](docs/release-notes.md).
-
-### Build and run from source
-
-```bash
-git clone https://github.com/tension-atoi/calix.git
-cd calix
-
-# 1. Build the Zig backend: produces Calix.Cli.Zig/zig-out/bin/calix,
-#    Calix.Cli.Zig/zig-out/bin/calix-daemon and
-#    Calix.Cli.Zig/zig-out/bin/calix-notify
-make zig
-
-# 2. Start the daemon (serves the unified inventory on
-#    $XDG_RUNTIME_DIR/calix/daemon.sock)
-./Calix.Cli.Zig/zig-out/bin/calix-daemon
-
-# 3. In another terminal, run the UI in development mode
-make run
-```
-
-`make run` builds the Zig CLI if the binary is missing, then starts `cargo run` with
-`CALIX_BIN` pointed at the in-tree backend. The daemon is a separate process and is not
-started by the UI: without it, the window still opens but only the packages the backend
-CLI reports are shown.
-
-Other `make` targets:
+### Make targets
 
 | Target | What it does |
 |---|---|
@@ -275,146 +436,40 @@ Other `make` targets:
 | `make build` | Optimised release build of `calix-gpui` |
 | `make check` | Fast `cargo check` without linking |
 | `make test` | Rust test suite for the frontend |
-| `make zig` / `make zig-rebuild` | Build the Zig backend (CLI, daemon and notification bridge) |
+| `make zig` / `make zig-rebuild` | Build the Zig backend: CLI, daemon and notification bridge |
 | `make package` | Build the Arch package in `/tmp` (`makepkg --noconfirm`); does not install |
 | `make package-install` | Build the package, then install it through `pkexec` |
 | `make install` | Development install into `/usr/local` (no PKGBUILD; needs elevated privileges) |
 | `make clean` | Remove Rust and Zig build artefacts |
 
-Backend tests run from the component directories:
+### The gate
+
+Every change is proven locally before it is pushed. There is no "try it on CI" step.
 
 ```bash
-(cd Calix.Cli.Zig && zig build test)
-(cd Calix.PackageManager && zig build test)
+./scripts/verify        # the same gate CI runs: naming, tests, release builds, smoke
+./scripts/ci-replay     # the same gate again, inside a clean archlinux:latest container
 ```
 
-### Release build
+`scripts/verify` runs the PackageManager suite, the CLI suite, the Rust suite, the
+release builds and a CLI smoke test. `scripts/ci-replay` replays that gate inside a
+pinned Arch snapshot, so a local pass and a CI pass cannot mean different things.
 
-```bash
-make build
-# binary: Calix.Ui.Gpui/target/release/calix-gpui
-```
+Current counts: **1 386** PackageManager tests, **391** CLI tests, **201** Rust tests.
 
----
+### Evidence
 
-## Usage
+`evidence/runs/` holds one machine-readable record per run — the local gate, the
+container replay, packaging, installs and releases — each with its raw logs under
+`evidence/logs/`. A run record states what was proven and, just as importantly, what
+was not.
 
-### Desktop application
+### The naming boundary
 
-Start `calix-daemon`, then launch `calix-gpui`. The main surfaces:
-
-- **Browse** — search and filter packages across the enabled sources; select a result to
-  open the inspector.
-- **Installed** — installed ALPM packages, plus the Cargo, NPM and tracked-release entries
-  the daemon contributes. Flatpak and AppImage packages remain in their source-filtered
-  search views.
-- **Updates** — available updates; **Upgrade All** runs a coordinated upgrade through the
-  backend CLI.
-- **News** — Arch Linux news fetched from the official RSS feed by the backend.
-- **Settings** — source toggles, package-management options, theme and density.
-
-Install, remove and upgrade operations open the operation console and stream the backend
-CLI output. Root operations raise a polkit prompt.
-
-### Command line
-
-The backend CLI is invoked as `calix`:
-
-```bash
-# Search
-./Calix.Cli.Zig/zig-out/bin/calix search standard firefox
-./Calix.Cli.Zig/zig-out/bin/calix search aur <package>
-
-# Install / remove / upgrade
-./Calix.Cli.Zig/zig-out/bin/calix install standard <package>
-./Calix.Cli.Zig/zig-out/bin/calix install aur <package>
-./Calix.Cli.Zig/zig-out/bin/calix remove standard <package>
-./Calix.Cli.Zig/zig-out/bin/calix upgrade all
-
-# The unified inventory document (all six ecosystems, versioned JSON)
-./Calix.Cli.Zig/zig-out/bin/calix inventory standard
-
-# Full command surface
-./Calix.Cli.Zig/zig-out/bin/calix --help
-```
-
-The daemon's defaults follow the XDG base directory specification:
-
-```text
-socket   $XDG_RUNTIME_DIR/calix/daemon.sock   (falls back to /tmp/calix-<uid>/daemon.sock)
-state    $XDG_STATE_HOME/calix
-```
-
-`calix-daemon --help` lists the `--socket` and `--state-dir` overrides. The protocol is
-one JSON object per line; a request is
-`{"version":1,"action":"inventory"}` and a response is `{"version":1,"ok":true,"data":…}`.
-
----
-
-## Packaging
-
-The current Arch package is defined by [`PKGBUILD-calix`](PKGBUILD-calix), with
-[`packaging/aur/PKGBUILD`](packaging/aur/PKGBUILD) as a symlink to it so the AUR copy
-cannot drift from the in-tree one.
-
-Zig 0.16 is required. `make package` selects `vendor/zig-0.16/usr/bin/zig` when it
-exists and exports it as `ZIG`; `PKGBUILD-calix` rejects any other Zig version with a
-clear message. If you invoke `makepkg` yourself, pass the toolchain explicitly:
-
-```bash
-# Build as your user; installation is elevated through polkit, not sudo.
-make package
-pkexec pacman -U --noconfirm /tmp/calix-gpui-pkg/*.pkg.tar.zst
-```
-
-For a direct `makepkg` run in `packaging/aur`, set `ZIG` to an absolute 0.16 binary:
-
-```bash
-cd packaging/aur
-ZIG=/absolute/path/to/zig-0.16/usr/bin/zig makepkg --noconfirm
-```
-
-Enable the per-user inventory service after installation:
-
-```bash
-systemctl --user enable --now calix-daemon.service
-```
-
-The optional desktop notification bridge uses the same session bus as the frontend:
-
-```bash
-systemctl --user enable --now calix-notify.service
-```
-
-The package installs both units but does not enable them, so installing Calix never
-changes a session the package manager was not asked to touch.
-
-The package (`calix-gpui-git`) installs:
-
-| Path | Contents |
-|---|---|
-| `/usr/bin/calix-gpui` | Wrapper that sets `CALIX_BIN` and execs the frontend |
-| `/usr/bin/calix` | Symlink to the backend CLI |
-| `/usr/bin/calix-daemon` | Symlink to the inventory daemon |
-| `/usr/bin/calix-notify` | Symlink to the notification bridge |
-| `/usr/lib/calix/calix-gpui` | GPUI frontend binary |
-| `/usr/lib/calix/calix` | Zig backend CLI (canonical polkit path) |
-| `/usr/lib/calix/calix-daemon` | Zig inventory daemon |
-| `/usr/lib/calix/calix-notify` | Session-bus notification bridge |
-| `/usr/lib/systemd/user/calix-daemon.service` | Per-user inventory service |
-| `/usr/lib/systemd/user/calix-notify.service` | Per-user notification bridge |
-| `/usr/share/applications/live.gnu6.calix.desktop` | XDG desktop entry |
-| `/usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg` | Application icon |
-| `/usr/share/polkit-1/actions/live.gnu6.calix.policy` | Polkit actions for install / remove / upgrade |
-
-Two boundaries are deliberate:
-
-- **The daemon and notification services are installed but not enabled.** Enabling a
-  user unit is a per-account decision; the package leaves it to
-  `systemctl --user enable --now`.
-- **The legacy systemd units in `packaging/systemd/` run the frozen Python engine**
-  (`calix sync`), not the daemon. They are not installed by this package and remain
-  part of the transitional state described above.
+The product was renamed from Shelly to Calix. The old name survives only in the
+historical record: `README.md`, `docs/` and `evidence/`. Code, packaging, paths,
+binaries and scripts use the Calix name, and `scripts/check-naming` is the tripwire
+that keeps it that way.
 
 ---
 
@@ -426,37 +481,66 @@ more optimistic document elsewhere in the tree, this table is the one to trust.
 | Area | State |
 |---|---|
 | GPUI frontend (`calix-gpui`) | Primary interface; active development |
-| Zig backend CLI (`calix`) | Works |
+| Zig backend CLI (`calix`) | Works for installed-state queries; `search`, `inventory` and `news` fail without the optional Flatpak backend present — see [What is next](#what-is-next) |
 | `calix-daemon` | Serves inventory and release state on demand; **no scheduler yet** |
 | Unified inventory | ALPM, AUR, Flatpak, AppImage, Cargo, NPM, tracked releases |
 | Release tracking | Zig registry and provenance checks landed; a frozen Python engine still writes the tracked-release observation file |
 | UI mutations | ALPM, AUR, Flatpak only |
 | UI search | ALPM, AUR, Flatpak, installed AppImages only |
-| Packaging | Installs frontend, backend CLI and the `calix-daemon` user service |
+| Desktop notifications | `calix-notify` shipped and verified end to end on a live session; installed, not enabled by default |
+| Packaging | Installs the frontend, the backend CLI, the notification bridge and both user services |
 | Naming | Complete: code, paths, binaries and packaging use `calix` and `live.gnu6.calix` |
 | Platform | Arch Linux, `x86_64` |
 
-Planned next steps, in rough order: the daemon scheduler and release watcher, the
-application flow (root helper + polkit rule), and removal of the frozen Python engine.
-
 The frontend crate is version `0.2.1`. The Zig backend reports `3.1.9-dev`, a version
-string inherited from the Shelly tree it descends from; it is not the Calix product
-version.
+string inherited from the tree it descends from; it is not the Calix product version.
 
 ---
 
-## Repository structure
+## What is next
+
+In rough order of value:
+
+1. **Ship the Flatpak backend in the package, or make the CLI degrade.** The package
+   declares `flatpak` as an optional dependency but never installs
+   `/usr/lib/calix/libcalix-flatpak-backend.so.1`. On a machine without that library,
+   `calix search`, `calix inventory` and `calix news` fail with
+   `FlatpakBackendUnavailable` — including operations that have nothing to do with
+   Flatpak — while `calix list` keeps working. Either the backend becomes part of the
+   package, or the ALPM and AUR paths stop depending on the Flatpak loader.
+
+   ![The packaged build on a machine without the optional Flatpak backend: the inventory loads, the package detail does not](docs/media/calix-inspector.png)
+
+   <sub>The packaged build, installed from `calix-gpui-git`, on a machine with `flatpak`
+   installed but without the optional backend library. The inventory renders; the package
+   detail request fails.</sub>
+2. **The daemon scheduler and the Zig release watcher.** The daemon currently answers
+   on demand; a scheduler and a native release watcher would retire the frozen Python
+   bridge and make tracked releases continuous instead of sampled.
+3. **Wire the application flow.** A dedicated root helper and a narrower polkit action
+   set, so the UI asks for exactly the operation it needs instead of a general CLI
+   invocation.
+4. **Close the mutation gap.** Installing and removing Cargo and NPM packages from the
+   UI, and searching the sources that are currently inventory-only.
+5. **Cut the frozen Python engine.** Once the watcher is native, `scripts/calix_*.py`
+   and the legacy `packaging/systemd/calix-sync.*` units can go.
+
+---
+
+## Repository layout
 
 | Path | Contents |
 |---|---|
 | `Calix.Ui.Gpui/` | Rust + GPUI frontend (crate `calix-gpui`) |
-| `Calix.Cli.Zig/` | Zig CLI (`calix`) and daemon (`calix-daemon`) |
+| `Calix.Cli.Zig/` | Zig CLI (`calix`), daemon (`calix-daemon`) and notification bridge (`calix-notify`) |
 | `Calix.PackageManager/` | Zig backend library: ALPM, AUR, Flatpak, AppImage, Cargo, NPM, release registry |
 | `Calix.Flatpak.Backend/` | Optional `libflatpak` shared library, loaded at runtime |
 | `Calix.Http/`, `Calix.Diagnostics/` | Supporting Zig components |
-| `scripts/` | Frozen Python engine and operational scripts (transitional) |
-| `docs/` | Current docs plus dated slice records and render-lab evidence; historical names may appear in the dated records |
-| `packaging/` | AUR symlink, daemon user service and legacy sync units |
+| `scripts/` | The local gate, the CI replay, and the frozen Python engine (transitional) |
+| `docs/` | Current docs plus dated slice records and render-lab evidence |
+| `docs/media/` | Screenshots used by this README |
+| `packaging/` | AUR symlink, the two user services and the legacy sync units |
+| `evidence/` | Machine-readable run records and raw logs |
 | `PKGBUILD-calix` | The current Arch package definition |
 | `vendor/` | Local toolchain cache, git-ignored |
 
@@ -465,7 +549,23 @@ recorded only in [`docs/legacy-references.md`](docs/legacy-references.md).
 
 ---
 
-## Credits & acknowledgements
+## Documentation
+
+| Document | What it covers |
+|---|---|
+| [`docs/release-notes.md`](docs/release-notes.md) | Release notes and the Shelly migration guide |
+| [`docs/calix-architecture.md`](docs/calix-architecture.md) | How the components fit together |
+| [`docs/ci.md`](docs/ci.md) | The CI workflow, caches, timeouts and how to diagnose a red run |
+| [`docs/isolated-builds.md`](docs/isolated-builds.md) | Isolated AUR builds through `systemd-nspawn` |
+| [`docs/flatpak-backend-abi.md`](docs/flatpak-backend-abi.md) | The optional Flatpak backend ABI |
+| [`docs/legacy-references.md`](docs/legacy-references.md) | The historical name boundary and the rename map |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Architecture overview and how to propose a change |
+| [`SECURITY.md`](SECURITY.md) | Reporting a vulnerability |
+| [`MANUAL_TESTING.md`](MANUAL_TESTING.md) | The manual checklist for behaviour that cannot be automated |
+
+---
+
+## Credits and lineage
 
 ### Historical lineage
 
@@ -479,6 +579,19 @@ of a substantial part of this codebase.
 They are credited here as the authors of the origin project. They are not maintainers of
 Calix, and their presence in this repository's history should not be read as an
 endorsement of or active involvement in Calix.
+
+The full upstream commit history and an `upstream` git remote are retained for
+reference and attribution. The codebase was developed here under the name
+`shelly-gpui` and renamed to **Calix** in October 2026. Since the fork it has been
+deeply refactored and redirected:
+
+- the Rust / GPUI frontend became the primary interface;
+- a separate `calix-daemon` became the boundary for installed-package state;
+- the installed-package model was unified across six ecosystems;
+- packaging, naming, protocol and roadmap diverged from upstream.
+
+Calix is not a clone of Shelly, and it is not a live continuation of the Shelly project.
+Upstream Shelly continues independently.
 
 ### Technical acknowledgements
 
@@ -497,8 +610,8 @@ endorsement of or active involvement in Calix.
 
 Calix is maintained by **tension-atoi**
 ([@tension-atoi](https://github.com/tension-atoi)). The `authors` field in
-`Calix.Ui.Gpui/Cargo.toml` still lists Seafoam Labs alongside the current maintainer
-for historical attribution; it does not describe current maintenance.
+`Calix.Ui.Gpui/Cargo.toml` still lists Seafoam Labs alongside the current maintainer for
+historical attribution; it does not describe current maintenance.
 
 Parts of the recent Calix work were produced with AI coding agents under maintainer
 direction and review. The maintainer is responsible for what is merged.
