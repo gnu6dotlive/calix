@@ -1,11 +1,13 @@
+use crate::state::package_store::{SourceHealthMap, SourceHealthStatus};
 use crate::state::query::{PackageStateFilter, SourceScope};
-use crate::state::{NavScope, Place};
+use crate::state::{NavScope, PackageSourceKind, Place};
 use crate::theme::Theme;
 use gpui::*;
 use std::rc::Rc;
 
 pub type ScopeSelectHandler = Rc<dyn Fn(NavScope, &mut Window, &mut App) + 'static>;
 pub type WindowActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
+pub type SourceRetryHandler = Rc<dyn Fn(PackageSourceKind, &mut Window, &mut App) + 'static>;
 
 pub struct ContextHeaderProps<'a> {
     /// Le lieu : la surface des paquets, Actualités ou Réglages.
@@ -24,6 +26,9 @@ pub struct ContextHeaderProps<'a> {
     pub appimage_enabled: bool,
     /// Quand la réponse du périmètre a été vraie, quand elle est connue.
     pub age: Option<String>,
+    /// La santé des sources : une source qui n'a pas répondu se dit.
+    pub source_health: &'a SourceHealthMap,
+    pub on_retry_source: SourceRetryHandler,
     pub on_select_scope: ScopeSelectHandler,
     pub on_clear_filters: WindowActionHandler,
     pub theme: &'a Theme,
@@ -191,6 +196,30 @@ impl ContextHeader {
             String::new()
         };
 
+        // Une source qui n'a pas répondu se dit, et se réessaie : la barre
+        // d'état a laissé la place, la santé reste.
+        let failed_source = [
+            PackageSourceKind::Alpm,
+            PackageSourceKind::Aur,
+            PackageSourceKind::Flatpak,
+            PackageSourceKind::AppImage,
+        ]
+        .into_iter()
+        .find(|kind| {
+            let enabled = match kind {
+                PackageSourceKind::Alpm => true,
+                PackageSourceKind::Aur => props.aur_enabled,
+                PackageSourceKind::Flatpak => props.flatpak_enabled,
+                PackageSourceKind::AppImage => props.appimage_enabled,
+                _ => false,
+            };
+            enabled
+                && props
+                    .source_health
+                    .get(kind)
+                    .is_some_and(|health| health.status == SourceHealthStatus::Failed)
+        });
+
         let filter_summary = format_filter_summary(
             &props.source_scope,
             props.state_filter,
@@ -254,6 +283,25 @@ impl ContextHeader {
         }
         if let Some(clear) = clear_action {
             second_line = second_line.child(clear);
+        }
+        if let Some(failed) = failed_source {
+            let on_retry = props.on_retry_source.clone();
+            let kind = failed;
+            second_line = second_line.child(
+                div()
+                    .id("context_header_retry_source")
+                    .px(px(6.0))
+                    .py(px(2.0))
+                    .rounded_sm()
+                    .cursor_pointer()
+                    .text_xs()
+                    .text_color(theme.danger)
+                    .hover(|s| s.bg(theme.bg_surface_hover))
+                    .child(format!("{} unavailable — retry", kind))
+                    .on_mouse_down(MouseButton::Left, move |_e, window, cx| {
+                        on_retry(kind, window, cx);
+                    }),
+            );
         }
 
         div()

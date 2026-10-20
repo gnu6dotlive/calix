@@ -4,9 +4,9 @@ use crate::components::menu::{
 };
 use crate::components::search_input::SearchInputView;
 use crate::components::view_mode_switcher::{ViewModeSwitcher, ViewModeSwitcherProps};
-use crate::icons::AppIcon;
 use crate::state::package_store::{SourceHealthMap, SourceHealthStatus};
 use crate::state::query::{PackageStateFilter, SortMode, SourceScope, WorkbenchBreakpoint};
+use crate::state::session::NavScope;
 use crate::state::{PackageSourceKind, PackageViewMode};
 use crate::theme::Theme;
 use crate::visual_style::paint::apply_surface_projection;
@@ -41,13 +41,14 @@ pub type ActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 pub struct QueryWorkbenchProps<'a> {
     pub search_input: Entity<SearchInputView>,
     pub list_pane_width: f32,
+    /// Le périmètre : il décide de ce que le contrôle des sources et de l'état
+    /// proposent.
+    pub scope: NavScope,
     pub source_scope: SourceScope,
     pub state_filter: PackageStateFilter,
     pub sort_mode: SortMode,
     pub view_mode: PackageViewMode,
     pub active_menu_state: Option<ActiveMenuState>,
-    pub is_searching: bool,
-    pub total_count: usize,
     pub reduce_motion: bool,
     pub aur_enabled: bool,
     pub flatpak_enabled: bool,
@@ -66,7 +67,15 @@ pub struct QueryWorkbenchProps<'a> {
     pub on_toggle_menu: MenuToggleHandler,
     pub on_navigate_menu: MenuKeyHandler,
     pub on_retry_source: SourceRetryHandler,
-    pub on_clear_filters: ActionHandler,
+    /// L'action propre au périmètre, quand il en a une.
+    pub scope_action: Option<ScopeAction>,
+}
+
+/// L'action d'un périmètre : dans Mises à jour, la mise à niveau de tout.
+#[derive(Clone)]
+pub struct ScopeAction {
+    pub label: &'static str,
+    pub handler: ActionHandler,
 }
 
 /// Computes the active filter badge count (non-default sources or state).
@@ -87,183 +96,8 @@ pub fn compute_filter_badge_count(
     count
 }
 
-/// Formats integers with standard grouping separators (e.g. 1,808 or 16).
-pub fn format_count(n: usize) -> String {
-    let s = n.to_string();
-    let mut result = String::new();
-    let len = s.len();
-    for (i, ch) in s.chars().enumerate() {
-        if i > 0 && (len - i).is_multiple_of(3) {
-            result.push(',');
-        }
-        result.push(ch);
-    }
-    result
-}
 
 /// Arguments pour le calcul de la ligne de statut permanente.
-pub struct FormatStatusRailArgs<'a> {
-    pub total_count: usize,
-    pub is_searching: bool,
-    pub source_scope: &'a SourceScope,
-    pub state_filter: PackageStateFilter,
-    pub source_health: &'a SourceHealthMap,
-    pub aur_enabled: bool,
-    pub flatpak_enabled: bool,
-    pub appimage_enabled: bool,
-}
-
-/// Etat de contenu de la ligne de statut permanente (Row 3).
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct StatusRailState {
-    pub left_text: String,
-    pub has_clear_filters: bool,
-    pub retry_source: Option<PackageSourceKind>,
-}
-
-/// Formats the single permanent status rail content (guaranteeing zero layout shift).
-pub fn format_status_rail(args: FormatStatusRailArgs<'_>) -> StatusRailState {
-    let total_count = args.total_count;
-    let is_searching = args.is_searching;
-    let source_scope = args.source_scope;
-    let state_filter = args.state_filter;
-    let source_health = args.source_health;
-    let aur_enabled = args.aur_enabled;
-    let flatpak_enabled = args.flatpak_enabled;
-    let appimage_enabled = args.appimage_enabled;
-
-    // 1. Check for partial failures first
-    let failed_source = [
-        PackageSourceKind::Alpm,
-        PackageSourceKind::Aur,
-        PackageSourceKind::Flatpak,
-        PackageSourceKind::AppImage,
-    ]
-    .into_iter()
-    .find(|kind| {
-        let is_enabled = match kind {
-            PackageSourceKind::Alpm => true,
-            PackageSourceKind::Aur => aur_enabled,
-            PackageSourceKind::Flatpak => flatpak_enabled,
-            PackageSourceKind::AppImage => appimage_enabled,
-            // Les écosystèmes Calix ne sont pas des sources de recherche :
-            // ils n'ont pas de rail de santé dans la station de recherche.
-            PackageSourceKind::Cargo | PackageSourceKind::Npm | PackageSourceKind::Release => {
-                false
-            }
-        };
-        is_enabled
-            && source_health
-                .get(kind)
-                .is_some_and(|h| h.status == SourceHealthStatus::Failed)
-    });
-
-    let is_all_sources =
-        source_scope.is_all_enabled(aur_enabled, flatpak_enabled, appimage_enabled);
-    let is_all_states = state_filter == PackageStateFilter::All;
-    let has_clear_filters = !is_all_sources || !is_all_states;
-
-    if let Some(failed) = failed_source {
-        let count_str = format_count(total_count);
-        let plural = if total_count == 1 {
-            "package"
-        } else {
-            "packages"
-        };
-        let failed_label = match failed {
-            PackageSourceKind::Alpm => "Arch ALPM",
-            PackageSourceKind::Aur => "AUR",
-            PackageSourceKind::Flatpak => "Flatpak",
-            PackageSourceKind::AppImage => "AppImage",
-            PackageSourceKind::Cargo => "Cargo",
-            PackageSourceKind::Npm => "NPM",
-            PackageSourceKind::Release => "Release",
-        };
-        return StatusRailState {
-            left_text: format!("{count_str} {plural}  •  {failed_label} unavailable"),
-            has_clear_filters,
-            retry_source: Some(failed),
-        };
-    }
-
-    if is_searching {
-        let search_sources = if is_all_sources {
-            "all sources".to_string()
-        } else {
-            let mut names = Vec::new();
-            if source_scope.alpm {
-                names.push("Official");
-            }
-            if source_scope.aur && aur_enabled {
-                names.push("AUR");
-            }
-            if source_scope.flatpak && flatpak_enabled {
-                names.push("Flatpak");
-            }
-            if source_scope.appimage && appimage_enabled {
-                names.push("AppImage");
-            }
-            names.join(" + ")
-        };
-        return StatusRailState {
-            left_text: format!("Searching {search_sources}…"),
-            has_clear_filters,
-            retry_source: None,
-        };
-    }
-
-    if has_clear_filters {
-        let count_str = format_count(total_count);
-        let plural = if total_count == 1 {
-            "package"
-        } else {
-            "packages"
-        };
-        let mut parts = vec![format!("{count_str} {plural}")];
-
-        if !is_all_sources {
-            let mut names = Vec::new();
-            if source_scope.alpm {
-                names.push("Official");
-            }
-            if source_scope.aur && aur_enabled {
-                names.push("AUR");
-            }
-            if source_scope.flatpak && flatpak_enabled {
-                names.push("Flatpak");
-            }
-            if source_scope.appimage && appimage_enabled {
-                names.push("AppImage");
-            }
-            if !names.is_empty() {
-                parts.push(names.join(" + "));
-            }
-        }
-
-        if !is_all_states {
-            parts.push(state_filter.label().to_string());
-        }
-
-        return StatusRailState {
-            left_text: parts.join("  •  "),
-            has_clear_filters: true,
-            retry_source: None,
-        };
-    }
-
-    // Default clean state
-    let count_str = format_count(total_count);
-    let plural = if total_count == 1 {
-        "package"
-    } else {
-        "packages"
-    };
-    StatusRailState {
-        left_text: format!("{count_str} {plural}"),
-        has_clear_filters: false,
-        retry_source: None,
-    }
-}
 
 pub struct QueryWorkbench;
 
@@ -339,29 +173,55 @@ impl QueryWorkbench {
 
         let mut item_index = 0;
 
-        // ALPM source check item
-        {
-            let (health_lbl, is_failed) = build_health_badge(PackageSourceKind::Alpm);
+        // Les sources du périmètre : celles qu'il contient, et pas d'autres.
+        for entry in SourceScope::ecosystems_for(props.scope) {
+            let is_enabled = match entry.kind {
+                PackageSourceKind::Alpm => true,
+                PackageSourceKind::Aur => props.aur_enabled,
+                PackageSourceKind::Flatpak => props.flatpak_enabled,
+                PackageSourceKind::AppImage => props.appimage_enabled,
+                // Les écosystèmes d'inventaire n'ont pas de dépôt à interroger :
+                // ils ne se conjuguent pas.
+                PackageSourceKind::Cargo | PackageSourceKind::Npm | PackageSourceKind::Release => {
+                    true
+                }
+            };
+            if !is_enabled {
+                continue;
+            }
+            let (health_lbl, is_failed) = if entry.inventory_only {
+                (None, false)
+            } else {
+                build_health_badge(entry.kind)
+            };
             let on_retry = if is_failed {
                 let cb = props.on_retry_source.clone();
+                let kind = entry.kind;
                 Some(Rc::new(move |w: &mut Window, a: &mut App| {
-                    cb(PackageSourceKind::Alpm, w, a);
+                    cb(kind, w, a);
                 }) as MenuActionHandler)
             } else {
                 None
             };
             let on_toggle = props.on_toggle_source.clone();
+            let kind = entry.kind;
+            let id: &'static str = Box::leak(
+                format!("menu_source_{}", kind.as_str()).into_boxed_str(),
+            );
+            let retry_id: &'static str = Box::leak(
+                format!("menu_retry_{}", kind.as_str()).into_boxed_str(),
+            );
             filter_menu_items.push(
                 MenuCheckItem::render(MenuCheckItemProps {
-                    id: "menu_source_alpm".into(),
-                    retry_id: "menu_retry_alpm".into(),
-                    label: "Official / ALPM".into(),
-                    is_checked: props.source_scope.alpm,
+                    id: id.into(),
+                    retry_id: retry_id.into(),
+                    label: entry.label.into(),
+                    is_checked: props.source_scope.is_selected(kind),
                     is_highlighted: is_filters_open && filters_highlighted == item_index,
                     health_label: health_lbl,
                     is_failed,
                     theme,
-                    on_toggle: Rc::new(move |w, a| on_toggle(PackageSourceKind::Alpm, w, a)),
+                    on_toggle: Rc::new(move |w, a| on_toggle(kind, w, a)),
                     on_retry,
                 })
                 .into_any_element(),
@@ -369,106 +229,15 @@ impl QueryWorkbench {
             item_index += 1;
         }
 
-        // AUR source check item
-        if props.aur_enabled {
-            let (health_lbl, is_failed) = build_health_badge(PackageSourceKind::Aur);
-            let on_retry = if is_failed {
-                let cb = props.on_retry_source.clone();
-                Some(Rc::new(move |w: &mut Window, a: &mut App| {
-                    cb(PackageSourceKind::Aur, w, a);
-                }) as MenuActionHandler)
-            } else {
-                None
-            };
-            let on_toggle = props.on_toggle_source.clone();
-            filter_menu_items.push(
-                MenuCheckItem::render(MenuCheckItemProps {
-                    id: "menu_source_aur".into(),
-                    retry_id: "menu_retry_aur".into(),
-                    label: "AUR".into(),
-                    is_checked: props.source_scope.aur,
-                    is_highlighted: is_filters_open && filters_highlighted == item_index,
-                    health_label: health_lbl,
-                    is_failed,
-                    theme,
-                    on_toggle: Rc::new(move |w, a| on_toggle(PackageSourceKind::Aur, w, a)),
-                    on_retry,
-                })
-                .into_any_element(),
-            );
-            item_index += 1;
-        }
 
-        // Flatpak source check item
-        if props.flatpak_enabled {
-            let (health_lbl, is_failed) = build_health_badge(PackageSourceKind::Flatpak);
-            let on_retry = if is_failed {
-                let cb = props.on_retry_source.clone();
-                Some(Rc::new(move |w: &mut Window, a: &mut App| {
-                    cb(PackageSourceKind::Flatpak, w, a);
-                }) as MenuActionHandler)
-            } else {
-                None
-            };
-            let on_toggle = props.on_toggle_source.clone();
-            filter_menu_items.push(
-                MenuCheckItem::render(MenuCheckItemProps {
-                    id: "menu_source_flatpak".into(),
-                    retry_id: "menu_retry_flatpak".into(),
-                    label: "Flatpak".into(),
-                    is_checked: props.source_scope.flatpak,
-                    is_highlighted: is_filters_open && filters_highlighted == item_index,
-                    health_label: health_lbl,
-                    is_failed,
-                    theme,
-                    on_toggle: Rc::new(move |w, a| on_toggle(PackageSourceKind::Flatpak, w, a)),
-                    on_retry,
-                })
-                .into_any_element(),
-            );
-            item_index += 1;
-        }
 
-        // AppImage source check item
-        if props.appimage_enabled {
-            let (health_lbl, is_failed) = build_health_badge(PackageSourceKind::AppImage);
-            let on_retry = if is_failed {
-                let cb = props.on_retry_source.clone();
-                Some(Rc::new(move |w: &mut Window, a: &mut App| {
-                    cb(PackageSourceKind::AppImage, w, a);
-                }) as MenuActionHandler)
-            } else {
-                None
-            };
-            let on_toggle = props.on_toggle_source.clone();
-            filter_menu_items.push(
-                MenuCheckItem::render(MenuCheckItemProps {
-                    id: "menu_source_appimage".into(),
-                    retry_id: "menu_retry_appimage".into(),
-                    label: "AppImage".into(),
-                    is_checked: props.source_scope.appimage,
-                    is_highlighted: is_filters_open && filters_highlighted == item_index,
-                    health_label: health_lbl,
-                    is_failed,
-                    theme,
-                    on_toggle: Rc::new(move |w, a| on_toggle(PackageSourceKind::AppImage, w, a)),
-                    on_retry,
-                })
-                .into_any_element(),
-            );
-            item_index += 1;
-        }
 
         // In Narrow mode ONLY: dynamically include Package State in Filters menu
         if breakpoint == WorkbenchBreakpoint::Narrow {
             filter_menu_items.push(MenuDivider::render(theme).into_any_element());
             filter_menu_items.push(MenuSection::render("Package State", theme).into_any_element());
-            for state in [
-                PackageStateFilter::All,
-                PackageStateFilter::Installed,
-                PackageStateFilter::NotInstalled,
-                PackageStateFilter::UpdatesAvailable,
-            ] {
+            for state in PackageStateFilter::options_for(props.scope) {
+                let state = *state;
                 let on_select = props.on_select_state.clone();
                 let close_cb = on_close_filters.clone();
                 let state_val = state;
@@ -609,14 +378,10 @@ impl QueryWorkbench {
             let mut state_items = Vec::new();
             state_items.push(MenuSection::render("Filter by State", theme).into_any_element());
 
-            for (idx, state) in [
-                PackageStateFilter::All,
-                PackageStateFilter::Installed,
-                PackageStateFilter::NotInstalled,
-                PackageStateFilter::UpdatesAvailable,
-            ]
-            .into_iter()
-            .enumerate()
+            for (idx, state) in PackageStateFilter::options_for(props.scope)
+                .iter()
+                .copied()
+                .enumerate()
             {
                 let on_select = props.on_select_state.clone();
                 let close_cb = on_close_state.clone();
@@ -911,6 +676,25 @@ impl QueryWorkbench {
         });
 
         // ── 6. Row 2 Composition: Pure Native Controls (Zero Count Crowding) ─
+        // L'action du périmètre : dans Mises à jour, la mise à niveau de tout.
+        let scope_action = props.scope_action.as_ref().map(|action| {
+            let handler = action.handler.clone();
+            div()
+                .id("workbench_scope_action")
+                .px(px(8.0))
+                .py(px(2.0))
+                .rounded_sm()
+                .cursor_pointer()
+                .text_xs()
+                .font_weight(FontWeight::BOLD)
+                .text_color(theme.accent)
+                .hover(|s| s.bg(theme.bg_surface_hover).text_color(theme.accent_hover))
+                .child(action.label)
+                .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
+                    handler(window, cx);
+                })
+        });
+
         let row2 = div()
             .id("workbench_row2_toolbar")
             .flex()
@@ -932,128 +716,10 @@ impl QueryWorkbench {
                     .gap(px(4.0))
                     .children(state_btn)
                     .child(sort_btn)
-                    .child(view_switcher),
+                    .child(view_switcher)
+                    .children(scope_action),
             );
 
-        // ── 7. Row 3: Permanent Status Rail (Fixed Height 24px) ───────────────
-        let rail_state = format_status_rail(FormatStatusRailArgs {
-            total_count: props.total_count,
-            is_searching: props.is_searching,
-            source_scope: &props.source_scope,
-            state_filter: props.state_filter,
-            source_health: props.source_health,
-            aur_enabled: props.aur_enabled,
-            flatpak_enabled: props.flatpak_enabled,
-            appimage_enabled: props.appimage_enabled,
-        });
-
-        let on_clear = props.on_clear_filters.clone();
-        let on_clear_key = on_clear.clone();
-        let on_retry = props.on_retry_source.clone();
-
-        let clear_action = if rail_state.has_clear_filters {
-            Some(
-                div()
-                    .id("workbench_clear_filters_btn")
-                    .focusable()
-                    .tab_stop(true)
-                    .focus(move |s| s.border_1().border_color(focus_border))
-                    .on_key_down(move |event, window, cx| {
-                        let key = event.keystroke.key.as_str();
-                        if key == "enter" || key == "space" {
-                            on_clear_key(window, cx);
-                        }
-                    })
-                    .flex()
-                    .items_center()
-                    .gap(px(4.0))
-                    .px(px(6.0))
-                    .py(px(2.0))
-                    .rounded_sm()
-                    .cursor_pointer()
-                    .text_xs()
-                    .text_color(theme.accent)
-                    .hover(|s| s.bg(theme.bg_surface_hover).text_color(theme.accent_hover))
-                    .child(
-                        svg()
-                            .path(AppIcon::Close.path())
-                            .size(px(10.0))
-                            .text_color(theme.accent),
-                    )
-                    .child("Clear filters")
-                    .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
-                        on_clear(window, cx);
-                    }),
-            )
-        } else {
-            None
-        };
-
-        let retry_action = if let Some(failed_kind) = rail_state.retry_source {
-            let cb = on_retry.clone();
-            Some(
-                div()
-                    .id(ElementId::Name(format!("rail_retry_{failed_kind}").into()))
-                    .focusable()
-                    .tab_stop(true)
-                    .focus(move |s| s.border_1().border_color(focus_border))
-                    .on_key_down({
-                        let cb_key = cb.clone();
-                        move |event, window, cx| {
-                            let key = event.keystroke.key.as_str();
-                            if key == "enter" || key == "space" {
-                                cb_key(failed_kind, window, cx);
-                            }
-                        }
-                    })
-                    .flex()
-                    .items_center()
-                    .gap(px(4.0))
-                    .px(px(6.0))
-                    .py(px(2.0))
-                    .rounded_sm()
-                    .cursor_pointer()
-                    .text_xs()
-                    .font_weight(FontWeight::BOLD)
-                    .text_color(theme.danger)
-                    .hover(|s| s.bg(theme.bg_surface_hover))
-                    .child("Retry")
-                    .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
-                        cb(failed_kind, window, cx);
-                    }),
-            )
-        } else {
-            None
-        };
-
-        let status_rail = div()
-            .id("workbench_row3_status_rail")
-            .h(px(24.0))
-            .flex()
-            .items_center()
-            .justify_between()
-            .gap(px(8.0))
-            .w_full()
-            .px(px(4.0))
-            .child(
-                div()
-                    .id("workbench_status_text")
-                    .text_xs()
-                    .text_color(if props.is_searching {
-                        theme.accent
-                    } else {
-                        theme.text_secondary
-                    })
-                    .child(rail_state.left_text),
-            )
-            .child(
-                div()
-                    .flex()
-                    .items_center()
-                    .gap(px(6.0))
-                    .children(clear_action)
-                    .children(retry_action),
-            );
 
         // ── 8. Final Container Assembly (Fixed Invariant Geometry) ────────────
         let base_container = div()
@@ -1075,136 +741,7 @@ impl QueryWorkbench {
         )
         .child(row1)
         .child(row2)
-        .child(status_rail)
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use core::prelude::v1::test;
 
-    #[test]
-    fn test_format_count() {
-        assert_eq!(format_count(0), "0");
-        assert_eq!(format_count(16), "16");
-        assert_eq!(format_count(999), "999");
-        assert_eq!(format_count(1000), "1,000");
-        assert_eq!(format_count(1808), "1,808");
-        assert_eq!(format_count(1234567), "1,234,567");
-    }
-
-    #[test]
-    fn test_format_status_rail_default() {
-        let scope = SourceScope::all();
-        let health = SourceHealthMap::default();
-        let rail = format_status_rail(FormatStatusRailArgs {
-            total_count: 1808,
-            is_searching: false,
-            source_scope: &scope,
-            state_filter: PackageStateFilter::All,
-            source_health: &health,
-            aur_enabled: true,
-            flatpak_enabled: true,
-            appimage_enabled: true,
-        });
-        assert_eq!(rail.left_text, "1,808 packages");
-        assert!(!rail.has_clear_filters);
-        assert!(rail.retry_source.is_none());
-    }
-
-    #[test]
-    fn test_format_status_rail_filtered() {
-        let mut scope = SourceScope::all();
-        scope.flatpak = false;
-        scope.appimage = false;
-        let health = SourceHealthMap::default();
-        let rail = format_status_rail(FormatStatusRailArgs {
-            total_count: 16,
-            is_searching: false,
-            source_scope: &scope,
-            state_filter: PackageStateFilter::Installed,
-            source_health: &health,
-            aur_enabled: true,
-            flatpak_enabled: true,
-            appimage_enabled: true,
-        });
-        assert_eq!(
-            rail.left_text,
-            "16 packages  •  Official + AUR  •  Installed"
-        );
-        assert!(rail.has_clear_filters);
-        assert!(rail.retry_source.is_none());
-    }
-
-    #[test]
-    fn test_format_status_rail_searching() {
-        let mut scope = SourceScope::all();
-        scope.appimage = false;
-        let health = SourceHealthMap::default();
-        let rail = format_status_rail(FormatStatusRailArgs {
-            total_count: 0,
-            is_searching: true,
-            source_scope: &scope,
-            state_filter: PackageStateFilter::All,
-            source_health: &health,
-            aur_enabled: true,
-            flatpak_enabled: true,
-            appimage_enabled: true,
-        });
-        assert_eq!(rail.left_text, "Searching Official + AUR + Flatpak…");
-        assert!(rail.has_clear_filters);
-        assert!(rail.retry_source.is_none());
-    }
-
-    #[test]
-    fn test_compute_filter_badge_count() {
-        let all_scope = SourceScope::all();
-        assert_eq!(
-            compute_filter_badge_count(&all_scope, PackageStateFilter::All, true, true, true),
-            0
-        );
-
-        let mut subset_scope = SourceScope::all();
-        subset_scope.aur = false;
-        subset_scope.flatpak = false;
-        subset_scope.appimage = false;
-        assert_eq!(
-            compute_filter_badge_count(&subset_scope, PackageStateFilter::All, true, true, true),
-            1
-        );
-        assert_eq!(
-            compute_filter_badge_count(&all_scope, PackageStateFilter::Installed, true, true, true),
-            1
-        );
-        assert_eq!(
-            compute_filter_badge_count(
-                &subset_scope,
-                PackageStateFilter::Installed,
-                true,
-                true,
-                true
-            ),
-            2
-        );
-    }
-
-    #[test]
-    fn test_format_status_rail_failure() {
-        let scope = SourceScope::all();
-        let mut health = SourceHealthMap::default();
-        health.aur = crate::state::package_store::SourceHealth::failed("network timeout");
-        let rail = format_status_rail(FormatStatusRailArgs {
-            total_count: 500,
-            is_searching: false,
-            source_scope: &scope,
-            state_filter: PackageStateFilter::All,
-            source_health: &health,
-            aur_enabled: true,
-            flatpak_enabled: true,
-            appimage_enabled: true,
-        });
-        assert_eq!(rail.left_text, "500 packages  •  AUR unavailable");
-        assert_eq!(rail.retry_source, Some(PackageSourceKind::Aur));
-    }
-}

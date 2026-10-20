@@ -75,17 +75,21 @@ zig-rebuild:
 	cd $(ZIG_SRC) && $(ZIG) build -Doptimize=ReleaseSafe
 
 ## Construit le paquet dans /tmp sans installer (jamais sudo)
+# Le travail de la construction vit dans le dépôt, dans le répertoire que le
+# dépôt ignore : /tmp est en mémoire et partagé.
+PKG_WORKDIR := $(REPO_ROOT).ci-cache/pkg
+
 package:
-	@echo ">>> Test PKGBUILD dans /tmp/calix-gpui-pkg..."
-	rm -rf /tmp/calix-gpui-pkg
-	mkdir -p /tmp/calix-gpui-pkg
-	cp $(PKGBUILD) /tmp/calix-gpui-pkg/PKGBUILD
-	cd /tmp/calix-gpui-pkg && makepkg --noconfirm
+	@echo ">>> Test PKGBUILD dans $(PKG_WORKDIR)..."
+	rm -rf $(PKG_WORKDIR)
+	mkdir -p $(PKG_WORKDIR)
+	cp $(PKGBUILD) $(PKG_WORKDIR)/PKGBUILD
+	cd $(PKG_WORKDIR) && makepkg --noconfirm
 
 ## Installe le paquet construit via polkit
 package-install: package
 	@echo ">>> Installation via pkexec..."
-	pkexec pacman -U --noconfirm /tmp/calix-gpui-pkg/*.pkg.tar.zst
+	pkexec pacman -U --noconfirm $(PKG_WORKDIR)/*.pkg.tar.zst
 
 ## Installe directement sans PKGBUILD (pour dev rapide)
 install: build

@@ -1,14 +1,26 @@
 use crate::backend::models::UnifiedPackage;
-use crate::state::session::PackageSourceKind;
+use crate::state::session::{NavScope, PackageSourceKind};
 use serde::{Deserialize, Serialize};
 
 /// Portée de filtrage des sources (sélection multiple ou unitaire de dépôts)
+///
+/// Les sept écosystèmes que Calix connaît ont leur drapeau. Les quatre
+/// premiers s'interrogent dans les dépôts ; les trois autres ne se listent
+/// qu'installés : ils sont dans l'inventaire, ils ne sont pas des sources de
+/// recherche. Un filtre qui ne représente pas les lignes qu'il filtre est un
+/// mensonge — d'où les trois drapeaux.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct SourceScope {
     pub alpm: bool,
     pub aur: bool,
     pub flatpak: bool,
     pub appimage: bool,
+    /// Les crates Cargo de l'inventaire : listés, jamais interrogés.
+    pub cargo: bool,
+    /// Les paquets NPM globaux de l'inventaire : listés, jamais interrogés.
+    pub npm: bool,
+    /// Les releases suivis de l'inventaire : listés, jamais interrogés.
+    pub release: bool,
 }
 
 impl Default for SourceScope {
@@ -24,6 +36,9 @@ impl SourceScope {
             aur: true,
             flatpak: true,
             appimage: true,
+            cargo: true,
+            npm: true,
+            release: true,
         }
     }
 
@@ -34,7 +49,13 @@ impl SourceScope {
     }
 
     pub fn is_all(&self) -> bool {
-        self.alpm && self.aur && self.flatpak && self.appimage
+        self.alpm
+            && self.aur
+            && self.flatpak
+            && self.appimage
+            && self.cargo
+            && self.npm
+            && self.release
     }
 
     pub fn is_all_enabled(
@@ -49,44 +70,72 @@ impl SourceScope {
             && (!appimage_enabled || self.appimage)
     }
 
-    pub fn toggle_source(&mut self, source: PackageSourceKind) {
+    /// L'écosystème est-il sélectionné ?
+    pub fn is_selected(&self, source: PackageSourceKind) -> bool {
+        self.flag(source)
+    }
+
+    /// Sélectionne ou retire un écosystème.
+    pub fn select(&mut self, source: PackageSourceKind, selected: bool) {
+        self.set_flag(source, selected);
+    }
+
+    /// Le drapeau d'un écosystème.
+    fn flag(&self, source: PackageSourceKind) -> bool {
         match source {
-            PackageSourceKind::Alpm => {
-                if !self.alpm || (self.aur || self.flatpak || self.appimage) {
-                    self.alpm = !self.alpm;
-                }
-            }
-            PackageSourceKind::Aur => {
-                if !self.aur || (self.alpm || self.flatpak || self.appimage) {
-                    self.aur = !self.aur;
-                }
-            }
-            PackageSourceKind::Flatpak => {
-                if !self.flatpak || (self.alpm || self.aur || self.appimage) {
-                    self.flatpak = !self.flatpak;
-                }
-            }
-            PackageSourceKind::AppImage => {
-                if !self.appimage || (self.alpm || self.aur || self.flatpak) {
-                    self.appimage = !self.appimage;
-                }
-            }
-            // Les écosystèmes Calix ne sont pas des sources de recherche
-            // interrogeables : ils ne sont pas activables dans la requête.
-            PackageSourceKind::Cargo | PackageSourceKind::Npm | PackageSourceKind::Release => {}
-        }
-        // Invariant strict : interdiction absolue d'avoir zéro source sélectionnée
-        if !self.alpm && !self.aur && !self.flatpak && !self.appimage {
-            self.alpm = true;
+            PackageSourceKind::Alpm => self.alpm,
+            PackageSourceKind::Aur => self.aur,
+            PackageSourceKind::Flatpak => self.flatpak,
+            PackageSourceKind::AppImage => self.appimage,
+            PackageSourceKind::Cargo => self.cargo,
+            PackageSourceKind::Npm => self.npm,
+            PackageSourceKind::Release => self.release,
         }
     }
 
+    /// Bascule un écosystème.
+    ///
+    /// Le dernier écosystème sélectionné ne s'éteint pas : un filtre qui
+    /// ne montre plus rien n'est pas un filtre.
+    pub fn toggle_source(&mut self, source: PackageSourceKind) {
+        let other_selected = PackageSourceKind::ALL
+            .iter()
+            .any(|kind| *kind != source && self.flag(*kind));
+        let selected = self.flag(source);
+        if !selected || other_selected {
+            self.set_flag(source, !selected);
+        }
+        // Invariant strict : jamais zéro source sélectionnée
+        if !PackageSourceKind::ALL.iter().any(|kind| self.flag(*kind)) {
+            self.set_flag(PackageSourceKind::Alpm, true);
+        }
+    }
+
+    fn set_flag(&mut self, source: PackageSourceKind, value: bool) {
+        match source {
+            PackageSourceKind::Alpm => self.alpm = value,
+            PackageSourceKind::Aur => self.aur = value,
+            PackageSourceKind::Flatpak => self.flatpak = value,
+            PackageSourceKind::AppImage => self.appimage = value,
+            PackageSourceKind::Cargo => self.cargo = value,
+            PackageSourceKind::Npm => self.npm = value,
+            PackageSourceKind::Release => self.release = value,
+        }
+    }
+
+    /// Une ligne est-elle d'une source sélectionnée ?
+    ///
+    /// Chaque écosystème a son drapeau : une ligne Cargo disparaît quand Cargo
+    /// est décoché, et non quand ALPM l'est.
     pub fn contains_str(&self, source_type: &str) -> bool {
         match source_type {
             "Standard" | "Official" | "ALPM" => self.alpm,
             "AUR" => self.aur,
             "Flatpak" => self.flatpak,
             "AppImage" => self.appimage,
+            "Cargo" => self.cargo,
+            "NPM" => self.npm,
+            "Release" => self.release,
             _ => self.alpm,
         }
     }
@@ -106,11 +155,15 @@ impl SourceScope {
         if !appimage_enabled {
             self.appimage = false;
         }
-        if !self.alpm && !self.aur && !self.flatpak && !self.appimage {
+        if !PackageSourceKind::ALL.iter().any(|kind| self.flag(*kind)) {
             self.alpm = true;
         }
     }
 
+    /// Les sources de recherche sélectionnées.
+    ///
+    /// Les quatre dépôts que Calix interroge : les trois écosystèmes d'inventaire
+    /// n'ont pas de dépôt à interroger.
     pub fn enabled_sources(
         &self,
         aur_enabled: bool,
@@ -132,6 +185,90 @@ impl SourceScope {
         }
         list
     }
+
+    /// Les écosystèmes que le périmètre contient, dans l'ordre du contrôle.
+    ///
+    /// Le contrôle des sources ne propose que ce que le périmètre peut
+    /// contenir : proposer Cargo dans un périmètre de recherche serait
+    /// promettre une ligne qui n'existe pas.
+    pub fn ecosystems_for(scope: NavScope) -> Vec<SourceEntry> {
+        scope
+            .sources()
+            .iter()
+            .map(|source| {
+                let kind = match *source {
+                    "alpm" => PackageSourceKind::Alpm,
+                    "aur" => PackageSourceKind::Aur,
+                    "flatpak" => PackageSourceKind::Flatpak,
+                    "appimage" => PackageSourceKind::AppImage,
+                    "cargo" => PackageSourceKind::Cargo,
+                    "npm" => PackageSourceKind::Npm,
+                    _ => PackageSourceKind::Release,
+                };
+                let inventory_only = scope.inventory_only_sources().contains(source);
+                let label = match kind {
+                    PackageSourceKind::Alpm => "Official / ALPM",
+                    PackageSourceKind::Aur => "AUR",
+                    PackageSourceKind::Flatpak => "Flatpak",
+                    PackageSourceKind::AppImage => "AppImage",
+                    PackageSourceKind::Cargo => "Cargo (inventory only)",
+                    PackageSourceKind::Npm => "NPM (inventory only)",
+                    PackageSourceKind::Release => "Release (inventory only)",
+                };
+                SourceEntry {
+                    kind,
+                    label,
+                    inventory_only,
+                }
+            })
+            .collect()
+    }
+
+    /// Les sources sélectionnées, parmi celles que le périmètre peut contenir.
+    ///
+    /// Le périmètre décide de ce qu'il contient ; le filtre décide de ce qui
+    /// reste. Un périmètre qui ne contient pas de Cargo n'a pas de ligne Cargo
+    /// à cacher.
+    pub fn sources_for(
+        &self,
+        scope: NavScope,
+        aur_enabled: bool,
+        flatpak_enabled: bool,
+        appimage_enabled: bool,
+    ) -> Vec<PackageSourceKind> {
+        let mut list = Vec::new();
+        for kind in scope.sources() {
+            let kind = match *kind {
+                "alpm" => PackageSourceKind::Alpm,
+                "aur" => PackageSourceKind::Aur,
+                "flatpak" => PackageSourceKind::Flatpak,
+                "appimage" => PackageSourceKind::AppImage,
+                "cargo" => PackageSourceKind::Cargo,
+                "npm" => PackageSourceKind::Npm,
+                _ => PackageSourceKind::Release,
+            };
+            if !self.flag(kind) {
+                continue;
+            }
+            match kind {
+                PackageSourceKind::Alpm => list.push(kind),
+                PackageSourceKind::Aur if aur_enabled => list.push(kind),
+                PackageSourceKind::Flatpak if flatpak_enabled => list.push(kind),
+                PackageSourceKind::AppImage if appimage_enabled => list.push(kind),
+                _ => list.push(kind),
+            }
+        }
+        list
+    }
+}
+
+/// Un écosystème, tel que le contrôle des sources le présente.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SourceEntry {
+    pub kind: PackageSourceKind,
+    pub label: &'static str,
+    /// L'écosystème se liste, il ne s'interroge pas.
+    pub inventory_only: bool,
 }
 
 /// Filtre d'état local des paquets
@@ -161,6 +298,29 @@ impl PackageStateFilter {
             PackageStateFilter::NotInstalled => !is_installed,
             PackageStateFilter::UpdatesAvailable => has_update,
         }
+    }
+
+    /// Les états qui peuvent être vrais des lignes du périmètre.
+    ///
+    /// Un état impossible dans le périmètre n'est pas proposé : dans Installés,
+    /// aucune ligne n'est « non installée » ; dans Mises à jour, chaque ligne a
+    /// une mise à jour.
+    pub fn options_for(scope: NavScope) -> &'static [PackageStateFilter] {
+        match scope {
+            NavScope::Results => &[
+                PackageStateFilter::All,
+                PackageStateFilter::Installed,
+                PackageStateFilter::NotInstalled,
+                PackageStateFilter::UpdatesAvailable,
+            ],
+            NavScope::Installed => &[PackageStateFilter::All, PackageStateFilter::UpdatesAvailable],
+            NavScope::Updates => &[PackageStateFilter::All],
+        }
+    }
+
+    /// L'état a-t-il un sens dans ce périmètre ?
+    pub fn is_meaningful_in(self, scope: NavScope) -> bool {
+        Self::options_for(scope).contains(&self)
     }
 }
 
@@ -434,15 +594,41 @@ mod tests {
         assert!(scope.appimage);
         assert_eq!(scope.enabled_sources(true, true, true).len(), 3);
 
-        // Cannot deselect all sources down to 0
+        // The three inventory ecosystems have their own flag: a Cargo row no
+        // longer disappears with ALPM, and the control offers them in the
+        // scopes that list them.
+        assert!(scope.is_selected(PackageSourceKind::Cargo));
+        assert!(scope.is_selected(PackageSourceKind::Npm));
+        assert!(scope.is_selected(PackageSourceKind::Release));
         scope.toggle_source(PackageSourceKind::Alpm);
-        scope.toggle_source(PackageSourceKind::Flatpak);
-        assert_eq!(scope.enabled_sources(true, true, true).len(), 1);
-        assert!(scope.appimage);
-        // Attempting to deselect the last remaining source (AppImage) is refused (never 0 sources)
-        scope.toggle_source(PackageSourceKind::AppImage);
-        assert_eq!(scope.enabled_sources(true, true, true).len(), 1);
-        assert!(scope.appimage);
+        assert!(!scope.contains_str("ALPM"));
+        assert!(scope.contains_str("Cargo"));
+        assert!(scope.contains_str("NPM"));
+
+        // The scope decides what the control offers.
+        let results = SourceScope::ecosystems_for(NavScope::Results);
+        assert_eq!(results.len(), 4);
+        assert!(results.iter().all(|entry| !entry.inventory_only));
+
+        let installed = SourceScope::ecosystems_for(NavScope::Installed);
+        assert_eq!(installed.len(), 7);
+        assert_eq!(
+            installed
+                .iter()
+                .filter(|entry| entry.inventory_only)
+                .map(|entry| entry.kind)
+                .collect::<Vec<_>>(),
+            vec![
+                PackageSourceKind::Cargo,
+                PackageSourceKind::Npm,
+                PackageSourceKind::Release
+            ]
+        );
+
+        // The selected sources of a scope are the scope's, among the selected.
+        let selected = scope.sources_for(NavScope::Installed, true, true, true);
+        assert!(selected.contains(&PackageSourceKind::Cargo));
+        assert!(!selected.contains(&PackageSourceKind::Alpm));
     }
 
     #[test]

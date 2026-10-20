@@ -449,6 +449,9 @@ mod tests {
             aur: false,
             flatpak: false,
             appimage: true,
+            cargo: false,
+            npm: false,
+            release: false,
         };
         store.cache_search("obsidian", scope, vec![pkg.clone()]);
         let cached = store.get_cached_search("obsidian", scope);

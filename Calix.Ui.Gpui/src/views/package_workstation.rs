@@ -3,7 +3,7 @@ use crate::components::menu::MenuLifecycle;
 use crate::components::package_card::{PackageCard, PackageCardProps};
 use crate::components::package_table::PackageTable;
 use crate::components::query_workbench::{
-    ActiveMenuState, QueryWorkbench, QueryWorkbenchProps, WorkbenchMenu,
+    ActiveMenuState, QueryWorkbench, QueryWorkbenchProps, ScopeAction, WorkbenchMenu,
 };
 use crate::components::search_input::SearchInputView;
 use crate::components::unified_search::UnifiedSearch;
@@ -645,237 +645,96 @@ impl Render for PackageWorkstationView {
         let entity_move = entity.clone();
         let entity_up = entity.clone();
 
-        let mode_switcher = {
-            let on_mode = entity_mode.clone();
-            crate::components::view_mode_switcher::ViewModeSwitcher::render(
-                crate::components::view_mode_switcher::ViewModeSwitcherProps {
-                    current_mode: view_mode,
-                    theme: &theme,
-                    on_select_mode: Rc::new(move |mode, _w, cx| {
-                        on_mode.update(cx, |view, cx| {
-                            view.session.update(cx, |s, cx| {
-                                s.set_view_mode(mode, cx);
-                            });
-                        });
-                    }),
-                },
-            )
-        };
 
-        let top_bar = match scope {
-            NavScope::Results => {
-                let on_toggle_source = entity.clone();
-                let on_state = entity.clone();
-                let on_sort = entity.clone();
-                let on_mode = entity_mode.clone();
-                let on_menu = entity.clone();
-                let on_nav_menu = entity.clone();
-                let on_retry = entity.clone();
-                let on_clear = entity.clone();
-                let aur_enabled = self.aur_enabled;
-                let flatpak_enabled = self.flatpak_enabled;
-                let appimage_enabled = self.appimage_enabled;
-                let breakpoint = WorkbenchBreakpoint::from_width(active_list_width);
-                let store = self.store.read(cx);
+        // The query surface is in every scope: the filters act on every
+        // scope, so the controls that change them are everywhere. The scope
+        // decides what the controls offer, not whether they are there.
+        let on_toggle_source = entity.clone();
+        let on_state = entity.clone();
+        let on_sort = entity.clone();
+        let on_mode = entity_mode.clone();
+        let on_menu = entity.clone();
+        let on_nav_menu = entity.clone();
+        let on_retry = entity.clone();
+        let aur_enabled = self.aur_enabled;
+        let flatpak_enabled = self.flatpak_enabled;
+        let appimage_enabled = self.appimage_enabled;
+        let breakpoint = WorkbenchBreakpoint::from_width(active_list_width);
+        let store = self.store.read(cx);
 
-                QueryWorkbench::render(&QueryWorkbenchProps {
-                    search_input: self.search_input.clone(),
-                    list_pane_width: active_list_width,
-                    source_scope,
-                    state_filter,
-                    sort_mode,
-                    view_mode,
-                    active_menu_state: self.active_menu,
-                    is_searching,
-                    total_count: packages.len(),
-                    reduce_motion: self.reduce_motion,
-                    aur_enabled: self.aur_enabled,
-                    flatpak_enabled: self.flatpak_enabled,
-                    appimage_enabled: self.appimage_enabled,
-                    source_health: &store.source_health,
-                    theme: &theme,
-                    visual_style: self.visual_style,
-                    filters_btn_focus: self.filters_btn_focus.clone(),
-                    state_btn_focus: self.state_btn_focus.clone(),
-                    sort_btn_focus: self.sort_btn_focus.clone(),
-                    menu_surface_focus: self.menu_surface_focus.clone(),
-                    on_toggle_source: Rc::new(move |kind, _w, cx| {
-                        on_toggle_source.update(cx, |view, cx| {
-                            view.session.update(cx, |s, cx| {
-                                s.toggle_source(kind, cx);
-                            });
-                        });
-                    }),
-                    on_select_state: Rc::new(move |state, _w, cx| {
-                        on_state.update(cx, |view, cx| {
-                            view.session.update(cx, |s, cx| {
-                                s.set_state_filter(state, cx);
-                            });
-                        });
-                    }),
-                    on_select_sort: Rc::new(move |sort, _w, cx| {
-                        on_sort.update(cx, |view, cx| {
-                            view.session.update(cx, |s, cx| {
-                                s.set_sort_mode(sort, cx);
-                            });
-                        });
-                    }),
-                    on_select_view_mode: Rc::new(move |mode, _w, cx| {
-                        on_mode.update(cx, |view, cx| {
-                            view.session.update(cx, |s, cx| {
-                                s.set_view_mode(mode, cx);
-                            });
-                        });
-                    }),
-                    on_toggle_menu: Rc::new(move |menu, window, cx| {
-                        on_menu.update(cx, |view, cx| {
-                            view.toggle_menu(menu, window, cx);
-                        });
-                    }),
-                    on_navigate_menu: Rc::new(move |key, window, cx| {
-                        on_nav_menu.update(cx, |view, cx| {
-                            view.navigate_menu(key, breakpoint, window, cx);
-                        });
-                    }),
-                    on_retry_source: Rc::new(move |kind, w, cx| {
-                        let cb = on_retry.read(cx).on_retry_source.clone();
-                        if let Some(cb) = cb {
-                            cb(kind, w, cx);
-                        }
-                    }),
-                    on_clear_filters: Rc::new(move |_w, cx| {
-                        on_clear.update(cx, |view, cx| {
-                            view.session.update(cx, |s, cx| {
-                                s.clear_filters(aur_enabled, flatpak_enabled, appimage_enabled, cx);
-                            });
-                        });
-                    }),
-                })
-                .into_any_element()
-            }
-            NavScope::Installed => div()
-                .flex()
-                .items_center()
-                .justify_between()
-                .px_4()
-                .py_3()
-                .bg(theme.bg_surface)
-                .border_b_1()
-                .border_color(theme.border)
-                .child(
-                    div()
-                        .flex()
-                        .items_center()
-                        .gap_2()
-                        .font_weight(FontWeight::BOLD)
-                        .text_sm()
-                        .text_color(theme.text_primary)
-                        .child(
-                            svg()
-                                .path(crate::icons::AppIcon::Installed.path())
-                                .size_4()
-                                .text_color(theme.accent),
-                        )
-                        .child("Locally Installed Packages"),
-                )
-                .child(
-                    div()
-                        .flex()
-                        .items_center()
-                        .gap_3()
-                        .child(
-                            div()
-                                .text_xs()
-                                .text_color(theme.text_muted)
-                                .child(format!("{} packages", packages.len())),
-                        )
-                        .child(mode_switcher),
-                )
-                .into_any_element(),
-            NavScope::Updates => {
-                let on_upgrade_cb = self.on_upgrade_all.clone();
-                div()
-                    .flex()
-                    .items_center()
-                    .justify_between()
-                    .px_4()
-                    .py_3()
-                    .bg(theme.bg_surface)
-                    .border_b_1()
-                    .border_color(theme.border)
-                    .child(
-                        div()
-                            .flex()
-                            .items_center()
-                            .gap_2()
-                            .font_weight(FontWeight::BOLD)
-                            .text_sm()
-                            .text_color(theme.text_primary)
-                            .child(
-                                svg()
-                                    .path(crate::icons::AppIcon::Updates.path())
-                                    .size_4()
-                                    .text_color(theme.accent),
-                            )
-                            .child("Available System Updates"),
-                    )
-                    .child(
-                        div()
-                            .flex()
-                            .items_center()
-                            .gap_3()
-                            .child(if is_busy {
-                                div()
-                                    .px_3()
-                                    .py_1()
-                                    .rounded_md()
-                                    .bg(theme.bg_surface_active)
-                                    .text_xs()
-                                    .font_weight(FontWeight::BOLD)
-                                    .text_color(theme.text_muted)
-                                    .child("Upgrade All")
-                                    .into_any_element()
-                            } else {
-                                let focus_border = theme.border_focus;
-                                let on_upgrade_key = on_upgrade_cb.clone();
-                                div()
-                                    .id("upgrade_all_btn")
-                                    .focusable()
-                                    .tab_stop(true)
-                                    .focus(move |s| s.border_1().border_color(focus_border))
-                                    .on_key_down(move |event, window, cx| {
-                                        let key = event.keystroke.key.as_str();
-                                        if key == "enter" || key == "space" {
-                                            if let Some(ref cb) = on_upgrade_key {
-                                                cb(window, cx);
-                                            }
-                                        }
-                                    })
-                                    .px_3()
-                                    .py_1()
-                                    .rounded_md()
-                                    .bg(theme.accent)
-                                    .text_xs()
-                                    .font_weight(FontWeight::BOLD)
-                                    .text_color(theme.bg_app)
-                                    .cursor_pointer()
-                                    .hover({
-                                        let h = theme.accent_hover;
-                                        move |s| s.bg(h)
-                                    })
-                                    .child("Upgrade All")
-                                    .on_mouse_down(MouseButton::Left, move |_e, w, cx| {
-                                        if let Some(ref cb) = on_upgrade_cb {
-                                            cb(w, cx);
-                                        }
-                                    })
-                                    .into_any_element()
-                            })
-                            .child(mode_switcher),
-                    )
-                    .into_any_element()
-            }
-        };
+        let top_bar = QueryWorkbench::render(&QueryWorkbenchProps {
+            search_input: self.search_input.clone(),
+            list_pane_width: active_list_width,
+            scope,
+            source_scope,
+            state_filter,
+            sort_mode,
+            view_mode,
+            active_menu_state: self.active_menu,
+            reduce_motion: self.reduce_motion,
+            aur_enabled,
+            flatpak_enabled,
+            appimage_enabled,
+            source_health: &store.source_health,
+            theme: &theme,
+            visual_style: self.visual_style,
+            filters_btn_focus: self.filters_btn_focus.clone(),
+            state_btn_focus: self.state_btn_focus.clone(),
+            sort_btn_focus: self.sort_btn_focus.clone(),
+            menu_surface_focus: self.menu_surface_focus.clone(),
+            on_toggle_source: Rc::new(move |kind, _w, cx| {
+                on_toggle_source.update(cx, |view, cx| {
+                    view.session.update(cx, |s, cx| {
+                        s.toggle_source(kind, cx);
+                    });
+                });
+            }),
+            on_select_state: Rc::new(move |state, _w, cx| {
+                on_state.update(cx, |view, cx| {
+                    view.session.update(cx, |s, cx| {
+                        s.set_state_filter(state, cx);
+                    });
+                });
+            }),
+            on_select_sort: Rc::new(move |sort, _w, cx| {
+                on_sort.update(cx, |view, cx| {
+                    view.session.update(cx, |s, cx| {
+                        s.set_sort_mode(sort, cx);
+                    });
+                });
+            }),
+            on_select_view_mode: Rc::new(move |mode, _w, cx| {
+                on_mode.update(cx, |view, cx| {
+                    view.session.update(cx, |s, cx| {
+                        s.set_view_mode(mode, cx);
+                    });
+                });
+            }),
+            on_toggle_menu: Rc::new(move |menu, window, cx| {
+                on_menu.update(cx, |view, cx| {
+                    view.toggle_menu(menu, window, cx);
+                });
+            }),
+            on_navigate_menu: Rc::new(move |key, window, cx| {
+                on_nav_menu.update(cx, |view, cx| {
+                    view.navigate_menu(key, breakpoint, window, cx);
+                });
+            }),
+            on_retry_source: Rc::new(move |kind, w, cx| {
+                let cb = on_retry.read(cx).on_retry_source.clone();
+                if let Some(cb) = cb {
+                    cb(kind, w, cx);
+                }
+            }),
+            scope_action: match scope {
+                NavScope::Updates => self.on_upgrade_all.clone().map(|handler| ScopeAction {
+                    label: "Upgrade all",
+                    handler,
+                }),
+                _ => None,
+            },
+        })
+        .into_any_element();
 
         // ── 2. Corps de la liste (Cards vs Table) ───────────────────────────
         let (installed_err, updates_err) = {

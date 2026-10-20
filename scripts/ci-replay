@@ -36,7 +36,12 @@ command -v podman >/dev/null || {
     exit 1
 }
 
-STAGE=$(mktemp -d "${TMPDIR:-/tmp}/calix-ci.XXXXXX")
+# The work of the run lives in the repository, in the directory the repository
+# ignores. /tmp is memory-backed and shared: a run that puts a gigabyte there
+# is a run that takes the machine's scratch away from everything else.
+WORK_ROOT="${CALIX_WORK_ROOT:-$ROOT/.ci-cache}"
+mkdir -p "$WORK_ROOT"
+STAGE=$(mktemp -d "$WORK_ROOT/ci-replay.XXXXXX")
 trap 'podman unshare rm -rf "$STAGE" 2>/dev/null || rm -rf "$STAGE"' EXIT
 
 if [ "$MODE" = worktree ]; then

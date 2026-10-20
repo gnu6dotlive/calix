@@ -18,6 +18,17 @@ pub enum PackageSourceKind {
 }
 
 impl PackageSourceKind {
+    /// Les sept écosystèmes, dans l'ordre où le contrôle les présente.
+    pub const ALL: &'static [PackageSourceKind] = &[
+        PackageSourceKind::Alpm,
+        PackageSourceKind::Aur,
+        PackageSourceKind::Flatpak,
+        PackageSourceKind::AppImage,
+        PackageSourceKind::Cargo,
+        PackageSourceKind::Npm,
+        PackageSourceKind::Release,
+    ];
+
     pub fn as_str(&self) -> &'static str {
         match self {
             PackageSourceKind::Alpm => "alpm",
@@ -379,6 +390,12 @@ impl AppSession {
     pub fn set_scope(&mut self, scope: NavScope, cx: &mut Context<Self>) {
         if self.scope != scope {
             self.scope = scope;
+            // Le vocabulaire des filtres suit le périmètre : un état qui ne peut
+            // pas être vrai des lignes du nouveau périmètre est retiré, sinon il
+            // viderait la liste sans que l'utilisateur l'ait demandé.
+            if !self.state_filter.is_meaningful_in(scope) {
+                self.state_filter = PackageStateFilter::All;
+            }
             self.navigation_epoch = self.navigation_epoch.wrapping_add(1);
             cx.emit(SessionEvent::ScopeChanged(scope));
             cx.notify();
@@ -404,6 +421,16 @@ impl AppSession {
 
     pub fn toggle_source(&mut self, source: PackageSourceKind, cx: &mut Context<Self>) {
         self.source_scope.toggle_source(source);
+        // Le périmètre ne se vide pas sous un filtre : la dernière source du
+        // périmètre reste sélectionnée. Le contrôle des sources ne propose que
+        // les écosystèmes du périmètre, donc c'est de ceux-là qu'on compte.
+        let scope_sources = SourceScope::ecosystems_for(self.scope);
+        if !scope_sources
+            .iter()
+            .any(|entry| self.source_scope.is_selected(entry.kind))
+        {
+            self.source_scope.select(source, true);
+        }
         cx.emit(SessionEvent::SourceScopeChanged(self.source_scope));
         cx.notify();
     }

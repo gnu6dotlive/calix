@@ -464,7 +464,8 @@ impl WorkspaceView {
                     filters: ControlFilters {
                         sources: session
                             .source_scope
-                            .enabled_sources(
+                            .sources_for(
+                                session.scope,
                                 self.calix_settings.aur_enabled,
                                 self.calix_settings.flat_pack_enabled,
                                 self.calix_settings.app_image_enabled,
@@ -2435,6 +2436,15 @@ impl Render for WorkspaceView {
             flatpak_enabled,
             appimage_enabled,
             age: None,
+            source_health: &self.store.read(cx).source_health,
+            on_retry_source: {
+                let entity_retry = entity.clone();
+                Rc::new(move |kind: PackageSourceKind, _w, cx| {
+                    entity_retry.update(cx, |view, cx| {
+                        view.retry_source_search(kind, cx);
+                    });
+                })
+            },
             on_select_scope: Rc::new(move |scope: NavScope, _w, cx| {
                 entity_scope.update(cx, |s, cx| {
                     s.set_scope(scope, cx);
