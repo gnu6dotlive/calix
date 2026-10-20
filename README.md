@@ -17,7 +17,7 @@ afterthought.
 
 ## Overview
 
-Calix is built from three native pieces:
+Calix is built from three core native pieces, plus an optional desktop-session bridge:
 
 - **`calix-gpui`** — the desktop application. Rust, built on
   [GPUI 0.2](https://github.com/zed-industries/zed/tree/main/crates/gpui) and Blade.
@@ -27,9 +27,13 @@ Calix is built from three native pieces:
   files, so there is one place where installed-package state is assembled.
 - **`calix`** — the package-management CLI and the shared backend library behind it.
   Zig, talking to `libalpm`, the AUR, Flatpak, AppImages, Cargo and NPM.
+- **`calix-notify`** — the optional session-bus bridge. Zig, listening for Calix's
+  `Refresh` signal and forwarding it to `org.freedesktop.Notifications`. It is installed
+  but not enabled by default.
 
-The UI and the daemon run unprivileged. Operations that need root go through the CLI and
-polkit (`pkexec`); the project's engineering policy forbids `sudo`, `su` and `doas`.
+The UI, the daemon and the notification bridge run unprivileged. Operations that need
+root go through the CLI and polkit (`pkexec`); the project's engineering policy forbids
+`sudo`, `su` and `doas`.
 
 Calix targets Arch Linux on `x86_64`. That is the only architecture `PKGBUILD-calix`
 declares; other Arch-based distributions may work but are not tested.
@@ -245,8 +249,9 @@ old package names are in [`docs/release-notes.md`](docs/release-notes.md).
 git clone https://github.com/tension-atoi/calix.git
 cd calix
 
-# 1. Build the Zig backend: produces Calix.Cli.Zig/zig-out/bin/calix
-#    and Calix.Cli.Zig/zig-out/bin/calix-daemon
+# 1. Build the Zig backend: produces Calix.Cli.Zig/zig-out/bin/calix,
+#    Calix.Cli.Zig/zig-out/bin/calix-daemon and
+#    Calix.Cli.Zig/zig-out/bin/calix-notify
 make zig
 
 # 2. Start the daemon (serves the unified inventory on
@@ -270,7 +275,7 @@ Other `make` targets:
 | `make build` | Optimised release build of `calix-gpui` |
 | `make check` | Fast `cargo check` without linking |
 | `make test` | Rust test suite for the frontend |
-| `make zig` / `make zig-rebuild` | Build the Zig backend (and `calix-daemon`) |
+| `make zig` / `make zig-rebuild` | Build the Zig backend (CLI, daemon and notification bridge) |
 | `make package` | Build the Arch package in `/tmp` (`makepkg --noconfirm`); does not install |
 | `make package-install` | Build the package, then install it through `pkexec` |
 | `make install` | Development install into `/usr/local` (no PKGBUILD; needs elevated privileges) |
@@ -375,7 +380,13 @@ Enable the per-user inventory service after installation:
 systemctl --user enable --now calix-daemon.service
 ```
 
-The package installs the unit but does not enable it, so installing Calix never
+The optional desktop notification bridge uses the same session bus as the frontend:
+
+```bash
+systemctl --user enable --now calix-notify.service
+```
+
+The package installs both units but does not enable them, so installing Calix never
 changes a session the package manager was not asked to touch.
 
 The package (`calix-gpui-git`) installs:
@@ -385,18 +396,22 @@ The package (`calix-gpui-git`) installs:
 | `/usr/bin/calix-gpui` | Wrapper that sets `CALIX_BIN` and execs the frontend |
 | `/usr/bin/calix` | Symlink to the backend CLI |
 | `/usr/bin/calix-daemon` | Symlink to the inventory daemon |
+| `/usr/bin/calix-notify` | Symlink to the notification bridge |
 | `/usr/lib/calix/calix-gpui` | GPUI frontend binary |
 | `/usr/lib/calix/calix` | Zig backend CLI (canonical polkit path) |
 | `/usr/lib/calix/calix-daemon` | Zig inventory daemon |
+| `/usr/lib/calix/calix-notify` | Session-bus notification bridge |
 | `/usr/lib/systemd/user/calix-daemon.service` | Per-user inventory service |
+| `/usr/lib/systemd/user/calix-notify.service` | Per-user notification bridge |
 | `/usr/share/applications/live.gnu6.calix.desktop` | XDG desktop entry |
 | `/usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg` | Application icon |
 | `/usr/share/polkit-1/actions/live.gnu6.calix.policy` | Polkit actions for install / remove / upgrade |
 
 Two boundaries are deliberate:
 
-- **The daemon service is installed but not enabled.** Enabling a user unit is a
-  per-account decision; the package leaves it to `systemctl --user enable --now`.
+- **The daemon and notification services are installed but not enabled.** Enabling a
+  user unit is a per-account decision; the package leaves it to
+  `systemctl --user enable --now`.
 - **The legacy systemd units in `packaging/systemd/` run the frozen Python engine**
   (`calix sync`), not the daemon. They are not installed by this package and remain
   part of the transitional state described above.

@@ -4,7 +4,7 @@
 #   make run       — compile (dev) et lance l'app avec le CLI Zig local
 #   make build     — cargo build --release
 #   make check     — cargo check (rapide, sans lier)
-#   make zig       — (re)compile le backend CLI Zig
+#   make zig       — (re)compile les binaires Zig
 #   make clean     — nettoie les artefacts Rust et Zig
 #   make package   — construit le paquet dans un répertoire isolé (sans installer)
 #   make package-install — construit puis installe le paquet via pkexec
@@ -13,9 +13,10 @@
 
 REPO_ROOT   := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 ZIG_SRC     := $(REPO_ROOT)Calix.Cli.Zig
-ZIG_BIN     := $(ZIG_SRC)/zig-out/bin/calix
-RUST_SRC    := $(REPO_ROOT)Calix.Ui.Gpui
-TARGET_DIR  := $(shell cd $(RUST_SRC) && cargo metadata --format-version 1 --no-deps 2>/dev/null | grep -o '"target_directory":"[^"]*"' | cut -d'"' -f4)
+ZIG_BIN        := $(ZIG_SRC)/zig-out/bin/calix
+ZIG_NOTIFY_BIN := $(ZIG_SRC)/zig-out/bin/calix-notify
+RUST_SRC       := $(REPO_ROOT)Calix.Ui.Gpui
+TARGET_DIR     := $(shell cd $(RUST_SRC) && cargo metadata --format-version 1 --no-deps 2>/dev/null | grep -o '"target_directory":"[^"]*"' | cut -d'"' -f4)
 ifeq ($(TARGET_DIR),)
   TARGET_DIR := $(RUST_SRC)/target
 endif
@@ -59,18 +60,18 @@ check:
 test:
 	cd $(RUST_SRC) && cargo test
 
-## Compile le backend CLI Zig
+## Compile les binaires Zig
 zig:
-	@if [ ! -f "$(ZIG_BIN)" ]; then \
-		echo ">>> Compilation du CLI Zig (ReleaseSafe)..."; \
+	@if [ ! -f "$(ZIG_BIN)" ] || [ ! -f "$(ZIG_NOTIFY_BIN)" ]; then \
+		echo ">>> Compilation des binaires Zig (ReleaseSafe)..."; \
 		cd $(ZIG_SRC) && $(ZIG) build -Doptimize=ReleaseSafe; \
 	else \
-		echo ">>> CLI Zig déjà compilé : $(ZIG_BIN)"; \
+		echo ">>> Binaires Zig déjà compilés : $(ZIG_BIN)"; \
 	fi
 
-## Force la recompilation du CLI Zig
+## Force la recompilation des binaires Zig
 zig-rebuild:
-	@echo ">>> Recompilation forcée du CLI Zig..."
+	@echo ">>> Recompilation forcée des binaires Zig..."
 	cd $(ZIG_SRC) && $(ZIG) build -Doptimize=ReleaseSafe
 
 ## Construit le paquet dans /tmp sans installer (jamais sudo)

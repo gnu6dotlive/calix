@@ -24,7 +24,7 @@ EOF
 # failure in the first place.
 pacman -Syyuu --noconfirm \
     base-devel git rust cargo zig pkgconf clang \
-    pacman libglvnd fontconfig freetype2 wayland mesa vulkan-icd-loader polkit \
+    pacman libglvnd fontconfig freetype2 wayland mesa vulkan-icd-loader polkit dbus \
     libxkbcommon libxkbcommon-x11 \
     curl xz python3
 

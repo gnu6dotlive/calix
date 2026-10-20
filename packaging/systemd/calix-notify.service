@@ -1,0 +1,25 @@
+[Unit]
+Description=Calix desktop notification bridge
+Documentation=https://github.com/tension-atoi/calix
+PartOf=graphical-session.target
+After=graphical-session.target
+StartLimitBurst=3
+StartLimitIntervalSec=30s
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/calix/calix-notify
+Restart=on-failure
+RestartSec=5s
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=full
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+RestrictAddressFamilies=AF_UNIX
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=graphical-session.target

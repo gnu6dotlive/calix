@@ -70,6 +70,25 @@ pub fn build(b: *std.Build) void {
     });
     b.installArtifact(daemon_executable);
 
+    // The notification bridge is a desktop-session service, not a CLI mode.
+    // It links libdbus directly instead of shelling out to dbus-monitor, so
+    // signal matching and notification calls are one event loop.
+    const notify_module = b.createModule(.{
+        .root_source_file = b.path("src/notify/main.zig"),
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    });
+    notify_module.linkSystemLibrary("dbus-1", .{
+        .use_pkg_config = .force,
+    });
+
+    const notify_executable = b.addExecutable(.{
+        .name = "calix-notify",
+        .root_module = notify_module,
+    });
+    b.installArtifact(notify_executable);
+
     const run_command = b.addRunArtifact(executable);
     run_command.step.dependOn(b.getInstallStep());
     if (b.args) |args| run_command.addArgs(args);
@@ -92,6 +111,12 @@ pub fn build(b: *std.Build) void {
     });
     const run_daemon_tests = b.addRunArtifact(daemon_tests);
 
+    const notify_tests = b.addTest(.{
+        .name = "notify-test",
+        .root_module = notify_module,
+    });
+    const run_notify_tests = b.addRunArtifact(notify_tests);
+
     // `zig build module-test -- --test-filter <substring>` runs a slice of the
     // module tests. The suite is large enough that bisecting a failure needs
     // a way in that is not "run everything again".
@@ -103,6 +128,7 @@ pub fn build(b: *std.Build) void {
     test_step.dependOn(&run_module_tests.step);
     test_step.dependOn(&run_executable_tests.step);
     test_step.dependOn(&run_daemon_tests.step);
+    test_step.dependOn(&run_notify_tests.step);
 
     const account_tests = b.addTest(.{
         .name = "user-account-test",

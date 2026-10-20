@@ -28,6 +28,7 @@ depends=(
     'vulkan-icd-loader'
     'pacman'
     'polkit'
+    'dbus'
 )
 makedepends=(
     'git'
@@ -105,12 +106,15 @@ package() {
         "${pkgdir}/usr/lib/calix/calix"
     install -Dm755 "Calix.Cli.Zig/zig-out/bin/calix-daemon" \
         "${pkgdir}/usr/lib/calix/calix-daemon"
+    install -Dm755 "Calix.Cli.Zig/zig-out/bin/calix-notify" \
+        "${pkgdir}/usr/lib/calix/calix-notify"
 
-    # Both binaries are also reachable on PATH; polkit and the user service
+    # The binaries are also reachable on PATH; polkit and the user services
     # keep the canonical lib paths.
     install -dm755 "${pkgdir}/usr/bin"
     ln -s /usr/lib/calix/calix "${pkgdir}/usr/bin/calix"
     ln -s /usr/lib/calix/calix-daemon "${pkgdir}/usr/bin/calix-daemon"
+    ln -s /usr/lib/calix/calix-notify "${pkgdir}/usr/bin/calix-notify"
 
     install -Dm755 "Calix.Ui.Gpui/target/release/calix-gpui" \
         "${pkgdir}/usr/lib/calix/calix-gpui"
@@ -141,7 +145,9 @@ EOF
     install -Dm644 "Calix.Ui.Gpui/assets/live.gnu6.calix.policy" \
         "${pkgdir}/usr/share/polkit-1/actions/live.gnu6.calix.policy"
 
-    # ── User Service ─────────────────────────────────────────────────────────
+    # ── User Services ────────────────────────────────────────────────────────
     install -Dm644 "packaging/systemd/calix-daemon.service" \
         "${pkgdir}/usr/lib/systemd/user/calix-daemon.service"
+    install -Dm644 "packaging/systemd/calix-notify.service" \
+        "${pkgdir}/usr/lib/systemd/user/calix-notify.service"
 }

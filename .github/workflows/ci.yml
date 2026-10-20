@@ -80,10 +80,12 @@ jobs:
           # Binaires
           install -Dm755 Calix.Cli.Zig/zig-out/bin/calix dist/usr/lib/calix/calix
           install -Dm755 Calix.Cli.Zig/zig-out/bin/calix-daemon dist/usr/lib/calix/calix-daemon
+          install -Dm755 Calix.Cli.Zig/zig-out/bin/calix-notify dist/usr/lib/calix/calix-notify
           install -Dm755 Calix.Ui.Gpui/target/release/calix-gpui dist/usr/lib/calix/calix-gpui
 
           ln -s /usr/lib/calix/calix dist/usr/bin/calix
           ln -s /usr/lib/calix/calix-daemon dist/usr/bin/calix-daemon
+          ln -s /usr/lib/calix/calix-notify dist/usr/bin/calix-notify
 
           cat > dist/usr/bin/calix-gpui << 'EOF'
           #!/bin/sh
@@ -96,6 +98,7 @@ jobs:
           install -Dm644 Calix.Ui.Gpui/assets/live.gnu6.calix.svg dist/usr/share/icons/hicolor/scalable/apps/
           install -Dm644 Calix.Ui.Gpui/assets/live.gnu6.calix.policy dist/usr/share/polkit-1/actions/
           install -Dm644 packaging/systemd/calix-daemon.service dist/usr/lib/systemd/user/calix-daemon.service
+          install -Dm644 packaging/systemd/calix-notify.service dist/usr/lib/systemd/user/calix-notify.service
 
           cd dist
           tar -czvf ../calix-gpui-linux-x86_64.tar.gz usr/
