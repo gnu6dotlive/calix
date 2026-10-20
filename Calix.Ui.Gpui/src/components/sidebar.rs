@@ -1,6 +1,6 @@
 use crate::components::status_pill::StatusPill;
 use crate::icons::AppIcon;
-use crate::state::NavDestination;
+use crate::state::{NavScope, Place, RailEntry};
 use crate::theme::Theme;
 use crate::visual_style::paint::apply_surface_projection;
 use crate::visual_style::roles::SurfaceRole;
@@ -9,17 +9,18 @@ use gpui::prelude::FluentBuilder;
 use gpui::*;
 use std::rc::Rc;
 
-pub type NavDestinationHandler = Rc<dyn Fn(NavDestination, &mut Window, &mut App) + 'static>;
+pub type RailSelectHandler = Rc<dyn Fn(RailEntry, &mut Window, &mut App) + 'static>;
 pub type WindowActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 
 pub struct SidebarProps<'a> {
-    pub active_destination: NavDestination,
+    pub active_place: Place,
+    pub active_scope: NavScope,
     pub updates_count: usize,
     pub is_collapsed: bool,
     pub current_width: f32,
     pub theme: &'a Theme,
     pub visual_style: VisualStyleId,
-    pub on_select_destination: NavDestinationHandler,
+    pub on_select: RailSelectHandler,
     pub on_toggle_collapse: WindowActionHandler,
 }
 
@@ -48,25 +49,18 @@ impl Render for DestinationTooltip {
 
 impl Sidebar {
     fn render_nav_item(
-        dest: NavDestination,
-        active_dest: NavDestination,
+        entry: RailEntry,
+        active_place: Place,
+        active_scope: NavScope,
         badge_count: usize,
         is_collapsed: bool,
         theme: &Theme,
-        on_select: NavDestinationHandler,
+        on_select: RailSelectHandler,
     ) -> impl IntoElement {
-        let is_active = active_dest == dest;
-        let icon = dest.icon();
-        let label = dest.label();
-
-        let element_id = match dest {
-            NavDestination::Browse => "nav_dest_browse",
-            NavDestination::Installed => "nav_dest_installed",
-            NavDestination::Updates => "nav_dest_updates",
-            NavDestination::News => "nav_dest_news",
-            NavDestination::Settings => "nav_dest_settings",
-            NavDestination::RenderLab => unreachable!("RenderLab is excluded from sidebar"),
-        };
+        let is_active = entry.is_active(active_place, active_scope);
+        let icon = entry.icon;
+        let label = entry.label;
+        let element_id = entry.id;
 
         let focus_border = theme.border_focus;
         let on_select_key = on_select.clone();
@@ -79,7 +73,7 @@ impl Sidebar {
             .on_key_down(move |event, window, cx| {
                 let key = event.keystroke.key.as_str();
                 if key == "enter" || key == "space" {
-                    on_select_key(dest, window, cx);
+                    on_select_key(entry, window, cx);
                 }
             })
             .flex()
@@ -134,7 +128,7 @@ impl Sidebar {
         }
 
         item.on_mouse_down(MouseButton::Left, move |_e, window, cx| {
-            on_select(dest, window, cx);
+            on_select(entry, window, cx);
         })
     }
 
@@ -143,30 +137,23 @@ impl Sidebar {
         let is_collapsed = props.is_collapsed;
         let width = px(props.current_width);
 
-        let destinations = [
-            NavDestination::Browse,
-            NavDestination::Installed,
-            NavDestination::Updates,
-            NavDestination::News,
-            NavDestination::Settings,
-        ];
-
         let mut nav_items = div().flex().flex_col().gap(px(2.0)).py(px(8.0));
 
-        for dest in destinations {
-            let badge = if dest == NavDestination::Updates {
+        for entry in RailEntry::ALL {
+            let badge = if entry.scope == Some(NavScope::Updates) {
                 props.updates_count
             } else {
                 0
             };
 
             nav_items = nav_items.child(Self::render_nav_item(
-                dest,
-                props.active_destination,
+                *entry,
+                props.active_place,
+                props.active_scope,
                 badge,
                 is_collapsed,
                 theme,
-                props.on_select_destination.clone(),
+                props.on_select.clone(),
             ));
         }
 

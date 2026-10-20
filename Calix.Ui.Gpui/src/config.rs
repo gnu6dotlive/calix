@@ -1,5 +1,6 @@
 use crate::state::session::PackageViewMode;
 use crate::brand::Brand;
+use crate::state::session::NavScope;
 use crate::visual_style::VisualStyleId;
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
@@ -70,8 +71,9 @@ pub struct GpuiUiConfig {
     pub log_drawer_open: bool,
     #[serde(default = "default_log_drawer_height")]
     pub log_drawer_height: f32,
-    #[serde(default = "default_last_selected_tab")]
-    pub last_selected_tab: usize,
+    /// Le dernier périmètre de la surface des paquets, retrouvé au lancement.
+    #[serde(default = "default_last_scope")]
+    pub last_scope: NavScope,
     #[serde(default)]
     pub reduce_motion: bool,
     #[serde(default = "default_view_mode")]
@@ -111,8 +113,8 @@ fn default_log_drawer_height() -> f32 {
     220.0
 }
 
-fn default_last_selected_tab() -> usize {
-    0
+fn default_last_scope() -> NavScope {
+    NavScope::default()
 }
 
 fn default_view_mode() -> PackageViewMode {
@@ -136,7 +138,7 @@ impl Default for GpuiUiConfig {
             compact_view: default_compact_view(),
             log_drawer_open: default_log_drawer_open(),
             log_drawer_height: default_log_drawer_height(),
-            last_selected_tab: default_last_selected_tab(),
+            last_scope: default_last_scope(),
             reduce_motion: false,
             view_mode: default_view_mode(),
             visual_style: default_visual_style(),
@@ -631,7 +633,7 @@ mod tests {
         assert!(!parsed.compact_view);
         assert!(!parsed.log_drawer_open);
         assert_eq!(parsed.log_drawer_height, 220.0);
-        assert_eq!(parsed.last_selected_tab, 0);
+        assert_eq!(parsed.last_scope, NavScope::Results);
         assert!(!parsed.reduce_motion);
         assert_eq!(parsed.view_mode, PackageViewMode::Table);
         assert_eq!(parsed.visual_style, VisualStyleId::Standard);
@@ -721,7 +723,7 @@ mod tests {
             "compact_view": true,
             "log_drawer_open": true,
             "log_drawer_height": 250.0,
-            "last_selected_tab": 2
+            "last_scope": "installed"
         }"#;
 
         let parsed: GpuiUiConfig = serde_json::from_str(legacy_json)
@@ -733,7 +735,7 @@ mod tests {
         assert!(parsed.compact_view);
         assert!(parsed.log_drawer_open);
         assert_eq!(parsed.log_drawer_height, 250.0);
-        assert_eq!(parsed.last_selected_tab, 2);
+        assert_eq!(parsed.last_scope, NavScope::Installed);
         assert!(
             !parsed.reduce_motion,
             "Default for reduce_motion must be false"
@@ -754,7 +756,7 @@ mod tests {
             "compact_view": false,
             "log_drawer_open": false,
             "log_drawer_height": 200.0,
-            "last_selected_tab": 0,
+            "last_scope": "results",
             "reduce_motion": true
         }"#;
 

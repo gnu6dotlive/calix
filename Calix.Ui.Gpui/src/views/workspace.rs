@@ -5,11 +5,13 @@ use crate::components::toast_overlay::{ToastOverlay, ToastOverlayProps};
 use crate::config::{ConfigManager, GpuiUiConfig, CalixSettings};
 use crate::control::ipc::{ControlIpcMessage, ControlIpcServer};
 use crate::control::protocol::{
-    ControlCommand, ControlResponse, ControlStatus, CONTROL_PROTOCOL_VERSION,
+    ControlCommand, ControlFilters, ControlResponse, ControlStatus, CONTROL_PROTOCOL_VERSION,
 };
+use crate::components::context_header::{ContextHeader, ContextHeaderProps};
 use crate::state::package_store::SourceHealth;
+use crate::state::query::SortMode;
 use crate::state::{
-    AppSession, ConsoleEvent, ConsoleModel, InspectorTab, MotionDurations, NavDestination,
+    AppSession, ConsoleEvent, ConsoleModel, InspectorTab, MotionDurations, NavScope, Place,
     PackageKey, PackageSourceKind, PackageStore, PackageStoreEvent, PackageViewMode, SessionEvent,
     ToastAction, ToastCenter, ToastKind,
 };
@@ -69,7 +71,7 @@ impl WorkspaceView {
 
         let client = CalixClient::new(None);
         let session = cx.new(|_cx| {
-            let mut s = AppSession::with_initial_tab(gpui_config.last_selected_tab);
+            let mut s = AppSession::with_initial_scope(gpui_config.last_scope);
             if gpui_config.compact_view {
                 s.sidebar_collapsed = true;
             }
@@ -140,9 +142,14 @@ impl WorkspaceView {
 
         // Abonnements réactifs aux événements de session
         cx.subscribe(&session, |this, _emitter, event, cx| match event {
-            SessionEvent::DestinationChanged(dest) => {
-                log::debug!("Navigation vers la destination : {:?}", dest);
-                this.on_destination_changed(*dest, cx);
+            SessionEvent::PlaceChanged(place) => {
+                log::debug!("Navigation vers le lieu : {:?}", place);
+                this.on_place_changed(*place, cx);
+                cx.notify();
+            }
+            SessionEvent::ScopeChanged(scope) => {
+                log::debug!("Navigation vers le périmètre : {:?}", scope);
+                this.on_scope_changed(*scope, cx);
                 cx.notify();
             }
             SessionEvent::SourceScopeChanged(scope) => {
@@ -440,7 +447,41 @@ impl WorkspaceView {
                     executable: std::env::current_exe()
                         .map(|p| p.to_string_lossy().to_string())
                         .unwrap_or_else(|_| "/usr/lib/calix/calix-gpui".to_string()),
-                    destination: session.destination.label().to_lowercase(),
+                    place: session.place.label().to_lowercase(),
+                    scope: session.scope.as_str().to_string(),
+                    scope_sources: session
+                        .scope
+                        .sources()
+                        .iter()
+                        .map(|source| source.to_string())
+                        .collect(),
+                    inventory_only_sources: session
+                        .scope
+                        .inventory_only_sources()
+                        .iter()
+                        .map(|source| source.to_string())
+                        .collect(),
+                    filters: ControlFilters {
+                        sources: session
+                            .source_scope
+                            .enabled_sources(
+                                self.calix_settings.aur_enabled,
+                                self.calix_settings.flat_pack_enabled,
+                                self.calix_settings.app_image_enabled,
+                            )
+                            .iter()
+                            .map(|source| source.as_str().to_lowercase())
+                            .collect(),
+                        state: session.state_filter.label().to_lowercase(),
+                        sort: session.sort_mode.label().to_lowercase(),
+                        view: match session.view_mode {
+                            PackageViewMode::Table => "table".to_string(),
+                            PackageViewMode::Cards => "cards".to_string(),
+                        },
+                    },
+                    row_count: self.current_display_packages(cx).len(),
+                    checked_at: None,
+                    destination: session.scope.as_str().to_string(),
                     query: session.search_query.clone(),
                     view_mode: match session.view_mode {
                         PackageViewMode::Table => "table".to_string(),
@@ -459,7 +500,7 @@ impl WorkspaceView {
                         console.status,
                         crate::components::log_drawer::OperationStatus::Running(_)
                     ) || session.is_searching,
-                    render_lab_active: session.destination == NavDestination::RenderLab,
+                    render_lab_active: session.render_lab,
                 };
                 ControlResponse::ok_with_data(
                     "Running",
@@ -467,27 +508,48 @@ impl WorkspaceView {
                 )
             }
             ControlCommand::Navigate { destination } => {
-                let dest = match destination.to_ascii_lowercase().as_str() {
-                    "browse" => Some(NavDestination::Browse),
-                    "installed" => Some(NavDestination::Installed),
-                    "updates" => Some(NavDestination::Updates),
-                    "news" => Some(NavDestination::News),
-                    "settings" => Some(NavDestination::Settings),
+                // The old verbs keep their meaning: the three package ones are
+                // the scopes, the two others are the places.
+                let target = match destination.to_ascii_lowercase().as_str() {
+                    "browse" | "results" | "search" => Some((Place::Packages, Some(NavScope::Results))),
+                    "installed" => Some((Place::Packages, Some(NavScope::Installed))),
+                    "updates" => Some((Place::Packages, Some(NavScope::Updates))),
+                    "news" => Some((Place::News, None)),
+                    "settings" => Some((Place::Settings, None)),
                     _ => None,
                 };
-                if let Some(dest) = dest {
-                    self.session.update(cx, |s, cx| s.set_destination(dest, cx));
-                    ControlResponse::ok(format!("Navigated to {}", destination))
-                } else {
-                    ControlResponse::error(format!(
+                match target {
+                    Some((place, scope)) => {
+                        self.session.update(cx, |s, cx| {
+                            if let Some(scope) = scope {
+                                s.set_scope(scope, cx);
+                            }
+                            s.set_place(place, cx);
+                        });
+                        ControlResponse::ok(format!("Navigated to {}", destination))
+                    }
+                    None => ControlResponse::error(format!(
                         "Invalid destination '{}'. Expected 'updates', 'installed', 'browse', 'news', or 'settings'",
                         destination
-                    ))
+                    )),
+                }
+            }
+            ControlCommand::Scope { scope } => {
+                match NavScope::parse(&scope) {
+                    Ok(scope) => {
+                        self.session.update(cx, |s, cx| {
+                            s.set_scope(scope, cx);
+                            s.set_place(Place::Packages, cx);
+                        });
+                        ControlResponse::ok(format!("Scope set to {}", scope))
+                    }
+                    Err(message) => ControlResponse::error(message),
                 }
             }
             ControlCommand::Search { query } => {
                 self.session.update(cx, |s, cx| {
-                    s.set_destination(NavDestination::Browse, cx);
+                    s.set_scope(NavScope::Results, cx);
+                    s.set_place(Place::Packages, cx);
                     s.search_query = query.clone();
                 });
                 self.workstation.update(cx, |ws, cx| {
@@ -725,7 +787,7 @@ impl WorkspaceView {
             }
             ControlCommand::RenderLabOpen => {
                 self.session.update(cx, |s, cx| {
-                    s.set_destination(NavDestination::RenderLab, cx);
+                    s.set_render_lab(true, cx);
                 });
                 ControlResponse::ok("Render Lab opened")
             }
@@ -1048,37 +1110,48 @@ impl WorkspaceView {
         .detach();
     }
 
-    /// Réaction au changement de destination
-    fn on_destination_changed(&mut self, dest: NavDestination, cx: &mut Context<Self>) {
+    /// Réaction au changement de lieu : la liste repart du haut.
+    fn on_place_changed(&mut self, place: Place, cx: &mut Context<Self>) {
+        self.workstation.update(cx, |ws, _cx| {
+            ws.scroll_handle.scroll_to_item(0, ScrollStrategy::Top)
+        });
+        if place == Place::News {
+            self.on_news_needed(cx);
+        }
+    }
+
+    /// Réaction au changement de périmètre : le périmètre charge ses propres lignes.
+    fn on_scope_changed(&mut self, scope: NavScope, cx: &mut Context<Self>) {
         self.workstation.update(cx, |ws, _cx| {
             ws.scroll_handle.scroll_to_item(0, ScrollStrategy::Top)
         });
 
-        match dest {
-            NavDestination::Browse => {
+        match scope {
+            NavScope::Results => {
                 let query = self.session.read(cx).search_query.clone();
                 if !query.trim().is_empty() {
                     self.execute_search(query, cx);
                 }
             }
-            NavDestination::Installed => {
+            NavScope::Installed => {
                 let is_empty = self.store.read(cx).installed_packages.is_empty();
                 if is_empty {
                     self.load_installed_packages(cx);
                 }
             }
-            NavDestination::Updates => {
+            NavScope::Updates => {
                 let is_empty = self.store.read(cx).updates_packages.is_empty();
                 if is_empty {
                     self.load_updates(cx);
                 }
             }
-            NavDestination::News => {
-                if self.news.is_empty() {
-                    self.load_news(cx);
-                }
-            }
-            NavDestination::Settings | NavDestination::RenderLab => {}
+        }
+    }
+
+    /// Réaction au changement de lieu : Actualités charge son propre flux.
+    fn on_news_needed(&mut self, cx: &mut Context<Self>) {
+        if self.news.is_empty() {
+            self.load_news(cx);
         }
     }
 
@@ -1688,11 +1761,11 @@ impl WorkspaceView {
                         st.invalidate_updates(cx);
                     });
 
-                    let dest = view.session.read(cx).destination;
-                    match dest {
-                        NavDestination::Installed => view.load_installed_packages(cx),
-                        NavDestination::Updates => view.load_updates(cx),
-                        _ => {}
+                    let scope = view.session.read(cx).scope;
+                    match scope {
+                        NavScope::Installed => view.load_installed_packages(cx),
+                        NavScope::Updates => view.load_updates(cx),
+                        NavScope::Results => {}
                     }
                 }
             });
@@ -1711,12 +1784,7 @@ impl WorkspaceView {
             self.settings.draft_gpui.window_height = h;
         }
 
-        self.settings.draft_gpui.last_selected_tab = self
-            .session
-            .read(cx)
-            .last_workspace_destination
-            .workspace_config_index()
-            .unwrap_or(0);
+        self.settings.draft_gpui.last_scope = self.session.read(cx).scope;
 
         let draft_aur = self.settings.draft_calix.aur_enabled;
         let draft_flatpak = self.settings.draft_calix.flat_pack_enabled;
@@ -1832,15 +1900,14 @@ impl WorkspaceView {
         }
     }
 
-    /// Récupère la liste de paquets actuellement affichée selon la destination active
+    /// Récupère la liste de paquets actuellement affichée selon le périmètre actif
     fn current_display_packages<'a>(&self, cx: &'a Context<Self>) -> &'a [UnifiedPackage] {
-        let dest = self.session.read(cx).destination;
+        let scope = self.session.read(cx).scope;
         let store = self.store.read(cx);
-        match dest {
-            NavDestination::Browse => &store.active_results,
-            NavDestination::Installed => &store.installed_packages,
-            NavDestination::Updates => &store.updates_packages,
-            _ => &[],
+        match scope {
+            NavScope::Results => &store.active_results,
+            NavScope::Installed => &store.installed_packages,
+            NavScope::Updates => &store.updates_packages,
         }
     }
 
@@ -1921,25 +1988,96 @@ impl WorkspaceView {
             _ => {}
         }
     }
+    /// La surface de développement : le laboratoire de rendu.
+    ///
+    /// Ce n'est pas un lieu : il s'ouvre par-dessus, et le lieu d'en dessous
+    /// est retrouvé à la fermeture.
+    fn render_lab_content(
+        &self,
+        cx: &mut Context<Self>,
+        theme: &Theme,
+        entity: &Entity<Self>,
+    ) -> AnyElement {
+            let entity_rl = entity.clone();
+            let rl_state = self.render_lab.read(cx);
+            div()
+                .size_full()
+                .child(crate::views::render_lab::RenderLabView::render(
+                    crate::views::render_lab::RenderLabViewProps {
+                        state: rl_state,
+                        theme: &theme,
+                        ledger_collapsed: self.render_lab_ledger_collapsed,
+                        catalog_scroll_handle: &self.render_lab_catalog_scroll,
+                        on_select_fixture: {
+                            let e = entity_rl.clone();
+                            Rc::new(move |id, _w, cx| {
+                                e.update(cx, |view, cx| {
+                                    view.render_lab.update(cx, |rl, cx| {
+                                        rl.set_fixture(Some(id), cx);
+                                    });
+                                    cx.notify();
+                                });
+                            })
+                        },
+                        on_clear_fixture: {
+                            let e = entity_rl.clone();
+                            Rc::new(move |_w, cx| {
+                                e.update(cx, |view, cx| {
+                                    view.render_lab.update(cx, |rl, cx| {
+                                        rl.set_fixture(None, cx);
+                                    });
+                                    cx.notify();
+                                });
+                            })
+                        },
+                        on_back_settings: {
+                            let e = entity_rl.clone();
+                            Rc::new(move |_w, cx| {
+                                e.update(cx, |view, cx| {
+                                    view.session.update(cx, |s, cx| {
+                                        s.set_render_lab(false, cx);
+                                        s.set_place(Place::Settings, cx);
+                                    });
+                                });
+                            })
+                        },
+                        on_toggle_ledger: {
+                            let e = entity_rl;
+                            Rc::new(move |_w, cx| {
+                                e.update(cx, |view, cx| {
+                                    view.render_lab_ledger_collapsed =
+                                        !view.render_lab_ledger_collapsed;
+                                    cx.notify();
+                                });
+                            })
+                        },
+                    },
+                ))
+            .into_any_element()
+    }
 }
-
 impl Render for WorkspaceView {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let theme = self.theme;
         let entity = cx.entity().clone();
 
         // ── Lecture de l'état de session ────────────────────────────────────
-        let (destination, destination_epoch) = {
+        let (place, render_lab, navigation_epoch) = {
             let session = self.session.read(cx);
-            (session.destination, session.destination_epoch)
+            (session.place, session.render_lab, session.navigation_epoch)
         };
 
-        // ── 1. Contenu principal selon la destination ───────────────────────
-        let main_content = match destination {
-            NavDestination::Browse | NavDestination::Installed | NavDestination::Updates => {
+        // ── 1. Contenu principal selon le lieu ──────────────────────────────
+        // Le laboratoire de rendu est une surface de développement, pas un
+        // lieu : il s'ouvre par-dessus et le lieu d'en dessous est retrouvé.
+        let main_content = if render_lab {
+            self.render_lab_content(cx, &theme, &entity)
+        } else {
+            match place {
+            Place::Packages => {
                 div().size_full().child(self.workstation.clone())
             }
-            NavDestination::News => {
+            Place::News => {
                 let entity_retry = entity.clone();
                 let store = self.store.read(cx);
                 div().size_full().child(NewsView::render(NewsViewProps {
@@ -1954,7 +2092,7 @@ impl Render for WorkspaceView {
                     })),
                 }))
             }
-            NavDestination::Settings => {
+            Place::Settings => {
                 let entity_st = entity.clone();
                 let theme_ref = &theme;
                 div()
@@ -2152,7 +2290,7 @@ impl Render for WorkspaceView {
                             Rc::new(move |_w, cx| {
                                 e.update(cx, |view, cx| {
                                     view.session.update(cx, |s, cx| {
-                                        s.set_destination(NavDestination::RenderLab, cx);
+                                        s.set_render_lab(true, cx);
                                     });
                                 })
                             })
@@ -2207,62 +2345,8 @@ impl Render for WorkspaceView {
                         }),
                     }))
             }
-            NavDestination::RenderLab => {
-                let entity_rl = entity.clone();
-                let rl_state = self.render_lab.read(cx);
-                div()
-                    .size_full()
-                    .child(crate::views::render_lab::RenderLabView::render(
-                        crate::views::render_lab::RenderLabViewProps {
-                            state: rl_state,
-                            theme: &theme,
-                            ledger_collapsed: self.render_lab_ledger_collapsed,
-                            catalog_scroll_handle: &self.render_lab_catalog_scroll,
-                            on_select_fixture: {
-                                let e = entity_rl.clone();
-                                Rc::new(move |id, _w, cx| {
-                                    e.update(cx, |view, cx| {
-                                        view.render_lab.update(cx, |rl, cx| {
-                                            rl.set_fixture(Some(id), cx);
-                                        });
-                                        cx.notify();
-                                    });
-                                })
-                            },
-                            on_clear_fixture: {
-                                let e = entity_rl.clone();
-                                Rc::new(move |_w, cx| {
-                                    e.update(cx, |view, cx| {
-                                        view.render_lab.update(cx, |rl, cx| {
-                                            rl.set_fixture(None, cx);
-                                        });
-                                        cx.notify();
-                                    });
-                                })
-                            },
-                            on_back_settings: {
-                                let e = entity_rl.clone();
-                                Rc::new(move |_w, cx| {
-                                    e.update(cx, |view, cx| {
-                                        view.session.update(cx, |s, cx| {
-                                            s.set_destination(NavDestination::Settings, cx);
-                                        });
-                                    });
-                                })
-                            },
-                            on_toggle_ledger: {
-                                let e = entity_rl;
-                                Rc::new(move |_w, cx| {
-                                    e.update(cx, |view, cx| {
-                                        view.render_lab_ledger_collapsed =
-                                            !view.render_lab_ledger_collapsed;
-                                        cx.notify();
-                                    });
-                                })
-                            },
-                        },
-                    ))
             }
+            .into_any_element()
         };
 
         // Transition discrète de destination (120ms d'opacité ou immédiat sous reduce_motion)
@@ -2279,7 +2363,7 @@ impl Render for WorkspaceView {
                 .size_full()
                 .child(main_content)
                 .with_animation(
-                    ("dest-fade", destination_epoch as usize),
+                    ("nav-fade", navigation_epoch as usize),
                     Animation::new(MotionDurations::FAST).with_easing(gpui::ease_out_quint()),
                     |elem, delta| elem.opacity(delta),
                 )
@@ -2312,7 +2396,60 @@ impl Render for WorkspaceView {
             }),
         });
 
-        // ── 3. Assemblage final du shell ─────────────────────────────────────
+        // ── 3. L'en-tête de contexte ─────────────────────────────────────────
+        // Il dit où l'on est : le lieu, le périmètre, le compte, la couverture
+        // des écosystèmes, l'âge de la réponse et les filtres en force.
+        let (header_place, header_scope, source_scope, state_filter) = {
+            let session = self.session.read(cx);
+            (
+                session.place,
+                session.scope,
+                session.source_scope,
+                session.state_filter,
+            )
+        };
+        let visible_count = {
+            let store = self.store.read(cx);
+            let rows = match header_scope {
+                NavScope::Results => &store.active_results,
+                NavScope::Installed => &store.installed_packages,
+                NavScope::Updates => &store.updates_packages,
+            };
+            crate::state::query::visible_packages(rows, &source_scope, state_filter, SortMode::Relevance).len()
+        };
+        let is_searching = self.session.read(cx).is_searching;
+        let aur_enabled = self.calix_settings.aur_enabled;
+        let flatpak_enabled = self.calix_settings.flat_pack_enabled;
+        let appimage_enabled = self.calix_settings.app_image_enabled;
+
+        let entity_scope = self.session.clone();
+        let entity_clear = self.session.clone();
+        let context_header = ContextHeader::render(ContextHeaderProps {
+            place: header_place,
+            scope: header_scope,
+            row_count: visible_count,
+            row_count_unknown: is_searching,
+            source_scope,
+            state_filter,
+            aur_enabled,
+            flatpak_enabled,
+            appimage_enabled,
+            age: None,
+            on_select_scope: Rc::new(move |scope: NavScope, _w, cx| {
+                entity_scope.update(cx, |s, cx| {
+                    s.set_scope(scope, cx);
+                    s.set_place(Place::Packages, cx);
+                });
+            }),
+            on_clear_filters: Rc::new(move |_w, cx| {
+                entity_clear.update(cx, |s, cx| {
+                    s.clear_filters(aur_enabled, flatpak_enabled, appimage_enabled, cx);
+                });
+            }),
+            theme: &theme,
+        });
+
+        // ── 4. Assemblage final du shell ─────────────────────────────────────
         let entity_key = entity.clone();
 
         div()
@@ -2337,10 +2474,11 @@ impl Render for WorkspaceView {
                     .flex()
                     .flex_col()
                     .overflow_hidden()
+                    .child(context_header)
                     .child(
                         div()
                             .flex_1()
-                            .h_full()
+                            .min_h(px(0.0))
                             .overflow_hidden()
                             .child(destination_element),
                     )

@@ -1,6 +1,6 @@
 use crate::components::sidebar::{Sidebar, SidebarProps};
 use crate::state::package_store::PackageStore;
-use crate::state::session::{AppSession, NavDestination, SessionEvent};
+use crate::state::session::{AppSession, RailEntry, SessionEvent};
 use crate::state::{AnimatedScalar, MotionDurations};
 use crate::theme::Theme;
 use crate::ui_metrics::UiMetrics;
@@ -94,9 +94,9 @@ impl Render for SidebarView {
         }
 
         let current_width = self.width_scalar.current;
-        let (destination, is_collapsed) = {
+        let (place, scope, is_collapsed) = {
             let s = self.session.read(cx);
-            (s.destination, s.sidebar_collapsed)
+            (s.place, s.scope, s.sidebar_collapsed)
         };
         let updates_count = self.store.read(cx).updates_count;
 
@@ -104,14 +104,20 @@ impl Render for SidebarView {
         let session_toggle = self.session.clone();
 
         Sidebar::render(SidebarProps {
-            active_destination: destination,
+            active_place: place,
+            active_scope: scope,
             updates_count,
             is_collapsed,
             current_width,
             theme: &self.theme,
             visual_style: self.visual_style,
-            on_select_destination: Rc::new(move |dest: NavDestination, _w, cx| {
-                session_dest.update(cx, |s, cx| s.set_destination(dest, cx));
+            on_select: Rc::new(move |entry: RailEntry, _w, cx| {
+                session_dest.update(cx, |s, cx| {
+                    if let Some(scope) = entry.scope {
+                        s.set_scope(scope, cx);
+                    }
+                    s.set_place(entry.place, cx);
+                });
             }),
             on_toggle_collapse: Rc::new(move |_w, cx| {
                 session_toggle.update(cx, |s, cx| s.toggle_sidebar(cx));

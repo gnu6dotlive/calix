@@ -2,7 +2,7 @@
 
 These are the wireframes the implementation is measured against. They are drawn on the
 metrics the code already uses (`ui_metrics.rs`), so no measurement has to be
-reinvented: the only new number is the `44px` context header.
+reinvented: the only new number is the `48px` context header.
 
 ## 1. Reading the wireframes
 
@@ -24,7 +24,7 @@ The frame is the same in every place. Only the content area changes.
 
 ```
 ┌──────────────┬────────────────────────────────────────────────────────────────┐
-│              │  CONTEXT HEADER                                   44px          │
+│              │  CONTEXT HEADER                                   48px          │
 │              ├────────────────────────────────────────────────────────────────┤
 │  RAIL        │                                                                │
 │  190px       │                  CONTENT AREA                                   │
@@ -41,7 +41,7 @@ The frame is the same in every place. Only the content area changes.
 | Region | Height | Scrolls | Always present |
 |---|---|---|---|
 | Rail | full | no | yes |
-| Context header | `44px` | no | yes |
+| Context header | `48px` | no | yes |
 | Content area | flex | its own | yes |
 | Operation console | `24px` / `220px` | yes, when open | yes |
 
@@ -52,7 +52,7 @@ covers the content area.
 
 ```
 ┌──────────────┬────────────────────────────────────────────────────────────────┐
-│ CALIX        │  Installed  [ Search | Installed | Updates ]   1 911 pkgs        │ 44
+│ CALIX        │  Installed  [ Search | Installed | Updates ]   1 911 pkgs        │ 48
 │              │  ALPM · AUR · Flatpak · AppImage · Cargo · NPM · Release          │
 │  ⌕ Search    ├────────────────────────────────────────────────────────────────┤
 │  ▣ Installed │  ⌕  search the 1 911 installed packages…                     40 │
@@ -73,7 +73,7 @@ covers the content area.
 
 | Region | Height | Scrolls | Notes |
 |---|---|---|---|
-| Context header | `44px` | no | title, scope switcher, count, coverage, filter summary |
+| Context header | `48px` | no | title, scope switcher, count, coverage, age, filter summary |
 | Search input | `40px` | no | sticky; its placeholder states the universe it searches |
 | Query controls | `34px` | no | sticky; present in every scope |
 | List pane | flex | **yes** | the only scrolling region of the list |
@@ -92,7 +92,7 @@ collapse to their compact form (the breakpoint rule already in
 
 ```
 ┌────────┬──────────────────────────────────────────────────────────────┐
-│        │  Search results  [ Search | Installed | Updates ]  18 pkgs  ▨▥ │ 44
+│        │  Search results  [ Search | Installed | Updates ]  18 pkgs  ▨▥ │ 48
 │  ⌕     │  ALPM · AUR                                                  │
 │  ▣     ├──────────────────────────────────────────────────────────────┤
 │  ↻     │  ⌕  ripgrep                                          [×]    │ 40
@@ -113,7 +113,7 @@ the user their orientation.
 
 ```
 ┌──────────────┬────────────────────────────────────────────────────────────────┐
-│  CALIX       │  Updates  [ Search | Installed | Updates ]        3 pkgs      │ 44
+│  CALIX       │  Updates  [ Search | Installed | Updates ]        3 pkgs      │ 48
 │              │  ALPM · AUR · Flatpak · AppImage · checked 4 minutes ago         │
 │  ⌕ Search    ├────────────────────────────────────────────────────────────────┤
 │  ▣ Installed │  ⌕  search the 3 pending updates…                           40 │
@@ -135,7 +135,7 @@ old its answer is cannot be trusted.
 
 ```
 ┌──────────────┬────────────────────────────────────────────────────────────────┐
-│  CALIX       │  Arch Linux news                                    3 unread   │ 44
+│  CALIX       │  Arch Linux news                                    3 unread   │ 48
 │              ├────────────────────────────────────────────────────────────────┤
 │  ⌕ Search    │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │
 │  ▣ Installed │  2026-10-18  Package signing keys rotated         ● unread     │
@@ -155,7 +155,7 @@ content: the rail *is* the way back, and it is one click away.
 
 ```
 ┌──────────────┬────────────────────────────────────────────────────────────────┐
-│  CALIX       │  Settings                                                       │ 44
+│  CALIX       │  Settings                                                       │ 48
 │              ├────────────────────────────────────────────────────────────────┤
 │  ⌕ Search    │  PACKAGE SOURCES                                                │
 │  ▣ Installed │  ┌────────────────────────────────────────────────────────────┐ │
@@ -183,7 +183,7 @@ of the configuration ("Up to date").
 
 ```
 ┌──────────────┬────────────────────────────────────────────────────────────────┐
-│  CALIX       │  Installed  [ Search | Installed | Updates ]        1 911 pkgs │ 44
+│  CALIX       │  Installed  [ Search | Installed | Updates ]        1 911 pkgs │ 48
 │  ...         ├────────────────────────────────────────────────────────────────┤
 │              │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │
 │              │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │
@@ -226,7 +226,7 @@ meaningful next to "checked when".
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────┐
-│  Installed ▾   [ Search | Installed | Updates ]            1 911 pkgs           │ 44
+│  Installed ▾   [ Search | Installed | Updates ]            1 911 pkgs           │ 48
 │  ALPM · AUR · Flatpak · AppImage · Cargo · NPM · Release  ·  Flatpak only     │
 └────────────────────────────────────────────────────────────────────────────────┘
    ↑ title        ↑ scope switcher (bound to the rail)      ↑ count    ↑ coverage

@@ -55,7 +55,10 @@ contain, with the inventory-only ones marked as such in the Installed scope.
 **N14 — The header carries the filter summary** when a filter is not at its default,
 and offers a single action that clears the filters.
 
-**N15 — The header is `44px` tall and does not scroll.** It is sticky in every place.
+**N15 — The header is `48px` tall and does not scroll.** It is sticky in every place.
+The first draft said 44px; the implementation measured 47 — the place and the
+perimeter, the scope switcher, then the coverage and the age — and the contract
+follows the measurement.
 
 ## 3. The back path
 

@@ -21,6 +21,8 @@ pub enum CliCommand {
     Status,
     Quit,
     Navigate { destination: String },
+    /// Change the scope of the package surface, without leaving the place.
+    Scope { scope: String },
     Search { query: String },
     View { mode: String },
     Inspect { package: String },
@@ -125,6 +127,17 @@ impl CliInvocation {
                 }
                 CliCommand::Navigate {
                     destination: positional[1].clone(),
+                }
+            }
+            "scope" => {
+                if positional.len() < 2 {
+                    return Err(
+                        "Missing scope argument for 'scope' (e.g. results, installed, updates)"
+                            .into(),
+                    );
+                }
+                CliCommand::Scope {
+                    scope: positional[1].clone(),
                 }
             }
             "search" => {
@@ -409,6 +422,7 @@ Runtime Control Commands:
   status                     Print runtime status and health
   quit                       Cleanly terminate running Calix instance
   navigate <dest>            Navigate to 'updates', 'installed', 'browse', 'news', 'settings'
+  scope <scope>              Change the package scope: 'results', 'installed', 'updates'
   search <query>             Search for packages in the browse workstation
   view <table|cards>         Switch package workstation view mode
   inspect <package>          Select and inspect a package
@@ -613,6 +627,13 @@ pub async fn run_cli_invocation(invocation: CliInvocation) -> Result<CliOutcome>
             }
             let resp =
                 ControlSocket::send_command(ControlCommand::Navigate { destination }).await?;
+            outcome_from_response(&resp, json)
+        }
+        CliCommand::Scope { scope } => {
+            if !is_running {
+                ensure_gui_running().await?;
+            }
+            let resp = ControlSocket::send_command(ControlCommand::Scope { scope }).await?;
             outcome_from_response(&resp, json)
         }
         CliCommand::Search { query } => {

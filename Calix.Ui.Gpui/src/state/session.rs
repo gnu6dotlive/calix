@@ -88,61 +88,170 @@ impl PackageKey {
     }
 }
 
-/// Destinations principales de la barre latérale de la station de travail
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum NavDestination {
-    #[default]
-    Browse,
-    Installed,
-    Updates,
-    News,
-    Settings,
-    RenderLab,
-}
-
 use crate::icons::AppIcon;
 
-impl NavDestination {
+/// Les lieux : une surface de travail, pas un jeu de données.
+///
+/// Le rail porte cinq entrées : les trois premières sont des périmètres de la
+/// surface des paquets, les deux dernières sont des lieux à part entière. Un
+/// lieu à la fois.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum Place {
+    #[default]
+    Packages,
+    News,
+    Settings,
+}
+
+impl Place {
     pub fn label(&self) -> &'static str {
         match self {
-            NavDestination::Browse => "Browse",
-            NavDestination::Installed => "Installed",
-            NavDestination::Updates => "Updates",
-            NavDestination::News => "News",
-            NavDestination::Settings => "Settings",
-            NavDestination::RenderLab => "Render Lab",
+            Place::Packages => "Packages",
+            Place::News => "News",
+            Place::Settings => "Settings",
+        }
+    }
+}
+
+/// Les périmètres : le jeu de données que montre la surface des paquets.
+///
+/// Un périmètre à la fois, et il est toujours nommé à l'écran.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum NavScope {
+    #[default]
+    Results,
+    Installed,
+    Updates,
+}
+
+impl NavScope {
+    /// Les trois périmètres, dans l'ordre où le commutateur les présente.
+    pub const ALL: &'static [NavScope] =
+        &[NavScope::Results, NavScope::Installed, NavScope::Updates];
+
+    pub fn label(&self) -> &'static str {
+        match self {
+            NavScope::Results => "Search results",
+            NavScope::Installed => "Installed",
+            NavScope::Updates => "Updates",
+        }
+    }
+
+    /// La clé du périmètre, dans la surface de contrôle et dans l'état persisté.
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            NavScope::Results => "results",
+            NavScope::Installed => "installed",
+            NavScope::Updates => "updates",
+        }
+    }
+
+    /// Lit une valeur de la surface de contrôle.
+    ///
+    /// `browse` reste un alias de `results` : les verbes d'avant doivent
+    /// continuer à répondre, et le nom d'avant disait la même chose.
+    pub fn parse(value: &str) -> Result<Self, String> {
+        match value.trim().to_ascii_lowercase().as_str() {
+            "results" | "search" | "browse" => Ok(NavScope::Results),
+            "installed" => Ok(NavScope::Installed),
+            "updates" => Ok(NavScope::Updates),
+            other => Err(format!(
+                "Invalid scope '{other}', expected 'results', 'installed' or 'updates'"
+            )),
         }
     }
 
     pub fn icon(&self) -> AppIcon {
         match self {
-            NavDestination::Browse => AppIcon::Browse,
-            NavDestination::Installed => AppIcon::Installed,
-            NavDestination::Updates => AppIcon::Updates,
-            NavDestination::News => AppIcon::News,
-            NavDestination::Settings => AppIcon::Settings,
-            NavDestination::RenderLab => AppIcon::RenderLab,
+            NavScope::Results => AppIcon::Search,
+            NavScope::Installed => AppIcon::Installed,
+            NavScope::Updates => AppIcon::Updates,
         }
     }
 
-    pub fn workspace_config_index(&self) -> Option<usize> {
+    /// Les écosystèmes que le périmètre peut contenir.
+    ///
+    /// Les périmètres qui interrogent les dépôts portent les quatre sources
+    /// interrogeables ; celui qui liste l'inventaire en porte sept.
+    pub fn sources(self) -> &'static [&'static str] {
         match self {
-            NavDestination::Browse => Some(0),
-            NavDestination::Installed => Some(1),
-            NavDestination::Updates => Some(2),
-            NavDestination::News => Some(3),
-            NavDestination::Settings => None,
-            NavDestination::RenderLab => None,
+            NavScope::Results | NavScope::Updates => &["alpm", "aur", "flatpak", "appimage"],
+            NavScope::Installed => {
+                &["alpm", "aur", "flatpak", "appimage", "cargo", "npm", "release"]
+            }
         }
     }
 
-    pub fn from_config_index(idx: usize) -> Self {
-        match idx {
-            1 => NavDestination::Installed,
-            2 => NavDestination::Updates,
-            3 => NavDestination::News,
-            _ => NavDestination::Browse,
+    /// Les écosystèmes que le périmètre liste mais ne peut pas interroger.
+    pub fn inventory_only_sources(self) -> &'static [&'static str] {
+        match self {
+            NavScope::Installed => &["cargo", "npm", "release"],
+            _ => &[],
         }
+    }
+}
+
+impl std::fmt::Display for NavScope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+/// Une entrée du rail : un lieu, et le périmètre quand elle en a un.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct RailEntry {
+    pub id: &'static str,
+    pub label: &'static str,
+    pub icon: AppIcon,
+    pub place: Place,
+    /// `None` pour les lieux qui n'ont pas de périmètre.
+    pub scope: Option<NavScope>,
+}
+
+impl RailEntry {
+    /// Les cinq entrées du rail, dans leur ordre.
+    pub const ALL: &'static [RailEntry] = &[
+        RailEntry {
+            id: "nav_scope_results",
+            label: "Search",
+            icon: AppIcon::Search,
+            place: Place::Packages,
+            scope: Some(NavScope::Results),
+        },
+        RailEntry {
+            id: "nav_scope_installed",
+            label: "Installed",
+            icon: AppIcon::Installed,
+            place: Place::Packages,
+            scope: Some(NavScope::Installed),
+        },
+        RailEntry {
+            id: "nav_scope_updates",
+            label: "Updates",
+            icon: AppIcon::Updates,
+            place: Place::Packages,
+            scope: Some(NavScope::Updates),
+        },
+        RailEntry {
+            id: "nav_place_news",
+            label: "News",
+            icon: AppIcon::News,
+            place: Place::News,
+            scope: None,
+        },
+        RailEntry {
+            id: "nav_place_settings",
+            label: "Settings",
+            icon: AppIcon::Settings,
+            place: Place::Settings,
+            scope: None,
+        },
+    ];
+
+    /// L'entrée est-elle celle qui est ouverte ?
+    pub fn is_active(&self, place: Place, scope: NavScope) -> bool {
+        self.place == place && self.scope.map_or(true, |s| s == scope)
     }
 }
 
@@ -193,7 +302,8 @@ impl InspectorTab {
 /// Événements sémantiques émis par la session applicative
 #[derive(Debug, Clone, PartialEq)]
 pub enum SessionEvent {
-    DestinationChanged(NavDestination),
+    PlaceChanged(Place),
+    ScopeChanged(NavScope),
     SearchQueryChanged(String),
     PackageSelected(Option<PackageKey>),
     SidebarToggled(bool),
@@ -207,8 +317,11 @@ pub enum SessionEvent {
 
 /// Entité GPUI gérant l'état de navigation et d'intention de l'utilisateur
 pub struct AppSession {
-    pub destination: NavDestination,
-    pub last_workspace_destination: NavDestination,
+    pub place: Place,
+    pub scope: NavScope,
+    /// La surface de développement n'est pas un lieu : elle est ouverte par
+    ///-dessus, et le lieu d'en dessous est retrouvé à la fermeture.
+    pub render_lab: bool,
     pub source_scope: SourceScope,
     pub state_filter: PackageStateFilter,
     pub sort_mode: SortMode,
@@ -219,7 +332,7 @@ pub struct AppSession {
     pub sidebar_collapsed: bool,
     pub view_mode: PackageViewMode,
     pub inspector_tab: InspectorTab,
-    pub destination_epoch: u64,
+    pub navigation_epoch: u64,
     pub inspector_tab_epoch: u64,
 }
 
@@ -227,14 +340,14 @@ impl EventEmitter<SessionEvent> for AppSession {}
 
 impl AppSession {
     pub fn new() -> Self {
-        Self::with_initial_tab(0)
+        Self::with_initial_scope(NavScope::default())
     }
 
-    pub fn with_initial_tab(tab_idx: usize) -> Self {
-        let initial_dest = NavDestination::from_config_index(tab_idx);
+    pub fn with_initial_scope(scope: NavScope) -> Self {
         Self {
-            destination: initial_dest,
-            last_workspace_destination: initial_dest,
+            place: Place::default(),
+            scope,
+            render_lab: false,
             source_scope: SourceScope::all(),
             state_filter: PackageStateFilter::All,
             sort_mode: SortMode::Relevance,
@@ -245,19 +358,38 @@ impl AppSession {
             sidebar_collapsed: false,
             view_mode: PackageViewMode::Cards,
             inspector_tab: InspectorTab::Overview,
-            destination_epoch: 0,
+            navigation_epoch: 0,
             inspector_tab_epoch: 0,
         }
     }
 
-    pub fn set_destination(&mut self, dest: NavDestination, cx: &mut Context<Self>) {
-        if self.destination != dest {
-            self.destination = dest;
-            if dest.workspace_config_index().is_some() {
-                self.last_workspace_destination = dest;
-            }
-            self.destination_epoch = self.destination_epoch.wrapping_add(1);
-            cx.emit(SessionEvent::DestinationChanged(dest));
+    /// Change de lieu. Le périmètre courant est conservé : revenir de Actualités
+    /// ou de Réglages ramène au périmètre d'où l'on venait.
+    pub fn set_place(&mut self, place: Place, cx: &mut Context<Self>) {
+        if self.place != place {
+            self.place = place;
+            self.navigation_epoch = self.navigation_epoch.wrapping_add(1);
+            cx.emit(SessionEvent::PlaceChanged(place));
+            cx.notify();
+        }
+    }
+
+    /// Change de périmètre. Les filtres sont conservés : l'utilisateur a
+    /// demandé une vue filtrée, elle ne se vide pas sous lui.
+    pub fn set_scope(&mut self, scope: NavScope, cx: &mut Context<Self>) {
+        if self.scope != scope {
+            self.scope = scope;
+            self.navigation_epoch = self.navigation_epoch.wrapping_add(1);
+            cx.emit(SessionEvent::ScopeChanged(scope));
+            cx.notify();
+        }
+    }
+
+    /// Ouvre ou ferme la surface de développement.
+    pub fn set_render_lab(&mut self, open: bool, cx: &mut Context<Self>) {
+        if self.render_lab != open {
+            self.render_lab = open;
+            self.navigation_epoch = self.navigation_epoch.wrapping_add(1);
             cx.notify();
         }
     }
@@ -408,7 +540,9 @@ mod tests {
     #[test]
     fn test_app_session_defaults() {
         let session = AppSession::new();
-        assert_eq!(session.destination, NavDestination::Browse);
+        assert_eq!(session.place, Place::Packages);
+        assert_eq!(session.scope, NavScope::Results);
+        assert!(!session.render_lab);
         assert_eq!(session.source_scope, SourceScope::all());
         assert_eq!(session.state_filter, PackageStateFilter::All);
         assert_eq!(session.sort_mode, SortMode::Relevance);
@@ -421,12 +555,44 @@ mod tests {
     }
 
     #[test]
-    fn test_nav_destination_metadata() {
-        assert_eq!(NavDestination::Browse.label(), "Browse");
-        assert_eq!(NavDestination::Installed.label(), "Installed");
-        assert_eq!(NavDestination::Updates.label(), "Updates");
-        assert_eq!(NavDestination::News.label(), "News");
-        assert_eq!(NavDestination::Settings.label(), "Settings");
+    fn test_nav_scope_metadata() {
+        assert_eq!(NavScope::Results.label(), "Search results");
+        assert_eq!(NavScope::Installed.label(), "Installed");
+        assert_eq!(NavScope::Updates.label(), "Updates");
+        assert_eq!(NavScope::Results.as_str(), "results");
+        assert_eq!(NavScope::Installed.as_str(), "installed");
+        assert_eq!(NavScope::Updates.as_str(), "updates");
+    }
+
+    #[test]
+    fn test_nav_scope_parses_the_control_surface_keys() {
+        assert_eq!(NavScope::parse("results").unwrap(), NavScope::Results);
+        assert_eq!(NavScope::parse("browse").unwrap(), NavScope::Results);
+        assert_eq!(NavScope::parse("Installed").unwrap(), NavScope::Installed);
+        assert_eq!(NavScope::parse("updates").unwrap(), NavScope::Updates);
+        assert!(NavScope::parse("cyan").is_err());
+    }
+
+    #[test]
+    fn test_the_rail_carries_five_entries_and_marks_the_active_one() {
+        assert_eq!(RailEntry::ALL.len(), 5);
+        assert_eq!(RailEntry::ALL[0].scope, Some(NavScope::Results));
+        assert_eq!(RailEntry::ALL[3].scope, None);
+        assert_eq!(RailEntry::ALL[3].place, Place::News);
+
+        // The entry of the current scope is the active one, and the three
+        // package entries never mark the same scope twice.
+        let mut active = 0;
+        for entry in RailEntry::ALL {
+            if entry.is_active(Place::Packages, NavScope::Installed) {
+                active += 1;
+                assert_eq!(entry.scope, Some(NavScope::Installed));
+            }
+        }
+        assert_eq!(active, 1);
+
+        assert!(RailEntry::ALL[3].is_active(Place::News, NavScope::Results));
+        assert!(!RailEntry::ALL[3].is_active(Place::Settings, NavScope::Results));
     }
 
     #[test]
@@ -467,86 +633,17 @@ mod tests {
         assert_eq!(InspectorTab::Dependencies.icon(), AppIcon::Dependencies);
         assert_eq!(InspectorTab::FilesBuild.icon(), AppIcon::FilesBuild);
 
-        assert_eq!(NavDestination::Browse.icon(), AppIcon::Browse);
-        assert_eq!(NavDestination::Installed.icon(), AppIcon::Installed);
-        assert_eq!(NavDestination::Updates.icon(), AppIcon::Updates);
-        assert_eq!(NavDestination::News.icon(), AppIcon::News);
-        assert_eq!(NavDestination::Settings.icon(), AppIcon::Settings);
-    }
-
-    #[test]
-    fn test_workspace_config_index_round_trip() {
-        assert_eq!(NavDestination::Browse.workspace_config_index(), Some(0));
-        assert_eq!(NavDestination::Installed.workspace_config_index(), Some(1));
-        assert_eq!(NavDestination::Updates.workspace_config_index(), Some(2));
-        assert_eq!(NavDestination::News.workspace_config_index(), Some(3));
-        assert_eq!(NavDestination::Settings.workspace_config_index(), None);
-
-        assert_eq!(NavDestination::from_config_index(0), NavDestination::Browse);
-        assert_eq!(
-            NavDestination::from_config_index(1),
-            NavDestination::Installed
-        );
-        assert_eq!(
-            NavDestination::from_config_index(2),
-            NavDestination::Updates
-        );
-        assert_eq!(NavDestination::from_config_index(3), NavDestination::News);
-        assert_eq!(NavDestination::from_config_index(4), NavDestination::Browse); // legacy settings maps to browse
-        assert_eq!(
-            NavDestination::from_config_index(99),
-            NavDestination::Browse
-        );
-    }
-
-    #[test]
-    fn test_last_workspace_destination_tracks_non_settings() {
-        let mut session = AppSession::new();
-        assert_eq!(session.destination, NavDestination::Browse);
-        assert_eq!(session.last_workspace_destination, NavDestination::Browse);
-
-        // Manually simulate set_destination logic without Context
-        session.destination = NavDestination::Installed;
-        session.last_workspace_destination = NavDestination::Installed;
-
-        // Navigating to Settings does NOT update last_workspace_destination
-        session.destination = NavDestination::Settings;
-        // last_workspace_destination remains Installed
-        assert_eq!(
-            session.last_workspace_destination,
-            NavDestination::Installed
-        );
-        assert_eq!(
-            session.last_workspace_destination.workspace_config_index(),
-            Some(1)
-        );
-    }
-
-    #[test]
-    fn test_startup_session_preserves_last_workspace_destination_across_settings() {
-        let mut session = AppSession::with_initial_tab(1); // 1 = Installed
-        assert_eq!(session.destination, NavDestination::Installed);
-        assert_eq!(
-            session.last_workspace_destination,
-            NavDestination::Installed
-        );
-        assert_eq!(
-            session.last_workspace_destination.workspace_config_index(),
-            Some(1)
-        );
-
-        // Transition to Settings preserves last_workspace_destination = Installed
-        session.destination = NavDestination::Settings;
-        assert_eq!(
-            session.last_workspace_destination.workspace_config_index(),
-            Some(1)
-        );
+        assert_eq!(NavScope::Results.icon(), AppIcon::Search);
+        assert_eq!(NavScope::Installed.icon(), AppIcon::Installed);
+        assert_eq!(NavScope::Updates.icon(), AppIcon::Updates);
+        assert_eq!(Place::News.label(), "News");
+        assert_eq!(Place::Settings.label(), "Settings");
     }
 
     #[test]
     fn test_view_mode_continuity_preserves_selection_query_and_generation() {
         let mut session = AppSession::new();
-        session.destination = NavDestination::Browse;
+        session.scope = NavScope::Results;
         session.search_query = "ripgrep".to_string();
         session.search_generation = 12;
 
@@ -586,93 +683,20 @@ mod tests {
 
         // Simulate dependency click navigation in session
         let mut session = AppSession::new();
-        session.destination = NavDestination::Installed;
+        session.scope = NavScope::Installed;
         session.search_query = "calix".to_string();
 
         // When navigating to dependency, clean name is used, not raw constraint/description
-        session.destination = NavDestination::Browse;
+        session.scope = NavScope::Results;
         session.search_query = parsed.name.clone();
         session.search_generation += 1;
 
-        assert_eq!(session.destination, NavDestination::Browse);
+        assert_eq!(session.scope, NavScope::Results);
         assert_eq!(session.search_query, "libalpm.so");
         assert!(!session.search_query.contains(">=14"));
         assert!(!session.search_query.contains("Arch package"));
     }
 
-    #[test]
-    fn test_session_epochs_increment() {
-        let mut session = AppSession::new();
-        assert_eq!(session.destination_epoch, 0);
-        assert_eq!(session.inspector_tab_epoch, 0);
-
-        // Manually simulate epoch increments as in set_destination and set_inspector_tab
-        session.destination = NavDestination::News;
-        session.destination_epoch += 1;
-        assert_eq!(session.destination_epoch, 1);
-
-        session.inspector_tab = InspectorTab::Dependencies;
-        session.inspector_tab_epoch += 1;
-        assert_eq!(session.inspector_tab_epoch, 1);
-    }
-
-    #[test]
-    fn test_nav_destination_render_lab_properties() {
-        let dest = NavDestination::RenderLab;
-        assert_eq!(dest.label(), "Render Lab");
-        assert_eq!(dest.icon(), AppIcon::RenderLab);
-        assert_eq!(dest.workspace_config_index(), None);
-    }
-
-    #[test]
-    fn test_set_destination_render_lab_does_not_update_last_workspace() {
-        let mut session = AppSession::new();
-        assert_eq!(session.destination, NavDestination::Browse);
-        assert_eq!(session.last_workspace_destination, NavDestination::Browse);
-
-        // Manually test set_destination logic without GPUI Context
-        let dest = NavDestination::Installed;
-        if dest.workspace_config_index().is_some() {
-            session.last_workspace_destination = dest;
-        }
-        session.destination = dest;
-        assert_eq!(session.destination, NavDestination::Installed);
-        assert_eq!(
-            session.last_workspace_destination,
-            NavDestination::Installed
-        );
-
-        // Navigating to Settings does NOT update last_workspace_destination
-        let dest = NavDestination::Settings;
-        if dest.workspace_config_index().is_some() {
-            session.last_workspace_destination = dest;
-        }
-        session.destination = dest;
-        assert_eq!(session.destination, NavDestination::Settings);
-        assert_eq!(
-            session.last_workspace_destination,
-            NavDestination::Installed
-        );
-
-        // Navigating to RenderLab does NOT update last_workspace_destination
-        let dest = NavDestination::RenderLab;
-        if dest.workspace_config_index().is_some() {
-            session.last_workspace_destination = dest;
-        }
-        session.destination = dest;
-        assert_eq!(session.destination, NavDestination::RenderLab);
-        assert_eq!(
-            session.last_workspace_destination,
-            NavDestination::Installed
-        );
-    }
-
-    /// Une crate Cargo ne doit pas être cléifiée comme un paquet ALPM.
-    ///
-    /// Le repli « toute source inconnue est ALPM » faisait récupérer les
-    /// détails ALPM d'un homonyme (une crate `cargo-edit` et le paquet AUR
-    /// `cargo-edit` partagent le même nom), affichant une URL amont et un
-    /// motif d'installation qui ne concernent pas la crate inspectée.
     #[test]
     fn ecosystem_packages_get_their_own_source_kind() {
         use crate::backend::models::{CargoCrate, NpmPackage, ReleasePackage};
@@ -731,4 +755,51 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn test_session_epochs_increment() {
+        let mut session = AppSession::new();
+        assert_eq!(session.navigation_epoch, 0);
+        assert_eq!(session.inspector_tab_epoch, 0);
+
+        // The navigation epoch is what tells the views that the place or the
+        // scope moved.
+        session.place = Place::News;
+        session.navigation_epoch += 1;
+        assert_eq!(session.navigation_epoch, 1);
+
+        session.scope = NavScope::Installed;
+        session.navigation_epoch += 1;
+        assert_eq!(session.navigation_epoch, 2);
+
+        session.inspector_tab = InspectorTab::Dependencies;
+        session.inspector_tab_epoch += 1;
+        assert_eq!(session.inspector_tab_epoch, 1);
+    }
+
+    #[test]
+    fn the_render_lab_is_not_a_place() {
+        // The render lab opens above the place, and the place is found again
+        // when it closes: it is not a destination of its own.
+        let mut session = AppSession::new();
+        assert!(!session.render_lab);
+        assert_eq!(session.place, Place::Packages);
+        session.render_lab = true;
+        assert_eq!(session.place, Place::Packages);
+        session.render_lab = false;
+        assert_eq!(session.place, Place::Packages);
+    }
+
+    #[test]
+    fn the_scope_survives_a_place_change() {
+        // Le périmètre appartient à la session, pas au lieu : revenir de
+        // Réglages ramène au périmètre d'où l'on venait.
+        let mut session = AppSession::new();
+        session.scope = NavScope::Installed;
+        session.place = Place::Settings;
+        assert_eq!(session.scope, NavScope::Installed);
+        session.place = Place::Packages;
+        assert_eq!(session.scope, NavScope::Installed);
+    }
+
 }

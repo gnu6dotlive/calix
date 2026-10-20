@@ -1,3 +1,4 @@
+pub mod context_header;
 pub mod inspector_header;
 pub mod log_drawer;
 pub mod menu;

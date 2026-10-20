@@ -10,7 +10,7 @@ use crate::components::unified_search::UnifiedSearch;
 use crate::state::console::{ConsoleEvent, ConsoleModel};
 use crate::state::query::{PackageStateFilter, SortMode, SourceScope, WorkbenchBreakpoint};
 use crate::state::{
-    canonical_install_command, AppSession, NavDestination, PackageKey, PackageSourceKind,
+    canonical_install_command, AppSession, NavScope, PackageKey, PackageSourceKind,
     PackageStore, PackageViewMode, ToastCenter, ToastKind,
 };
 use crate::theme::Theme;
@@ -583,7 +583,7 @@ impl Render for PackageWorkstationView {
         };
 
         let (
-            destination,
+            scope,
             is_searching,
             selected_key,
             view_mode,
@@ -594,7 +594,7 @@ impl Render for PackageWorkstationView {
         ) = {
             let s = self.session.read(cx);
             (
-                s.destination,
+                s.scope,
                 s.is_searching,
                 s.selected_package_key.clone(),
                 s.view_mode,
@@ -612,11 +612,10 @@ impl Render for PackageWorkstationView {
 
         let raw_packages: std::sync::Arc<[UnifiedPackage]> = {
             let store = self.store.read(cx);
-            match destination {
-                NavDestination::Browse => std::sync::Arc::clone(&store.active_results),
-                NavDestination::Installed => std::sync::Arc::clone(&store.installed_packages),
-                NavDestination::Updates => std::sync::Arc::clone(&store.updates_packages),
-                _ => std::sync::Arc::from([]),
+            match scope {
+                NavScope::Results => std::sync::Arc::clone(&store.active_results),
+                NavScope::Installed => std::sync::Arc::clone(&store.installed_packages),
+                NavScope::Updates => std::sync::Arc::clone(&store.updates_packages),
             }
         };
 
@@ -627,16 +626,12 @@ impl Render for PackageWorkstationView {
             {
                 raw_packages
             } else {
-                let mut filtered: Vec<UnifiedPackage> = raw_packages
-                    .iter()
-                    .filter(|p| {
-                        source_scope.contains_str(&p.source_type)
-                            && state_filter.matches(p.is_installed, p.has_update)
-                    })
-                    .cloned()
-                    .collect();
-                sort_mode.sort_packages(&mut filtered);
-                std::sync::Arc::from(filtered)
+                std::sync::Arc::from(crate::state::query::visible_packages(
+                    &raw_packages,
+                    &source_scope,
+                    state_filter,
+                    sort_mode,
+                ))
             }
         };
 
@@ -667,8 +662,8 @@ impl Render for PackageWorkstationView {
             )
         };
 
-        let top_bar = match destination {
-            crate::state::NavDestination::Browse => {
+        let top_bar = match scope {
+            NavScope::Results => {
                 let on_toggle_source = entity.clone();
                 let on_state = entity.clone();
                 let on_sort = entity.clone();
@@ -758,7 +753,7 @@ impl Render for PackageWorkstationView {
                 })
                 .into_any_element()
             }
-            crate::state::NavDestination::Installed => div()
+            NavScope::Installed => div()
                 .flex()
                 .items_center()
                 .justify_between()
@@ -797,7 +792,7 @@ impl Render for PackageWorkstationView {
                         .child(mode_switcher),
                 )
                 .into_any_element(),
-            crate::state::NavDestination::Updates => {
+            NavScope::Updates => {
                 let on_upgrade_cb = self.on_upgrade_all.clone();
                 div()
                     .flex()
@@ -880,7 +875,6 @@ impl Render for PackageWorkstationView {
                     )
                     .into_any_element()
             }
-            _ => div().into_any_element(),
         };
 
         // ── 2. Corps de la liste (Cards vs Table) ───────────────────────────
@@ -890,9 +884,9 @@ impl Render for PackageWorkstationView {
         };
 
         let is_browse_empty =
-            destination == crate::state::NavDestination::Browse && search_query.trim().is_empty();
+            scope == NavScope::Results && search_query.trim().is_empty();
 
-        let list_body = if let (NavDestination::Installed, Some(err)) = (destination, installed_err)
+        let list_body = if let (NavScope::Installed, Some(err)) = (scope, installed_err)
         {
             let on_reload_installed_cb = self.on_reload_installed.clone();
             div()
@@ -930,7 +924,7 @@ impl Render for PackageWorkstationView {
                         }),
                 )
                 .into_any_element()
-        } else if let (NavDestination::Updates, Some(err)) = (destination, updates_err) {
+        } else if let (NavScope::Updates, Some(err)) = (scope, updates_err) {
             let on_reload_updates_cb = self.on_reload_updates.clone();
             div()
                 .flex()
@@ -1267,7 +1261,7 @@ impl Render for PackageWorkstationView {
                 on_navigate_package: Some(Rc::new(move |pkg_name, _w, cx| {
                     entity_nav_dep.update(cx, |view, cx| {
                         view.session.update(cx, |s, cx| {
-                            s.set_destination(crate::state::NavDestination::Browse, cx);
+                            s.set_scope(NavScope::Results, cx);
                             s.set_source_scope(SourceScope::all(), cx);
                             s.set_state_filter(PackageStateFilter::All, cx);
                             s.set_search_query(pkg_name.clone(), cx);

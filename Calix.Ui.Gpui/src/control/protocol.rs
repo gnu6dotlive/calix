@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 /// - v2: Render Lab baseline surface commands (open, fixture, material, topology, motion, quality, time, status)
 /// - v3: RenderLabStyle command & schema v2 manifest fields (recipe, seed, diagnostics) for RENDER-01 confrontation
 /// - v4: RenderLabMetrics, RenderLabRecipes, RenderLabRecipe for RENDER-02 structural telemetry
-pub const CONTROL_PROTOCOL_VERSION: u32 = 4;
+pub const CONTROL_PROTOCOL_VERSION: u32 = 5;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ControlRequest {
@@ -30,6 +30,8 @@ pub enum ControlCommand {
     Quit,
     Status,
     Navigate { destination: String },
+    /// Change the scope of the package surface, without leaving the place.
+    Scope { scope: String },
     Search { query: String },
     View { mode: String },
     Inspect { package: String },
@@ -102,6 +104,21 @@ pub struct ControlStatus {
     pub gui_running: bool,
     pub pid: u32,
     pub executable: String,
+    /// The place: `packages`, `news` or `settings`.
+    pub place: String,
+    /// The scope of the package surface: `results`, `installed` or `updates`.
+    pub scope: String,
+    /// The ecosystems the scope can contain.
+    pub scope_sources: Vec<String>,
+    /// The ecosystems the scope lists but cannot query.
+    pub inventory_only_sources: Vec<String>,
+    /// The filters in force, as the interface shows them.
+    pub filters: ControlFilters,
+    /// The number of rows the scope shows.
+    pub row_count: usize,
+    /// When the scope's answer was true, when it is known.
+    pub checked_at: Option<String>,
+    /// The deprecated alias of `scope`, kept for the automation that reads it.
     pub destination: String,
     pub query: String,
     pub view_mode: String,
@@ -110,6 +127,15 @@ pub struct ControlStatus {
     pub operation_running: bool,
     #[serde(default)]
     pub render_lab_active: bool,
+}
+
+/// The filters in force, in the vocabulary the interface uses.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct ControlFilters {
+    pub sources: Vec<String>,
+    pub state: String,
+    pub sort: String,
+    pub view: String,
 }
 
 impl ControlStatus {
@@ -122,6 +148,13 @@ impl ControlStatus {
             gui_running: false,
             pid: 0,
             executable: exe,
+            place: "unknown".to_string(),
+            scope: "unknown".to_string(),
+            scope_sources: Vec::new(),
+            inventory_only_sources: Vec::new(),
+            filters: ControlFilters::default(),
+            row_count: 0,
+            checked_at: None,
             destination: "unknown".to_string(),
             query: String::new(),
             view_mode: "unknown".to_string(),
@@ -165,7 +198,19 @@ mod tests {
             gui_running: true,
             pid: 12345,
             executable: "/usr/lib/calix/calix-gpui".to_string(),
-            destination: "browse".to_string(),
+            place: "packages".to_string(),
+            scope: "results".to_string(),
+            scope_sources: vec!["alpm".to_string(), "aur".to_string()],
+            inventory_only_sources: Vec::new(),
+            filters: ControlFilters {
+                sources: vec!["alpm".to_string()],
+                state: "all".to_string(),
+                sort: "relevance".to_string(),
+                view: "table".to_string(),
+            },
+            row_count: 18,
+            checked_at: None,
+            destination: "results".to_string(),
             query: "ripgrep".to_string(),
             view_mode: "table".to_string(),
             inspector_tab: "overview".to_string(),
@@ -179,6 +224,13 @@ mod tests {
         assert!(parsed.gui_running);
         assert_eq!(parsed.selected_package.as_deref(), Some("ripgrep"));
         assert!(!parsed.render_lab_active);
+        // The place and the scope travel together, and the deprecated alias
+        // still answers.
+        assert_eq!(parsed.place, "packages");
+        assert_eq!(parsed.scope, "results");
+        assert_eq!(parsed.destination, parsed.scope);
+        assert_eq!(parsed.row_count, 18);
+        assert_eq!(parsed.filters.view, "table");
     }
 
     #[test]

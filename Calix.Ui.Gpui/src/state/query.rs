@@ -272,6 +272,34 @@ impl WorkbenchBreakpoint {
     }
 }
 
+/// Les lignes d'un périmètre, filtrées et triées comme l'interface les filtre.
+///
+/// Le poste de travail et l'en-tête de contexte appellent la même fonction :
+/// le compte que l'en-tête annonce est celui que la liste montre.
+pub fn visible_packages(
+    packages: &[UnifiedPackage],
+    source_scope: &SourceScope,
+    state_filter: PackageStateFilter,
+    sort_mode: SortMode,
+) -> Vec<UnifiedPackage> {
+    if source_scope.is_all()
+        && state_filter == PackageStateFilter::All
+        && sort_mode == SortMode::Relevance
+    {
+        return packages.to_vec();
+    }
+    let mut filtered: Vec<UnifiedPackage> = packages
+        .iter()
+        .filter(|p| {
+            source_scope.contains_str(&p.source_type)
+                && state_filter.matches(p.is_installed, p.has_update)
+        })
+        .cloned()
+        .collect();
+    sort_mode.sort_packages(&mut filtered);
+    filtered
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
