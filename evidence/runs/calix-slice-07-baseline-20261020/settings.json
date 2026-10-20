@@ -1,0 +1,18 @@
+{
+  "version": 4,
+  "ok": true,
+  "message": "Running",
+  "data": {
+    "protocol_version": 4,
+    "gui_running": true,
+    "pid": 3185637,
+    "executable": "/usr/lib/calix/calix-gpui",
+    "destination": "settings",
+    "query": "ripgrep",
+    "view_mode": "table",
+    "inspector_tab": "overview",
+    "selected_package": null,
+    "operation_running": false,
+    "render_lab_active": false
+  }
+}

@@ -12,6 +12,11 @@ reinvented: the only new number is the `44px` context header.
   $w_{rail} = 190px$ expanded and $56px$ collapsed.
 - Three widths are drawn: **wide** ($w_c \ge 1090$), **medium**
   ($746.67 \le w_c < 1090$) and **narrow** ($w_c < 746.67$, the stacked fallback).
+- $w_{window}$ is the width the **compositor** gives the window, not the width the
+  application asked for. The two differ whenever a tiling compositor re-tiles the
+  window, and the geometry below is recomputed from the former (N52). Today it is
+  not, which is why the baseline capture in `01-CURRENT-STATE.md` §4.2 shows an
+  inspector of $137px$ and of $1622px$ in the same session.
 
 ## 2. W0 — The shell
 
@@ -50,17 +55,17 @@ covers the content area.
 │ CALIX        │  Installed  [ Search | Installed | Updates ]   1 911 pkgs        │ 44
 │              │  ALPM · AUR · Flatpak · AppImage · Cargo · NPM · Release          │
 │  ⌕ Search    ├────────────────────────────────────────────────────────────────┤
-│  ▣ Installed │  ⌕  search packages and apps…                                 40 │
+│  ▣ Installed │  ⌕  search the 1 911 installed packages…                     40 │
 │  ↻ Updates   ├────────────────────────────────────────────────────────────────┤
-│  ▤ News      │  Filters ▾   All States ▾   Relevance ▾   ▦▤   ▨▥            │ 34
-│  ⚙ Settings  │  1 911 packages · Sources: all · State: all                      │ 24
+│  ▤ News      │  Sources ▾   All States ▾   Relevance ▾   ▦▤   ▨▥            │ 34
+│  ⚙ Settings  │                                                                │
 │              ├───────────────────────────────┬────────────────────────────────┤
-│              │  NAME          VER   SOURCE  │  bash                     5.3-2 │ 
+│              │  NAME          VER   SOURCE  │  bash                     5.3-2 │
 │              │  7zip          26.04  local   │  ALPM · local · Installed          │ 36
-│              │  a52dec        0.8.0  local   │  ┌ Install ┐ ┌ Copy install cmd ┐    │ 
+│              │  a52dec        0.8.0  local   │  ┌ Install ┐ ┌ Copy install cmd ┐    │
 │              │  aalib         1.4rc5 local  │  │ Overview │ Dependencies │ Files │   │ 32
 │              │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │  ────────────────────────────────    │
-│              │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │ 
+│              │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │
 │              │  list pane  ≥340px           │  inspector  320≤I≤min(520,3/7·w_c)│
 │  ‹ Collapse  │                               │                                │
 └──────────────┴───────────────────────────────┴────────────────────────────────┘
@@ -68,15 +73,16 @@ covers the content area.
 
 | Region | Height | Scrolls | Notes |
 |---|---|---|---|
-| Context header | `44px` | no | title, scope switcher, count, coverage |
-| Search input | `40px` | no | sticky |
-| Query controls | `34px` | no | sticky |
-| Status rail | `24px` | no | sticky |
+| Context header | `44px` | no | title, scope switcher, count, coverage, filter summary |
+| Search input | `40px` | no | sticky; its placeholder states the universe it searches |
+| Query controls | `34px` | no | sticky; present in every scope |
 | List pane | flex | **yes** | the only scrolling region of the list |
 | Inspector | flex | body only | header and tabs pinned, body scrolls |
 
 The scope switcher in the header and the three rail entries show the same value
-(L3). The rail's *Installed* row is the active one.
+(L3). The rail's *Installed* row is the active one. The `24px` status rail of the
+current application is retired: the count and the filter summary move into the
+header (IA-10).
 
 ## 4. W2 — Package surface, Search results (medium)
 
@@ -86,15 +92,15 @@ collapse to their compact form (the breakpoint rule already in
 
 ```
 ┌────────┬──────────────────────────────────────────────────────────────┐
-│        │  Search results   18 pkgs                        ▨▥          │ 44
+│        │  Search results  [ Search | Installed | Updates ]  18 pkgs  ▨▥ │ 44
 │  ⌕     │  ALPM · AUR                                                  │
 │  ▣     ├──────────────────────────────────────────────────────────────┤
 │  ↻     │  ⌕  ripgrep                                          [×]    │ 40
 │  ▤     ├──────────────────────────────────────────────────────────────┤
-│  ⚙     │  Filters ▾   All States ▾   Relevance ▾                     │ 34
-│        │  18 packages · Sources: ALPM, AUR                              │ 24
+│  ⚙     │  Sources ▾   All States ▾   Relevance ▾                     │ 34
+│        │                                                              │
 │ 56px   ├─────────────────────────────┬────────────────────────────────┤
-│        │  ripgrep   15.2.0  ALPM     │  ripgrep                   15.2 │ 
+│        │  ripgrep   15.2.0  ALPM     │  ripgrep                   15.2 │
 │        │  ripgrep-all 0.10.10 AUR    │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │
 └────────┴─────────────────────────────┴────────────────────────────────┘
 ```
@@ -108,20 +114,20 @@ the user their orientation.
 ```
 ┌──────────────┬────────────────────────────────────────────────────────────────┐
 │  CALIX       │  Updates  [ Search | Installed | Updates ]        3 pkgs      │ 44
-│              │  ALPM · AUR · Flatpak · AppImage                              │
+│              │  ALPM · AUR · Flatpak · AppImage · checked 4 minutes ago         │
 │  ⌕ Search    ├────────────────────────────────────────────────────────────────┤
-│  ▣ Installed │  ⌕  search packages and apps…                                 40 │
-│  ↻ Updates   ├──────────────────────────────────────────────────────────────┤
-│  ▤ News      │  Filters ▾   All States ▾   Relevance ▾   ▦▤   ▨▥            │ 34
-│  ⚙ Settings  │  3 packages · checked 4 minutes ago                           │ 24
+│  ▣ Installed │  ⌕  search the 3 pending updates…                           40 │
+│  ↻ Updates   ├────────────────────────────────────────────────────────────────┤
+│  ▤ News      │  Sources ▾   All States ▾   Relevance ▾   ▦▤   ▨▥            │ 34
+│  ⚙ Settings  │                                                                │
 │              ├───────────────────────────────┬────────────────────────────────┤
 │              │  linux  6.9.1 → 6.9.2  ALPM  │  linux                        │
 │              │  rust   1.82 → 1.83    AUR   │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │
-│              │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │
+│              │  ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  │
 └──────────────┴───────────────────────────────┴────────────────────────────────┘
 ```
 
-The status rail carries the **age** of the update set. Today the Updates scope answers
+The header carries the **age** of the update set. Today the Updates scope answers
 "3 packages" and never says when that was true; a package manager that cannot say how
 old its answer is cannot be trusted.
 
@@ -226,6 +232,7 @@ meaningful next to "checked when".
 | Scope switcher | Only in the package surface. Bound to the rail (L3). The active target is marked. |
 | Count | The number of rows in the current scope. `—` while loading, on error. Hidden in Settings. |
 | Coverage | The ecosystems the scope contains. For the Installed scope, the inventory-only ones are marked, per R1. |
+| Age | When the scope's answer was true. Only in the Updates scope. |
 | Filter summary | Only when a filter is not at its default. Shows the filters and a clear action. |
 
 ## 11. W9 — The rail
@@ -263,3 +270,8 @@ meaningful next to "checked when".
 
 Two rules hold in every cell: the header never disappears, and an error never clears
 the surface the user was looking at.
+
+The query surface — the search input and the controls row — is present in every scope
+of the package surface, in every cell of the table. An error in the Installed scope
+leaves the input and the controls in place, so the user can narrow the set that
+failed to load.

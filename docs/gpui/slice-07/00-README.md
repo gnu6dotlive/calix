@@ -27,8 +27,34 @@ correction must not require a refonte of the data flow or of the control surface
 
 Model A is specified in [`02-IA.md`](02-IA.md). The one place where the chosen model's
 wording admitted two readings — whether the rail keeps three scope entries or collapses
-to a single *Packages* entry — is resolved in §2.3 of that document, with the
+to a single *Packages* entry — is resolved in §3.4 of that document, with the
 alternative recorded so the review can flip it with one edit.
+
+---
+
+## What the baseline capture changed
+
+The contract was first written from the code alone. It was then checked against a live
+session: the application was driven through the control surface and every place and
+scope was captured, before any change
+(`evidence/runs/calix-slice-07-baseline-20261020/`). Two premises of the first draft
+were wrong, and the capture is kept as the evidence of both:
+
+- **The query surface is not in three of the five entries, it is in one.** The query
+  workbench is rendered for Browse only; the Installed and Updates scopes have a bare
+  header. The first draft said otherwise, and the error would have carried into the
+  wireframes.
+- **The filters act everywhere, and are visible nowhere.** The filter state is applied
+  to all three scopes, but the controls that change it exist in one of them. A filter
+  set in Browse silently governs Installed and Updates, in surfaces that cannot show
+  it.
+
+A third finding is not about the navigation but about the layout the navigation is
+drawn on: the workstation's geometry is computed once and never recomputed when the
+compositor resizes the window, so the inspector has been measured at $137px$ — below
+its floor — and at $1622px$ — above its cap — in the same session. The contract now
+requires the geometry to follow the mapped window (N52), because the wireframes
+describe a layout the application does not currently produce.
 
 ---
 
@@ -37,10 +63,10 @@ alternative recorded so the review can flip it with one edit.
 | Document | What it fixes |
 |---|---|
 | [`00-README.md`](00-README.md) | This kit: the target slice, the decision, the reading order |
-| [`01-CURRENT-STATE.md`](01-CURRENT-STATE.md) | What navigation is today, with code pointers, and the five questions it fails to answer |
-| [`02-IA.md`](02-IA.md) | The information architecture: places, scopes, filters, naming, the coverage rules |
+| [`01-CURRENT-STATE.md`](01-CURRENT-STATE.md) | What navigation is today, with code pointers, the two findings of the baseline capture, and the five questions it fails to answer |
+| [`02-IA.md`](02-IA.md) | The information architecture: places, scopes, queries, filters, naming, the coverage rules |
 | [`03-WIREFRAMES.md`](03-WIREFRAMES.md) | The wireframes: the shell, one per surface, at three widths, with the states |
-| [`04-NAVIGATION-CONTRACT.md`](04-NAVIGATION-CONTRACT.md) | The behavioural contract: switching, back path, keyboard, control CLI, focus, states |
+| [`04-NAVIGATION-CONTRACT.md`](04-NAVIGATION-CONTRACT.md) | The behavioural contract: switching, back path, keyboard, control CLI, focus, states, layout |
 | [`05-ACCEPTANCE-MATRIX.md`](05-ACCEPTANCE-MATRIX.md) | Every requirement of the slice, with how it will be verified |
 
 ## Reading order

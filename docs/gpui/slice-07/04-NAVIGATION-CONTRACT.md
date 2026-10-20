@@ -66,9 +66,17 @@ and is not empty; otherwise it leaves News or Settings for the package surface;
 otherwise it clears the inspector selection. It never does nothing when something is
 possible.
 
-**N18 — A search implies the Results scope.** A search issued from any scope lands in
-Search results with the query applied, and the scope the user came from is remembered
-for `Escape` and for the back path (N7).
+**N18 — A global search implies the Results scope; a query narrows the scope it is
+typed in.** Two different things are called a search, and the contract keeps them
+apart:
+
+- The control surface's `search` verb performs a *global* search: it lands in the
+  Results scope with the query applied, and the scope the user came from is
+  remembered for `Escape` and for the back path (N7).
+- The search input of the package surface narrows the *current* scope: in the Results
+  scope the query is dispatched to the backend, and in the Installed and Updates
+  scopes it filters the rows that are already loaded (R6). The input's placeholder
+  states the universe it searches, so the difference is never a surprise.
 
 **N19 — Inspect does not change the scope.** `inspect` sets the selection only. If
 the package is not among the current scope's rows, the inspector opens it anyway and
@@ -121,32 +129,39 @@ header carries the scope, so collapsing never costs the user their orientation.
 
 ## 6. The work surfaces
 
-**N30 — The query surface is sticky.** The search input (`40px`), the query controls
-(`34px`) and the status rail (`24px`) stay anchored at the top of the list pane while
-the rows scroll beneath.
+**N30 — The query surface is sticky, and it is present in every scope.** The search
+input (`40px`) and the query controls (`34px`) stay anchored at the top of the list
+pane while the rows scroll beneath, in the Search results, Installed and Updates
+scopes alike. The `24px` status rail of the current application is retired: the count
+and the filter summary move into the context header (N12, N14).
 
-**N31 — The inspector is docked, never an overlay**, and its header and tabs are
+**N31 — The controls that change a filter are present in every scope.** The source
+control, the state control and the sort control are rendered in all three scopes,
+because the filters act on all three (R5). A scope that applies a filter the user
+cannot see, and cannot undo, is a scope the user cannot trust.
+
+**N32 — The inspector is docked, never an overlay**, and its header and tabs are
 pinned while only its body scrolls. The $3/7$ ratio cap, the $320px$ and $340px$
 floors and the stacked fallback below $746.67px$ of content width are unchanged.
 
-**N32 — News and Settings replace the station inside the frame.** The rail and the
+**N33 — News and Settings replace the station inside the frame.** The rail and the
 header remain; the list and the inspector are not rendered.
 
-**N33 — The operation console is docked and global.** It opens automatically when an
+**N34 — The operation console is docked and global.** It opens automatically when an
 operation starts, from any place, and it never covers the content area.
 
-**N34 — An error never clears the surface.** The rows the user was looking at stay,
+**N35 — An error never clears the surface.** The rows the user was looking at stay,
 the error is reported in place, and a retry action is offered.
 
-**N35 — The Updates scope states the age of its answer** — when the update set was
-last checked — in the status rail and in the empty state.
+**N36 — The Updates scope states the age of its answer** — when the update set was
+last checked — in the context header and in the empty state.
 
 ## 7. The control surface
 
 The control CLI is an automation surface, not a convenience. Its verbs are part of
 the product contract (`docs/gpui/control-cli/01-COMMAND-SURFACE.md`).
 
-**N36 — The existing verbs keep working, unchanged in meaning:**
+**N37 — The existing verbs keep working, unchanged in meaning:**
 
 | Verb | Behaviour after the change |
 |---|---|
@@ -160,14 +175,14 @@ the product contract (`docs/gpui/control-cli/01-COMMAND-SURFACE.md`).
 | `view table\|cards` | View mode, unchanged |
 | `inspector <tab>` | Inspector tab, unchanged |
 | `logs show\|hide\|clear` | Operation console, unchanged |
-| `status [--json]` | Extended, per N38 |
+| `status [--json]` | Extended, per N39 |
 | `open`, `focus`, `quit` | Unchanged |
 
-**N37 — A new `scope` verb** changes the scope without leaving the package surface:
+**N38 — A new `scope` verb** changes the scope without leaving the package surface:
 `calix-gpui scope installed`. It accepts `results`, `installed` and `updates`, and
 `browse` is accepted as an alias of `results`.
 
-**N38 — `status --json` gains the navigation state.** The envelope is unchanged; the
+**N39 — `status --json` gains the navigation state.** The envelope is unchanged; the
 `data` object gains the fields below, and `protocol_version` becomes `5` when they
 appear, so the control surface reports the version it speaks.
 
@@ -202,19 +217,19 @@ appear, so the control surface reports the version it speaks.
 `destination` is retained as a deprecated alias of `scope`, so existing automation
 keeps working.
 
-**N39 — The control surface never leaves the application in an inconsistent state.**
+**N40 — The control surface never leaves the application in an inconsistent state.**
 Every verb that changes the place or the scope returns only after the frame has been
 re-rendered with the new state, so a `navigate` followed by a `status` always reports
 the new state.
 
 ## 8. Persistence
 
-**N40 — The persisted window state gains the last package scope** (`last_scope`), next
+**N41 — The persisted window state gains the last package scope** (`last_scope`), next
 to the existing `window_width`, `window_height`, `view_mode`, `visual_style`,
 `reduce_motion` and `log_drawer_*` fields. The file keeps its current name and format
 compatibility: a state file without `last_scope` loads with the default scope.
 
-**N41 — The filters are persisted** with the rest of the window state, so a restart
+**N42 — The filters are persisted** with the rest of the window state, so a restart
 returns to the view the user left, filtered the same way.
 
 ## 9. Invariants that must not regress
@@ -224,12 +239,35 @@ These are the measurements the previous phases made. Slice-08 may not weaken the
 
 | # | Invariant |
 |---|---|
-| N42 | $w_{inspector} \le \min(520,\; 3/7\,w_c)$ |
-| N43 | $w_{inspector} \ge 320px$ in horizontal mode |
-| N44 | $w_{list} \ge 340px$ |
-| N45 | Horizontal split at $w_c \ge 746.67px$, stacked below |
-| N46 | The query surface is sticky (N30) |
-| N47 | Zero overlay: the inspector, the menus and the news and settings surfaces never float over the list |
-| N48 | The console is docked, never a modal (N33) |
-| N49 | The splitter resize is a pure differential, invariant to the rail being collapsed or expanded |
-| N50 | The render lab stays out of the rail and keeps its return path to Settings |
+| N43 | $w_{inspector} \le \min(520,\; 3/7\,w_c)$ |
+| N44 | $w_{inspector} \ge 320px$ in horizontal mode |
+| N45 | $w_{list} \ge 340px$ |
+| N46 | Horizontal split at $w_c \ge 746.67px$, stacked below |
+| N47 | The query surface is sticky (N30) |
+| N48 | Zero overlay: the inspector, the menus and the news and settings surfaces never float over the list |
+| N49 | The console is docked, never a modal (N34) |
+| N50 | The splitter resize is a pure differential, invariant to the rail being collapsed or expanded |
+| N51 | The render lab stays out of the rail and keeps its return path to Settings |
+| N52 | The geometry is recomputed when the window bounds change (below) |
+
+**N52 — The geometry follows the window the compositor gives the application.**
+The workstation's widths are recomputed from the *mapped* window bounds every time
+those bounds change, and not only when the workstation happens to re-render. The
+workspace caches the workstation's element, so a resize of the window does not
+re-render it, and the clamped widths survive the resize while the flex inspector
+absorbs the difference.
+
+The measured failure, in one session with the window requested at $1440px$ and tiled
+by the compositor (`01-CURRENT-STATE.md` §4.2):
+
+| The compositor gave the window | The list pane | The inspector | Cap | Floor |
+|---|---|---|---|---|
+| $1056px$ | $724px$ | $137px$ | $371px$ | $320px$ |
+| $2542px$ | $724px$ | $1622px$ | $520px$ | $320px$ |
+
+After the requirement is met, the same two windows yield an inspector inside
+$[320,\; \min(520,\; 3/7\,w_c)]$ in both cases, and a list pane of at least $340px$.
+
+The window's own bounds are the only source of truth. The size the application
+*requested* is a starting hint, not a measurement, and the difference between the
+two is what a tiling compositor decides on every focus change.

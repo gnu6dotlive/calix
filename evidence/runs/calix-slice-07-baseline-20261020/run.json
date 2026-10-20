@@ -1,0 +1,201 @@
+{
+  "run_id": "calix-slice-07-baseline-20261020",
+  "kind": "evidence",
+  "status": "ok",
+  "started_at": "2026-10-20T18:51:49.467081+00:00",
+  "finished_at": "2026-10-20T18:52:17.149534+00:00",
+  "objective": "Record the state of the navigation before the Slice-08 implementation, so that the acceptance matrix of Slice-07 can be closed with a before/after comparison instead of a claim.",
+  "method": {
+    "compositor": "Hyprland",
+    "capture": "grim, on the window geometry read from `hyprctl clients -j`",
+    "crop": "the bottom 70px are cropped: the desktop dock floats over the window",
+    "driver": "the control surface (`calix-gpui navigate`, `calix-gpui search`)",
+    "pairing": "each capture is stored next to the control surface's status document for the same state"
+  },
+  "captures": [
+    {
+      "file": "browse-empty.png",
+      "region": "-621,1348 2542x673",
+      "cropped_px": {
+        "bottom": 70
+      },
+      "bytes": 60874,
+      "sha256": "2599efd9af06d803867caf918944f3a704a1f5418c302f0079883119ef3d8ce9",
+      "state": "browse-empty",
+      "command": "calix-gpui navigate browse",
+      "settle_seconds": 3.0
+    },
+    {
+      "file": "browse-results.png",
+      "region": "-621,1348 2542x673",
+      "cropped_px": {
+        "bottom": 70
+      },
+      "bytes": 89155,
+      "sha256": "53980284975f2406af17e63a8b6c882bffd7287784cf51c398826b7720c21e6f",
+      "state": "browse-results",
+      "command": "calix-gpui search ripgrep",
+      "settle_seconds": 4.0
+    },
+    {
+      "file": "installed.png",
+      "region": "-621,1348 2542x673",
+      "cropped_px": {
+        "bottom": 70
+      },
+      "bytes": 101323,
+      "sha256": "d24b3686c8fa7fbf6d8b71c89f377669b1a85ac9e83ab2d1161fba6d6943ca99",
+      "state": "installed",
+      "command": "calix-gpui navigate installed",
+      "settle_seconds": 6.0
+    },
+    {
+      "file": "updates.png",
+      "region": "-621,1348 2542x673",
+      "cropped_px": {
+        "bottom": 70
+      },
+      "bytes": 41015,
+      "sha256": "425ae8eb8d6e1caae5fb18fc905ccae74f1043514d9892dca966838210e6d602",
+      "state": "updates",
+      "command": "calix-gpui navigate updates",
+      "settle_seconds": 5.0
+    },
+    {
+      "file": "news.png",
+      "region": "-621,1348 2542x673",
+      "cropped_px": {
+        "bottom": 70
+      },
+      "bytes": 33859,
+      "sha256": "b2f73f25101d5c5352c836844daa1d86ceedbbd94fe3134df175bc2be34be205",
+      "state": "news",
+      "command": "calix-gpui navigate news",
+      "settle_seconds": 5.0
+    },
+    {
+      "file": "settings.png",
+      "region": "-621,1348 2542x673",
+      "cropped_px": {
+        "bottom": 70
+      },
+      "bytes": 76263,
+      "sha256": "3700e23b5e8d8826977dd63aa61be8a8224d0003a4df9416bc0d946197d0db19",
+      "state": "settings",
+      "command": "calix-gpui navigate settings",
+      "settle_seconds": 3.0
+    }
+  ],
+  "status_documents": [
+    "browse-empty.json",
+    "browse-results.json",
+    "installed.json",
+    "updates.json",
+    "news.json",
+    "settings.json"
+  ],
+  "commit": "2f496a18",
+  "working_tree_dirty": true,
+  "note": "The captures were taken with the contract committed at 2f496a18. The working tree carried the uncommitted revision of the contract itself (documentation only).",
+  "findings": [
+    {
+      "id": "F1",
+      "summary": "The filters act in all three package scopes, but the controls that change them are rendered in Browse only.",
+      "where": "views/package_workstation.rs:610-628 applies source_scope, state_filter and sort_mode to every destination; views/package_workstation.rs:673 renders the query workbench for Browse only.",
+      "consequence": "A filter set in Browse silently governs Installed and Updates, in surfaces that show no control and no summary.",
+      "captured_in": [
+        "browse-results.png",
+        "installed.png",
+        "updates.png"
+      ]
+    },
+    {
+      "id": "F2",
+      "summary": "The workstation's geometry is computed from the window bounds it knows when it renders, and is not recomputed when the compositor resizes the window.",
+      "where": "views/workspace.rs:1936 caches the workstation element (self.workstation.clone()), so a resize does not re-render it; views/package_workstation.rs:558-570 derives the widths from window.window_bounds().",
+      "measurements": [
+        {
+          "window_mapped_px": 1056,
+          "list_pane_px": 724,
+          "inspector_px": 137,
+          "inspector_cap_px": 371,
+          "inspector_floor_px": 320,
+          "verdict": "below the floor"
+        },
+        {
+          "window_mapped_px": 2542,
+          "list_pane_px": 724,
+          "inspector_px": 1622,
+          "inspector_cap_px": 520,
+          "inspector_floor_px": 320,
+          "verdict": "above the cap"
+        }
+      ],
+      "method": "grim captures of the mapped window, with the vertical edges read from the pixels: the rail's border at 189/190px and the splitter at 914/920px.",
+      "note": "The list pane is 724px in both cases: the layout does not depend on the width the window actually has."
+    }
+  ],
+  "corresponds_to": "docs/gpui/slice-07/01-CURRENT-STATE.md section 4",
+  "artifacts": [
+    {
+      "path": "evidence/runs/calix-slice-07-baseline-20261020/browse-empty.json",
+      "bytes": 391,
+      "sha256": "bb3f99462b82c106d3ff303c45bf6a2758092dc49b6e06e3c7ca7e468cf61a6a"
+    },
+    {
+      "path": "evidence/runs/calix-slice-07-baseline-20261020/browse-empty.png",
+      "bytes": 60874,
+      "sha256": "2599efd9af06d803867caf918944f3a704a1f5418c302f0079883119ef3d8ce9"
+    },
+    {
+      "path": "evidence/runs/calix-slice-07-baseline-20261020/browse-results.json",
+      "bytes": 398,
+      "sha256": "7e3fdc5715da98e7eea42d0343048eeeb28aee8425c7cbad25576919984fc31a"
+    },
+    {
+      "path": "evidence/runs/calix-slice-07-baseline-20261020/browse-results.png",
+      "bytes": 89155,
+      "sha256": "53980284975f2406af17e63a8b6c882bffd7287784cf51c398826b7720c21e6f"
+    },
+    {
+      "path": "evidence/runs/calix-slice-07-baseline-20261020/installed.json",
+      "bytes": 401,
+      "sha256": "ef99aea87d32750c4593808ccc716d9f7a8f6a6d12628991edd4c848b3bb81f7"
+    },
+    {
+      "path": "evidence/runs/calix-slice-07-baseline-20261020/installed.png",
+      "bytes": 101323,
+      "sha256": "d24b3686c8fa7fbf6d8b71c89f377669b1a85ac9e83ab2d1161fba6d6943ca99"
+    },
+    {
+      "path": "evidence/runs/calix-slice-07-baseline-20261020/news.json",
+      "bytes": 396,
+      "sha256": "ed998629b712ebaa639aad06c8a1032fd491a4d6ec97699430d1fc80f173ba64"
+    },
+    {
+      "path": "evidence/runs/calix-slice-07-baseline-20261020/news.png",
+      "bytes": 33859,
+      "sha256": "b2f73f25101d5c5352c836844daa1d86ceedbbd94fe3134df175bc2be34be205"
+    },
+    {
+      "path": "evidence/runs/calix-slice-07-baseline-20261020/settings.json",
+      "bytes": 400,
+      "sha256": "590940b200ce9b072bc5e35b11bf312a3ef1a422a91b8a1cdce20b9df790e9ea"
+    },
+    {
+      "path": "evidence/runs/calix-slice-07-baseline-20261020/settings.png",
+      "bytes": 76263,
+      "sha256": "3700e23b5e8d8826977dd63aa61be8a8224d0003a4df9416bc0d946197d0db19"
+    },
+    {
+      "path": "evidence/runs/calix-slice-07-baseline-20261020/updates.json",
+      "bytes": 399,
+      "sha256": "75b4219d172924f6cd478838f058bb7cb82cd0081aace11a37148c2b0369638d"
+    },
+    {
+      "path": "evidence/runs/calix-slice-07-baseline-20261020/updates.png",
+      "bytes": 41015,
+      "sha256": "425ae8eb8d6e1caae5fb18fc905ccae74f1043514d9892dca966838210e6d602"
+    }
+  ]
+}
