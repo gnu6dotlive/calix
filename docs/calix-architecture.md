@@ -301,9 +301,22 @@ Tranche 1b2 (Done)  : Provenance amont (digest du forge, refus si divergence, Tr
                         chemin live.
                       → Un défaut trouvé seulement en live, pas par les tests : `.awake` est
                         monotone depuis le boot, pas l'époque Unix. Trois champs dataient en 1970.
-Tranche 1b3 (Next)  : UI sur le daemon (le cutover supprime la fusion côté frontend, pas
-                        seulement le fichier), scheduler du daemon, flux d'application, helper
-                        root + polkit, `calix` CLI, suppression du moteur Python.
+Tranche 1b3 (Done)  : UI sur le daemon. `calix_state.rs` supprimé : l'UI n'ouvre plus aucun
+                        fichier d'état. `backend/calix_daemon.rs` (socket, enveloppe versionnée,
+                        délais bornés, dégradation propre) ; `from_snapshot` reconstruit les
+                        variantes typées pour que les panneaux d'inspection par écosystème
+                        survivent ; `release/tracked.zig` sert la ligne release-tracked.
+                      → Défaut trouvé avant expédition : le daemon écrivait son registre dans
+                        `$XDG_STATE_HOME/calix/releases.json` — le fichier même que le moteur
+                        Python utilise pour ses observations. La première requête `releases`
+                        aurait détruit l'état du moteur.
+                      → Le variant `UnifiedPackageSource::Snapshot` prévu a été abandonné : il
+                        aurait supprimé les panneaux d'inspection. On reconstruit les variantes
+                        existantes ; c'est une contrainte de produit, pas un compromis.
+Tranche 1b4 (Next)  : Scheduler du daemon, watcher de releases (remplace
+                        `release/tracked.zig` et supprime le dernier producteur Python), flux
+                        d'application, helper root + polkit, `calix` CLI, suppression du moteur
+                        Python.
 ```
 
 ---
@@ -522,13 +535,20 @@ Travail réellement nouveau, en Zig :
    propre répertoire d'état, détection de socket périmé. **Le scheduler reste à faire** : le daemon
    interroge quand on le lui demande, pas encore en continu.
 10. **`calix` CLI** en Zig, partageant la bibliothèque, fonctionnant en autonome *et* contre le daemon.
-11. **L'UI passe par le daemon** — la lecture directe de `~/.local/state/calix/*.json` (Phase 7b)
-    disparaît ; le modèle `UnifiedPackage` Rust devient un pur rendu. **Prochaine tranche** : le
-    daemon sert déjà l'inventaire complet (1966 paquets), mais `calix_state.rs` lit encore les
-    fichiers. Le cutover n'est pas un simple changement de transport : le document du daemon est
-    plat et contient *tous* les écosystèmes, alors que `EcosystemInventory` attend trois maps
-    (`cargo.json`, `npm.json`, `releases.json`) fusionnées avec ALPM côté frontend. C'est cette
-    fusion — et non le socket — qui disparaît.
+11. ~~**L'UI passe par le daemon**~~ — **fait** (tranche 1b3). `calix_state.rs` est supprimé :
+    l'UI n'ouvre plus aucun fichier d'état. `backend/calix_daemon.rs` parle le protocole sur le
+    socket et `backend/models.rs` reconstruit les variantes typées (`Cargo`, `Npm`, `Release`) à
+    partir des enregistrements plats, donc les panneaux d'inspection par écosystème survivent.
+    La fusion qui reste n'est plus celle de deux formats de stockage mais de deux origines : la
+    liste ALPM typée du backend CLI, qui porte les champs que l'inspecteur lit (dépendances,
+    mainteneur, base du paquet), et les écosystèmes que pacman ne possède pas. ALPM et AUR sont
+    volontairement ignorés côté daemon : AUR est un sous-ensemble d'ALPM, et les recopier
+    doublerait chaque paquet.
+    → Un daemon absent n'empêche pas la fenêtre de s'ouvrir : elle montre la liste du backend et
+      le journal dit pourquoi le reste manque.
+    → Le daemon lit `releases.json` du moteur gelé pour la seule ligne « release-tracked » et la
+      re-sert. C'est une passerelle bornée : l'UI ne lit plus le fichier, et ce lecteur meurt avec
+      le watcher de releases (tranche 1b4).
 12. **Suppression du moteur Python.**
 
 ### Outillage : Zig 0.16.0, pas 0.17.0

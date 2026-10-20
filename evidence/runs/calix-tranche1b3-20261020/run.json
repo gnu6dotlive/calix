@@ -1,0 +1,115 @@
+{
+  "run_id": "calix-tranche1b3-20261020",
+  "kind": "calix-tranche1b3",
+  "status": "ok",
+  "started_at": "2026-10-20T04:40:00Z",
+  "finished_at": "2026-10-20T06:05:00Z",
+  "objective": "Tranche 1b3: the GPUI frontend stops reading the Calix state directory and takes the multi-ecosystem inventory from calix-daemon over its socket.",
+  "host": {
+    "kernel": "7.2.9-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "zig": "0.16.0 (vendored from the pacman cache; the system default is 0.17.0)"
+  },
+  "steps": [
+    {
+      "name": "daemon-client",
+      "status": "ok",
+      "detail": "backend/calix_daemon.rs: resolves the socket exactly as the daemon does ($XDG_RUNTIME_DIR/calix/daemon.sock, then /tmp/calix-<uid>/daemon.sock), speaks the JSON-lines protocol with bounded connect and response timeouts, unwraps the versioned envelope, and refuses a protocol or snapshot version it does not know.",
+      "tests_added": 9
+    },
+    {
+      "name": "typed-reconstruction",
+      "status": "ok",
+      "detail": "UnifiedPackage::from_snapshot rebuilds the existing Cargo / Npm / Release variants from flat records instead of introducing a generic Snapshot variant. A generic variant would have deleted the per-ecosystem inspector panels, which is a feature loss, not a transport change.",
+      "tests_added": 6
+    },
+    {
+      "name": "state-file-reader-deleted",
+      "status": "ok",
+      "detail": "backend/calix_state.rs removed. The frontend no longer opens any file under $XDG_STATE_HOME/calix; a grep for state_dir / local/state / XDG_STATE in the UI sources returns nothing. merge_snapshot keeps the typed ALPM list from the CLI backend and appends the ecosystems pacman does not own."
+    },
+    {
+      "name": "release-tracked-rows",
+      "status": "ok",
+      "detail": "Shelly.PackageManager/src/release/tracked.zig reads the frozen engine's release observations and serves them as Release records (provider, canal, pkgname). This preserves the release panel; the reader is transitional and dies with the release watcher.",
+      "tests_added": 4
+    },
+    {
+      "name": "registry-path-collision-fixed",
+      "status": "ok",
+      "detail": "The daemon wrote its registry to <state>/releases.json, which is the frozen engine's release observation file in the same directory, with a different schema. The first `releases` request would have destroyed it. The registry is now <state>/release-registry.json."
+    },
+    {
+      "name": "live-verification",
+      "status": "ok",
+      "detail": "Ran the built daemon against a state directory holding a copy of the engine's releases.json.",
+      "observed": {
+        "inventory_packages": 1967,
+        "inventory_by_source": {
+          "ALPM": 1880,
+          "AUR": 17,
+          "Flatpak": 24,
+          "AppImage": 16,
+          "Cargo": 20,
+          "NPM": 9,
+          "Release": 1
+        },
+        "release_row": "artcraft-launcher 0.5.1 (github, stable, pkgname artcraft-launcher-bin)",
+        "python_state_sha256_before": "2b1ecea32704be8d2066f0cb55199f376e325a53f58175e03b0bd19f349c98f2",
+        "python_state_sha256_after": "2b1ecea32704be8d2066f0cb55199f376e325a53f58175e03b0bd19f349c98f2",
+        "state_directory_after": ["journal/", "release-registry.json", "releases.json"],
+        "journal": "listening / inventory / releases, one JSON line each"
+      }
+    },
+    {
+      "name": "full-test-suites",
+      "status": "ok",
+      "detail": "PackageManager 1386 passed / 4 skipped; CLI 387 passed; UI 201 passed. cargo build is clean under #![deny(dead_code)], #![deny(unused_variables)], #![deny(unused_imports)], #![deny(unused_must_use)]."
+    }
+  ],
+  "defects_found_and_fixed": [
+    {
+      "defect": "The daemon's registry path collided with the frozen engine's release observation file: same directory, same name, different schema.",
+      "caught_by": "reading the two path computations side by side before shipping",
+      "fix": "registry renamed release-registry.json; verified by sha256 that a `releases` request leaves the engine's file byte-identical"
+    },
+    {
+      "defect": "A Release record carried new_version even when has_update was false, contradicting the field's documented contract ('the available version, when has_update is set').",
+      "caught_by": "reading the served document against the record's own documentation",
+      "fix": "new_version is only set when there is an update"
+    },
+    {
+      "defect": "Snapshot::parse and Snapshot::by_source were used only by tests: after the cutover nothing in the binary called them.",
+      "caught_by": "cargo build, not cargo test — a test build counts test-only usage as live",
+      "fix": "folded into one production path, Snapshot::from_value, which the daemon client uses and which owns the version check"
+    },
+    {
+      "defect": "The planned UnifiedPackageSource::Snapshot variant would have removed the per-ecosystem inspector panels.",
+      "caught_by": "reading what the panels actually read from `inner` before changing the enum",
+      "fix": "reconstruct the existing typed variants from flat records instead"
+    }
+  ],
+  "deviations": [
+    "No UnifiedPackageSource::Snapshot variant. The enum is unchanged; the flat record is mapped back into Cargo / Npm / Release. This keeps every inspector panel alive, which outranks the symmetry of one variant per source.",
+    "The frontend still has two origins (CLI backend for typed ALPM, daemon for the rest), but only one storage format and no file reads. AUR is deliberately not taken from the daemon because it is a subset of ALPM.",
+    "Flatpak and AppImage rows are served by the daemon and parse correctly, but are not added to the Installed list in this slice: doing so changes what the list shows, which is a product decision, not a cutover."
+  ],
+  "artifacts": [
+    "Shelly.Ui.Gpui/src/backend/calix_daemon.rs",
+    "Shelly.Ui.Gpui/src/backend/calix_snapshot.rs",
+    "Shelly.Ui.Gpui/src/backend/models.rs",
+    "Shelly.Ui.Gpui/src/views/workspace.rs",
+    "Shelly.Ui.Gpui/tests/fixtures/calix-inventory-sample.json",
+    "Shelly.PackageManager/src/inventory/record.zig",
+    "Shelly.PackageManager/src/release/tracked.zig",
+    "Shelly.Cli.Zig/src/inventory/service.zig",
+    "Shelly.Cli.Zig/src/daemon/server.zig"
+  ],
+  "known_gaps": [
+    "The release-tracked row is still produced by the frozen Python engine; the daemon reads its file and re-serves it. The reader is transitional and its removal condition is the release watcher (tranche 1b4).",
+    "The GPUI window itself was not launched: the session is headless. The cutover is validated by a clean strict build, 201 tests, and the daemon's live protocol; visual behaviour is unverified.",
+    "No scheduler: the daemon probes when asked.",
+    "The apply flow, the root helper and the polkit rule are still unimplemented."
+  ],
+  "ok": true
+}
