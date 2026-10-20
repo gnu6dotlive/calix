@@ -1,0 +1,124 @@
+{
+  "run_id": "calix-ci-single-release-20261020",
+  "kind": "infrastructure",
+  "status": "ok",
+  "started_at": "2026-10-20T12:36:00Z",
+  "finished_at": "2026-10-20T13:04:00Z",
+  "commit": "e8a8987a0d787e58b6fbef39577370fc77c8dbc4",
+  "parent_commit": "e05bda753688ab34086e9604113b72dd40b498b0",
+  "working_tree_dirty": false,
+  "objective": "Stop the remote gate from compiling the Rust dependency graph twice, bound a slow or stuck run, and remove the two stale workflows that would fail on a tag.",
+  "changes": [
+    "scripts/verify runs cargo test --release --locked and then cargo build --release --locked in one target directory; the debug cargo check/test pair is gone",
+    "ci.yml caches ~/.cargo, Calix.Ui.Gpui/target and ~/.cache/zig, keyed by Cargo.lock and the Zig manifests",
+    "ci.yml gives Verify a 35-minute step timeout and the job a 45-minute timeout",
+    ".github/workflows/release.yml and build-and-publish.yml are deleted; ci.yml is the only workflow and owns tag builds and GitHub releases",
+    "docs/ci.md records the single-profile build, the cache, the timeouts and the workflow ownership"
+  ],
+  "remote_run": {
+    "id": 39419513845,
+    "event": "workflow_dispatch",
+    "head_sha": "e05bda753688ab34086e9604113b72dd40b498b0",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "dispatched_at": "2026-10-20T12:04:22Z",
+    "cancelled_at": "2026-10-20T12:35:50Z",
+    "verify_started_at": "2026-10-20T12:06:23Z",
+    "verify_cancelled_after_seconds": 1759,
+    "finding": "Not a loop. The log shows the steps running once, in order. At cancellation the job was in the final rust-release-build step; it had been there 731 seconds. The prior green run 39398808673 spent 864 seconds in that same step and 1826 seconds in Verify, so the duration was cold-compile cost, not a retry cycle.",
+    "cost_note": "The cancellation completed. No further remote run was dispatched for this change."
+  },
+  "verification": {
+    "local": {
+      "command": "scripts/verify",
+      "commit": "e8a8987a",
+      "working_tree_dirty": false,
+      "naming_check": "pass",
+      "packagemanager_tests": 1386,
+      "packagemanager_floor": 1380,
+      "cli_tests": 388,
+      "cli_floor": 380,
+      "rust_tests": 201,
+      "rust_floor": 195,
+      "rust_profile": "release",
+      "rust_tests_duration_ms": 0,
+      "rust_release_build_duration_ms": 0,
+      "cli_smoke": "pass",
+      "elapsed": "60.93s",
+      "note": "The host shares a warm Cargo target; the timings show correctness, not a cold build."
+    },
+    "container_baseline": {
+      "command": "scripts/ci-replay",
+      "commit": "e05bda75",
+      "image": "archlinux:latest",
+      "snapshot": "2026/10/01",
+      "mode": "HEAD archive, no .git",
+      "naming_check": "pass",
+      "packagemanager_tests": 1388,
+      "cli_tests": 388,
+      "rust_tests": 201,
+      "rust_check_ms": 34000,
+      "rust_tests_ms": 52000,
+      "rust_release_build_ms": 96000,
+      "elapsed": "6m58.96s",
+      "note": "Baseline before this change: debug check/test plus a separate release build."
+    },
+    "container_after": {
+      "command": "scripts/ci-replay",
+      "commit": "e8a8987a",
+      "image": "archlinux:latest",
+      "snapshot": "2026/10/01",
+      "mode": "HEAD archive, no .git",
+      "naming_check": "pass",
+      "packagemanager_tests": 1388,
+      "cli_tests": 388,
+      "rust_tests": 201,
+      "rust_tests_ms": 103000,
+      "rust_release_build_ms": 37000,
+      "elapsed": "6m20.04s",
+      "note": "The release test compile and the release binary build share one target directory. The local saving is small because this host has a warm shared cache; the remote saving is the removed debug compile."
+    },
+    "worktree_rehearsal": {
+      "command": "scripts/ci-replay --worktree",
+      "commit": "uncommitted worktree at e05bda75 plus the staged change",
+      "packagemanager_tests": 1388,
+      "cli_tests": 388,
+      "rust_tests": 201,
+      "rust_tests_ms": 86000,
+      "rust_release_build_ms": 32000,
+      "elapsed": "5m57.10s"
+    },
+    "workflow": {
+      "parser": "python3 yaml.safe_load",
+      "result": "pass",
+      "workflow_count": 1,
+      "jobs": [
+        "build-and-test",
+        "release"
+      ],
+      "build_timeout_minutes": 45,
+      "verify_timeout_minutes": 35
+    }
+  },
+  "artifacts": [
+    {
+      "path": "evidence/logs/calix-ci-single-release-20261020-baseline-head.log",
+      "bytes": 21828,
+      "sha256": "b8cc0d2b2b159e7f4f8df83a3699fdf0a4846ac6601501b13503da99938b7138"
+    },
+    {
+      "path": "evidence/logs/calix-ci-single-release-20261020-ci-replay.log",
+      "bytes": 21783,
+      "sha256": "287d5fbf25e3437a22339aae54c4d03dcfe09cdc229163104f89ccca341ef1b7"
+    },
+    {
+      "path": "evidence/logs/calix-ci-single-release-20261020-verify-clean.log",
+      "bytes": 780,
+      "sha256": "10f831e59e12cd2e5fc57da6ab2eceed21e2fba0f4b1003c83b746b9d8f74e94"
+    }
+  ],
+  "known_gaps": [
+    "The actions/cache restore-and-save path is GitHub-hosted behavior. The cached paths exist after the local container build, but a cache hit could not be exercised locally. The first tag run remains cold and must fit the 35-minute Verify timeout.",
+    "The remote runner is slower than this host; the container replay proves the gate's shape and counts, not the remote wall-clock time."
+  ]
+}
