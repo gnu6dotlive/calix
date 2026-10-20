@@ -1,0 +1,2 @@
+$ python3 -m py_compile scripts/calix_core.py scripts/calix-release.py scripts/calix-sync.py scripts/test-flatpak-integrate.py
+exit 0: Python sources compile

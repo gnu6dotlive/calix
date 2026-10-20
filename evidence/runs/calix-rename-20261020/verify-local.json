@@ -1,0 +1,53 @@
+{
+  "run_id": "local-verify-20261020T101944Z",
+  "kind": "local-verify",
+  "status": "ok",
+  "ok": true,
+  "started_at": "2026-10-20T10:19:44Z",
+  "finished_at": "2026-10-20T10:21:03Z",
+  "commit": "bd51789a",
+  "working_tree_dirty": false,
+  "steps": [
+    {
+      "name": "naming-check",
+      "status": "ok",
+      "duration_ms": 71
+    },
+    {
+      "name": "packagemanager-tests",
+      "status": "ok",
+      "duration_ms": 58343
+    },
+    {
+      "name": "cli-tests",
+      "status": "ok",
+      "duration_ms": 2209
+    },
+    {
+      "name": "cli-release-build",
+      "status": "ok",
+      "duration_ms": 139
+    },
+    {
+      "name": "cli-smoke",
+      "status": "ok",
+      "duration_ms": 16
+    },
+    {
+      "name": "rust-check",
+      "status": "ok",
+      "duration_ms": 17391
+    },
+    {
+      "name": "rust-tests",
+      "status": "ok",
+      "duration_ms": 1017
+    },
+    {
+      "name": "rust-release-build",
+      "status": "ok",
+      "duration_ms": 346
+    }
+  ],
+  "note": "A dirty tree means this is a development run, not proof of the commit."
+}

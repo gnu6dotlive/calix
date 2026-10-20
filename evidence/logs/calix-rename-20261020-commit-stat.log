@@ -1,0 +1,430 @@
+bd51789a refactor: rename the live tree from Shelly to Calix
+ .gitattributes                                     |   2 +-
+ .github/ISSUE_TEMPLATE/bug_report.yml              |   2 +-
+ .github/workflows/build-and-publish.yml            |  74 ++--
+ .github/workflows/ci.yml                           |  14 +-
+ .github/workflows/release.yml                      | 142 +++----
+ .gitignore                                         |   4 +-
+ .zed/debug.json                                    |  12 +-
+ .zed/tasks.json                                    |   6 +-
+ AGENTS.md                                          |   4 +-
+ CONTRIBUTING.md                                    |  22 +-
+ {Shelly.Cli.Zig => Calix.Cli.Zig}/build.zig        |  16 +-
+ {Shelly.Cli.Zig => Calix.Cli.Zig}/build.zig.zon    |   8 +-
+ .../scripts/test-elevation-cancellation.sh         |  34 +-
+ .../scripts/test-isolated-build.sh                 |  40 +-
+ .../scripts/test-isolated-cancellation.sh          |  42 +-
+ .../src/builder_command_test.zig                   |   0
+ {Shelly.Cli.Zig => Calix.Cli.Zig}/src/cli/app.zig  |  24 +-
+ .../src/cli/catalog.zig                            |   8 +-
+ .../src/cli/catalog/backup.zig                     |   0
+ .../src/cli/catalog/builder.zig                    |   0
+ .../src/cli/catalog/config.zig                     |  10 +-
+ .../src/cli/catalog/downgrade.zig                  |   0
+ .../src/cli/catalog/install.zig                    |   4 +-
+ .../src/cli/catalog/inventory.zig                  |   0
+ .../src/cli/catalog/keyring.zig                    |  12 +-
+ .../src/cli/catalog/list.zig                       |   0
+ .../src/cli/catalog/list_updates.zig               |   0
+ .../src/cli/catalog/mark.zig                       |   2 +-
+ .../src/cli/catalog/news.zig                       |   0
+ .../src/cli/catalog/purify.zig                     |   2 +-
+ .../src/cli/catalog/remove.zig                     |   4 +-
+ .../src/cli/catalog/repo_db.zig                    |   0
+ .../src/cli/catalog/repository.zig                 |   2 +-
+ .../src/cli/catalog/resolve.zig                    |   0
+ .../src/cli/catalog/run.zig                        |   0
+ .../src/cli/catalog/search.zig                     |   4 +-
+ .../src/cli/catalog/sync.zig                       |   0
+ .../src/cli/catalog/types.zig                      |   4 +-
+ .../src/cli/catalog/update.zig                     |   0
+ .../src/cli/catalog/upgrade.zig                    |   0
+ .../src/cli/catalog/utility.zig                    |   4 +-
+ .../src/cli/completions.zig                        | 168 ++++----
+ .../src/cli/documentation.zig                      |  14 +-
+ {Shelly.Cli.Zig => Calix.Cli.Zig}/src/cli/help.zig |  56 +--
+ .../src/cli/parser.zig                             |  32 +-
+ .../src/cli/shortcodes.zig                         |  14 +-
+ {Shelly.Cli.Zig => Calix.Cli.Zig}/src/cli/spec.zig |  50 +--
+ .../src/commands/backup.zig                        |   8 +-
+ .../src/commands/builder.zig                       |  84 ++--
+ .../src/commands/config.zig                        |  18 +-
+ .../src/commands/dispatcher.zig                    |   0
+ .../src/commands/downgrade.zig                     |   2 +-
+ .../src/commands/fixtures/source-pgp/README.md     |   2 +-
+ .../src/commands/fixtures/source-pgp/payload.sig   | Bin
+ .../src/commands/fixtures/source-pgp/payload.txt   |   0
+ .../src/commands/fixtures/source-pgp/public.asc    |   0
+ .../src/commands/install.zig                       |  18 +-
+ .../src/commands/inventory.zig                     |   2 +-
+ .../src/commands/isolated_build.zig                |  66 +--
+ .../src/commands/keyring.zig                       |  36 +-
+ .../src/commands/list.zig                          |  12 +-
+ .../src/commands/list_updates.zig                  |  18 +-
+ .../src/commands/mark.zig                          |  18 +-
+ .../src/commands/news.zig                          |   8 +-
+ .../src/commands/pacfiles.zig                      |   0
+ .../src/commands/purify.zig                        |  20 +-
+ .../src/commands/purify_aur_cache.zig              |   2 +-
+ .../src/commands/remove.zig                        |  20 +-
+ .../src/commands/repo_db.zig                       |  14 +-
+ .../src/commands/repository.zig                    |   6 +-
+ .../src/commands/resolve.zig                       |   4 +-
+ .../src/commands/run.zig                           |  18 +-
+ .../src/commands/search.zig                        |   6 +-
+ .../src/commands/search_install.zig                |   2 +-
+ .../src/commands/source_pgp_transport.zig          |   0
+ .../src/commands/sync.zig                          |  12 +-
+ .../src/commands/test_support.zig                  |   2 +-
+ .../src/commands/update.zig                        |  10 +-
+ .../src/commands/upgrade.zig                       |  20 +-
+ .../src/commands/utility.zig                       |  28 +-
+ .../src/config/aur_url.zig                         |   2 +-
+ .../src/config/defaults.zig                        |   0
+ .../src/config/download_policy.zig                 |   0
+ .../src/config/manager.zig                         |   2 +-
+ .../src/config/model.zig                           |   2 +-
+ .../src/daemon/journal.zig                         |   0
+ .../src/daemon/main.zig                            |   8 +-
+ .../src/daemon/protocol.zig                        |   0
+ .../src/daemon/server.zig                          |   2 +-
+ .../src/inventory/service.zig                      |   6 +-
+ {Shelly.Cli.Zig => Calix.Cli.Zig}/src/main.zig     |  34 +-
+ .../src/output/colors.zig                          |   0
+ .../src/output/config.zig                          |   0
+ .../src/output/detail.zig                          |   0
+ .../src/output/format.zig                          |   0
+ .../src/output/review.zig                          |   0
+ .../src/output/standard_single_pane.zig            |   2 +-
+ .../src/output/table.zig                           |   0
+ .../src/output/terminal.zig                        |   0
+ .../src/output/ui_operation.zig                    |   0
+ {Shelly.Cli.Zig => Calix.Cli.Zig}/src/root.zig     |   0
+ .../src/runtime/context.zig                        |   2 +-
+ .../src/runtime/elevation.zig                      |  30 +-
+ .../src/runtime/log.zig                            |  20 +-
+ .../src/runtime/proxy_environment.zig              |   0
+ .../src/runtime/signals.zig                        |   0
+ .../src/runtime/tray.zig                           |   4 +-
+ .../src/runtime/xdg.zig                            |  16 +-
+ .../build.zig                                      |   0
+ .../build.zig.zon                                  |   4 +-
+ .../src/errors.zig                                 |  42 +-
+ .../build.zig                                      |  28 +-
+ .../build.zig.zon                                  |   6 +-
+ .../src/exports.zig                                |   8 +-
+ .../src/flatpak/bindings.zig                       |   0
+ .../src/flatpak/catalogs.zig                       |   2 +-
+ .../src/flatpak/events.zig                         |   0
+ .../src/flatpak/flatpak.zig                        |   0
+ .../src/flatpak/flatpak_include.h                  |   0
+ .../src/flatpak/manager.zig                        |   0
+ .../src/flatpak/remote_manager.zig                 |   0
+ .../src/operation_context.zig                      |   0
+ .../src/protocol.zig                               |   2 +-
+ .../src/root.zig                                   |   0
+ .../src/testing/abi_test.zig                       |   2 +-
+ .../src/testing/fake_backend.zig                   |   4 +-
+ .../src/testing/incompatible_backend.zig           |   4 +-
+ .../src/testing/missing_backend.zig                |   3 +
+ .../src/testing/null_backend.zig                   |   4 +-
+ .../src/testing/short_backend.zig                  |   4 +-
+ .../src/wire.zig                                   |   0
+ {Shelly.Http => Calix.Http}/build.zig              |   2 +-
+ {Shelly.Http => Calix.Http}/build.zig.zon          |   4 +-
+ {Shelly.Http => Calix.Http}/src/http_client.zig    |   0
+ {Shelly.Http => Calix.Http}/src/resolver.zig       |   0
+ {Shelly.Http => Calix.Http}/src/tls_client.zig     |   2 +-
+ .../.gitignore                                     |   0
+ .../build.zig                                      |  64 +--
+ .../build.zig.zon                                  |  10 +-
+ .../src/alpm/alpm_include.h                        |   0
+ .../src/alpm/archive_manager.zig                   |   6 +-
+ .../src/alpm/bindings.zig                          |   0
+ .../src/alpm/bootstrap.zig                         |  30 +-
+ .../src/alpm/cache_manager.zig                     |   0
+ .../src/alpm/configuration.zig                     |  26 +-
+ .../distribution-hooks/CachyOS/update_notice.zig   |   6 +-
+ .../src/alpm/distribution-hooks/os_utilities.zig   |   4 +-
+ .../src/alpm/events.zig                            |   0
+ .../src/alpm/manager.zig                           |  26 +-
+ .../src/alpm/manager_test.zig                      | 224 +++++-----
+ .../src/alpm/pacfile_manager.zig                   |   2 +-
+ .../src/appimage/bindings.zig                      |   0
+ .../src/appimage/discovery.zig                     |   0
+ .../src/appimage/environment.zig                   |   0
+ .../src/appimage/events.zig                        |   0
+ .../src/appimage/manager.zig                       |   8 +-
+ .../src/appimage/test_support.zig                  |   0
+ .../src/appimage/update_manager.zig                |  14 +-
+ .../src/aur/build_path.zig                         |   0
+ .../src/aur/builder.zig                            |  14 +-
+ .../src/aur/builder/README.md                      |   8 +-
+ .../src/aur/builder/builder.zig                    |  24 +-
+ .../src/aur/builder/builder_test.zig               | 394 +++++++++---------
+ .../src/aur/builder/checksums.zig                  |   0
+ .../src/aur/builder/chroot-builder/models.zig      |   0
+ .../src/aur/builder/metadata.zig                   |   4 +-
+ .../src/aur/builder/package_file.zig               |  32 +-
+ .../src/aur/builder/pkgbuild_review.zig            |   0
+ .../src/aur/builder/pkgbuild_validation.zig        |   0
+ .../src/aur/builder/sandbox.zig                    |   6 +-
+ .../src/aur/builder/security.zig                   |   0
+ .../src/aur/builder/source_spec.zig                |   0
+ .../src/aur/builder/sources.zig                    |  14 +-
+ .../src/aur/builder/steps.zig                      | 454 ++++++++++-----------
+ .../src/aur/builder/virtual_ownership.zig          |   0
+ .../src/aur/calixbuild.zig                         |  88 ++--
+ .../src/aur/dependency_resolver.zig                |   0
+ .../src/aur/endpoints.zig                          |   0
+ .../src/aur/events.zig                             |   0
+ .../src/aur/manager.zig                            | 178 ++++----
+ .../src/aur/models.zig                             |   0
+ .../src/aur/review_integrity.zig                   |   0
+ .../src/aur/rpc_client.zig                         |   6 +-
+ .../src/aur/srcinfo.zig                            |   0
+ .../src/aur/vcs.zig                                |   0
+ .../src/aur/version.zig                            |   0
+ .../src/cargo/manager.zig                          |   0
+ .../src/flatpak/appstream_manager.zig              |   2 +-
+ .../src/flatpak/appstream_parser.zig               |   0
+ .../src/flatpak/backend_integration_test.zig       |   0
+ .../src/flatpak/backend_loader.zig                 |   6 +-
+ .../src/flatpak/client.zig                         |   2 +-
+ .../src/flatpak/eol.zig                            |   0
+ .../src/flatpak/errors.zig                         |   6 +-
+ .../src/flatpak/events.zig                         |   0
+ .../src/flatpak/manager.zig                        |   2 +-
+ .../src/flatpak/remote_manager.zig                 |   4 +-
+ .../src/flatpak/types.zig                          |   2 +-
+ .../src/inventory/record.zig                       |   0
+ .../src/local/events.zig                           |   0
+ .../src/local/file_inspector.zig                   |   0
+ .../src/local/manager.zig                          |   4 +-
+ .../src/local/xdg_integration.zig                  |   0
+ .../src/main.zig                                   |   0
+ .../src/npm/manager.zig                            |   0
+ .../src/pkgbuild/homograph_validator.zig           |   2 +-
+ .../src/pkgbuild/install_script.zig                |   2 +-
+ .../src/pkgbuild/install_script_scanner.zig        |   0
+ .../src/pkgbuild/local_source_validator.zig        |   0
+ .../src/pkgbuild/package_metadata.zig              |  14 +-
+ .../src/pkgbuild/parser/README.md                  |   4 +-
+ .../src/pkgbuild/parser/arithmetic.zig             |   0
+ .../src/pkgbuild/parser/arrays.zig                 |   0
+ .../src/pkgbuild/parser/dependencies.zig           |   0
+ .../src/pkgbuild/parser/diagnostic.zig             |   0
+ .../src/pkgbuild/parser/execution.zig              |   0
+ .../src/pkgbuild/parser/expansion.zig              |   0
+ .../src/pkgbuild/parser/fields.zig                 |   0
+ .../src/pkgbuild/parser/function_body.zig          |   0
+ .../src/pkgbuild/parser/parser.zig                 |  10 +-
+ .../src/pkgbuild/parser/shell_scan.zig             |   0
+ .../src/pkgbuild/parser/sources.zig                |   0
+ .../src/pkgbuild/parser/types.zig                  |   0
+ .../src/pkgbuild/parser/validation.zig             |   0
+ .../src/pkgbuild/parser/variables.zig              |   0
+ .../src/pkgbuild/parser/word.zig                   |   0
+ .../src/pkgbuild/pkgbuild_parser.zig               |   0
+ .../src/pkgbuild/post_install_validator.zig        |   4 +-
+ .../src/pkgbuild/shared_validtor.zig               |   0
+ .../src/release/registry.zig                       |   0
+ .../src/release/tracked.zig                        |   0
+ .../src/repo/README.md                             |   4 +-
+ .../src/repo/database.zig                          |   2 +-
+ .../src/repo/pkginfo.zig                           |   0
+ .../src/root.zig                                   |   2 +-
+ .../src/shared/archive.zig                         |   0
+ .../src/shared/download_queue.zig                  |   0
+ .../src/shared/downloader.zig                      |  10 +-
+ .../src/shared/json.zig                            |   0
+ .../src/shared/list_dictionary.zig                 |   0
+ .../src/shared/operation_context.zig               |   0
+ .../src/shared/package_signer.zig                  |   0
+ .../src/shared/provenance.zig                      |   0
+ .../src/shared/release_version.zig                 |   0
+ .../src/shared/source_pgp_keyring.zig              |   6 +-
+ .../src/shared/source_pgp_verifier.zig             |   2 +-
+ .../src/shared/user_account.zig                    |   0
+ .../src/shared/user_errors.zig                     |   0
+ .../src/shared/xdg_paths.zig                       |   0
+ .../LICENSE                                        |   0
+ .../README.md                                      |   0
+ .../build.zig                                      |   0
+ .../build.zig.zon                                  |   0
+ .../src/common.zig                                 |   0
+ .../src/connection.zig                             |   0
+ .../src/core.zig                                   |   0
+ .../src/dbus_types.zig                             |   0
+ .../src/dispatcher.zig                             |   0
+ .../src/generator.zig                              |   0
+ .../src/introspection.zig                          |   0
+ .../src/message_utils.zig                          |   0
+ .../src/proxy.zig                                  |   0
+ .../src/root.zig                                   |   0
+ .../src/tests/batteries.zig                        |   0
+ .../src/tests/client_test.zig                      |   0
+ .../src/tests/main.zig                             |   0
+ .../src/tests/server_test.zig                      |   0
+ .../src/tools/generate_proxy.zig                   |   0
+ .../src/tools/introspector.zig                     |   0
+ .../src/utils.zig                                  |   0
+ .../src/value.zig                                  |   0
+ .../src/xml_generator.zig                          |   0
+ .../LICENSE                                        |   0
+ .../README.md                                      |   0
+ .../build.zig                                      |   0
+ .../build.zig.zon                                  |   0
+ .../src/Reader.zig                                 |   0
+ .../src/Writer.zig                                 |   0
+ .../src/xml.zig                                    |   0
+ .../LICENSE                                        |   0
+ .../build.zig                                      |   0
+ .../build.zig.zon                                  |   0
+ .../src/time.zig                                   |   0
+ .../src/timer.zig                                  |   0
+ {Shelly.Ui.Gpui => Calix.Ui.Gpui}/Cargo.lock       |   0
+ {Shelly.Ui.Gpui => Calix.Ui.Gpui}/Cargo.toml       |   0
+ .../assets/live.gnu6.calix.desktop                 |   4 +-
+ .../assets/live.gnu6.calix.policy                  |  14 +-
+ .../assets/live.gnu6.calix.svg                     |   2 +-
+ .../examples/render04_p0_i02_blade_probe.rs        |   0
+ .../examples/render04_p0_i03_blade_readback.rs     |   0
+ .../src/backend/calix_daemon.rs                    |   0
+ .../src/backend/calix_snapshot.rs                  |   0
+ .../src/backend/client.rs                          |  32 +-
+ .../src/backend/mod.rs                             |   0
+ .../src/backend/models.rs                          |   6 +-
+ .../src/backend/process.rs                         |   6 +-
+ .../src/backend/protocol.rs                        |   2 +-
+ .../src/components/inspector_header.rs             |   0
+ .../src/components/log_drawer.rs                   |   0
+ .../src/components/menu.rs                         |   0
+ .../src/components/mod.rs                          |   0
+ .../src/components/package_card.rs                 |   0
+ .../src/components/package_identity.rs             |   0
+ .../src/components/package_table.rs                |   0
+ .../src/components/query_workbench.rs              |   0
+ .../src/components/search_input.rs                 |   0
+ .../src/components/semantic_value.rs               |   0
+ .../src/components/sidebar.rs                      |   0
+ .../src/components/status_pill.rs                  |   0
+ .../src/components/toast_overlay.rs                |   0
+ .../src/components/unified_search.rs               |   0
+ .../src/components/view_mode_switcher.rs           |   0
+ {Shelly.Ui.Gpui => Calix.Ui.Gpui}/src/config.rs    |  68 +--
+ .../src/control/cli.rs                             |   6 +-
+ .../src/control/ipc.rs                             |   0
+ .../src/control/mod.rs                             |   0
+ .../src/control/protocol.rs                        |   0
+ .../src/control/socket.rs                          |   0
+ {Shelly.Ui.Gpui => Calix.Ui.Gpui}/src/icons.rs     |   0
+ .../src/icons/browse.svg                           |   0
+ Calix.Ui.Gpui/src/icons/calix.svg                  |   1 +
+ .../src/icons/cards.svg                            |   0
+ .../src/icons/check.svg                            |   0
+ .../src/icons/close.svg                            |   0
+ .../src/icons/collapse.svg                         |   0
+ .../src/icons/copy.svg                             |   0
+ .../src/icons/dependencies.svg                     |   0
+ .../src/icons/expand.svg                           |   0
+ .../src/icons/external-url.svg                     |   0
+ .../src/icons/file-path.svg                        |   0
+ .../src/icons/files-build.svg                      |   0
+ .../src/icons/info.svg                             |   0
+ .../src/icons/installed.svg                        |   0
+ .../src/icons/news.svg                             |   0
+ .../src/icons/overview.svg                         |   0
+ .../src/icons/package-generic.svg                  |   0
+ .../src/icons/render-lab.svg                       |   0
+ .../src/icons/search.svg                           |   0
+ .../src/icons/settings.svg                         |   0
+ .../src/icons/source-alpm.svg                      |   0
+ .../src/icons/source-appimage.svg                  |   0
+ .../src/icons/source-aur.svg                       |   0
+ .../src/icons/source-cargo.svg                     |   0
+ .../src/icons/source-flatpak.svg                   |   0
+ .../src/icons/source-npm.svg                       |   0
+ .../src/icons/source-release.svg                   |   0
+ .../src/icons/table.svg                            |   0
+ .../src/icons/trash.svg                            |   0
+ .../src/icons/updates.svg                          |   0
+ .../src/icons/warning.svg                          |   0
+ {Shelly.Ui.Gpui => Calix.Ui.Gpui}/src/main.rs      |   8 +-
+ .../src/render_lab/capability.rs                   |   0
+ .../src/render_lab/catalog.rs                      |   0
+ .../src/render_lab/confront.rs                     |   0
+ .../src/render_lab/diagnostics.rs                  |   0
+ .../src/render_lab/experimental.rs                 |   0
+ .../src/render_lab/fixture.rs                      |   0
+ .../src/render_lab/graph.rs                        |   0
+ .../src/render_lab/ledger.rs                       |   0
+ .../src/render_lab/manifest.rs                     |   0
+ .../src/render_lab/mod.rs                          |   0
+ .../src/render_lab/plans.rs                        |   0
+ .../src/render_lab/recipe.rs                       |   0
+ .../src/render_lab/state.rs                        |   0
+ .../src/render_lab/texture.rs                      |   0
+ .../src/state/console.rs                           |   0
+ {Shelly.Ui.Gpui => Calix.Ui.Gpui}/src/state/mod.rs |   0
+ .../src/state/motion.rs                            |   0
+ .../src/state/package_store.rs                     |  20 +-
+ .../src/state/query.rs                             |   0
+ .../src/state/semantic.rs                          |  24 +-
+ .../src/state/session.rs                           |   2 +-
+ .../src/state/toast.rs                             |   0
+ {Shelly.Ui.Gpui => Calix.Ui.Gpui}/src/theme.rs     |   0
+ .../src/ui_metrics.rs                              |   0
+ .../src/views/inspector/dependencies.rs            |   0
+ .../src/views/inspector/files_build.rs             |   4 +-
+ .../src/views/inspector/mod.rs                     |   0
+ .../src/views/inspector/overview.rs                |   0
+ {Shelly.Ui.Gpui => Calix.Ui.Gpui}/src/views/mod.rs |   0
+ .../src/views/news.rs                              |   0
+ .../src/views/operation_console.rs                 |   0
+ .../src/views/package_workstation.rs               |   0
+ .../src/views/render_lab.rs                        |   0
+ .../src/views/settings.rs                          |  74 ++--
+ .../src/views/sidebar.rs                           |   0
+ .../src/views/workspace.rs                         |  88 ++--
+ .../src/visual_style/mod.rs                        |   0
+ .../src/visual_style/paint.rs                      |   2 +-
+ .../src/visual_style/profile.rs                    |   0
+ .../src/visual_style/projection.rs                 |   0
+ .../src/visual_style/resolver.rs                   |   2 +-
+ .../src/visual_style/roles.rs                      |   2 +-
+ .../src/visual_style/standard.rs                   |   0
+ .../src/visual_style/transparency.rs               |   0
+ .../tests/fixtures/calix-inventory-sample.json     |   0
+ MANUAL_TESTING.md                                  | 126 +++---
+ Makefile                                           |  30 +-
+ PKGBUILD-calix                                     |  50 +--
+ README.md                                          | 104 +++--
+ .../src/testing/missing_backend.zig                |   3 -
+ Shelly.Ui.Gpui/src/icons/calix.svg                 |   1 -
+ ...ly-flatpak-integrate => calix-flatpak-integrate |  24 +-
+ shellybuild.conf => calixbuild.conf                |  14 +-
+ docs/calix-architecture.md                         |   6 +-
+ docs/{shellybuild.conf.md => calixbuild.conf.md}   |  34 +-
+ docs/flatpak-backend-abi.md                        |  46 +--
+ docs/gpui/control-cli/00-README.md                 |  16 +-
+ docs/gpui/control-cli/01-COMMAND-SURFACE.md        |  26 +-
+ docs/gpui/control-cli/02-CONTROL-PROTOCOL.md       |   6 +-
+ docs/gpui/control-cli/03-SETTINGS-AUTHORITY.md     |   8 +-
+ docs/gpui/control-cli/04-AGENT-AUTOMATION.md       |  18 +-
+ docs/gpui/control-cli/05-ACCEPTANCE.md             |   2 +-
+ docs/gpui/render-lab/tools/capture_all.py          |   4 +-
+ docs/gpui/render-lab/tools/capture_fixture.sh      |  10 +-
+ docs/gpui/render-lab/tools/render03_runtime.py     |   2 +-
+ docs/isolated-builds.md                            |  57 ++-
+ docs/legacy-references.md                          | 304 +++++---------
+ scripts/bump-version.sh                            |  20 +-
+ scripts/calix                                      |  10 +-
+ scripts/calix-sync.py                              |  20 +-
+ scripts/check-flatpak-separation.sh                |  14 +-
+ scripts/check-naming                               |  53 +++
+ scripts/repo-db-parity.sh                          | 136 +++---
+ scripts/test-flatpak-integrate.py                  |   8 +-
+ scripts/test-flatpak-separation.sh                 |  26 +-
+ scripts/verify                                     |  21 +-
+ 428 files changed, 2396 insertions(+), 2445 deletions(-)

@@ -1,0 +1,146 @@
+{
+  "run_id": "calix-rename-20261020",
+  "kind": "identity-rename",
+  "status": "ok",
+  "started_at": "2026-10-20T10:19:44Z",
+  "finished_at": "2026-10-20T10:28:14Z",
+  "duration_ms": 510000,
+  "commit": "bd51789a9123cb81875d72059bfaba895b3620c4",
+  "working_tree_dirty": false,
+  "objective": "Complete the Calix identity purge with zero old-name references in live code, packaging, scripts and paths, while retaining lineage only in README/docs/evidence.",
+  "scope": [
+    "six live Zig/Rust directories renamed in place",
+    "CLI binary renamed to calix; /usr/bin/calix symlink added",
+    "CALIX_* environment variables replace the old names",
+    "config, cache, state and AppImage DB paths moved to calix",
+    "Flatpak backend SONAME and entry point renamed with no alias",
+    "Zig package identity .calix with fingerprint 0x30067142801312fc",
+    "desktop, icon, polkit and D-Bus identity live.gnu6.calix",
+    "Python bridge renamed completely and kept frozen",
+    "dead upstream surfaces removed in commit 44fcf498",
+    "scripts/check-naming guard added to scripts/verify"
+  ],
+  "naming_decisions": {
+    "namespace": "live.gnu6.calix",
+    "derivation": "owned domain gnu6.live",
+    "rejected_com_calix": "calix.com belongs to Calix Inc.",
+    "rejected_in_gnu": "gnu.in is not owned by the project",
+    "d_bus_signal": "live.gnu6.calix.Refresh",
+    "d_bus_path": "/live/gnu6/calix/Notifications",
+    "flatpak_soname": "libcalix-flatpak-backend.so.1",
+    "flatpak_symbol": "calix_flatpak_backend_get_api",
+    "zig_package": ".calix",
+    "zig_fingerprint": "0x30067142801312fc"
+  },
+  "verification": {
+    "local": {
+      "command": "scripts/verify",
+      "commit": "bd51789a",
+      "working_tree_dirty": false,
+      "naming_check": "pass",
+      "packagemanager_tests": 1386,
+      "packagemanager_floor": 1380,
+      "cli_tests": 387,
+      "cli_floor": 380,
+      "rust_tests": 201,
+      "rust_floor": 195,
+      "release_builds": "pass",
+      "cli_smoke": "pass"
+    },
+    "container": {
+      "command": "scripts/ci-replay",
+      "image": "archlinux:latest",
+      "snapshot": "2026/10/01",
+      "mode": "HEAD archive, no .git",
+      "naming_check": "pass",
+      "packagemanager_tests": 1388,
+      "cli_tests": 387,
+      "rust_tests": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass"
+    },
+    "naming_guard": {
+      "live_tree": "pass",
+      "plain_git_archive": "pass",
+      "content_probe": "rejected",
+      "path_probe": "rejected"
+    },
+    "flatpak_separation": "pass",
+    "flatpak_integration_fixture": "pass",
+    "pkgbuild_syntax": "pass",
+    "python_compile": "pass"
+  },
+  "test_count_delta": {
+    "local_packagemanager": 1386,
+    "container_packagemanager": 1388,
+    "reason": "container image provides optional dependencies that enable two additional host-dependent tests; this matches the pre-rename baseline of 1388 in the container."
+  },
+  "artifacts": [
+    {
+      "path": "evidence/logs/calix-rename-20261020-ci-replay.log",
+      "bytes": 21797,
+      "sha256": "b5616c1c5327b3379b8fbf696c753c7b1fed97751112978b036a00335187ec00"
+    },
+    {
+      "path": "evidence/logs/calix-rename-20261020-commit-stat.log",
+      "bytes": 25593,
+      "sha256": "31c844b3f68376ab061267b626548cd31bed9feb070bc8e732835b64764cabae"
+    },
+    {
+      "path": "evidence/logs/calix-rename-20261020-flatpak-integrate.log",
+      "bytes": 204,
+      "sha256": "fe779cd2d310b2532b2fb38ac87f8c55bbb0094cd091007933110e5edc98d576"
+    },
+    {
+      "path": "evidence/logs/calix-rename-20261020-flatpak-separation.log",
+      "bytes": 42,
+      "sha256": "c0a20214ae9cb365d1df20d2e555aa773dac755f91277c3c3a04cf961fe5e647"
+    },
+    {
+      "path": "evidence/logs/calix-rename-20261020-naming-negative-content.log",
+      "bytes": 207,
+      "sha256": "b2af8f684985e9c5da22adb29a86286c0f2588de4b913848ac97f3475fee42a2"
+    },
+    {
+      "path": "evidence/logs/calix-rename-20261020-naming-negative-path.log",
+      "bytes": 164,
+      "sha256": "68883446b606f1c4716f0819122ee9cd4a9ec93d3789fe0279112b0675b517a2"
+    },
+    {
+      "path": "evidence/logs/calix-rename-20261020-naming-pass.log",
+      "bytes": 70,
+      "sha256": "f5ac1e7a4dcc1d644474138fd835a2f705f15770ecf8b497fe6406c8b564ebb9"
+    },
+    {
+      "path": "evidence/logs/calix-rename-20261020-pkgbuild-syntax.log",
+      "bytes": 58,
+      "sha256": "7023f5de7dc38ef62b1dcb39d46952450bff435e8c0b1a234484c948d234791f"
+    },
+    {
+      "path": "evidence/logs/calix-rename-20261020-python-compile.log",
+      "bytes": 158,
+      "sha256": "38fdb1c56171bb35e278bbe1aef5a33743787ac4bcf9f20538c0beaf1eb9ad72"
+    },
+    {
+      "path": "evidence/logs/calix-rename-20261020-verify.log",
+      "bytes": 794,
+      "sha256": "73b19bb331ed124d2c588b5936b2e2f8cd2b76e00f1be31922f8a0a4c531cc17"
+    },
+    {
+      "path": "evidence/runs/calix-rename-20261020/verify-local.json",
+      "bytes": 1076,
+      "sha256": "bc5c47e5f5d30f955d9ab3f85dd1292be8b3f5282cb76bd307f0f6f27f900bf6"
+    }
+  ],
+  "known_gaps": [
+    "GitHub Actions was not triggered for this commit; the container replay is the pre-push proof. Pushes to main do not trigger CI.",
+    "docs/shelly-*.md, dated docs/gpui/slice-* records and docs/gpui/ux/ retain the old name as historical records, by design and allowed by the guard.",
+    "Calix.Cli.Zig/scripts/test-isolated-build.sh still contains sudo-based test harness code; it was not run by the gate and is tracked as separate policy debt.",
+    "calix-daemon is not installed by PKGBUILD-calix; this predates the rename and is documented in the README."
+  ],
+  "not_run": [
+    "full pacman package install of PKGBUILD-calix (requires a clean chroot and elevated package installation)",
+    "live polkit prompt and desktop-session launch (requires an interactive session)",
+    "push to the remote"
+  ]
+}

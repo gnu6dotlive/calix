@@ -1,0 +1,3 @@
+./naming-probe.txt:1:shelly
+error: tracked content still carries the old product name outside the historical record
+naming: use 'calix' in code and packaging; keep the old name only in README/docs/evidence.

@@ -1,0 +1,3 @@
+error: tracked path still carries the old product name:
+shelly-probe.txt
+naming: use 'calix' in code and packaging; keep the old name only in README/docs/evidence.
