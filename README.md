@@ -346,10 +346,21 @@ The current Arch package is defined by [`PKGBUILD-calix`](PKGBUILD-calix), with
 [`packaging/aur/PKGBUILD`](packaging/aur/PKGBUILD) as a symlink to it so the AUR copy
 cannot drift from the in-tree one.
 
+Zig 0.16 is required. `make package` selects `vendor/zig-0.16/usr/bin/zig` when it
+exists and exports it as `ZIG`; `PKGBUILD-calix` rejects any other Zig version with a
+clear message. If you invoke `makepkg` yourself, pass the toolchain explicitly:
+
 ```bash
 # Build as your user; installation is elevated through polkit, not sudo.
-makepkg --noconfirm
-pkexec pacman -U --noconfirm calix-gpui-git-*.pkg.tar.zst
+make package
+pkexec pacman -U --noconfirm /tmp/calix-gpui-pkg/*.pkg.tar.zst
+```
+
+For a direct `makepkg` run in `packaging/aur`, set `ZIG` to an absolute 0.16 binary:
+
+```bash
+cd packaging/aur
+ZIG=/absolute/path/to/zig-0.16/usr/bin/zig makepkg --noconfirm
 ```
 
 Enable the per-user inventory service after installation:

@@ -21,6 +21,10 @@ ifeq ($(TARGET_DIR),)
 endif
 RUST_BIN    := $(TARGET_DIR)/release/calix-gpui
 PKGBUILD    := $(REPO_ROOT)PKGBUILD-calix
+# Zig 0.16 is required by the build API. Prefer the git-ignored vendored
+# toolchain when present; package builds receive the same path via ZIG.
+ZIG ?= $(if $(wildcard $(REPO_ROOT)vendor/zig-0.16/usr/bin/zig),$(REPO_ROOT)vendor/zig-0.16/usr/bin/zig,zig)
+export ZIG
 
 # Préfère le CLI Zig local ; tombe en arrière sur le CLI système si absent
 ifeq ($(wildcard $(ZIG_BIN)),)
@@ -59,7 +63,7 @@ test:
 zig:
 	@if [ ! -f "$(ZIG_BIN)" ]; then \
 		echo ">>> Compilation du CLI Zig (ReleaseSafe)..."; \
-		cd $(ZIG_SRC) && zig build -Doptimize=ReleaseSafe; \
+		cd $(ZIG_SRC) && $(ZIG) build -Doptimize=ReleaseSafe; \
 	else \
 		echo ">>> CLI Zig déjà compilé : $(ZIG_BIN)"; \
 	fi
@@ -67,7 +71,7 @@ zig:
 ## Force la recompilation du CLI Zig
 zig-rebuild:
 	@echo ">>> Recompilation forcée du CLI Zig..."
-	cd $(ZIG_SRC) && zig build -Doptimize=ReleaseSafe
+	cd $(ZIG_SRC) && $(ZIG) build -Doptimize=ReleaseSafe
 
 ## Construit le paquet dans /tmp sans installer (jamais sudo)
 package:

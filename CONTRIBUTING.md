@@ -103,9 +103,12 @@ code paths that invoke those tools.
    make package
    ```
 
-   Do not use `makepkg -si`: its install step invokes `sudo` on a default
-   `makepkg` configuration. Run `makepkg --noconfirm` and install the result
-   with `pkexec pacman -U` instead.
+   `make package` prefers the git-ignored `vendor/zig-0.16/usr/bin/zig` and
+   exports it as `ZIG`; a direct `makepkg` run must set `ZIG` to a 0.16 binary
+   because current Arch ships Zig 0.17. Do not use `makepkg -si`: its install
+   step invokes `sudo` on a default `makepkg` configuration. Run
+   `makepkg --noconfirm` and install the result with `pkexec pacman -U`
+   instead.
 
 ---
 

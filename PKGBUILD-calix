@@ -61,9 +61,25 @@ build() {
     cd "${srcdir}/${pkgname}"
 
     # 1. Compile the Zig CLI backend
-    echo ">>> Compiling the Zig CLI backend..."
+    # Arch's system Zig has moved past the 0.16 build API this tree uses.
+    # Allow an explicit ZIG override so package builders can point at a
+    # 0.16 toolchain without changing their system installation.
+    local zig_bin="${ZIG:-zig}"
+    local zig_version
+    if ! zig_version="$("$zig_bin" version 2>/dev/null)"; then
+        echo "error: cannot run Zig toolchain: ${zig_bin}" >&2
+        echo "       set ZIG to the absolute path of a Zig 0.16 binary" >&2
+        return 1
+    fi
+    if [[ "${zig_version}" != 0.16.* ]]; then
+        echo "error: Calix requires Zig 0.16.x; ${zig_bin} reports ${zig_version}" >&2
+        echo "       set ZIG to the absolute path of a Zig 0.16 binary" >&2
+        return 1
+    fi
+
+    echo ">>> Compiling the Zig CLI backend with Zig ${zig_version}..."
     cd Calix.Cli.Zig
-    zig build -Doptimize=ReleaseSafe
+    "$zig_bin" build -Doptimize=ReleaseSafe
     cd ..
 
     # 2. Compile the Calix GPUI frontend (Rust)
