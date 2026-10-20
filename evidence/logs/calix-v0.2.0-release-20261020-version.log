@@ -1,0 +1,5 @@
+== version ==
+calix-gpui 0.2.0 (control protocol v4)
+{"version":"0.2.0","control_protocol":4}
+== binary ==
+/mnt/sandbox/builds/cargo/release/calix-gpui: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 6.1.0, BuildID[sha1]=7a662b41bde7a70986fc2181ccadf13591d790b1, stripped

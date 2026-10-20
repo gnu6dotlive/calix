@@ -1,0 +1,48 @@
+== release assets (gh release view v0.2.0) ==
+{"assets":[{"name":"calix-gpui-linux-x86_64.tar.gz","size":20825997,"state":"uploaded"},{"name":"calix-gpui-linux-x86_64.tar.gz.sha256","size":97,"state":"uploaded"}],"isDraft":false,"isPrerelease":false,"name":"Calix v0.2.0","publishedAt":"2026-10-20T13:55:59Z","tagName":"v0.2.0","url":"https://github.com/tension-atoi/calix/releases/tag/v0.2.0"}
+
+== checksum file ==
+e0470efd4442f3922d335c7b0cfcc1490d302ecd756c2a046a6343f68c1e6d7b  calix-gpui-linux-x86_64.tar.gz
+== sha256sum -c ==
+calix-gpui-linux-x86_64.tar.gz: OK
+
+== tarball manifest ==
+usr/
+usr/bin/
+usr/bin/calix
+usr/bin/calix-daemon
+usr/bin/calix-gpui
+usr/lib/
+usr/lib/calix/
+usr/lib/calix/calix
+usr/lib/calix/calix-daemon
+usr/lib/calix/calix-gpui
+usr/lib/systemd/
+usr/lib/systemd/user/
+usr/lib/systemd/user/calix-daemon.service
+usr/share/
+usr/share/applications/
+usr/share/applications/live.gnu6.calix.desktop
+usr/share/icons/
+usr/share/icons/hicolor/
+usr/share/icons/hicolor/scalable/
+usr/share/icons/hicolor/scalable/apps/
+usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg
+usr/share/polkit-1/
+usr/share/polkit-1/actions/
+usr/share/polkit-1/actions/live.gnu6.calix.policy
+
+== body comparison against the tagged release notes ==
+--- /var/tmp/calix-release-verify.dy7H1O/tagged-release-notes.md	2026-10-20 10:02:36.596170907 -0400
++++ /var/tmp/calix-release-verify.dy7H1O/release-body.md	2026-10-20 10:02:36.587170786 -0400
+@@ -109,3 +109,4 @@
+ 
+ The release commit passed `scripts/verify` and `scripts/ci-replay` locally before the
+ tag was pushed. The same gate runs in `ci.yml`.
++
+difference above is the trailing newline added by the release action
+
+== binaries ==
+usr/lib/calix/calix:        ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 4.4.0, with debug_info, not stripped
+usr/lib/calix/calix-daemon: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 4.4.0, with debug_info, not stripped
+usr/lib/calix/calix-gpui:   ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 4.4.0, BuildID[sha1]=867f6b949533dd94733507ccd7086ae543ef3567, stripped

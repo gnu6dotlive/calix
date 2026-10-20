@@ -1,0 +1,134 @@
+{
+  "run_id": "calix-notify-bridge-20261020",
+  "kind": "feature",
+  "status": "ok",
+  "started_at": "2026-10-20T13:41:00Z",
+  "finished_at": "2026-10-20T14:03:52Z",
+  "commit": "b0a617dd",
+  "parent_commit": "f201ab92",
+  "working_tree_dirty": false,
+  "objective": "Turn Calix's live.gnu6.calix.Refresh signal into a desktop notification without a shell pipeline: a small session-bus bridge that links libdbus, ships as a packaged user service, and is installed without being enabled.",
+  "scope": [
+    "calix-notify is a separate executable, not a CLI mode: the daemon must not inherit a terminal or a desktop dependency",
+    "the bridge links libdbus directly and matches type='signal',interface='live.gnu6.calix',member='Refresh',path='/live/gnu6/calix/Notifications'",
+    "the refresh signal becomes one org.freedesktop.Notifications.Notify call with app_name Calix, app_icon live.gnu6.calix and a 5s expiry",
+    "the session bus address is taken from DBUS_SESSION_BUS_ADDRESS, otherwise from an absolute XDG_RUNTIME_DIR; the bridge never autolaunches a bus",
+    "a dropped bus exits the process so the systemd unit restarts it inside its StartLimit window",
+    "the package installs /usr/lib/calix/calix-notify, the /usr/bin/calix-notify symlink and calix-notify.service, and now depends on dbus",
+    "the release artifact carries the same three files",
+    "both user units stay installed and disabled"
+  ],
+  "verification": {
+    "local": {
+      "command": "scripts/verify",
+      "commit": "b0a617dd",
+      "working_tree_dirty": false,
+      "naming_check": "pass",
+      "packagemanager_tests": 1386,
+      "cli_tests": 391,
+      "cli_floor": 380,
+      "rust_tests": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass",
+      "elapsed": "1m00.46s"
+    },
+    "container": {
+      "command": "scripts/ci-replay",
+      "image": "archlinux:latest",
+      "snapshot": "2026/10/01",
+      "mode": "HEAD archive, no .git",
+      "commit_under_test": "b0a617dd",
+      "naming_check": "pass",
+      "packagemanager_tests": 1388,
+      "cli_tests": 391,
+      "rust_tests": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass",
+      "elapsed": "5m40.97s"
+    },
+    "zig_unit_tests": {
+      "target": "notify-test",
+      "passed": 3,
+      "cases": [
+        "session bus address prefers the explicit environment and falls back to XDG",
+        "only the Calix Refresh signal is accepted",
+        "notification method call is a complete Notify message"
+      ],
+      "total_cli_tests": 391
+    },
+    "end_to_end": {
+      "method": "a private dbus-daemon, dbus-monitor on org.freedesktop.Notifications.Notify, the bridge subscribed to the signal, then dbus-send of the exact signal calix sends",
+      "unrelated_signal": "live.gnu6.calix.Other produced no notification",
+      "refresh_signal": "one Notify call with app_name Calix, replaces_id 0, app_icon live.gnu6.calix, summary 'Package state changed', empty actions and hints, expire_timeout 5000",
+      "service_survived": true
+    },
+    "failure_paths": {
+      "no_session_bus": "exit 1 with 'no session bus (DBUS_SESSION_BUS_ADDRESS and XDG_RUNTIME_DIR are unset)' when neither is set",
+      "bus_disconnect": "exit 1 with SessionBusDisconnected when the bus is killed under the bridge"
+    },
+    "packaging": {
+      "pkgbuild_syntax": "pass (bash -n, makepkg --printsrcinfo)",
+      "package_staging": "the package() function was staged against the built binaries: usr/lib/calix/calix-notify, usr/bin/calix-notify -> /usr/lib/calix/calix-notify and usr/lib/systemd/user/calix-notify.service are all present",
+      "unit_syntax": "pass with ExecStart substituted with /bin/true, because the install path only exists after package extraction",
+      "dbus_dependency": "dbus added to depends; the container base image already ships dbus 1.16.2 with pkgconfig, and ci-setup now installs it explicitly"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "evidence/logs/calix-notify-20261020-verify-clean.log",
+      "bytes": 780,
+      "sha256": "81f582da2ae67bda63d0c3920d752b9853a3af1363bba1054ff123bc5d2f149e"
+    },
+    {
+      "path": "evidence/logs/calix-notify-20261020-ci-replay.log",
+      "bytes": 22085,
+      "sha256": "b1daefd9e8bb3aa86f9f9f3331c167bd36b5620fe30f5df898c108d2d47abe82"
+    },
+    {
+      "path": "evidence/logs/calix-notify-20261020-zig-tests.log",
+      "bytes": 6788,
+      "sha256": "c9693277d120f46b3d1f7ee2a601e9e0bc65f82211369208b468546f9b48ef88"
+    },
+    {
+      "path": "evidence/logs/calix-notify-20261020-e2e.log",
+      "bytes": 1128,
+      "sha256": "14d3e34029e7bbdb961fd01a4e7e20fb7fbac883a46c890d224b62576face69a"
+    },
+    {
+      "path": "evidence/logs/calix-notify-20261020-e2e-monitor.log",
+      "bytes": 759,
+      "sha256": "be149d65881f31e4eb8324726e06867120d540efc9c37244a5577354506f8e11"
+    },
+    {
+      "path": "evidence/logs/calix-notify-20261020-e2e-service.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "evidence/logs/calix-notify-20261020-no-session-bus.log",
+      "bytes": 95,
+      "sha256": "87948cf6e25f6314ee56371e7b7dd442c2618e45268069fe0b879fd329d13b14"
+    },
+    {
+      "path": "evidence/logs/calix-notify-20261020-bus-disconnect.log",
+      "bytes": 37,
+      "sha256": "4e41387a5dabf3a77bc8c9b49513f635825aab5782e9740c3b6984091a22a799"
+    },
+    {
+      "path": "evidence/logs/calix-notify-20261020-package-stage.log",
+      "bytes": 2493,
+      "sha256": "e3cf36cf656317e7958842252e1f79e2969438e09fe4415abaccda9335e79d59"
+    },
+    {
+      "path": "evidence/logs/calix-notify-20261020-systemd-unit.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "known_gaps": [
+    "The bridge was exercised against a private dbus-daemon, not against a live desktop notification daemon: no notification daemon is installed on this host, so the Notify call was observed on the bus rather than rendered.",
+    "The user unit was not enabled on the live system. Enabling a user unit and installing the package need an interactive polkit session, so the unit is validated by syntax check and package staging only.",
+    "The full makepkg build was not repeated for this change: the package() function was staged directly against the built binaries, and the release-artifact step was mirrored in the workflow.",
+    "calix-notify is not part of the published v0.2.0 artifact: that tag predates this commit."
+  ]
+}

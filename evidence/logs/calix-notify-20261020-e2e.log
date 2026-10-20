@@ -1,0 +1,28 @@
+== private bus ==
+address=unix:path=/tmp/dbus-ioW7j89SQI,guid=9ff29e59f747145d3b57a9796ad775f3
+
+== service log ==
+== dbus-monitor: org.freedesktop.Notifications.Notify calls ==
+signal time=1792505331.743832 sender=org.freedesktop.DBus -> destination=:1.0 serial=2 path=/org/freedesktop/DBus; interface=org.freedesktop.DBus; member=NameAcquired
+   string ":1.0"
+signal time=1792505331.743865 sender=org.freedesktop.DBus -> destination=:1.0 serial=4 path=/org/freedesktop/DBus; interface=org.freedesktop.DBus; member=NameLost
+   string ":1.0"
+method call time=1792505333.750643 sender=:1.1 -> destination=org.freedesktop.Notifications serial=3 path=/org/freedesktop/Notifications; interface=org.freedesktop.Notifications; member=Notify
+   string "Calix"
+   uint32 0
+   string "live.gnu6.calix"
+   string "Package state changed"
+   string "Open Calix to review the updated package inventory."
+   array [
+   ]
+   array [
+   ]
+   int32 5000
+== assertions ==
+one Notify call observed: yes
+app_name: Calix
+app_icon: live.gnu6.calix
+summary: Package state changed
+expire_timeout: 5000
+service still running: yes
+notify bridge e2e: PASS

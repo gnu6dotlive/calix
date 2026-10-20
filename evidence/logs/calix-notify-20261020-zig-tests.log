@@ -1,0 +1,105 @@
+1/6 isolated_build.test.reviewed input paths cannot escape the staged source root...OK
+2/6 isolated_build.test.reviewed inputs are materialized with exact bytes and permissions...OK
+3/6 isolated_build.test.staged reviewed inputs preserve the host digest and reject real changes...OK
+4/6 isolated_build.test.isolated guest traversal permissions survive restrictive umasks...OK
+5/6 isolated_build.test.isolated configuration permissions survive restrictive umasks and replacement...OK
+6/6 isolated_build.test.isolated public source key bundle is readable under restrictive umasks...OK
+All 6 tests passed.
+1/6 isolated_build.test.reviewed input paths cannot escape the staged source root...OK
+2/6 isolated_build.test.reviewed inputs are materialized with exact bytes and permissions...OK
+3/6 isolated_build.test.staged reviewed inputs preserve the host digest and reject real changes...OK
+4/6 isolated_build.test.isolated guest traversal permissions survive restrictive umasks...OK
+5/6 isolated_build.test.isolated configuration permissions survive restrictive umasks and replacement...OK
+6/6 isolated_build.test.isolated public source key bundle is readable under restrictive umasks...OK
+All 6 tests passed.
+1/6 isolated_build.test.reviewed input paths cannot escape the staged source root...OK
+2/6 isolated_build.test.reviewed inputs are materialized with exact bytes and permissions...OK
+3/6 isolated_build.test.staged reviewed inputs preserve the host digest and reject real changes...OK
+4/6 isolated_build.test.isolated guest traversal permissions survive restrictive umasks...OK
+5/6 isolated_build.test.isolated configuration permissions survive restrictive umasks and replacement...OK
+6/6 isolated_build.test.isolated public source key bundle is readable under restrictive umasks...OK
+All 6 tests passed.
+1/6 isolated_build.test.reviewed input paths cannot escape the staged source root...OK
+2/6 isolated_build.test.reviewed inputs are materialized with exact bytes and permissions...OK
+3/6 isolated_build.test.staged reviewed inputs preserve the host digest and reject real changes...OK
+4/6 isolated_build.test.isolated guest traversal permissions survive restrictive umasks...OK
+5/6 isolated_build.test.isolated configuration permissions survive restrictive umasks and replacement...OK
+6/6 isolated_build.test.isolated public source key bundle is readable under restrictive umasks...OK
+All 6 tests passed.
+test
++- run test w
+unexpected errno: 111
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/std/posix.zig:1672:40: 0x124ca90 in unexpectedErrno (std.zig)
+        std.debug.dumpCurrentStackTrace(.{});
+                                       ^
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/std/Io/Threaded.zig:11983:63: 0x1306da1 in posixConnectUnix (std.zig)
+                    else => |err| return posix.unexpectedErrno(err),
+                                                              ^
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/std/Io/Threaded.zig:12141:25: 0x1307105 in netConnectUnixPosix (std.zig)
+    try posixConnectUnix(socket_fd, &storage.any, addr_len);
+                        ^
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/std/Io/net.zig:911:51: 0x139989b in connect (std.zig)
+            .handle = try io.vtable.netConnectUnix(io.userdata, ua),
+                                                  ^
+/home/tension_atoi/Projects/calix/Calix.Cli.Zig/src/daemon/server.zig:379:35: 0x1398dea in isServing (root.zig)
+    const stream = address.connect(io) catch return false;
+                                  ^
+/home/tension_atoi/Projects/calix/Calix.Cli.Zig/src/daemon/server.zig:437:38: 0x1399392 in test.isServing: a bound socket with no daemon behind it is not a running daemon (root.zig)
+    try testing.expect(!try isServing(testing.io, &address));
+                                     ^
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/compiler/test_runner.zig:140:68: 0x132fbac in mainServer (test_runner.zig)
+                const status: TestResults.Status = if (test_fn.func()) |v| s: {
+                                                                   ^
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/compiler/test_runner.zig:71:26: 0x133099d in main (test_runner.zig)
+        return mainServer(init) catch |err| panic("internal test runner failure: {t}", .{err});
+                         ^
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/std/start.zig:699:88: 0x132d73e in callMain (std.zig)
+    if (fn_info.params[0].type.? == std.process.Init.Minimal) return wrapMain(root.main(.{
+                                                                                       ^
+../sysdeps/nptl/libc_start_call_main.h:59:16: 0x7f8ed1e27d0d in __libc_start_call_main (../sysdeps/x86/libc-start.c)
+../csu/libc-start.c:372:3: 0x7f8ed1e27e4a in __libc_start_main_impl (../sysdeps/x86/libc-start.c)
+???:?:?: 0x247f584 in ??? (???)
+[default] (warn): calix-daemon: could not append to the journal: NotDir
+failed command: ./.zig-cache/o/ad83ea11ec6e3f843964cf2121c8d178/test --cache-dir=./.zig-cache --seed=0x1d88beb5 --listen=-
+
+Build Summary: 21/21 steps succeeded; 391/391 tests passed
+test success
++- run test 380 pass (380 total) 1s MaxRSS:132M
+|  +- compile test Debug native cached 21ms MaxRSS:56M
+|     +- options cached
+|     +- translate-c cached 18ms MaxRSS:55M
+|     +- options cached
+|     +- options cached
++- run test success 8ms MaxRSS:14M
+|  +- compile test Debug native cached 20ms MaxRSS:54M
+|     +- options (reused)
+|     +- translate-c (reused)
+|     +- options (reused)
+|     +- options (reused)
++- run test success 6ms MaxRSS:12M
+|  +- compile test Debug native cached 21ms MaxRSS:57M
+|     +- options (reused)
+|     +- translate-c (reused)
+|     +- options (reused)
+|     +- options (reused)
++- run test notify-test 3 pass (3 total) 6ms MaxRSS:14M
+|  +- compile test notify-test Debug native success 285ms MaxRSS:157M
++- run test builder-command-test 8 pass (8 total) 725ms MaxRSS:28M
+|  +- compile test builder-command-test Debug native cached 20ms MaxRSS:54M
+|     +- options (reused)
+|     +- translate-c (reused)
+|     +- options (reused)
+|     +- options (reused)
++- isolated-build-test success
+   +- run bash success 41ms
+   |  +- compile test isolated-build-test Debug native cached 21ms MaxRSS:54M
+   |     +- translate-c (reused)
+   |     +- options (reused)
+   |     +- options (reused)
+   +- run bash success 42ms
+   |  +- compile test isolated-build-test Debug native (+3 more reused dependencies)
+   +- run bash success 37ms
+   |  +- compile test isolated-build-test Debug native (+3 more reused dependencies)
+   +- run bash success 40ms
+      +- compile test isolated-build-test Debug native (+3 more reused dependencies)
+

@@ -1,0 +1,152 @@
+{
+  "run_id": "calix-v0.2.0-release-20261020",
+  "kind": "release",
+  "status": "ok",
+  "started_at": "2026-10-20T13:13:26Z",
+  "finished_at": "2026-10-20T13:56:02Z",
+  "commit": "f201ab92b53794bfe9e31a2f9b5e3e96aa5628fb",
+  "tag": "v0.2.0",
+  "tag_object": "annotated",
+  "parent_commit": "92afbbab",
+  "working_tree_dirty": false,
+  "objective": "Publish Calix v0.2.0 as a hard cut from the Shelly name: version the frontend from CARGO_PKG_VERSION, ship the migration guide as the release body, and publish a tarball with a verifiable checksum.",
+  "scope": [
+    "calix-gpui version is 0.2.0 in Cargo.toml, Cargo.lock, the --version string and the JSON version output",
+    "docs/release-notes.md is the migration guide and is published verbatim as the GitHub release body",
+    "the release job checks out the tagged tree, so body_path resolves inside the tag",
+    "the tarball is published with a .sha256 checksum beside it",
+    "the release is named from the tag: Calix v0.2.0",
+    "the version is reported by one source: CARGO_PKG_VERSION"
+  ],
+  "verification": {
+    "local": {
+      "command": "scripts/verify",
+      "commit": "f201ab92",
+      "working_tree_dirty": false,
+      "naming_check": "pass",
+      "packagemanager_tests": 1386,
+      "cli_tests": 388,
+      "rust_tests": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass",
+      "elapsed": "57.33s"
+    },
+    "container": {
+      "command": "scripts/ci-replay",
+      "image": "archlinux:latest",
+      "snapshot": "2026/10/01",
+      "mode": "HEAD archive, no .git",
+      "commit_under_test": "f201ab92",
+      "naming_check": "pass",
+      "packagemanager_tests": 1388,
+      "cli_tests": 388,
+      "rust_tests": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass",
+      "elapsed": "6m09.15s"
+    },
+    "version_output": {
+      "human": "calix-gpui 0.2.0 (control protocol v4)",
+      "json": "{\"version\":\"0.2.0\",\"control_protocol\":4}",
+      "binary": "ELF 64-bit LSB pie executable, x86-64, stripped"
+    },
+    "artifact_rehearsal": {
+      "method": "the workflow's install and tar steps replayed locally against the built binaries",
+      "sha256": "a2462286dc2aec393fe8a78323315f775ea650d844fb98971ee335356b30eb5c",
+      "checksum_verify": "sha256sum -c: OK",
+      "contents": [
+        "usr/bin/calix, usr/bin/calix-daemon symlinks",
+        "usr/bin/calix-gpui wrapper",
+        "usr/lib/calix/calix, calix-daemon, calix-gpui",
+        "usr/lib/systemd/user/calix-daemon.service",
+        "usr/share/applications/live.gnu6.calix.desktop",
+        "usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg",
+        "usr/share/polkit-1/actions/live.gnu6.calix.policy"
+      ],
+      "note": "This checksum is a local rehearsal. The published tarball is built on the runner and has its own checksum."
+    },
+    "remote_run": {
+      "run_id": 39432369137,
+      "workflow": "CI & Release",
+      "event": "push",
+      "ref": "v0.2.0",
+      "head_sha": "f201ab92b53794bfe9e31a2f9b5e3e96aa5628fb",
+      "conclusion": "success",
+      "created_at": "2026-10-20T13:40:01Z",
+      "build_job": "13:40:03Z -> 13:55:48Z (15m45s)",
+      "release_job": "13:55:50Z -> 13:56:01Z (11s)",
+      "total": "16m01s"
+    },
+    "github_release": {
+      "url": "https://github.com/tension-atoi/calix/releases/tag/v0.2.0",
+      "name": "Calix v0.2.0",
+      "draft": false,
+      "prerelease": false,
+      "published_at": "2026-10-20T13:55:59Z",
+      "body_matches_tagged_release_notes": "yes, byte-identical apart from the trailing newline the release action adds",
+      "assets": [
+        {
+          "name": "calix-gpui-linux-x86_64.tar.gz",
+          "bytes": 20825997,
+          "state": "uploaded"
+        },
+        {
+          "name": "calix-gpui-linux-x86_64.tar.gz.sha256",
+          "bytes": 97,
+          "state": "uploaded"
+        }
+      ],
+      "published_sha256": "e0470efd4442f3922d335c7b0cfcc1490d302ecd756c2a046a6343f68c1e6d7b",
+      "checksum_verify": "sha256sum -c against the downloaded asset: OK",
+      "manifest_matches_release_notes": "yes"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "evidence/logs/calix-v0.2.0-release-20261020-verify-clean.log",
+      "bytes": 780,
+      "sha256": "ce7c2c274bd0002c3ece66e349b4901c4b16365328ce793eb7c6944a126a7621"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.0-release-20261020-ci-replay.log",
+      "bytes": 21782,
+      "sha256": "6a2746f8b2ebd81e9c1f1fb4c2994a86790edb34f0ceb8d3a0fdaaa03b59fb0f"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.0-release-20261020-version.log",
+      "bytes": 357,
+      "sha256": "356020531301d0e1c4bb86ac087ce5a1b7593cf0b4b1e1edeecff54045fcb399"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.0-release-20261020-artifact-rehearsal.log",
+      "bytes": 1595,
+      "sha256": "1e67b7a5af17569145a431220215fa836f3eb69a89485936a94d0664bd0ecc87"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.0-release-20261020-push.log",
+      "bytes": 869,
+      "sha256": "3fccedf6f2545d7b0b02fe136b094e85ea079e67e17c67cdc9e95b60b652f424"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.0-release-20261020-run-watch.log",
+      "bytes": 20953,
+      "sha256": "ceb3b3bf543bca26055d9a9e0de1162407c1eb8853d11e9c10c3c576b01f673e"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.0-release-20261020-release-assets.log",
+      "bytes": 2302,
+      "sha256": "1270c210f7b6afe7306cfe43639eec254ab2ff67a0e899380b3eea63f01815c9"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.0-release-20261020-release.json",
+      "bytes": 576,
+      "sha256": "fd385e7482d715d04e2e439939c422bf7a6418df995573a78b20b8cfbf2c19b1"
+    }
+  ],
+  "known_gaps": [
+    "The GitHub Actions cache was consumed for the first time by this run: the local replay cannot exercise cache restore or save, so the first remote consumer proved the key layout.",
+    "The published tarball is built on the runner; its checksum differs from the local rehearsal checksum. The published checksum was verified against the downloaded asset.",
+    "The package was not installed on the live system in this phase: pacman -U and systemctl --user enable --now need an interactive polkit session, so they remain unverified here.",
+    "calix-notify is not part of the v0.2.0 artifact: the tag was pushed before the notification bridge existed."
+  ]
+}

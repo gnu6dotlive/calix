@@ -1,0 +1,30 @@
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/bin -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/lib -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/lib/calix -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/lib/systemd -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/lib/systemd/user -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/applications -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/icons -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/icons/hicolor -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/icons/hicolor/scalable -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/icons/hicolor/scalable/apps -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/licenses -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/licenses/calix-gpui-git -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/polkit-1 -> 
+drwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/polkit-1/actions -> 
+lrwxrwxrwx /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/bin/calix-daemon -> /usr/lib/calix/calix-daemon
+lrwxrwxrwx /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/bin/calix-notify -> /usr/lib/calix/calix-notify
+lrwxrwxrwx /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/bin/calix -> /usr/lib/calix/calix
+-rw-r--r-- /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/lib/systemd/user/calix-daemon.service -> 
+-rw-r--r-- /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/lib/systemd/user/calix-notify.service -> 
+-rw-r--r-- /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/applications/live.gnu6.calix.desktop -> 
+-rw-r--r-- /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg -> 
+-rw-r--r-- /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/licenses/calix-gpui-git/LICENSE -> 
+-rw-r--r-- /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/share/polkit-1/actions/live.gnu6.calix.policy -> 
+-rwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/bin/calix-gpui -> 
+-rwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/lib/calix/calix -> 
+-rwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/lib/calix/calix-daemon -> 
+-rwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/lib/calix/calix-gpui -> 
+-rwxr-xr-x /var/tmp/calix-package-stage.Nz9jg6/pkg/usr/lib/calix/calix-notify -> 

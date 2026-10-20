@@ -1,0 +1,56 @@
+usr/
+usr/bin/
+usr/bin/calix
+usr/bin/calix-daemon
+usr/bin/calix-gpui
+usr/lib/
+usr/lib/calix/
+usr/lib/calix/calix
+usr/lib/calix/calix-daemon
+usr/lib/calix/calix-gpui
+usr/lib/systemd/
+usr/lib/systemd/user/
+usr/lib/systemd/user/calix-daemon.service
+usr/share/
+usr/share/applications/
+usr/share/applications/live.gnu6.calix.desktop
+usr/share/icons/
+usr/share/icons/hicolor/
+usr/share/icons/hicolor/scalable/
+usr/share/icons/hicolor/scalable/apps/
+usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg
+usr/share/polkit-1/
+usr/share/polkit-1/actions/
+usr/share/polkit-1/actions/live.gnu6.calix.policy
+== checksum ==
+a2462286dc2aec393fe8a78323315f775ea650d844fb98971ee335356b30eb5c  calix-gpui-linux-x86_64.tar.gz
+calix-gpui-linux-x86_64.tar.gz: OK
+== manifest ==
+usr/
+usr/bin/
+usr/bin/calix
+usr/bin/calix-daemon
+usr/bin/calix-gpui
+usr/lib/
+usr/lib/calix/
+usr/lib/calix/calix
+usr/lib/calix/calix-daemon
+usr/lib/calix/calix-gpui
+usr/lib/systemd/
+usr/lib/systemd/user/
+usr/lib/systemd/user/calix-daemon.service
+usr/share/
+usr/share/applications/
+usr/share/applications/live.gnu6.calix.desktop
+usr/share/icons/
+usr/share/icons/hicolor/
+usr/share/icons/hicolor/scalable/
+usr/share/icons/hicolor/scalable/apps/
+usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg
+usr/share/polkit-1/
+usr/share/polkit-1/actions/
+usr/share/polkit-1/actions/live.gnu6.calix.policy
+== sizes ==
+-rw-r--r-- 1 tension_atoi tension_atoi 20M Oct 20 09:38 calix-gpui-linux-x86_64.tar.gz
+-rw-r--r-- 1 tension_atoi tension_atoi  97 Oct 20 09:38 calix-gpui-linux-x86_64.tar.gz.sha256
+rehearsal_dir=/var/tmp/calix-release.HPNOwX
