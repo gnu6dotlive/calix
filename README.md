@@ -578,6 +578,7 @@ recorded only in [`docs/legacy-references.md`](docs/legacy-references.md).
 | [`docs/ci.md`](docs/ci.md) | The CI workflow, caches, timeouts and how to diagnose a red run |
 | [`docs/isolated-builds.md`](docs/isolated-builds.md) | Isolated AUR builds through `systemd-nspawn` |
 | [`docs/flatpak-backend-abi.md`](docs/flatpak-backend-abi.md) | The optional Flatpak backend ABI |
+| [`docs/gpui/`](docs/gpui/) | The front-end slice kits: the work contracts, the render lab, the UX workbench, and the Slice-07 information architecture and navigation plan |
 | [`docs/legacy-references.md`](docs/legacy-references.md) | The historical name boundary and the rename map |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Architecture overview and how to propose a change |
 | [`SECURITY.md`](SECURITY.md) | Reporting a vulnerability |

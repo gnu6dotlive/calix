@@ -1,0 +1,58 @@
+# 05 — Acceptance Matrix (Slice-07)
+
+Every row is a requirement of the contract in `04-NAVIGATION-CONTRACT.md` and the
+architecture in `02-IA.md`. The status is `PLANNED` throughout: this slice is the
+contract, and the status becomes `PASSED` when Slice-08 implements it and Slice-09
+produces the evidence.
+
+| Requirement | Specification | Planned implementation | Verification method | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **One place at a time** (N1) | Exactly one of package surface, News, Settings is rendered | `Workspace::render` routes on a `Place` value; the render lab stays out of the rail | Unit test on the place router; code audit of `views/workspace.rs` routing | **PLANNED** |
+| **One scope at a time** (N2) | The package surface shows one of Search results, Installed, Updates | `NavScope` enum in the session state, with the scope bound to the package surface | Unit test: setting a scope twice leaves one value | **PLANNED** |
+| **Rail and switcher bound** (N3) | The rail's active entry and the header's switcher always agree | One `NavScope` value; both render from it | Unit test: rendering the rail and the switcher from one state yields the same active target | **PLANNED** |
+| **The rail is never a filter** (N4) | No source or state control in the rail | Audit of `components/sidebar.rs`: no query state reaches it | Code audit; runtime capture | **PLANNED** |
+| **Scope change reloads the scope** (N5) | Switching scope shows that scope's rows, not a filtered remnant | The scope change dispatches the scope's own loader (`load_installed_packages`, `load_updates`, search) | Unit test on the dispatch; runtime capture of each scope | **PLANNED** |
+| **Scope change preserves filters** (N6) | The source and state filters survive a scope change | The filter state is not reset by `set_scope`; only the control's vocabulary is scope-dependent | Unit test: filters unchanged across a scope change | **PLANNED** |
+| **Place change preserves the scope** (N7) | Returning from News or Settings lands on the same scope | The scope lives in the session, not in the place | Unit test: place round-trip preserves the scope | **PLANNED** |
+| **Last scope remembered** (N8) | The scope survives a place change and a restart | `last_scope` in `gpui-ui.json`; default `results` when absent | Unit test on the config round-trip; runtime capture after a restart | **PLANNED** |
+| **Scope switcher only on the package surface** (N9) | News and Settings have no scope switcher | The header renders the switcher only for the package place | Runtime captures of all three places | **PLANNED** |
+| **Header present everywhere** (N10, N11) | The header renders in every place, with a non-empty title | The header is rendered by the shell, above the content area | Runtime captures of all three places, and during an operation | **PLANNED** |
+| **Header carries the count** (N12) | The row count of the current scope; `—` while loading and on error; hidden in Settings | The count is derived from the store for the active scope | Unit test on the count derivation; runtime captures in the three states | **PLANNED** |
+| **Header carries the coverage** (N13) | The ecosystems the scope can contain; the inventory-only ones marked in Installed | The coverage list is derived from the scope, not from the loaded rows | Unit test on the coverage derivation; runtime capture of the Installed scope | **PLANNED** |
+| **Header carries the filter summary** (N14) | Shown only when a filter is off its default, with a clear action | The summary is the existing `format_active_filter_summary`, moved to the header | Unit test; runtime capture with a filter active | **PLANNED** |
+| **Header geometry** (N15) | `44px`, sticky, never scrolls | A new header row in the shell, above the content area | Code audit; runtime capture at three widths | **PLANNED** |
+| **No dead ends** (N16) | From News and Settings the rail returns to the package surface, on the scope the user left | The rail's package entries set the place to the package surface | Runtime capture: News → rail → package surface | **PLANNED** |
+| **Escape is the local back** (N17) | Clear the search, else leave the place, else clear the selection | A single escape handler with a documented precedence | Unit test on the precedence; runtime capture | **PLANNED** |
+| **A search implies the Results scope** (N18) | A search from any scope lands in Search results with the query applied, and remembers the previous scope | The search command sets the scope and stores the previous one for the back path | Unit test; control-surface test `search` then `status` | **PLANNED** |
+| **Inspect does not change the scope** (N19) | `inspect` sets the selection only; a package outside the scope is marked in the header | The inspector selection is independent of the scope; the header marks the exception | Control-surface test `inspect` then `status`; runtime capture | **PLANNED** |
+| **Rail by keyboard** (N20) | The rail is reachable, operable, and marks the active entry | Roving focus on the rail, as the menus already do | Unit test on the focus order; runtime capture | **PLANNED** |
+| **Global keys** (N21, N22) | `⌘1`…`⌘5`, `⌥←`/`⌥→`, `⌘F`, `⌘L`, `⌘⌥C`, `Escape`, with the text-field precedence | A key handler on the shell, gated on the focused element | Unit test on the precedence; runtime capture | **PLANNED** |
+| **Focus order per place** (N23) | The order in the table, per place | The shell's focus tree follows the place | Unit test; runtime capture of the focus ring in three places | **PLANNED** |
+| **Focus on place change** (N24) | A place change focuses the new place's first element; a scope change focuses the list | The place change requests the focus handle of the new surface | Runtime capture | **PLANNED** |
+| **Rail keeps five entries** (N25, N26) | Same entries, order, icons and labels; the scope's entry is the active one | `NavDestination` is split into `Place` and `NavScope`; the rail renders from both | Unit test on the rendered entries; runtime capture | **PLANNED** |
+| **Updates badge** (N27) | The pending-update count on the rail entry | The existing badge, fed by the updates store | Runtime capture with pending updates | **PLANNED** |
+| **Collapsed rail** (N28) | Icons and the active marker survive the collapse; the header carries the scope | The existing collapsed rail, plus the header | Runtime capture, collapsed | **PLANNED** |
+| **Rail does not scroll or grow** (N29) | Fixed entries, fixed height | The existing fixed list | Code audit | **PLANNED** |
+| **Sticky query surface** (N30) | Search `40px`, controls `34px`, status rail `24px`, anchored above the scrolling rows | The existing arrangement, unchanged | Runtime capture while scrolled; the invariant from the UX workbench | **PLANNED** |
+| **Inspector docked** (N31) | Never an overlay; the ratio cap, the floors and the stacked fallback are unchanged | No change to `package_workstation.rs` | The existing geometry unit tests, unchanged and green | **PLANNED** |
+| **News and Settings dock in the frame** (N32) | The rail and header remain; the list and the inspector are not rendered | The shell keeps the frame; the content area swaps | Runtime capture of News and Settings | **PLANNED** |
+| **Console docked and global** (N33) | Opens from any place, never covers the content | The console stays a frame region | Runtime capture of an operation started from News | **PLANNED** |
+| **Errors never clear the surface** (N34) | The rows stay; the error is in place; a retry is offered | The existing inline error path, kept per surface | Runtime capture of a failing load | **PLANNED** |
+| **Updates states its age** (N35) | The last check time in the status rail and in the empty state | The check time travels with the update set | Runtime capture of the empty Updates scope | **PLANNED** |
+| **Existing control verbs keep working** (N36) | `navigate browse\|installed\|updates\|news\|settings`, `search`, `inspect`, `view`, `inspector`, `logs`, `status`, `open`, `focus`, `quit` keep their meaning | The verbs map onto `Place` and `NavScope` | Control-surface tests, one per verb, asserting the resulting state | **PLANNED** |
+| **New `scope` verb** (N37) | `scope results\|installed\|updates`, with `browse` as an alias of `results` | A new control command | Control-surface test | **PLANNED** |
+| **`status --json` gains the navigation state** (N38) | `place`, `scope`, `scope_sources`, `inventory_only_sources`, `filters`, `row_count`, `checked_at`; `destination` kept as a deprecated alias; protocol version 5 | The status payload is built from the session state | Control-surface test asserting every field, and the alias | **PLANNED** |
+| **The control surface never leaves an inconsistent state** (N39) | A verb returns only after the frame has re-rendered | The navigation commands await the render before answering | Control-surface test: `navigate` then `status` in one process | **PLANNED** |
+| **Persisted state** (N40, N41) | `last_scope` joins the window state; a state file without it loads with the default | The GPUI config gains the field, with a default | Unit test on the config round-trip, and on a file without the field | **PLANNED** |
+| **Geometry invariants** (N42–N45) | $I \le \min(520, 3/7\,w_c)$, $I \ge 320$, $L \ge 340$, stacked below $746.67px$ | No change | The existing unit tests, unchanged and green | **PLANNED** |
+| **Zero overlay** (N46–N48) | The inspector, the menus and the news and settings surfaces never float; the console is docked | No change | The existing invariant, plus a runtime capture of each surface | **PLANNED** |
+| **Splitter isolation** (N49) | The resize is a pure differential, invariant to the rail's state | No change | The existing unit test | **PLANNED** |
+| **Render lab stays out** (N50) | Excluded from the rail, keeps its return path | No change | Code audit; runtime capture | **PLANNED** |
+| **Source control is scope-aware** (R1) | The control offers exactly the ecosystems the scope can contain, all toggleable, the inventory-only ones marked | `SourceScope` gains Cargo, NPM and Release flags, and `contains_str` stops folding them into ALPM | Unit test: a Cargo row survives with ALPM deselected, and is hidden when Cargo is deselected | **PLANNED** |
+| **State control is scope-aware** (R2) | Only the states that can be true of the rows are offered | The state control's options are derived from the scope | Unit test on the derived option list | **PLANNED** |
+| **Filters survive a scope change** (R3) | The filter values persist; only the vocabulary follows the scope | The filter state is not reset by a scope change | Unit test | **PLANNED** |
+| **A filter never empties the scope** (R4) | At least one source and one state always remain applied | The existing invariant, extended to the new sources | Unit test | **PLANNED** |
+| **Zero dead code, zero warnings** | `#![deny(dead_code)]` and the rest stay enforced; no suppression | Slice-08 adds no exception | `cargo clippy --release --locked -- -D warnings` exits 0 | **PLANNED** |
+| **Release locked tests** | The suite passes in the release profile | — | `cargo test --release --locked` exits 0 | **PLANNED** |
+| **Wayland runtime evidence** | The three places, the three scopes, the empty states, the collapsed rail and an operation in flight are captured on a live session | Slice-09 | `grim` captures on a Hyprland session, filed under `docs/gpui/slice-07/` | **PLANNED** |
+| **Control surface evidence** | Every verb of N36 and N37 is exercised against a live application | Slice-09 | The control CLI transcript, filed under `docs/gpui/slice-07/` | **PLANNED** |
