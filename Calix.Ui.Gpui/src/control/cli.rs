@@ -447,7 +447,8 @@ Render Lab Commands (RENDER-00, CLI-only developer surface):
 
     pub fn print_version() {
         println!(
-            "calix-gpui 0.1.0 (control protocol v{})",
+            "calix-gpui {} (control protocol v{})",
+            env!("CARGO_PKG_VERSION"),
             CONTROL_PROTOCOL_VERSION
         );
     }
@@ -505,7 +506,7 @@ pub async fn run_cli_invocation(invocation: CliInvocation) -> Result<CliOutcome>
                 println!(
                     "{}",
                     serde_json::json!({
-                        "version": "0.1.0",
+                        "version": env!("CARGO_PKG_VERSION"),
                         "control_protocol": CONTROL_PROTOCOL_VERSION,
                     })
                 );

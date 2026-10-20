@@ -233,6 +233,12 @@ shell that runs them.
 Flatpak support additionally needs the Flatpak development files and a separately built
 `Calix.Flatpak.Backend`; the base CLI does not link `libflatpak`.
 
+### Migrating from Shelly
+
+Calix v0.2.0 is a hard cut from the Shelly name. There is no compatibility layer and
+the old state paths are not read. The one-time state move, the renamed surfaces and the
+old package names are in [`docs/release-notes.md`](docs/release-notes.md).
+
 ### Build and run from source
 
 ```bash
@@ -418,7 +424,7 @@ more optimistic document elsewhere in the tree, this table is the one to trust.
 Planned next steps, in rough order: the daemon scheduler and release watcher, the
 application flow (root helper + polkit rule), and removal of the frozen Python engine.
 
-The frontend crate is version `0.1.0`. The Zig backend reports `3.1.9-dev`, a version
+The frontend crate is version `0.2.0`. The Zig backend reports `3.1.9-dev`, a version
 string inherited from the Shelly tree it descends from; it is not the Calix product
 version.
 
