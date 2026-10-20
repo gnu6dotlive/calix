@@ -181,6 +181,21 @@ impl NavScope {
         }
     }
 
+    /// Le périmètre suivant, dans l'ordre du commutateur.
+    pub fn next(self) -> Option<Self> {
+        let index = NavScope::ALL.iter().position(|scope| *scope == self)?;
+        NavScope::ALL.get(index + 1).copied()
+    }
+
+    /// Le périmètre précédent, dans l'ordre du commutateur.
+    pub fn previous(self) -> Option<Self> {
+        let index = NavScope::ALL.iter().position(|scope| *scope == self)?;
+        if index == 0 {
+            return None;
+        }
+        NavScope::ALL.get(index - 1).copied()
+    }
+
     /// Les écosystèmes que le périmètre peut contenir.
     ///
     /// Les périmètres qui interrogent les dépôts portent les quatre sources

@@ -1330,6 +1330,14 @@ impl WorkspaceView {
     fn on_search_input(&mut self, input: String, cx: &mut Context<Self>) {
         self.search_input_buffer = input.clone();
 
+        // Dans Installés et Mises à jour, la requête réduit les lignes déjà
+        // chargées : elle n'interroge pas les dépôts.
+        if self.session.read(cx).scope != NavScope::Results {
+            self.search_debounce_task = None;
+            self.session.update(cx, |s, cx| s.set_search_query(input, cx));
+            return;
+        }
+
         if input.trim().is_empty() {
             self.search_debounce_task = None;
             self.execute_search(String::new(), cx);
@@ -1920,6 +1928,80 @@ impl WorkspaceView {
         cx: &mut Context<Self>,
     ) {
         let key = event.keystroke.key.as_str();
+        let modifiers = event.keystroke.modifiers;
+
+        // ── Les touches globales ─────────────────────────────────────────────
+        // ⌘1 à ⌘5 : les cinq entrées du rail. ⌥← et ⌥→ : le périmètre
+        // précédent et le suivant. ⌘F : la recherche. ⌘L : la console.
+        // ⌘⌥C : le rail.
+        if modifiers.platform {
+            let rail_target = match key {
+                "1" => Some((Place::Packages, Some(NavScope::Results))),
+                "2" => Some((Place::Packages, Some(NavScope::Installed))),
+                "3" => Some((Place::Packages, Some(NavScope::Updates))),
+                "4" => Some((Place::News, None)),
+                "5" => Some((Place::Settings, None)),
+                _ => None,
+            };
+            if let Some((place, scope)) = rail_target {
+                self.session.update(cx, |s, cx| {
+                    if let Some(scope) = scope {
+                        s.set_scope(scope, cx);
+                    }
+                    s.set_place(place, cx);
+                });
+                return;
+            }
+            if key == "f" {
+                let search_input = self.workstation.read(cx).search_input.clone();
+                search_input.update(cx, |si, _cx| si.focus(window));
+                return;
+            }
+            if key == "l" {
+                self.console.update(cx, |c, cx| c.toggle_drawer(cx));
+                return;
+            }
+            if key == "c" && modifiers.alt {
+                self.session.update(cx, |s, cx| s.toggle_sidebar(cx));
+                return;
+            }
+        }
+
+        if modifiers.alt && !modifiers.platform {
+            let scope = self.session.read(cx).scope;
+            let next = match key {
+                "left" => scope.previous(),
+                "right" => scope.next(),
+                _ => None,
+            };
+            if let Some(next) = next {
+                self.session.update(cx, |s, cx| {
+                    s.set_scope(next, cx);
+                    s.set_place(Place::Packages, cx);
+                });
+                return;
+            }
+        }
+
+        if key == "escape" {
+            // Échap est le retour local : il efface la recherche, puis il
+            // quitte le lieu, puis il vide la sélection.
+            let search_input = self.workstation.read(cx).search_input.clone();
+            let query = self.session.read(cx).search_query.clone();
+            if search_input.read(cx).is_focused(window) && !query.trim().is_empty() {
+                search_input.update(cx, |si, cx| si.set_text(String::new(), cx));
+                self.session.update(cx, |s, cx| s.set_search_query(String::new(), cx));
+                self.on_search_input(String::new(), cx);
+                return;
+            }
+            let place = self.session.read(cx).place;
+            if place != Place::Packages {
+                self.session.update(cx, |s, cx| s.set_place(Place::Packages, cx));
+                return;
+            }
+            self.session.update(cx, |s, cx| s.select_package(None, cx));
+            return;
+        }
 
         if key == "tab" {
             if event.keystroke.modifiers.shift {

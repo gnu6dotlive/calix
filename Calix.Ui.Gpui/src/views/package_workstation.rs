@@ -619,19 +619,31 @@ impl Render for PackageWorkstationView {
             }
         };
 
+        // La requête réduit le périmètre courant. Dans Résultats, les lignes
+        // sont déjà celles de la recherche ; dans Installés et Mises à jour, les
+        // lignes sont là et la requête les réduit.
+        let query_narrows = scope != NavScope::Results && !search_query.trim().is_empty();
+
         let packages: std::sync::Arc<[UnifiedPackage]> = {
             if source_scope.is_all()
                 && state_filter == PackageStateFilter::All
                 && sort_mode == SortMode::Relevance
+                && !query_narrows
             {
                 raw_packages
             } else {
-                std::sync::Arc::from(crate::state::query::visible_packages(
+                let mut filtered = crate::state::query::visible_packages(
                     &raw_packages,
                     &source_scope,
                     state_filter,
                     sort_mode,
-                ))
+                );
+                if query_narrows {
+                    filtered.retain(|package| {
+                        crate::state::query::matches_query(package, &search_query)
+                    });
+                }
+                std::sync::Arc::from(filtered)
             }
         };
 

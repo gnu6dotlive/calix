@@ -1,0 +1,48 @@
+{
+  "run_id": "calix-slice-08-20261020",
+  "kind": "evidence",
+  "objective": "Record the Slice-08 surfaces: the context header, the query surface in every scope, and the places.",
+  "method": {
+    "compositor": "Hyprland",
+    "capture": "grim, on the window geometry read from `hyprctl clients -j`",
+    "driver": "the control surface (`calix-gpui navigate`, `calix-gpui status --json`)",
+    "pairing": "each capture is stored next to the control surface's status document"
+  },
+  "captures": [
+    {
+      "state": "scope-results",
+      "target": "results",
+      "file": "scope-results.png",
+      "region": "-621,1348 957x673",
+      "bytes": 77473
+    },
+    {
+      "state": "scope-installed",
+      "target": "installed",
+      "file": "scope-installed.png",
+      "region": "-621,1348 957x673",
+      "bytes": 97768
+    },
+    {
+      "state": "scope-updates",
+      "target": "updates",
+      "file": "scope-updates.png",
+      "region": "-621,1348 957x673",
+      "bytes": 78817
+    },
+    {
+      "state": "place-news",
+      "target": "news",
+      "file": "place-news.png",
+      "region": "-621,1348 957x673",
+      "bytes": 43877
+    },
+    {
+      "state": "place-settings",
+      "target": "settings",
+      "file": "place-settings.png",
+      "region": "-621,1348 957x673",
+      "bytes": 83775
+    }
+  ]
+}

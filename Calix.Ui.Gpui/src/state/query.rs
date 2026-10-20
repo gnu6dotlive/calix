@@ -436,6 +436,19 @@ impl WorkbenchBreakpoint {
 ///
 /// Le poste de travail et l'en-tête de contexte appellent la même fonction :
 /// le compte que l'en-tête annonce est celui que la liste montre.
+/// La ligne correspond-elle à la requête ?
+///
+/// La requête réduit le périmètre courant : dans Installés et Mises à jour, les
+/// lignes sont déjà là, la requête les réduit.
+pub fn matches_query(package: &UnifiedPackage, query: &str) -> bool {
+    let query = query.trim().to_lowercase();
+    if query.is_empty() {
+        return true;
+    }
+    package.name.to_lowercase().contains(&query)
+        || package.description.to_lowercase().contains(&query)
+}
+
 pub fn visible_packages(
     packages: &[UnifiedPackage],
     source_scope: &SourceScope,
@@ -629,6 +642,41 @@ mod tests {
         let selected = scope.sources_for(NavScope::Installed, true, true, true);
         assert!(selected.contains(&PackageSourceKind::Cargo));
         assert!(!selected.contains(&PackageSourceKind::Alpm));
+    }
+
+    #[test]
+    fn the_query_narrows_the_rows_of_the_scope() {
+        use crate::backend::models::{AlpmPackage, UnifiedPackage, UnifiedPackageSource};
+
+        let package = UnifiedPackage {
+            name: "ripgrep".into(),
+            version: "14.1.1".into(),
+            description: "A search tool".into(),
+            source_type: "ALPM".into(),
+            repository_or_remote: "repos".into(),
+            is_installed: true,
+            has_update: false,
+            new_version: None,
+            inner: UnifiedPackageSource::Standard(AlpmPackage::default()),
+        };
+        assert!(matches_query(&package, ""));
+        assert!(matches_query(&package, "rip"));
+        assert!(matches_query(&package, "  RIPGREP  "));
+        assert!(matches_query(&package, "search tool"));
+        assert!(!matches_query(&package, "firefox"));
+
+        let other = UnifiedPackage {
+            name: "firefox".into(),
+            version: "128.0".into(),
+            description: "A web browser".into(),
+            source_type: "ALPM".into(),
+            repository_or_remote: "repos".into(),
+            is_installed: true,
+            has_update: false,
+            new_version: None,
+            inner: UnifiedPackageSource::Standard(AlpmPackage::default()),
+        };
+        assert!(!matches_query(&other, "ripgrep"));
     }
 
     #[test]

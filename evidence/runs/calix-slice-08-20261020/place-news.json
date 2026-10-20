@@ -1,0 +1,40 @@
+{
+  "version": 5,
+  "ok": true,
+  "message": "Running",
+  "data": {
+    "protocol_version": 5,
+    "gui_running": true,
+    "pid": 1216642,
+    "executable": "/mnt/sandbox/builds/cargo/release/calix-gpui",
+    "place": "news",
+    "scope": "updates",
+    "scope_sources": [
+      "alpm",
+      "aur",
+      "flatpak",
+      "appimage"
+    ],
+    "inventory_only_sources": [],
+    "filters": {
+      "sources": [
+        "alpm",
+        "aur",
+        "flatpak",
+        "appimage"
+      ],
+      "state": "all states",
+      "sort": "relevance",
+      "view": "table"
+    },
+    "row_count": 7,
+    "checked_at": null,
+    "destination": "updates",
+    "query": "",
+    "view_mode": "table",
+    "inspector_tab": "overview",
+    "selected_package": null,
+    "operation_running": false,
+    "render_lab_active": false
+  }
+}
