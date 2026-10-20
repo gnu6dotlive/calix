@@ -27,7 +27,8 @@ status=0
 # Prune build outputs and the historical record before looking at names.
 bad_paths=$(find . \
     \( -path ./.git -o -path ./docs -o -path ./evidence -o -path ./vendor \
-       -o -name .zig-cache -o -name zig-out -o -name target -o -name node_modules \) -prune \
+       -o -name .zig-cache -o -name zig-out -o -name target -o -name node_modules \
+       -o -name .ci-cache \) -prune \
     -o -iname "*${old_name}*" -print | sed 's|^\./||' || true)
 if [ -n "$bad_paths" ]; then
     echo "error: tracked path still carries the old product name:" >&2
@@ -39,7 +40,8 @@ fi
 if grep -r -I -i -n \
     --exclude-dir=.git --exclude-dir=docs --exclude-dir=evidence \
     --exclude-dir=vendor --exclude-dir=.zig-cache --exclude-dir=zig-out \
-    --exclude-dir=target --exclude-dir=node_modules --exclude=README.md \
+    --exclude-dir=target --exclude-dir=node_modules --exclude-dir=.ci-cache \
+    --exclude=README.md \
     -- "$old_name" .; then
     echo "error: tracked content still carries the old product name outside the historical record" >&2
     status=1
