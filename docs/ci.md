@@ -27,6 +27,12 @@ change still pays for a cold compile; later runs restore the artifacts.
 `Verify` has a 35-minute step timeout and the job a 45-minute timeout, so an
 unexpectedly slow run fails instead of consuming hours.
 
+The gate also builds the optional Flatpak backend and checks that the library
+is there. The Arch package ships that library and the release artifact carries
+it, so a backend that no longer builds would ship a package whose Flatpak
+support silently never works. The container installs the Flatpak development
+files for the same reason.
+
 ## Why the job is pinned to a date
 
 `archlinux:latest` is a moving target, and the job used to install `zig` from

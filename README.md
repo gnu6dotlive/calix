@@ -431,7 +431,14 @@ Linux Archive, or `zig` will fail to start.
 
 Flatpak support is a separate shared library that the CLI loads at runtime. The
 package builds and ships it; to build it from source you need the Flatpak development
-files, and the base CLI never links `libflatpak`.
+files, and the base CLI never links `libflatpak`. From a checkout, point the CLI at the
+backend you just built:
+
+```bash
+(cd Calix.Flatpak.Backend && zig build -Doptimize=ReleaseSafe)
+(cd Calix.Cli.Zig && zig build -Doptimize=ReleaseSafe \
+  -Dflatpak-backend-path="$PWD/../Calix.Flatpak.Backend/zig-out/lib/libcalix-flatpak-backend.so.1")
+```
 
 ### Make targets
 

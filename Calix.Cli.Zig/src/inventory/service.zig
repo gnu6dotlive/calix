@@ -138,6 +138,11 @@ fn appendAur(context: *runtime.RuntimeContext, records: *std.ArrayList(record.Re
     }
 }
 
+/// Whether the absent optional backend has already been reported in this
+/// process. The daemon answers many inventory requests and the operator only
+/// needs to hear about it once.
+var flatpak_absence_reported = std.atomic.Value(bool).init(false);
+
 /// Appends the installed Flatpak applications.
 fn appendFlatpak(context: *runtime.RuntimeContext, records: *std.ArrayList(record.Record)) !void {
     // The Flatpak backend is optional: it is a separate library loaded at
@@ -146,7 +151,12 @@ fn appendFlatpak(context: *runtime.RuntimeContext, records: *std.ArrayList(recor
     // still a true view of what is on the machine.
     switch (flatpakContribution(Zigalpm.flatpak.backendStatus())) {
         .contribute => {},
-        .skip => return,
+        .skip => {
+            if (!flatpak_absence_reported.swap(true, .monotonic)) {
+                std.log.warn("the optional Flatpak backend is not installed, so this inventory carries no Flatpak rows", .{});
+            }
+            return;
+        },
         .fail => return Zigalpm.flatpak.errors.Error.FlatpakBackendIncompatible,
     }
 
