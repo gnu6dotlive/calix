@@ -221,7 +221,9 @@ The GitHub release contains `calix-gpui-linux-x86_64.tar.gz`, its
 - `usr/lib/calix/calix-gpui`
 - `usr/bin/calix`, `usr/bin/calix-daemon` and `usr/bin/calix-notify` symlinks
 - `usr/bin/calix-gpui` wrapper
-- the desktop entry, icon and polkit policy
+- the desktop entry and the polkit policy
+- `usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg`, its single-colour
+  variant, and the raster sizes from 16 to 512
 - `usr/lib/systemd/user/calix-daemon.service`
 - `usr/lib/systemd/user/calix-notify.service`
 
