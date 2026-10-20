@@ -8,6 +8,7 @@ const test_support = @import("test_support.zig");
 
 const downloader = @import("../shared/downloader.zig");
 const release_version = @import("../shared/release_version.zig");
+const provenance = @import("../shared/provenance.zig");
 const operation_api = @import("operation_context");
 
 pub const UpdateManager = struct {
@@ -433,7 +434,100 @@ pub const UpdateManager = struct {
             }
         }
 
+        // Verify before the swap, never after: an artefact that does not
+        // match what its forge published must not reach the live path.
+        if (try self.verifyUpstream(&app_to_update, appimage_ptr.download_url, download_path)) |verification| {
+            var checked = verification;
+            defer checked.deinit(self.allocator);
+            if (!checked.matches) {
+                std.log.err("Refusing to apply the update for {0f}: the downloaded file does not match the digest {1f} published.", .{ @import("diagnostics").safe(app_to_update.name), @import("diagnostics").safe(checked.statement.source_url) });
+                self.emitStatusFmt(.err, "Refusing to apply the update for {0f}: the downloaded file does not match the digest the forge published. Nothing was changed.\n\n{1s}", .{ @import("diagnostics").safe(app_to_update.name), checked.trust().describe() });
+                return false;
+            }
+            const digest_text = try checked.digest.format(self.allocator);
+            defer self.allocator.free(digest_text);
+            self.emitStatusFmt(
+                .information,
+                "Verified {0f}: the file matches {1s} from the forge's {2s}. {3s}",
+                .{
+                    @import("diagnostics").safe(app_to_update.name),
+                    digest_text,
+                    checked.statement.mechanism.describe(),
+                    checked.trust().describe(),
+                },
+            );
+        } else {
+            self.emitStatusFmt(.warning, "The forge published no digest for this update, so its contents could not be checked against anything. {s}", .{provenance.Trust.none.describe()});
+        }
+
         return self.applyDownloadedUpdate(appimage_ptr, app_to_update, current_path, download_path);
+    }
+
+    /// Verifies a downloaded artefact against the digest its forge published.
+    ///
+    /// Returns null when the forge published nothing to verify against. An
+    /// AppImage update replaces a user-scoped file rather than installing as
+    /// root, so an absent statement is reported rather than fatal: the user
+    /// is told that nothing was checked instead of being told a comfortable
+    /// lie. A published digest that does not match is returned with
+    /// `matches` false, and the caller refuses to apply it.
+    fn verifyUpstream(
+        self: UpdateManager,
+        app: *const appimage.AppImage,
+        download_url: []const u8,
+        download_path: []const u8,
+    ) !?provenance.Verification {
+        const api_url = releaseApiUrl(self.allocator, app) catch return null;
+        defer self.allocator.free(api_url);
+
+        const body = (try self.fetchJson(api_url, "application/vnd.github+json")) orelse return null;
+        defer self.allocator.free(body);
+
+        var parsed = std.json.parseFromSlice(std.json.Value, self.allocator, body, .{}) catch return null;
+        defer parsed.deinit();
+
+        const release = selectRelease(&parsed.value, app.allow_prerelease) orelse return null;
+        const artifact_name = std.fs.path.basename(download_url);
+        const read_at: i64 = @intCast(@divTrunc(
+            std.Io.Timestamp.now(self.io, .real).nanoseconds,
+            std.time.ns_per_s,
+        ));
+
+        var mechanism: provenance.Mechanism = .api_digest;
+        var statement_url: []const u8 = api_url;
+        var digest: ?provenance.Digest = null;
+        errdefer if (digest) |found| found.deinit(self.allocator);
+
+        if (try provenance.assetDigest(self.allocator, release, artifact_name)) |found| {
+            digest = found;
+        } else if (try provenance.checksumAssetUrl(self.allocator, release, artifact_name)) |sums_url| {
+            defer self.allocator.free(sums_url);
+            if (try self.fetchJson(sums_url, "text/plain")) |sums_body| {
+                defer self.allocator.free(sums_body);
+                if (try provenance.sumsFileDigest(self.allocator, sums_body, artifact_name)) |found| {
+                    digest = found;
+                    mechanism = .checksum_file;
+                    statement_url = sums_url;
+                }
+            }
+        }
+
+        const found = digest orelse return null;
+        const artifact_url = try self.allocator.dupe(u8, download_url);
+        errdefer self.allocator.free(artifact_url);
+        const source_url = try self.allocator.dupe(u8, statement_url);
+        errdefer self.allocator.free(source_url);
+
+        return .{
+            .artifact_url = artifact_url,
+            .digest = found,
+            .statement = .{
+                .mechanism = mechanism,
+                .source_url = source_url,
+                .read_at = read_at,
+            },
+            .matches = try provenance.verifyFile(self.allocator, self.io, download_path, found),
+        };
     }
 
     pub fn applyDownloadedUpdate(
@@ -800,6 +894,59 @@ pub const UpdateManager = struct {
         if (normalized_count == 1) return normalized_url;
         if (normalized_count > 1) return null;
         if (compatible_count == 1) return compatible_url;
+        return null;
+    }
+
+/// The release API a forge serves, for the source an AppImage is configured
+    /// with.
+    ///
+    /// `none` and `static_url` have no release metadata: a static URL names a
+    /// file, not a release, so there is nothing for a forge to state a digest
+    /// in.
+    fn releaseApiUrl(allocator: std.mem.Allocator, app: *const appimage.AppImage) ![]u8 {
+        return switch (app.update_type) {
+            .github => github_to_releases_api(
+                allocator,
+                app.repo_owner orelse return error.MissingRepository,
+                app.repo_name orelse return error.MissingRepository,
+            ),
+            .gitlab => gitlab_to_releases_api(
+                allocator,
+                app.repo_owner orelse return error.MissingRepository,
+                app.repo_name orelse return error.MissingRepository,
+            ),
+            .codeberg => gitea_to_releases_api(
+                allocator,
+                "codeberg.org",
+                app.repo_owner orelse return error.MissingRepository,
+                app.repo_name orelse return error.MissingRepository,
+            ),
+            .forgejo => blk: {
+                const repository = try parseForgejoRepository(app.update_url);
+                break :blk try forgejo_to_releases_api(
+                    allocator,
+                    repository.origin,
+                    repository.owner,
+                    repository.repo,
+                );
+            },
+            .none, .static_url => error.NoReleaseApi,
+        };
+    }
+
+    /// The release a forge's answer is about: the newest one, unless
+    /// prereleases were not asked for.
+    fn selectRelease(root: *std.json.Value, allow_prerelease: bool) ?*std.json.Value {
+        if (root.* != .array or root.array.items.len == 0) return null;
+        for (root.array.items) |*release| {
+            if (release.* != .object) continue;
+            if (!allow_prerelease) {
+                if (release.object.get("prerelease")) |value| {
+                    if (value == .bool and value.bool) continue;
+                }
+            }
+            return release;
+        }
         return null;
     }
 

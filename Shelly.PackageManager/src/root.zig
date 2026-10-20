@@ -165,6 +165,13 @@ pub const inventory = struct {
     pub const record = @import("inventory/record.zig");
 };
 
+pub const release = struct {
+    pub const registry = @import("release/registry.zig");
+    pub const Registry = registry.Registry;
+    pub const Entry = registry.Entry;
+    pub const Probe = registry.Probe;
+};
+
 pub const cargo = struct {
     pub const manager = @import("cargo/manager.zig");
     pub const Crate = manager.Crate;
@@ -218,6 +225,8 @@ pub const operation = @import("operation_context");
 pub const HttpClient = @import("ShellyHttp");
 
 pub const shared = struct {
+    pub const provenance = @import("shared/provenance.zig");
+    pub const json = @import("shared/json.zig");
     pub const archive = @import("archive");
     pub const downloader = @import("shared/downloader.zig");
     pub const download_queue = @import("shared/download_queue.zig");
@@ -362,6 +371,10 @@ test "public library surface exposes package manager APIs" {
     _ = appimage.StatusHandler;
     _ = appimage.DownloadProgressHandler;
     _ = appimage.AppImageDiscovery;
+    _ = shared.provenance.Digest;
+    _ = shared.provenance.Verification;
+    _ = release.Registry;
+    _ = release.Entry;
     _ = inventory.record.Record;
     _ = inventory.record.Source;
     _ = cargo.CargoManager;

@@ -11,6 +11,7 @@
 //! `source_type`, so the two sides agree without a translation table.
 
 const std = @import("std");
+const shared_json = @import("../shared/json.zig");
 
 /// The ecosystem a record came from.
 pub const Source = enum {
@@ -102,7 +103,7 @@ pub const snapshot_version = 1;
 /// A null optional is omitted rather than written as `null`: the document
 /// stays compact, and a consumer that does not know a field simply does
 /// not see it.
-pub const json_options: std.json.Stringify.Options = .{ .emit_null_optional_fields = false };
+pub const json_options: std.json.Stringify.Options = shared_json.omit_null_optionals;
 
 /// The document the daemon serves.
 pub const Snapshot = struct {

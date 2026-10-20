@@ -28,7 +28,11 @@ pub fn build(b: *std.Build) void {
     });
     cli.addImport("diagnostics", diagnostics);
     cli.addImport("Zigalpm", zigalpm);
-    cli.addOptions("build_options", build_options);
+    // One options module, imported by both the CLI and the daemon: two
+    // modules generated from the same options step collide, because they
+    // root the same generated file.
+    const build_options_module = build_options.createModule();
+    cli.addImport("build_options", build_options_module);
 
     const executable_module = b.createModule(.{
         .root_source_file = b.path("src/main.zig"),
@@ -45,6 +49,26 @@ pub fn build(b: *std.Build) void {
     });
     executable.root_module.addImport("diagnostics", diagnostics);
     b.installArtifact(executable);
+
+    // The daemon is the frontend's only entry point, and the only writer of
+    // Calix state. It is a separate executable, not a CLI mode: a mode would
+    // inherit the CLI's lifetime and its terminal, and neither is what a
+    // daemon has.
+    const daemon_module = b.createModule(.{
+        .root_source_file = b.path("src/daemon/main.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    daemon_module.addImport("diagnostics", diagnostics);
+    daemon_module.addImport("Shelly_Cli_Zig", cli);
+    daemon_module.addImport("Zigalpm", zigalpm);
+    daemon_module.addImport("build_options", build_options_module);
+
+    const daemon_executable = b.addExecutable(.{
+        .name = "calix-daemon",
+        .root_module = daemon_module,
+    });
+    b.installArtifact(daemon_executable);
 
     const run_command = b.addRunArtifact(executable);
     run_command.step.dependOn(b.getInstallStep());
@@ -63,9 +87,22 @@ pub fn build(b: *std.Build) void {
     });
     const run_executable_tests = b.addRunArtifact(executable_tests);
 
+    const daemon_tests = b.addTest(.{
+        .root_module = daemon_module,
+    });
+    const run_daemon_tests = b.addRunArtifact(daemon_tests);
+
+    // `zig build module-test -- --test-filter <substring>` runs a slice of the
+    // module tests. The suite is large enough that bisecting a failure needs
+    // a way in that is not "run everything again".
+    const module_test_step = b.step("module-test", "Run the module tests, passing extra arguments to the test runner");
+    if (b.args) |test_arguments| run_module_tests.addArgs(test_arguments);
+    module_test_step.dependOn(&run_module_tests.step);
+
     const test_step = b.step("test", "Run all tests");
     test_step.dependOn(&run_module_tests.step);
     test_step.dependOn(&run_executable_tests.step);
+    test_step.dependOn(&run_daemon_tests.step);
 
     const account_tests = b.addTest(.{
         .name = "user-account-test",

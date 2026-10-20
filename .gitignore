@@ -17,3 +17,6 @@ Shelly.Notifications.Zig/build/
 .zed/
 __pycache__/
 *.pyc
+
+# Locally extracted toolchains and external dependencies (never committed).
+vendor/
