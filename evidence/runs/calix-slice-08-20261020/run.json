@@ -13,36 +13,36 @@
       "state": "scope-results",
       "target": "results",
       "file": "scope-results.png",
-      "region": "-621,1348 957x673",
-      "bytes": 77473
+      "region": "1484,659 437x673",
+      "bytes": 52639
     },
     {
       "state": "scope-installed",
       "target": "installed",
       "file": "scope-installed.png",
-      "region": "-621,1348 957x673",
-      "bytes": 97768
+      "region": "1484,659 437x673",
+      "bytes": 51340
     },
     {
       "state": "scope-updates",
       "target": "updates",
       "file": "scope-updates.png",
-      "region": "-621,1348 957x673",
-      "bytes": 78817
+      "region": "1484,659 437x673",
+      "bytes": 48560
     },
     {
       "state": "place-news",
       "target": "news",
       "file": "place-news.png",
-      "region": "-621,1348 957x673",
-      "bytes": 43877
+      "region": "1484,659 437x673",
+      "bytes": 32160
     },
     {
       "state": "place-settings",
       "target": "settings",
       "file": "place-settings.png",
-      "region": "-621,1348 957x673",
-      "bytes": 83775
+      "region": "1484,659 437x673",
+      "bytes": 55724
     }
   ]
 }

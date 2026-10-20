@@ -2491,14 +2491,25 @@ impl Render for WorkspaceView {
                 session.state_filter,
             )
         };
-        let visible_count = {
-            let store = self.store.read(cx);
-            let rows = match header_scope {
-                NavScope::Results => &store.active_results,
-                NavScope::Installed => &store.installed_packages,
-                NavScope::Updates => &store.updates_packages,
-            };
-            crate::state::query::visible_packages(rows, &source_scope, state_filter, SortMode::Relevance).len()
+        // The count is the place's: the scope's rows, or the announcements.
+        let visible_count = match header_place {
+            Place::Packages => {
+                let store = self.store.read(cx);
+                let rows = match header_scope {
+                    NavScope::Results => &store.active_results,
+                    NavScope::Installed => &store.installed_packages,
+                    NavScope::Updates => &store.updates_packages,
+                };
+                crate::state::query::visible_packages(
+                    rows,
+                    &source_scope,
+                    state_filter,
+                    SortMode::Relevance,
+                )
+                .len()
+            }
+            Place::News => self.news.len(),
+            Place::Settings => 0,
         };
         let is_searching = self.session.read(cx).is_searching;
         let aur_enabled = self.calix_settings.aur_enabled;

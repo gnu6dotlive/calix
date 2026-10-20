@@ -5,7 +5,7 @@
   "data": {
     "protocol_version": 5,
     "gui_running": true,
-    "pid": 1216642,
+    "pid": 1362547,
     "executable": "/mnt/sandbox/builds/cargo/release/calix-gpui",
     "place": "packages",
     "scope": "updates",

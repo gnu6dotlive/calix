@@ -94,6 +94,8 @@ impl ContextHeader {
         };
 
         // ── Le commutateur de périmètre ─────────────────────────────────────
+        // Le commutateur n'existe que là où il y a un périmètre : Actualités et
+        // Réglages n'en ont pas.
         let mut switcher = div().flex().items_center().gap(px(2.0));
         for target in NavScope::ALL {
             let is_active = is_packages && *target == props.scope;
@@ -162,12 +164,28 @@ impl ContextHeader {
         }
 
         // ── Le compte ───────────────────────────────────────────────────────
+        // Les lignes du périmètre, les annonces, ou rien : un compte qui ne
+        // compte rien ne se montre pas.
         let count = if props.row_count_unknown {
             "—".to_string()
-        } else if props.row_count == 1 {
-            "1 package".to_string()
         } else {
-            format!("{} packages", props.row_count)
+            match props.place {
+                Place::Packages => {
+                    if props.row_count == 1 {
+                        "1 package".to_string()
+                    } else {
+                        format!("{} packages", props.row_count)
+                    }
+                }
+                Place::News => {
+                    if props.row_count == 1 {
+                        "1 announcement".to_string()
+                    } else {
+                        format!("{} announcements", props.row_count)
+                    }
+                }
+                Place::Settings => String::new(),
+            }
         };
 
         // ── La couverture : les écosystèmes du périmètre ────────────────────
@@ -338,7 +356,7 @@ impl ContextHeader {
                                     .text_color(theme.text_primary)
                                     .child(title),
                             )
-                            .child(switcher),
+                            .child(if is_packages { switcher } else { div() }),
                     )
                     .child(
                         div()
