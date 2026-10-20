@@ -1,0 +1,182 @@
+{
+  "run_id": "calix-v0.2.1-release-20261020",
+  "kind": "release",
+  "status": "ok",
+  "started_at": "2026-10-20T14:20:08Z",
+  "finished_at": "2026-10-20T14:48:36Z",
+  "commit": "2aebddb1a5123deaffa2d30c3225edcd88146b14",
+  "tag": "v0.2.1",
+  "tag_object": "annotated",
+  "parent_commit": "bfda2213",
+  "working_tree_dirty": false,
+  "objective": "Publish the notification bridge as a patch release, then prove the packaged result on this machine: build the Arch package from the pushed tree, install it through polkit, enable both user services and watch a real notification cross the live session bus.",
+  "scope": [
+    "the frontend version moves to 0.2.1 and is still derived from CARGO_PKG_VERSION",
+    "docs/release-notes.md becomes the v0.2.1 release body: the bridge, how to enable it, what it refuses to do, and the artifact contents",
+    "the published tarball now carries calix-notify, the /usr/bin/calix-notify symlink and calix-notify.service",
+    "the Arch package is built from the pushed tree, installed with pkexec, and both user services are enabled per account"
+  ],
+  "verification": {
+    "local": {
+      "command": "scripts/verify",
+      "commit": "2aebddb1",
+      "working_tree_dirty": false,
+      "naming_check": "pass",
+      "packagemanager_tests": 1386,
+      "cli_tests": 391,
+      "rust_tests": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass",
+      "elapsed": "1m38.36s"
+    },
+    "container": {
+      "command": "scripts/ci-replay",
+      "image": "archlinux:latest",
+      "snapshot": "2026/10/01",
+      "mode": "HEAD archive, no .git",
+      "commit_under_test": "2aebddb1",
+      "naming_check": "pass",
+      "packagemanager_tests": 1388,
+      "cli_tests": 391,
+      "rust_tests": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass",
+      "elapsed": "5m46.40s"
+    },
+    "version_output": {
+      "human": "calix-gpui 0.2.1 (control protocol v4)",
+      "json": "{\"version\":\"0.2.1\",\"control_protocol\":4}"
+    },
+    "remote_run": {
+      "run_id": 39439564644,
+      "workflow": "CI & Release",
+      "event": "push",
+      "ref": "v0.2.1",
+      "head_sha": "2aebddb1a5123deaffa2d30c3225edcd88146b14",
+      "conclusion": "success",
+      "created_at": "2026-10-20T14:28:43Z",
+      "build_job": "14:28:45Z -> 14:43:57Z (15m12s)",
+      "release_job": "14:43:59Z -> 14:44:17Z (18s)",
+      "total": "15m32s"
+    },
+    "github_release": {
+      "url": "https://github.com/tension-atoi/calix/releases/tag/v0.2.1",
+      "name": "Calix v0.2.1",
+      "draft": false,
+      "prerelease": false,
+      "published_at": "2026-10-20T14:44:14Z",
+      "body_bytes": 5169,
+      "body_matches_tagged_release_notes": "yes, byte-identical apart from the trailing newline the release action adds",
+      "assets": [
+        {
+          "name": "calix-gpui-linux-x86_64.tar.gz",
+          "bytes": 21854919,
+          "state": "uploaded"
+        },
+        {
+          "name": "calix-gpui-linux-x86_64.tar.gz.sha256",
+          "bytes": 97,
+          "state": "uploaded"
+        }
+      ],
+      "published_sha256": "67e80a08927fce30af85731ad729f353d287818c2233a57144c47c9662b88d49",
+      "checksum_verify": "sha256sum -c against the downloaded asset: OK",
+      "manifest_additions": [
+        "usr/bin/calix-notify",
+        "usr/lib/calix/calix-notify",
+        "usr/lib/systemd/user/calix-notify.service"
+      ]
+    },
+    "package_build": {
+      "command": "makepkg --noconfirm --cleanbuild --force",
+      "build_root": "/var/tmp/calix-gpui-pkg (not /tmp: the tmpfs holds 16 GiB and the Rust build does not fit)",
+      "source": "the pushed main branch, r4804.g2aebddb1",
+      "ZIG": "/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/bin/zig",
+      "zig_version": "0.16.0",
+      "exit": 0,
+      "elapsed": "4m19.43s",
+      "package": "calix-gpui-git-r4804.g2aebddb1-1-x86_64.pkg.tar.zst",
+      "package_version": "r4804.g2aebddb1-1",
+      "package_bytes": 11153778,
+      "package_sha256": "a6d40963e7051edb6895ba5fa1d0c970606a6624eb7a1e7a217c9f229b38ed53",
+      "cargo_test_result": "201 passed; 0 failed"
+    },
+    "live_install": {
+      "command": "pkexec pacman -U --noconfirm",
+      "elevation": "polkit only; no sudo, su or doas",
+      "installed_version": "calix-gpui-git r4804.g2aebddb1-1",
+      "installed_size": "32.56 MiB",
+      "exit": 0
+    },
+    "live_verification": {
+      "package_contents": "calix-notify, the /usr/bin symlinks and both user units are present under /usr",
+      "calix-daemon.service": "enabled and active; the socket /run/user/1000/calix/daemon.sock answers a ping with {\"version\":1,\"ok\":true,\"data\":{\"pid\":1011660,\"protocol\":1,...}}",
+      "calix-notify.service": "enabled and active",
+      "live_bus": "the session bus has org.freedesktop.Notifications owned by gnos-ux-scene; a live.gnu6.calix.Refresh signal produced one Notify call with app_name Calix, app_icon live.gnu6.calix, summary 'Package state changed' and expire_timeout 5000",
+      "journal": "the unit starts clean and logs nothing on the happy path"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "evidence/logs/calix-v0.2.1-release-20261020-verify-clean.log",
+      "bytes": 783,
+      "sha256": "a0d6bd84ebab860bcafae6ec0ea830fc66c4fca6b0a3a11e541836b5cce70eac"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.1-release-20261020-ci-replay.log",
+      "bytes": 22085,
+      "sha256": "9f629101522a95491e9f92418c7605ea0a03b0ef2d194e17c2d663388ccd79d6"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.1-release-20261020-version.log",
+      "bytes": 41,
+      "sha256": "dd6c6e6b150808f265e22f80bf3b2cb06d314568736d137d853e0b3081a875f4"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.1-release-20261020-push.log",
+      "bytes": 869,
+      "sha256": "aed1926f6a0231aea78543be0f9118adbe6223622a501638150902f8896bbafe"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.1-release-20261020-run-watch.log",
+      "bytes": 21155,
+      "sha256": "77569c8d3e0243f365a2d05abc773dd482fbf24dcea324c085baefcfe0462204"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.1-release-20261020-release-assets.log",
+      "bytes": 2580,
+      "sha256": "1194ed22c43c06d7f994659ec20d605996dc26efb8bb70db0820e2a4cd91fe96"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.1-release-20261020-release.json",
+      "bytes": 365,
+      "sha256": "654ecff6244aa92d09b445b3d3903a943271c6b30f2e6958bdb6d822b581b175"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.1-package-makepkg.log",
+      "bytes": 35128,
+      "sha256": "0c3edf31f352f5a01c884ded677a4823bd81bd2335298c167773340df6409fa7"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.1-package.sha256",
+      "bytes": 142,
+      "sha256": "e7a3b35e7b2a551a09ff5194bd4985452a3fe450e957bcfcf4c6e19cb78dc977"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.1-pacman-install.log",
+      "bytes": 1078,
+      "sha256": "a2a17625ce83fb3d5a86cdf5a6c07b508318a72c4297686603988b8cef90fc4c"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.1-live-install-verify.log",
+      "bytes": 4051,
+      "sha256": "380fd67a3d4cd00b10e67c8dbe24f98cd0e8066c2c4bcf5723567737c4c95dfe"
+    }
+  ],
+  "known_gaps": [
+    "The notification was observed on the live bus and answered by the desktop notification daemon; the rendered toast was not asserted programmatically.",
+    "The live install used the package built from the pushed tree, not the release tarball. The tarball is not an installer.",
+    "The Cargo cache key includes Cargo.lock, so the version bump made the v0.2.1 tag run a cold Rust build again (15m12s).",
+    "calix-notify takes no options: it is a service, so a manual invocation blocks on the bus by design."
+  ]
+}

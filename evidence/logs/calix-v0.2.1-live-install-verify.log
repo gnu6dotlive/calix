@@ -1,0 +1,87 @@
+
+== package ==
+calix-gpui-git r4804.g2aebddb1-1
+calix-gpui-git /usr/bin/calix-daemon
+calix-gpui-git /usr/bin/calix-gpui
+calix-gpui-git /usr/bin/calix-notify
+calix-gpui-git /usr/lib/calix/calix-daemon
+calix-gpui-git /usr/lib/calix/calix-gpui
+calix-gpui-git /usr/lib/calix/calix-notify
+calix-gpui-git /usr/lib/systemd/user/
+calix-gpui-git /usr/lib/systemd/user/calix-daemon.service
+calix-gpui-git /usr/lib/systemd/user/calix-notify.service
+
+== installed binaries ==
+lrwxrwxrwx 1 root root 20 Oct 20 10:28 /usr/bin/calix -> /usr/lib/calix/calix
+lrwxrwxrwx 1 root root 27 Oct 20 10:28 /usr/bin/calix-daemon -> /usr/lib/calix/calix-daemon
+lrwxrwxrwx 1 root root 27 Oct 20 10:28 /usr/bin/calix-notify -> /usr/lib/calix/calix-notify
+
+/usr/lib/calix/:
+total 33308
+-rwxr-xr-x 1 root root  5867976 Oct 20 10:28 calix
+-rwxr-xr-x 1 root root  1881280 Oct 20 10:28 calix-daemon
+-rwxr-xr-x 1 root root 25799984 Oct 20 10:28 calix-gpui
+-rwxr-xr-x 1 root root   549888 Oct 20 10:28 calix-notify
+calix-gpui 0.2.1 (control protocol v4)
+{"version":"0.2.1","control_protocol":4}
+
+== user units ==
+Created symlink '/home/tension_atoi/.config/systemd/user/default.target.wants/calix-daemon.service' → '/usr/lib/systemd/user/calix-daemon.service'.
+Created symlink '/home/tension_atoi/.config/systemd/user/graphical-session.target.wants/calix-notify.service' → '/usr/lib/systemd/user/calix-notify.service'.
+enabled
+enabled
+active
+active
+● calix-daemon.service - Calix package inventory service
+     Loaded: loaded (/usr/lib/systemd/user/calix-daemon.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-10-20 10:33:39 EDT; 222ms ago
+ Invocation: d45395d3310b4da79cf4976078271d10
+       Docs: https://github.com/tension-atoi/calix
+   Main PID: 1011660 (calix-daemon)
+      Tasks: 1 (limit: 38111)
+     Memory: 6.1M (peak: 6.3M)
+        CPU: 43ms
+     CGroup: /user.slice/user-1000.slice/user@1000.service/app.slice/calix-daemon.service
+             └─1011660 /usr/lib/calix/calix-daemon
+
+Oct 20 10:33:39 gnosisos-x8664 systemd[1022]: Started Calix package inventory service.
+● calix-notify.service - Calix desktop notification bridge
+     Loaded: loaded (/usr/lib/systemd/user/calix-notify.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-10-20 10:33:39 EDT; 53ms ago
+ Invocation: e2299b65544745faaee1c2483b5bd44a
+       Docs: https://github.com/tension-atoi/calix
+   Main PID: 1011712 (calix-notify)
+      Tasks: 1 (limit: 38111)
+     Memory: 2.6M (peak: 3.6M)
+        CPU: 31ms
+     CGroup: /user.slice/user-1000.slice/user@1000.service/app.slice/calix-notify.service
+             └─1011712 /usr/lib/calix/calix-notify
+
+Oct 20 10:33:39 gnosisos-x8664 systemd[1022]: Started Calix desktop notification bridge.
+
+== daemon socket ==
+srw------- 1 tension_atoi tension_atoi 0 Oct 20 10:33 /run/user/1000/calix/daemon.sock
+{"version":1,"ok":true,"data":{"pid":1011660,"protocol":1,"started_at":1792506819}}
+
+== notification bridge on the live session bus ==
+org.freedesktop.Notifications                    986282 gnos-ux-scene   tension_atoi :1.2686       user@1000.service -       -
+signal time=1792506824.836364 sender=org.freedesktop.DBus -> destination=:1.2699 serial=4294967295 path=/org/freedesktop/DBus; interface=org.freedesktop.DBus; member=NameAcquired
+   string ":1.2699"
+signal time=1792506824.836400 sender=org.freedesktop.DBus -> destination=:1.2699 serial=4294967295 path=/org/freedesktop/DBus; interface=org.freedesktop.DBus; member=NameLost
+   string ":1.2699"
+method call time=1792506825.837596 sender=:1.2697 -> destination=org.freedesktop.Notifications serial=3 path=/org/freedesktop/Notifications; interface=org.freedesktop.Notifications; member=Notify
+   string "Calix"
+   uint32 0
+   string "live.gnu6.calix"
+   string "Package state changed"
+   string "Open Calix to review the updated package inventory."
+   array [
+   ]
+   array [
+   ]
+   int32 5000
+
+== journal ==
+Oct 20 10:33:39 gnosisos-x8664 systemd[1022]: Started Calix desktop notification bridge.
+
+live verification: PASS
