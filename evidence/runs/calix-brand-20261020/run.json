@@ -44,7 +44,14 @@
       "mark-royal.png"
     ],
     "the_settings_row": "settings-brand-row-crop.png, in the appearance section, with the two swatches",
-    "the_control_surface": "calix-gpui settings set brand-color royal changes the mark and the accent of the running application, live, and the value is persisted in ~/.config/calix/gpui-ui.json"
+    "the_control_surface": "calix-gpui settings set brand-color royal changes the mark and the accent of the running application, live, and the value is persisted in ~/.config/calix/gpui-ui.json",
+    "the_installed_package": [
+      "installed-mark-orange.png",
+      "installed-mark-royal.png"
+    ],
+    "the_published_artifact": [
+      "published-mark.png"
+    ]
   },
   "tests": {
     "brand": "the two colourways parse from their keys; the tokens are the design system's; the colourway is written as its key",
@@ -58,6 +65,16 @@
   ],
   "artifacts": [
     {
+      "path": "evidence/runs/calix-brand-20261020/installed-mark-orange.png",
+      "bytes": 4457,
+      "sha256": "481eaf692809a98d7bcc0b32417f3499a8559256425ee2cf31e2324054db4662"
+    },
+    {
+      "path": "evidence/runs/calix-brand-20261020/installed-mark-royal.png",
+      "bytes": 4481,
+      "sha256": "c839049f4f0e1be980ce63987d6c5f7adbb8d9ef40c6f5b80a58d65a090d20e0"
+    },
+    {
       "path": "evidence/runs/calix-brand-20261020/mark-orange.png",
       "bytes": 4500,
       "sha256": "1073d5ca07c6d27f4a0638cdbb6c79b8542b088c7c8ac3e46ae81f0bdff3595a"
@@ -66,6 +83,11 @@
       "path": "evidence/runs/calix-brand-20261020/mark-royal.png",
       "bytes": 4523,
       "sha256": "7dfb047efb785a9f246c87304bdf5b2464155ace0b693acb1d2c917f889c3b1a"
+    },
+    {
+      "path": "evidence/runs/calix-brand-20261020/published-mark.png",
+      "bytes": 4480,
+      "sha256": "f95bae77152c5dcc65e950faa660c49f6f83b610092887f4278ab15bc17845ca"
     },
     {
       "path": "evidence/runs/calix-brand-20261020/settings-brand-row-crop.png",
@@ -85,5 +107,87 @@
   "toolchain": {
     "the_zig_0_16_toolchain": "the vendored Zig 0.16 needs libclang-cpp.so.21.1 and liblldELF.so.21.1, which the clang21 and lld21 packages provide; they had been removed from the machine, and the system Zig is 0.17, which the repository does not support. They were reinstalled through polkit.",
     "elevation": "pkexec only; no sudo, su or doas"
+  },
+  "verification": {
+    "local": {
+      "command": "scripts/verify",
+      "commit": "8969fae5",
+      "naming_check": "pass",
+      "packagemanager_tests": 1386,
+      "cli_tests": 392,
+      "rust_tests": 215,
+      "rust_tests_before": 208,
+      "release_builds": "pass",
+      "portable_binaries": "pass"
+    },
+    "container": {
+      "command": "scripts/ci-replay",
+      "image": "archlinux:latest",
+      "snapshot": "2026/10/01",
+      "commit_under_test": "8969fae5",
+      "packagemanager_tests": 1388,
+      "cli_tests": 392,
+      "rust_tests": 215,
+      "portable_binaries": "pass"
+    },
+    "package_build": {
+      "command": "makepkg --noconfirm --cleanbuild --force",
+      "build_root": "/var/tmp/calix-gpui-pkg",
+      "source": "the pushed main branch, r4820.g8969fae5",
+      "ZIG": "vendor/zig-0.16/usr/bin/zig (0.16.0)",
+      "exit": 0,
+      "package": "calix-gpui-git-r4820.g8969fae5-1-x86_64.pkg.tar.zst",
+      "package_bytes": 11504757,
+      "package_sha256": "a2c9fd94b4a8bc51f29c32bf6bd968435576224a5c16bf7ab125672869fc2652"
+    },
+    "live_install": {
+      "command": "pkexec pacman -U --noconfirm",
+      "elevation": "polkit only; no sudo, su or doas",
+      "installed_version": "calix-gpui-git r4820.g8969fae5-1",
+      "exit": 0,
+      "live_verification": "the installed application shows the shell mark, painted by the accent; `calix-gpui settings list` carries the brand-color entry; the icon tree is installed under the application id",
+      "installed_icons": [
+        "/usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg",
+        "/usr/share/icons/hicolor/scalable/apps/live.gnu6.calix-symbolic.svg",
+        "/usr/share/icons/hicolor/16x16..512x512/apps/live.gnu6.calix.png"
+      ]
+    },
+    "remote_run": {
+      "run_id": 39498508580,
+      "workflow": "CI & Release",
+      "ref": "v0.2.4",
+      "conclusion": "success",
+      "created_at": "2026-10-20T21:12:47Z"
+    },
+    "github_release": {
+      "url": "https://github.com/tension-atoi/calix/releases/tag/v0.2.4",
+      "name": "Calix v0.2.4",
+      "published_at": "2026-10-20T21:30:32Z",
+      "assets": [
+        {
+          "name": "calix-gpui-linux-x86_64.tar.gz",
+          "bytes": 23337861
+        },
+        {
+          "name": "calix-gpui-linux-x86_64.tar.gz.sha256",
+          "bytes": 97
+        }
+      ],
+      "published_sha256": "93c97fb29a544f4d9508ed5beb7a921d86305909930253f6f6d9e66234f7eadd"
+    },
+    "artifact_check": {
+      "method": "the published tarball was downloaded, its checksum verified, its binaries disassembled, and the whole tree run on the machine that found the defects",
+      "checksum": "ok",
+      "instructions_above_the_baseline": {
+        "usr/lib/calix/calix": 0,
+        "usr/lib/calix/calix-daemon": 0,
+        "usr/lib/calix/calix-notify": 0,
+        "usr/lib/calix/libcalix-flatpak-backend.so.1.0.0": 0
+      },
+      "calix_news": "No new news found (the HTTPS path that killed v0.2.0 and v0.2.1)",
+      "frontend": "the published binary was run from the unpacked tarball: the shell mark is painted by the accent, and the brand-color setting is in the registry",
+      "icons": "the published tree carries the colour master and the single-colour variant",
+      "result": "pass"
+    }
   }
 }
