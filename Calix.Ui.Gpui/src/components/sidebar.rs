@@ -260,9 +260,11 @@ impl Sidebar {
                         .border_b_1()
                         .border_color(theme.border)
                         .child(
+                            // The shell mark, painted by the accent: the mark
+                            // and the interface speak the same colour.
                             svg()
                                 .path(AppIcon::Calix.path())
-                                .size_5()
+                                .size_6()
                                 .text_color(theme.accent),
                         )
                         .child(if !is_collapsed {

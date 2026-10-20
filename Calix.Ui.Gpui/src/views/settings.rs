@@ -1,3 +1,4 @@
+use crate::brand::Brand;
 use crate::components::menu::{
     MenuCheckmarkItem, MenuKeyHandler, MenuLifecycle, MenuSurface, MenuSurfaceProps,
 };
@@ -11,6 +12,7 @@ use std::rc::Rc;
 
 pub type WindowActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 pub type StyleSelectHandler = Rc<dyn Fn(VisualStyleId, &mut Window, &mut App) + 'static>;
+pub type BrandSelectHandler = Rc<dyn Fn(Brand, &mut Window, &mut App) + 'static>;
 
 pub struct StyleSelectRowProps<'a> {
     pub current: VisualStyleId,
@@ -47,6 +49,7 @@ pub struct SettingsViewProps<'a> {
     pub on_close_style_menu: WindowActionHandler,
     pub on_navigate_style_menu: MenuKeyHandler,
     pub on_select_style: StyleSelectHandler,
+    pub on_select_brand: BrandSelectHandler,
     pub on_toggle_advanced_settings: WindowActionHandler,
     pub on_open_render_lab: WindowActionHandler,
     pub on_save: WindowActionHandler,
@@ -161,6 +164,12 @@ impl SettingsView {
 
     pub fn toggle_dark_theme(&mut self) {
         self.draft_gpui.dark_theme = !self.draft_gpui.dark_theme;
+        self.is_dirty = true;
+    }
+
+    /// Applique la couleur de marque au brouillon ; l'appelant repeint l'interface.
+    pub fn set_brand_color(&mut self, brand: Brand) {
+        self.draft_gpui.brand_color = brand;
         self.is_dirty = true;
     }
 
@@ -373,6 +382,11 @@ impl SettingsView {
                 "Use high-contrast dark theme interface (uncheck for light theme)",
                 g.dark_theme,
                 props.on_toggle_dark_theme,
+                theme,
+            ))
+            .child(Self::brand_row(
+                g.brand_color,
+                props.on_select_brand.clone(),
                 theme,
             ))
             .child(Self::toggle_row(
@@ -816,6 +830,110 @@ impl SettingsView {
             )
     }
 
+    /// La couleur de marque : deux pastilles, la couleur choisie.
+    ///
+    /// La pastille porte la couleur qu'elle choisit, et l'accent de l'interface
+    /// suit le choix : la coupe en écalille de la barre latérale et l'interface
+    /// parlent alors la même couleur.
+    fn brand_row(
+        current: Brand,
+        on_select: BrandSelectHandler,
+        theme: &Theme,
+    ) -> AnyElement {
+        let focus_border = theme.border_focus;
+        let mut swatches: Vec<AnyElement> = Vec::new();
+        for brand in Brand::ALL.iter() {
+            let select_cb = on_select.clone();
+            let select_cb_key = select_cb.clone();
+            let brand_val = *brand;
+            let selected = current == *brand;
+            swatches.push(
+                div()
+                    .id(ElementId::Name(
+                        format!("setting_brand_{}", brand.as_str()).into(),
+                    ))
+                    .flex()
+                    .items_center()
+                    .gap_2()
+                    .px_3()
+                    .py_1()
+                    .rounded_full()
+                    .border_1()
+                    .border_color(if selected {
+                        brand.accent()
+                    } else {
+                        theme.border
+                    })
+                    .bg(if selected {
+                        theme.bg_surface_active
+                    } else {
+                        theme.bg_surface
+                    })
+                    .focusable()
+                    .tab_stop(true)
+                    .focus(move |s| s.border_1().border_color(focus_border))
+                    .on_key_down(move |event, window, cx| {
+                        let key = event.keystroke.key.as_str();
+                        if key == "enter" || key == "space" {
+                            select_cb_key(brand_val, window, cx);
+                        }
+                    })
+                    .cursor_pointer()
+                    .on_mouse_down(MouseButton::Left, move |_event, window, cx| {
+                        select_cb(brand_val, window, cx);
+                    })
+                    .child(div().size_3().rounded_full().bg(brand.accent()))
+                    .child(
+                        div()
+                            .text_xs()
+                            .font_weight(if selected {
+                                FontWeight::BOLD
+                            } else {
+                                FontWeight::NORMAL
+                            })
+                            .text_color(if selected {
+                                theme.text_primary
+                            } else {
+                                theme.text_secondary
+                            })
+                            .child(brand.label()),
+                    )
+                    .into_any_element(),
+            );
+        }
+
+        div()
+            .flex()
+            .items_center()
+            .justify_between()
+            .py_3()
+            .px_3()
+            .rounded_sm()
+            .border_b_1()
+            .border_color(theme.border)
+            .child(
+                div()
+                    .flex()
+                    .flex_col()
+                    .gap_0p5()
+                    .child(
+                        div()
+                            .text_xs()
+                            .font_weight(FontWeight::BOLD)
+                            .text_color(theme.text_primary)
+                            .child("Brand Colour"),
+                    )
+                    .child(
+                        div()
+                            .text_xs()
+                            .text_color(theme.text_secondary)
+                            .child("The colour of the shell mark, and the accent of the interface"),
+                    ),
+            )
+            .child(div().flex().items_center().gap_2().children(swatches))
+            .into_any_element()
+    }
+
     fn toggle_row(
         id: &'static str,
         title: &'static str,
@@ -892,6 +1010,20 @@ impl SettingsView {
 mod tests {
     use super::*;
     use core::prelude::v1::test;
+
+    #[test]
+    fn the_brand_colour_is_a_draft_change_like_the_other_toggles() {
+        let mut settings = SettingsView::new(CalixSettings::default(), GpuiUiConfig::default());
+        assert!(!settings.is_dirty);
+        assert_eq!(settings.draft_gpui.brand_color, Brand::default());
+
+        settings.set_brand_color(Brand::Royal);
+        assert_eq!(settings.draft_gpui.brand_color, Brand::Royal);
+        assert!(
+            settings.is_dirty,
+            "the colour is unsaved until the user saves the settings"
+        );
+    }
 
     #[test]
     fn test_settings_draft_dirty_flag() {

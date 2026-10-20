@@ -152,9 +152,17 @@ EOF
     install -Dm644 "Calix.Ui.Gpui/assets/live.gnu6.calix.desktop" \
         "${pkgdir}/usr/share/applications/live.gnu6.calix.desktop"
 
-    # ── SVG Icon ─────────────────────────────────────────────────────────────
-    install -Dm644 "Calix.Ui.Gpui/assets/live.gnu6.calix.svg" \
+    # ── Icons ────────────────────────────────────────────────────────────────
+    # The shell mark: the colour master in SVG, the raster sizes, and the
+    # single-colour variant the menus use.
+    install -Dm644 "Calix.Ui.Gpui/assets/icons/hicolor/scalable/apps/live.gnu6.calix.svg" \
         "${pkgdir}/usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg"
+    install -Dm644 "Calix.Ui.Gpui/assets/icons/hicolor/scalable/apps/live.gnu6.calix-symbolic.svg" \
+        "${pkgdir}/usr/share/icons/hicolor/scalable/apps/live.gnu6.calix-symbolic.svg"
+    for size in 16 22 24 32 48 64 128 256 512; do
+        install -Dm644 "Calix.Ui.Gpui/assets/icons/hicolor/${size}x${size}/apps/live.gnu6.calix.png" \
+            "${pkgdir}/usr/share/icons/hicolor/${size}x${size}/apps/live.gnu6.calix.png"
+    done
 
     # ── License ──────────────────────────────────────────────────────────────
     if [ -f LICENSE ]; then

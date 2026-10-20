@@ -1,4 +1,5 @@
 use crate::state::session::PackageViewMode;
+use crate::brand::Brand;
 use crate::visual_style::VisualStyleId;
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
@@ -77,6 +78,10 @@ pub struct GpuiUiConfig {
     pub view_mode: PackageViewMode,
     #[serde(default = "default_visual_style")]
     pub visual_style: VisualStyleId,
+    /// La couleur de marque : l'accent de l'interface et la couleur de la
+    /// coupe en écalille. C'est l'utilisateur qui choisit.
+    #[serde(default = "default_brand_color")]
+    pub brand_color: Brand,
 }
 
 pub const MIN_WINDOW_WIDTH: f32 = 1024.0;
@@ -118,6 +123,10 @@ fn default_visual_style() -> VisualStyleId {
     VisualStyleId::Standard
 }
 
+fn default_brand_color() -> Brand {
+    Brand::default()
+}
+
 impl Default for GpuiUiConfig {
     fn default() -> Self {
         Self {
@@ -131,6 +140,7 @@ impl Default for GpuiUiConfig {
             reduce_motion: false,
             view_mode: default_view_mode(),
             visual_style: default_visual_style(),
+            brand_color: default_brand_color(),
         }
     }
 }
@@ -266,6 +276,13 @@ impl ConfigManager {
                 authority: "gpui-ui".to_string(),
             },
             SettingEntry {
+                key: "brand-color".to_string(),
+                value: gpui.brand_color.as_str().to_string(),
+                default: Brand::default().as_str().to_string(),
+                description: "Brand colour of the shell mark and the interface accent ('orange' or 'royal')".to_string(),
+                authority: "gpui-ui".to_string(),
+            },
+            SettingEntry {
                 key: "compact-view".to_string(),
                 value: gpui.compact_view.to_string(),
                 default: "false".to_string(),
@@ -390,6 +407,12 @@ impl ConfigManager {
                         other
                     ),
                 }
+                Self::save_gpui_config(&config)?;
+            }
+            "brand-color" => {
+                let mut config = Self::load_gpui_config();
+                let brand = Brand::parse(value).map_err(|e| anyhow::anyhow!("{e}"))?;
+                config.brand_color = brand;
                 Self::save_gpui_config(&config)?;
             }
             "compact-view" => {
@@ -552,6 +575,10 @@ impl ConfigManager {
         match key_lower.as_str() {
             "all" => Self::reset_all(),
             "theme" => Self::set_setting("theme", "dark"),
+            "brand-color" => Self::set_setting(
+                "brand-color",
+                Brand::default().as_str(),
+            ),
             "compact-view" => Self::set_setting("compact-view", "false"),
             "reduce-motion" => Self::set_setting("reduce-motion", "false"),
             "view-mode" => Self::set_setting("view-mode", "table"),
@@ -608,6 +635,31 @@ mod tests {
         assert!(!parsed.reduce_motion);
         assert_eq!(parsed.view_mode, PackageViewMode::Table);
         assert_eq!(parsed.visual_style, VisualStyleId::Standard);
+        assert_eq!(parsed.brand_color, Brand::Orange);
+    }
+
+    #[test]
+    fn test_gpui_config_preserves_explicit_brand_color() {
+        let royal_json = r#"{"brand_color": "royal"}"#;
+        let parsed: GpuiUiConfig =
+            serde_json::from_str(royal_json).expect("Should deserialize the royal colourway");
+        assert_eq!(parsed.brand_color, Brand::Royal);
+
+        let orange_json = r#"{"brand_color": "orange"}"#;
+        let parsed: GpuiUiConfig =
+            serde_json::from_str(orange_json).expect("Should deserialize the orange colourway");
+        assert_eq!(parsed.brand_color, Brand::Orange);
+    }
+
+    #[test]
+    fn the_brand_colour_is_part_of_the_settings_registry() {
+        let entries = ConfigManager::list_settings();
+        let brand = entries
+            .iter()
+            .find(|entry| entry.key == "brand-color")
+            .expect("the brand colour is a registered setting");
+        assert_eq!(brand.default, Brand::default().as_str());
+        assert_eq!(brand.authority, "gpui-ui");
     }
 
     #[test]
@@ -717,6 +769,7 @@ mod tests {
         let list = ConfigManager::list_settings();
         let expected_keys = [
             "theme",
+            "brand-color",
             "compact-view",
             "reduce-motion",
             "view-mode",
@@ -747,6 +800,7 @@ mod tests {
         assert!(ConfigManager::get_setting("view-mode").is_ok());
         assert!(ConfigManager::get_setting("compact-view").is_ok());
         assert!(ConfigManager::get_setting("visual-style").is_ok());
+        assert!(ConfigManager::get_setting("brand-color").is_ok());
         assert!(ConfigManager::get_setting("non_existent_key").is_err());
     }
 
@@ -760,6 +814,7 @@ mod tests {
         assert!(ConfigManager::set_setting("window-width", "500.0").is_err());
         assert!(ConfigManager::set_setting("window-height", "400.0").is_err());
         assert!(ConfigManager::set_setting("visual-style", "neon").is_err());
+        assert!(ConfigManager::set_setting("brand-color", "cyan").is_err());
         assert!(ConfigManager::set_setting("invalid_setting_key", "val").is_err());
     }
 

@@ -73,7 +73,7 @@ Five decisions follow from that:
 Every release publishes a tarball and its checksum:
 
 ```bash
-gh release download v0.2.3 --repo tension-atoi/calix \
+gh release download v0.2.4 --repo tension-atoi/calix \
   --pattern 'calix-gpui-linux-x86_64.tar.gz*'
 sha256sum -c calix-gpui-linux-x86_64.tar.gz.sha256
 mkdir -p /tmp/calix && tar -xzf calix-gpui-linux-x86_64.tar.gz -C /tmp/calix
@@ -520,7 +520,7 @@ more optimistic document elsewhere in the tree, this table is the one to trust.
 | Naming | Complete: code, paths, binaries and packaging use `calix` and `live.gnu6.calix` |
 | Platform | Arch Linux, `x86_64` |
 
-The frontend crate is version `0.2.3`. The Zig backend reports `3.1.9-dev`, a version
+The frontend crate is version `0.2.4`. The Zig backend reports `3.1.9-dev`, a version
 string inherited from the tree it descends from; it is not the Calix product version.
 
 ---
@@ -546,8 +546,10 @@ In rough order of value:
 5. **Cut the frozen Python engine.** Once the watcher is native, `scripts/calix_*.py`
    and the legacy `packaging/systemd/calix-sync.*` units can go.
 
-Just before this list: `v0.2.3` revived the Updates scope, which had never loaded in
-any released version, and made the layout follow the window the compositor grants
+Just before this list: `v0.2.4` brought the new mark — a chalice whose cup is a
+scallop shell — and the user's choice of colour, which follows the accent of the
+interface. `v0.2.3` revived the Updates scope, which had never loaded in any
+released version, and made the layout follow the window the compositor grants
 instead of the one the application asked for. `v0.2.2` shipped the optional Flatpak
 backend in the package, stopped a command from running the inventory instead of its own
 job, and rebuilt every Zig binary for the x86_64 baseline so the artifact runs on
@@ -586,6 +588,7 @@ recorded only in [`docs/legacy-references.md`](docs/legacy-references.md).
 | [`docs/ci.md`](docs/ci.md) | The CI workflow, caches, timeouts and how to diagnose a red run |
 | [`docs/isolated-builds.md`](docs/isolated-builds.md) | Isolated AUR builds through `systemd-nspawn` |
 | [`docs/flatpak-backend-abi.md`](docs/flatpak-backend-abi.md) | The optional Flatpak backend ABI |
+| [`docs/brand.md`](docs/brand.md) | The mark, the two colourways, and the user's choice |
 | [`docs/gpui/`](docs/gpui/) | The front-end slice kits: the work contracts, the render lab, the UX workbench, and the Slice-07 information architecture and navigation plan |
 | [`docs/legacy-references.md`](docs/legacy-references.md) | The historical name boundary and the rename map |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Architecture overview and how to propose a change |

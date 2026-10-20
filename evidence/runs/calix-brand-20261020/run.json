@@ -1,0 +1,81 @@
+{
+  "run_id": "calix-brand-20261020",
+  "kind": "feature",
+  "status": "ok",
+  "started_at": "2026-10-20T16:15:00Z",
+  "finished_at": "2026-10-20T16:50:00Z",
+  "commit": "pending",
+  "objective": "Bring the Calix mark into the application and let the user choose its colour, in the settings and from the control surface.",
+  "the_pack": {
+    "source": "/home/tension_atoi/Pictures/calix-logo-pack.zip",
+    "geometry": "a chalice whose cup is a scallop shell, one geometry in two colourways",
+    "colourways": {
+      "v1-royal": {
+        "base": "#4169E1",
+        "hover": "#87A0F4"
+      },
+      "v2-orange": {
+        "base": "#FF6A00",
+        "hover": "#FF8E40"
+      }
+    },
+    "tokens": "the Gnosix DS tokens, taken as they are: no re-light, no re-tint",
+    "provenance": "the pack regenerates itself from src/paths.json and carries its own SHA256SUMS"
+  },
+  "the_decision": {
+    "the_colour_follows": "the mark and the accent of the interface, and the focus ring with them",
+    "the_colour_does_not_follow": "the source badges (an ecosystem, not a brand), the semantic colours, the surfaces",
+    "the_system_icon": "Signal Orange, because the launcher reads a system file that a per-user setting cannot reach",
+    "the_in_application_mark": "the single-path mono master, painted by the accent, so it follows the choice without a second asset"
+  },
+  "what_changed": [
+    "Calix.Ui.Gpui/src/brand.rs: the two colourways, their tokens, and the parsing of the setting",
+    "Calix.Ui.Gpui/src/theme.rs: Theme::with_brand paints the accent, its hover and the focus ring",
+    "Calix.Ui.Gpui/src/config.rs: the brand-color setting, in the registry, in the reset table and in the persisted state",
+    "Calix.Ui.Gpui/src/views/settings.rs: the Brand Colour row, two swatches, in the appearance section",
+    "Calix.Ui.Gpui/src/views/workspace.rs: every theme rebuild carries the brand",
+    "Calix.Ui.Gpui/src/icons/calix.svg: the mono currentColor master, painted by the accent",
+    "Calix.Ui.Gpui/assets/: the Signal Orange colour master and the hicolor tree",
+    "PKGBUILD-calix: the icon tree is installed under the application id"
+  ],
+  "runtime_evidence": {
+    "the_mark_in_both_colourways": [
+      "mark-orange.png",
+      "mark-royal.png"
+    ],
+    "the_settings_row": "settings-brand-row-crop.png, in the appearance section, with the two swatches",
+    "the_control_surface": "calix-gpui settings set brand-color royal changes the mark and the accent of the running application, live, and the value is persisted in ~/.config/calix/gpui-ui.json"
+  },
+  "tests": {
+    "brand": "the two colourways parse from their keys; the tokens are the design system's; the colourway is written as its key",
+    "theme": "the brand paints the accent, the hover and the focus ring, and leaves the rest of the palette alone",
+    "config": "the colour round-trips through the persisted state, is part of the settings registry, and an unknown colour is refused",
+    "settings": "the colour is a draft change like the other toggles: it marks the settings unsaved until the user saves"
+  },
+  "known_gaps": [
+    "The click on a swatch could not be exercised on this desktop: the synthetic pointer events never reach the Wayland client, so the wheel does not scroll and the clicks do not land. The click path is covered by the unit test on the draft and by the theme test; the runtime proof is the control surface's path, which writes the same state and rebuilds the same theme.",
+    "The window the capture was taken in was resized by the compositor, which the application follows (the v0.2.3 fix); the geometry invariants hold at every width that was measured."
+  ],
+  "artifacts": [
+    {
+      "path": "evidence/runs/calix-brand-20261020/mark-orange.png",
+      "bytes": 4500,
+      "sha256": "1073d5ca07c6d27f4a0638cdbb6c79b8542b088c7c8ac3e46ae81f0bdff3595a"
+    },
+    {
+      "path": "evidence/runs/calix-brand-20261020/mark-royal.png",
+      "bytes": 4523,
+      "sha256": "7dfb047efb785a9f246c87304bdf5b2464155ace0b693acb1d2c917f889c3b1a"
+    },
+    {
+      "path": "evidence/runs/calix-brand-20261020/settings-brand-row-crop.png",
+      "bytes": 15316,
+      "sha256": "7086e546f8cda08f0ed7221975b1e1b4a77914415845cd6cbc24074546a04f00"
+    },
+    {
+      "path": "evidence/runs/calix-brand-20261020/settings-brand-row.png",
+      "bytes": 175420,
+      "sha256": "c3f46f1696d0bddde02a33711cac6ad0c8a71de4dcf8ff0f9e0206950c9f224c"
+    }
+  ]
+}

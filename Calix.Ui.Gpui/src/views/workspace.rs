@@ -64,7 +64,8 @@ impl WorkspaceView {
             Theme::dark()
         } else {
             Theme::light()
-        };
+        }
+        .with_brand(gpui_config.brand_color);
 
         let client = CalixClient::new(None);
         let session = cx.new(|_cx| {
@@ -932,7 +933,8 @@ impl WorkspaceView {
             Theme::dark()
         } else {
             Theme::light()
-        };
+        }
+        .with_brand(gpui.brand_color);
         let theme = self.theme;
 
         self.motion_policy = crate::state::motion::MotionPolicy::new(gpui.reduce_motion);
@@ -1753,7 +1755,8 @@ impl WorkspaceView {
                     Theme::dark()
                 } else {
                     Theme::light()
-                };
+                }
+                .with_brand(self.gpui_config.brand_color);
 
                 let theme = self.theme;
                 self.motion_policy =
@@ -2019,7 +2022,32 @@ impl Render for WorkspaceView {
                                         Theme::dark()
                                     } else {
                                         Theme::light()
-                                    };
+                                    }
+                                    .with_brand(view.settings.draft_gpui.brand_color);
+                                    view.theme = theme;
+                                    view.workstation
+                                        .update(cx, |ws, cx| ws.set_theme(theme, cx));
+                                    view.sidebar.update(cx, |sb, cx| sb.set_theme(theme, cx));
+                                    view.console_view
+                                        .update(cx, |cv, cx| cv.set_theme(theme, cx));
+                                    cx.notify();
+                                })
+                            })
+                        },
+                        on_select_brand: {
+                            let e = entity_st.clone();
+                            Rc::new(move |brand: crate::brand::Brand, _w, cx| {
+                                e.update(cx, |view, cx| {
+                                    // The colour is applied to the draft and to the
+                                    // theme at once: the accent changes under the
+                                    // user's finger, the save commits it.
+                                    view.settings.set_brand_color(brand);
+                                    let theme = if view.settings.draft_gpui.dark_theme {
+                                        Theme::dark()
+                                    } else {
+                                        Theme::light()
+                                    }
+                                    .with_brand(brand);
                                     view.theme = theme;
                                     view.workstation
                                         .update(cx, |ws, cx| ws.set_theme(theme, cx));
@@ -2149,7 +2177,8 @@ impl Render for WorkspaceView {
                                         Theme::dark()
                                     } else {
                                         Theme::light()
-                                    };
+                                    }
+                                    .with_brand(view.gpui_config.brand_color);
                                     view.theme = theme;
                                     view.workstation
                                         .update(cx, |ws, cx| ws.set_theme(theme, cx));

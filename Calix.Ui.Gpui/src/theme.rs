@@ -1,3 +1,4 @@
+use crate::brand::Brand;
 use gpui::{rgb, Rgba};
 
 #[derive(Clone, Copy, Debug)]
@@ -96,6 +97,21 @@ impl Theme {
         }
     }
 
+    /// Applique la couleur de marque choisie par l'utilisateur.
+    ///
+    /// La marque est une coupe en écalille : elle est peinte par l'accent, donc
+    /// l'accent et son survol portent la couleur de la marque. L'anneau de
+    /// focus suit le même accent — un focus d'une autre couleur que l'accent
+    /// ressemblerait à une erreur.
+    pub fn with_brand(self, brand: Brand) -> Self {
+        Self {
+            accent: brand.accent(),
+            accent_hover: brand.accent_hover(),
+            border_focus: brand.accent(),
+            ..self
+        }
+    }
+
     pub fn is_dark(&self) -> bool {
         self.bg_app.r < 0.5
     }
@@ -129,6 +145,20 @@ impl Theme {
 mod tests {
     use super::*;
     use core::prelude::v1::test;
+
+    #[test]
+    fn the_brand_colour_paints_the_accent_and_the_focus_ring() {
+        let dark = Theme::dark();
+        let royal = dark.with_brand(Brand::Royal);
+        assert_eq!(royal.accent, Brand::Royal.accent());
+        assert_eq!(royal.accent_hover, Brand::Royal.accent_hover());
+        assert_eq!(royal.border_focus, Brand::Royal.accent());
+
+        // The rest of the palette is the brand's business, not the theme's.
+        assert_eq!(royal.bg_app, dark.bg_app);
+        assert_eq!(royal.success, dark.success);
+        assert_eq!(royal.badge_aur, dark.badge_aur);
+    }
 
     #[test]
     fn test_theme_dark_and_light_parity_and_contrast() {

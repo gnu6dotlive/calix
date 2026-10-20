@@ -1,10 +1,45 @@
-# Calix v0.2.3
+# Calix v0.2.4
 
-Calix v0.2.3 is a correctness release. It revives a rail entry that had never
-loaded, and it makes the layout follow the window the compositor actually
-grants instead of the one the application asked for.
+Calix v0.2.4 is the brand release. The application wears the new mark — a
+chalice whose cup is a scallop shell — and the user chooses its colour, in the
+settings or from the control surface. The colour follows the accent of the
+interface, so the mark and the application speak the same colour.
 
-## Read this first: the Updates scope never worked
+It also carries the v0.2.3 correctness fixes, for the accounts that have not
+taken them yet.
+
+## The mark, and the colour the user chooses
+
+The rail header now shows the shell in a chalice, painted by the accent of the
+interface. Two colourways, one geometry, and the choice is the user's:
+
+- **Signal Orange** — `#FF6A00`, hover `#FF8E40` (the default);
+- **Royal Blue** — `#4169E1`, hover `#87A0F4`.
+
+The setting is in the appearance section of the settings, and on the control
+surface:
+
+```bash
+calix-gpui settings set brand-color royal
+calix-gpui settings get brand-color
+```
+
+The choice changes the mark, the accent (buttons, focus ring, active row) and the
+focus ring itself. It does not change the source badges — ALPM, AUR, Flatpak,
+AppImage, Cargo, NPM and Release each keep the colour that names their ecosystem.
+
+The launcher, the taskbar and the window switcher read a system file, so they
+cannot follow a per-user setting: the package ships the Signal Orange colour
+master under the application id, with the raster sizes and the single-colour
+variant the menus use.
+
+The colours are design system tokens, taken as they are — no re-light, no
+re-tint. The rules the application follows are written in
+[`docs/brand.md`](docs/brand.md).
+
+## What v0.2.3 fixed, and what v0.2.2 fixed before it
+
+### The Updates scope never worked
 
 One of the five entries in the rail — **Updates** — answered
 *Failed to check for updates: Désérialisation de la liste des mises à jour*

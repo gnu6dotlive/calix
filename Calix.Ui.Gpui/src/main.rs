@@ -8,6 +8,7 @@ mod backend;
 mod components;
 mod config;
 mod control;
+pub mod brand;
 pub mod icons;
 pub mod render_lab;
 mod state;
