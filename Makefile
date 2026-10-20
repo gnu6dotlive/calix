@@ -12,9 +12,9 @@
 # ──────────────────────────────────────────────────────────────────────────────
 
 REPO_ROOT   := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-ZIG_SRC     := $(REPO_ROOT)Shelly.Cli.Zig
-ZIG_BIN     := $(ZIG_SRC)/zig-out/bin/shelly
-RUST_SRC    := $(REPO_ROOT)Shelly.Ui.Gpui
+ZIG_SRC     := $(REPO_ROOT)Calix.Cli.Zig
+ZIG_BIN     := $(ZIG_SRC)/zig-out/bin/calix
+RUST_SRC    := $(REPO_ROOT)Calix.Ui.Gpui
 TARGET_DIR  := $(shell cd $(RUST_SRC) && cargo metadata --format-version 1 --no-deps 2>/dev/null | grep -o '"target_directory":"[^"]*"' | cut -d'"' -f4)
 ifeq ($(TARGET_DIR),)
   TARGET_DIR := $(RUST_SRC)/target
@@ -24,12 +24,12 @@ PKGBUILD    := $(REPO_ROOT)PKGBUILD-calix
 
 # Préfère le CLI Zig local ; tombe en arrière sur le CLI système si absent
 ifeq ($(wildcard $(ZIG_BIN)),)
-  SHELLY_BIN ?= $(shell which shelly 2>/dev/null)
+  CALIX_BIN ?= $(shell which calix 2>/dev/null)
 else
-  SHELLY_BIN ?= $(ZIG_BIN)
+  CALIX_BIN ?= $(ZIG_BIN)
 endif
 
-export SHELLY_BIN
+export CALIX_BIN
 
 # ─── Cibles principales ───────────────────────────────────────────────────────
 
@@ -37,14 +37,14 @@ export SHELLY_BIN
 
 ## Lance l'application en mode développement (cargo run)
 run: zig
-	@echo ">>> SHELLY_BIN = $(SHELLY_BIN)"
+	@echo ">>> CALIX_BIN = $(CALIX_BIN)"
 	@echo ">>> Lancement de calix-gpui..."
-	cd $(RUST_SRC) && SHELLY_BIN=$(SHELLY_BIN) cargo run 2>&1
+	cd $(RUST_SRC) && CALIX_BIN=$(CALIX_BIN) cargo run 2>&1
 
 ## Compile le binaire de release Rust
 build: zig
 	@echo ">>> Build release..."
-	cd $(RUST_SRC) && SHELLY_BIN=$(SHELLY_BIN) cargo build --release
+	cd $(RUST_SRC) && CALIX_BIN=$(CALIX_BIN) cargo build --release
 	@echo ">>> Binaire : $(RUST_BIN)"
 
 ## Vérifie le code Rust sans lier (rapide)
@@ -86,13 +86,13 @@ package-install: package
 install: build
 	@echo ">>> Installation dans /usr/local..."
 	install -Dm755 $(RUST_BIN) /usr/local/lib/calix/calix-gpui
-	install -Dm755 $(ZIG_BIN)  /usr/local/lib/shelly/shelly
-	@printf '#!/bin/sh\nSHELLY_BIN=/usr/local/lib/shelly/shelly exec /usr/local/lib/calix/calix-gpui "$$@"\n' \
+	install -Dm755 $(ZIG_BIN)  /usr/local/lib/calix/calix
+	@printf '#!/bin/sh\nCALIX_BIN=/usr/local/lib/calix/calix exec /usr/local/lib/calix/calix-gpui "$$@"\n' \
 		| install -Dm755 /dev/stdin /usr/local/bin/calix-gpui
-	install -Dm644 $(RUST_SRC)/assets/com.calix.calix-gpui.desktop \
-		/usr/local/share/applications/com.calix.calix-gpui.desktop
-	install -Dm644 $(RUST_SRC)/assets/calix-gpui.svg \
-		/usr/local/share/icons/hicolor/scalable/apps/calix-gpui.svg
+	install -Dm644 $(RUST_SRC)/assets/live.gnu6.calix.desktop \
+		/usr/local/share/applications/live.gnu6.calix.desktop
+	install -Dm644 $(RUST_SRC)/assets/live.gnu6.calix.svg \
+		/usr/local/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg
 	@echo ">>> Installé. Lance : calix-gpui"
 
 ## Nettoie tous les artefacts compilés

@@ -1,11 +1,9 @@
 # Maintainer: tension-atoi <tension-atoi@users.noreply.github.com>
-# Forked from: Seafoam-Labs/Shelly-ALPM
 # Paquet: frontend GPUI natif Rust pour Calix — gestionnaire de paquets Arch Linux
 #          (ALPM, AUR, Flatpak, AppImage, Cargo, NPM, releases GitHub/GitLab)
 #
-# Le backend CLI Zig reste installé sous /usr/lib/shelly/shelly tant que la
-# migration du backend (Shelly.Cli.Zig → calix.cli.zig) n'est pas terminée ;
-# le frontend Calix l'atteint via la variable SHELLY_BIN.
+# Le backend CLI Zig est installé sous /usr/lib/calix/calix ; le frontend
+# Calix l'atteint via la variable CALIX_BIN.
 
 pkgname=calix-gpui-git
 pkgver=r0.git
@@ -40,11 +38,11 @@ makedepends=(
 )
 optdepends=(
     'flatpak: support des applications Flatpak'
-    'paru: support AUR via Shelly'
+    'paru: support AUR via Calix'
     'yay: support AUR alternatif'
 )
 provides=('calix-gpui')
-conflicts=('calix-gpui' 'shelly-gpui')
+conflicts=('calix-gpui')
 source=("${pkgname}::git+https://github.com/tension-atoi/calix.git#branch=main")
 sha256sums=('SKIP')
 
@@ -54,31 +52,31 @@ pkgver() {
 }
 
 prepare() {
-    cd "${srcdir}/${pkgname}/Shelly.Ui.Gpui"
+    cd "${srcdir}/${pkgname}/Calix.Ui.Gpui"
     cargo fetch --locked
 }
 
 build() {
     cd "${srcdir}/${pkgname}"
 
-    # 1. Compile the Zig CLI backend (still shipped as `shelly` for now)
+    # 1. Compile the Zig CLI backend
     echo ">>> Compiling the Zig CLI backend..."
-    cd Shelly.Cli.Zig
+    cd Calix.Cli.Zig
     zig build -Doptimize=ReleaseSafe
     cd ..
 
     # 2. Compile the Calix GPUI frontend (Rust)
     echo ">>> Compiling the Calix GPUI frontend (Rust)..."
-    cd Shelly.Ui.Gpui
+    cd Calix.Ui.Gpui
     export CARGO_TARGET_DIR="target"
-    SHELLY_BIN="${srcdir}/${pkgname}/Shelly.Cli.Zig/zig-out/bin/shelly" \
+    CALIX_BIN="${srcdir}/${pkgname}/Calix.Cli.Zig/zig-out/bin/calix" \
         cargo build --release --locked
 }
 
 check() {
-    cd "${srcdir}/${pkgname}/Shelly.Ui.Gpui"
+    cd "${srcdir}/${pkgname}/Calix.Ui.Gpui"
     export CARGO_TARGET_DIR="target"
-    SHELLY_BIN="${srcdir}/${pkgname}/Shelly.Cli.Zig/zig-out/bin/shelly" \
+    CALIX_BIN="${srcdir}/${pkgname}/Calix.Cli.Zig/zig-out/bin/calix" \
         cargo test --release --locked
 }
 
@@ -86,27 +84,31 @@ package() {
     cd "${srcdir}/${pkgname}"
 
     # ── Binaries ─────────────────────────────────────────────────────────────
-    install -Dm755 "Shelly.Cli.Zig/zig-out/bin/shelly" \
-        "${pkgdir}/usr/lib/shelly/shelly"
+    install -Dm755 "Calix.Cli.Zig/zig-out/bin/calix" \
+        "${pkgdir}/usr/lib/calix/calix"
 
-    install -Dm755 "Shelly.Ui.Gpui/target/release/calix-gpui" \
+    # The CLI is also reachable on PATH; polkit keeps the canonical lib path.
+    install -dm755 "${pkgdir}/usr/bin"
+    ln -s /usr/lib/calix/calix "${pkgdir}/usr/bin/calix"
+
+    install -Dm755 "Calix.Ui.Gpui/target/release/calix-gpui" \
         "${pkgdir}/usr/lib/calix/calix-gpui"
 
-    # Wrapper /usr/bin/calix-gpui setting SHELLY_BIN and executing the binary
+    # Wrapper /usr/bin/calix-gpui setting CALIX_BIN and executing the binary
     install -dm755 "${pkgdir}/usr/bin"
     cat > "${pkgdir}/usr/bin/calix-gpui" << 'EOF'
 #!/bin/sh
-SHELLY_BIN=/usr/lib/shelly/shelly exec /usr/lib/calix/calix-gpui "$@"
+CALIX_BIN=/usr/lib/calix/calix exec /usr/lib/calix/calix-gpui "$@"
 EOF
     chmod 755 "${pkgdir}/usr/bin/calix-gpui"
 
     # ── Desktop Entry ────────────────────────────────────────────────────────
-    install -Dm644 "Shelly.Ui.Gpui/assets/com.calix.calix-gpui.desktop" \
-        "${pkgdir}/usr/share/applications/com.calix.calix-gpui.desktop"
+    install -Dm644 "Calix.Ui.Gpui/assets/live.gnu6.calix.desktop" \
+        "${pkgdir}/usr/share/applications/live.gnu6.calix.desktop"
 
     # ── SVG Icon ─────────────────────────────────────────────────────────────
-    install -Dm644 "Shelly.Ui.Gpui/assets/calix-gpui.svg" \
-        "${pkgdir}/usr/share/icons/hicolor/scalable/apps/calix-gpui.svg"
+    install -Dm644 "Calix.Ui.Gpui/assets/live.gnu6.calix.svg" \
+        "${pkgdir}/usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg"
 
     # ── License ──────────────────────────────────────────────────────────────
     if [ -f LICENSE ]; then
@@ -115,6 +117,6 @@ EOF
     fi
 
     # ── Polkit Policy ────────────────────────────────────────────────────────
-    install -Dm644 "Shelly.Ui.Gpui/assets/com.calix.calix-gpui.policy" \
-        "${pkgdir}/usr/share/polkit-1/actions/com.calix.calix-gpui.policy"
+    install -Dm644 "Calix.Ui.Gpui/assets/live.gnu6.calix.policy" \
+        "${pkgdir}/usr/share/polkit-1/actions/live.gnu6.calix.policy"
 }

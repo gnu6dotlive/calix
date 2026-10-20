@@ -127,7 +127,7 @@ cmd_gui() {
   # Locate the Calix GPUI binary. The cargo target directory can be
   # redirected by ~/.cargo/config.toml, so ask cargo rather than guessing.
   local cargo_target=""
-  local manifest="$CALIX_HOME/Shelly.Ui.Gpui/Cargo.toml"
+  local manifest="$CALIX_HOME/Calix.Ui.Gpui/Cargo.toml"
   if command -v cargo >/dev/null 2>&1 && [ -f "$manifest" ]; then
     cargo_target="$(cargo metadata --format-version 1 --no-deps \
       --manifest-path "$manifest" 2>/dev/null \
@@ -136,7 +136,7 @@ cmd_gui() {
   fi
 
   local candidates=(
-    "$CALIX_HOME/Shelly.Ui.Gpui/target/release/calix-gpui"
+    "$CALIX_HOME/Calix.Ui.Gpui/target/release/calix-gpui"
     "${cargo_target:+$cargo_target/release/calix-gpui}"
     "/usr/lib/calix/calix-gpui"
     "/usr/bin/calix-gpui"
@@ -148,9 +148,9 @@ cmd_gui() {
   done
 
   echo "No compiled Calix UI found. Build it with:" >&2
-  echo "  (cd $CALIX_HOME/Shelly.Ui.Gpui && cargo build --release)" >&2
-  echo "Falling back to the system Shelly (not the same product)." >&2
-  exec /usr/bin/shelly "$@"
+  echo "  (cd $CALIX_HOME/Calix.Ui.Gpui && cargo build --release)" >&2
+  echo "Falling back to the system Calix (not the same product)." >&2
+  exec /usr/bin/calix "$@"
 }
 
 case "${1:-help}" in

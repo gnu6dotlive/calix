@@ -5,7 +5,7 @@ calix-sync — Universal package state synchronizer for Calix & gnosix desktop.
 Unifies & synchronizes:
   1. AppImages: discovers ~/Applications, correlates ~/.local/share/applications
      metadata (icon, version, description) and mirrors the result into the
-     Shelly AppImage registry for interoperability.
+     Calix AppImage registry for interoperability.
   2. Cargo:     ingests ~/.cargo/.crates2.json (user + desktop daemons).
   3. NPM:       ingests `npm list -g --depth=0 --json`.
   4. ALPM/AUR:  ingests pacman status, checks the database lock and pending
@@ -74,8 +74,8 @@ HOME = os.path.expanduser("~")
 SHARE_DIR = os.path.join(HOME, ".local/share/calix")
 APP_DIR = os.path.join(HOME, "Applications")
 DESKTOP_DIR = os.path.join(HOME, ".local/share/applications")
-SHELLY_CONFIG_DIR = os.path.join(HOME, ".config/shelly")
-SHELLY_APPIMAGE_DB = os.path.join(SHELLY_CONFIG_DIR, "appimage-metadata-v2.db")
+CALIX_CONFIG_DIR = os.path.join(HOME, ".config/calix")
+CALIX_APPIMAGE_DB = os.path.join(CALIX_CONFIG_DIR, "appimage-metadata-v2.db")
 
 VERSION_KEYS = (
     "X-AppImage-Version",
@@ -149,9 +149,9 @@ def sync_appimages(dry_run=False):
     implementation kept stale metadata forever.
     """
     registry = []
-    if os.path.exists(SHELLY_APPIMAGE_DB):
+    if os.path.exists(CALIX_APPIMAGE_DB):
         try:
-            with open(SHELLY_APPIMAGE_DB, "r", encoding="utf-8") as handle:
+            with open(CALIX_APPIMAGE_DB, "r", encoding="utf-8") as handle:
                 registry = json.load(handle)
         except (OSError, json.JSONDecodeError):
             registry = []
@@ -208,13 +208,13 @@ def sync_appimages(dry_run=False):
             })
 
     if not dry_run:
-        if os.path.exists(SHELLY_APPIMAGE_DB):
+        if os.path.exists(CALIX_APPIMAGE_DB):
             try:
-                shutil.copy2(SHELLY_APPIMAGE_DB, f"{SHELLY_APPIMAGE_DB}.bak")
+                shutil.copy2(CALIX_APPIMAGE_DB, f"{CALIX_APPIMAGE_DB}.bak")
             except OSError:
                 pass
-        os.makedirs(SHELLY_CONFIG_DIR, exist_ok=True)
-        write_json(SHELLY_APPIMAGE_DB, entries)
+        os.makedirs(CALIX_CONFIG_DIR, exist_ok=True)
+        write_json(CALIX_APPIMAGE_DB, entries)
         write_json(os.path.join(STATE_DIR, "appimages.json"), entries)
 
     return entries
@@ -492,7 +492,7 @@ def main():
         print(f"  🔒 Pacman DB Lock:   {'LOCKED ⚠️' if status['db_locked'] else 'Free ✓'}")
         print(f"  🔄 Pending Updates:  {status['pending_updates']['alpm']} standard updates available\n")
         print("  ✓ State synchronized: ~/.local/state/calix/status.json")
-        print("  ✓ Shelly AppImage DB updated: ~/.config/shelly/appimage-metadata-v2.db")
+        print("  ✓ Calix AppImage DB updated: ~/.config/calix/appimage-metadata-v2.db")
 
     evidence.finish(counts=status["counts"], db_locked=status["db_locked"])
     return 0

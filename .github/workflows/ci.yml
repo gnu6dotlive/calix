@@ -40,22 +40,22 @@ jobs:
       - name: Prepare Release Artifacts
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
-          mkdir -p dist/usr/bin dist/usr/lib/shelly dist/usr/lib/calix dist/usr/share/applications dist/usr/share/icons/hicolor/scalable/apps dist/usr/share/polkit-1/actions
+          mkdir -p dist/usr/bin dist/usr/lib/calix dist/usr/lib/calix dist/usr/share/applications dist/usr/share/icons/hicolor/scalable/apps dist/usr/share/polkit-1/actions
 
           # Binaires
-          install -Dm755 Shelly.Cli.Zig/zig-out/bin/shelly dist/usr/lib/shelly/shelly
-          install -Dm755 Shelly.Ui.Gpui/target/release/calix-gpui dist/usr/lib/calix/calix-gpui
+          install -Dm755 Calix.Cli.Zig/zig-out/bin/calix dist/usr/lib/calix/calix
+          install -Dm755 Calix.Ui.Gpui/target/release/calix-gpui dist/usr/lib/calix/calix-gpui
 
           cat > dist/usr/bin/calix-gpui << 'EOF'
           #!/bin/sh
-          SHELLY_BIN=/usr/lib/shelly/shelly exec /usr/lib/calix/calix-gpui "$@"
+          CALIX_BIN=/usr/lib/calix/calix exec /usr/lib/calix/calix-gpui "$@"
           EOF
           chmod 755 dist/usr/bin/calix-gpui
 
           # Intégration bureau
-          install -Dm644 Shelly.Ui.Gpui/assets/com.calix.calix-gpui.desktop dist/usr/share/applications/
-          install -Dm644 Shelly.Ui.Gpui/assets/calix-gpui.svg dist/usr/share/icons/hicolor/scalable/apps/
-          install -Dm644 Shelly.Ui.Gpui/assets/com.calix.calix-gpui.policy dist/usr/share/polkit-1/actions/
+          install -Dm644 Calix.Ui.Gpui/assets/live.gnu6.calix.desktop dist/usr/share/applications/
+          install -Dm644 Calix.Ui.Gpui/assets/live.gnu6.calix.svg dist/usr/share/icons/hicolor/scalable/apps/
+          install -Dm644 Calix.Ui.Gpui/assets/live.gnu6.calix.policy dist/usr/share/polkit-1/actions/
 
           cd dist
           tar -czvf ../calix-gpui-linux-x86_64.tar.gz usr/

@@ -1,19 +1,17 @@
-# Shelly Flatpak backend ABI
+# Calix Flatpak backend ABI
 
-> **Naming note.** This document describes the Zig package-management backend. The
-> backend executable and several identifiers are still named `shelly`; Calix is a
-> distinct project historically forked from Shelly. See
-> [legacy references](legacy-references.md).
+> The former `shelly_*` ABI names were replaced without a compatibility shim in the
+> October 2026 rename. The current names below are the only supported ABI.
 
 Flatpak support is an optional native backend. The base CLI and
-`Shelly.PackageManager` do not link libflatpak, GLib, GIO, GObject, or OSTree
+`Calix.PackageManager` do not link libflatpak, GLib, GIO, GObject, or OSTree
 for Flatpak support. Native Flatpak objects and generated bindings live only in
-`Shelly.Flatpak.Backend`.
+`Calix.Flatpak.Backend`.
 
 The production loader opens exactly:
 
 ```text
-/usr/lib/shelly/libshelly-flatpak-backend.so.1
+/usr/lib/calix/libcalix-flatpak-backend.so.1
 ```
 
 It does not search the working directory, `PATH`, or an environment variable.
@@ -32,13 +30,13 @@ PackageManager-owned Flatpak facade and owned domain values
 strict JSON schema 2 over C ABI 1
     |
     v
-libshelly-flatpak-backend.so.1
+libcalix-flatpak-backend.so.1
     |
     v
 libflatpak / GLib / OSTree
 ```
 
-`Shelly.PackageManager/src/flatpak/types.zig` owns all values returned to
+`Calix.PackageManager/src/flatpak/types.zig` owns all values returned to
 consumers. No generated binding, GObject pointer, or backend allocation is
 exposed through its public declarations. AppStream XML parsing stays in
 PackageManager because it is native-library-independent; the backend returns
@@ -47,10 +45,10 @@ owned catalog locations and metadata.
 ## C ABI version 1
 
 The declarations are defined in
-`Shelly.Flatpak.Backend/src/protocol.zig`. The only exported backend symbol is:
+`Calix.Flatpak.Backend/src/protocol.zig`. The only exported backend symbol is:
 
 ```c
-shelly_flatpak_backend_get_api
+calix_flatpak_backend_get_api
 ```
 
 Conceptually, ABI 1 contains these C-compatible tables:
@@ -59,37 +57,37 @@ Conceptually, ABI 1 contains these C-compatible tables:
 typedef struct {
     const uint8_t *ptr;
     size_t len;
-} ShellyRequestBuffer;
+} CalixRequestBuffer;
 
 typedef struct {
     uint8_t *ptr;
     size_t len;
-} ShellyResponseBuffer;
+} CalixResponseBuffer;
 
 typedef struct {
     const uint8_t *ptr;
     size_t len;
-} ShellyEventBuffer;
+} CalixEventBuffer;
 
 typedef struct {
     size_t struct_size;
     uint32_t abi_version;
     void *user_data;
-    void (*emit_event)(void *user_data, ShellyEventBuffer event);
-} ShellyHostApiV1;
+    void (*emit_event)(void *user_data, CalixEventBuffer event);
+} CalixHostApiV1;
 
 typedef struct {
     size_t struct_size;
     uint32_t abi_version;
-    Status (*create)(const ShellyHostApiV1 *host, void **handle);
+    Status (*create)(const CalixHostApiV1 *host, void **handle);
     void (*destroy)(void *handle);
     Status (*execute)(
         void *handle,
-        ShellyRequestBuffer request,
-        ShellyResponseBuffer *response);
+        CalixRequestBuffer request,
+        CalixResponseBuffer *response);
     Status (*cancel)(void *handle, uint64_t operation_id);
-    void (*free_response)(void *handle, ShellyResponseBuffer response);
-} ShellyBackendApiV1;
+    void (*free_response)(void *handle, CalixResponseBuffer response);
+} CalixBackendApiV1;
 ```
 
 The loader requests the exact supported ABI. It rejects a different version,
@@ -193,7 +191,7 @@ and a Flatpak-free fake shared library.
 
 Discovery failures map to `FlatpakBackendUnavailable`; ABI failures map to
 `FlatpakBackendIncompatible`. Direct Flatpak CLI commands explain that
-`shelly-flatpak-backend` and Flatpak must be installed. Aggregate update and
+`calix-flatpak-backend` and Flatpak must be installed. Aggregate update and
 upgrade commands emit a warning, skip only Flatpak, and continue other
 backends. Backup emits a warning and omits Flatpak records.
 
@@ -203,7 +201,7 @@ load or probe the backend.
 ## Building and testing
 
 ```bash
-cd Shelly.Flatpak.Backend
+cd Calix.Flatpak.Backend
 zig build
 zig build test
 zig build abi-test

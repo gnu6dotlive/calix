@@ -4,8 +4,8 @@ set -euo pipefail
 unset LD_PRELOAD
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cli_path="${1:-${repo_root}/Shelly.Cli.Zig/zig-out/bin/shelly}"
-backend_path="${2:-${repo_root}/Shelly.Flatpak.Backend/zig-out/lib/libshelly-flatpak-backend.so.1}"
+cli_path="${1:-${repo_root}/Calix.Cli.Zig/zig-out/bin/calix}"
+backend_path="${2:-${repo_root}/Calix.Flatpak.Backend/zig-out/lib/libcalix-flatpak-backend.so.1}"
 
 for tool in readelf nm rg bash; do
     if ! command -v "${tool}" >/dev/null 2>&1; then
@@ -35,25 +35,25 @@ if ! grep -Fq 'Shared library: [libflatpak.so.0]' <<<"${backend_dynamic}"; then
     echo "error: the Flatpak backend does not depend on libflatpak.so.0" >&2
     exit 1
 fi
-if ! grep -Fq 'Library soname: [libshelly-flatpak-backend.so.1]' <<<"${backend_dynamic}"; then
+if ! grep -Fq 'Library soname: [libcalix-flatpak-backend.so.1]' <<<"${backend_dynamic}"; then
     echo "error: the Flatpak backend SONAME is not ABI version 1" >&2
     exit 1
 fi
 if ! nm -D --defined-only "${backend_path}" |
-    grep -Eq '[[:space:]]shelly_flatpak_backend_get_api$'; then
+    grep -Eq '[[:space:]]calix_flatpak_backend_get_api$'; then
     echo "error: the Flatpak backend entry point is not exported" >&2
     exit 1
 fi
 
 if rg -n --glob '*.zig' \
     'flatpak\.bindings|bindings\.libflatpak|@import\("flatpak"\)|g_object_unref|refToString' \
-    "${repo_root}/Shelly.PackageManager" \
-    "${repo_root}/Shelly.Cli.Zig"; then
+    "${repo_root}/Calix.PackageManager" \
+    "${repo_root}/Calix.Cli.Zig"; then
     echo "error: native Flatpak declarations escaped the backend project" >&2
     exit 1
 fi
 
-fake_backend="${repo_root}/Shelly.PackageManager/zig-out/test-flatpak-backend/libshelly-flatpak-backend-package-manager-test.so"
+fake_backend="${repo_root}/Calix.PackageManager/zig-out/test-flatpak-backend/libcalix-flatpak-backend-package-manager-test.so"
 if [[ -e "${fake_backend}" ]] &&
     readelf -d "${fake_backend}" | grep -Fq 'Shared library: [libflatpak.so.0]'; then
     echo "error: the test-only fake backend unexpectedly links libflatpak" >&2

@@ -4,12 +4,12 @@ set -euo pipefail
 unset LD_PRELOAD
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-keep_build_root="${SHELLY_FLATPAK_KEEP_BUILD_ROOT:-0}"
+keep_build_root="${CALIX_FLATPAK_KEEP_BUILD_ROOT:-0}"
 owns_build_root=0
-if [[ -n "${SHELLY_FLATPAK_BUILD_ROOT:-}" ]]; then
-    build_root="${SHELLY_FLATPAK_BUILD_ROOT}"
+if [[ -n "${CALIX_FLATPAK_BUILD_ROOT:-}" ]]; then
+    build_root="${CALIX_FLATPAK_BUILD_ROOT}"
 else
-    build_root="$(mktemp -d /tmp/shelly-flatpak-separation.XXXXXX)"
+    build_root="$(mktemp -d /tmp/calix-flatpak-separation.XXXXXX)"
     owns_build_root=1
 fi
 
@@ -18,7 +18,7 @@ cleanup() {
         return
     fi
     case "${build_root}" in
-        /tmp/shelly-flatpak-separation.*)
+        /tmp/calix-flatpak-separation.*)
             rm -rf -- "${build_root}"
             ;;
         *)
@@ -40,7 +40,7 @@ zig_common=(
 )
 
 (
-    cd "${repo_root}/Shelly.Flatpak.Backend"
+    cd "${repo_root}/Calix.Flatpak.Backend"
     zig build "${zig_common[@]}" \
         --prefix "${build_root}/backend" \
         -Dcpu=baseline \
@@ -51,12 +51,12 @@ zig_common=(
 )
 
 (
-    cd "${repo_root}/Shelly.PackageManager"
+    cd "${repo_root}/Calix.PackageManager"
     zig build flatpak-test "${zig_common[@]}"
 )
 
 (
-    cd "${repo_root}/Shelly.Cli.Zig"
+    cd "${repo_root}/Calix.Cli.Zig"
     zig build "${zig_common[@]}" \
         --prefix "${build_root}/cli" \
         -Dcpu=baseline \
@@ -65,11 +65,11 @@ zig_common=(
 )
 
 "${repo_root}/scripts/check-flatpak-separation.sh" \
-    "${build_root}/cli/bin/shelly" \
-    "${build_root}/backend/lib/libshelly-flatpak-backend.so.1"
+    "${build_root}/cli/bin/calix" \
+    "${build_root}/backend/lib/libcalix-flatpak-backend.so.1"
 
-"${build_root}/cli/bin/shelly" --help >/dev/null
-"${build_root}/cli/bin/shelly" --version >/dev/null
-"${build_root}/cli/bin/shelly" utility --completions bash >/dev/null
+"${build_root}/cli/bin/calix" --help >/dev/null
+"${build_root}/cli/bin/calix" --version >/dev/null
+"${build_root}/cli/bin/calix" utility --completions bash >/dev/null
 
 echo "Flatpak separation build and core-only smoke tests passed."

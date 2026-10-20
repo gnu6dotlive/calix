@@ -14,7 +14,7 @@ CONTROL-01 provides a native agent automation surface that communicates directly
 ### 1. Introspection Workflow
 An agent can query the current state of the application at any time:
 ```bash
-shelly-gpui status --json
+calix-gpui status --json
 ```
 Output:
 ```json
@@ -26,7 +26,7 @@ Output:
     "protocol_version": 1,
     "gui_running": true,
     "pid": 2382698,
-    "executable": "/usr/lib/shelly/shelly-gpui-bin",
+    "executable": "/usr/lib/calix/calix-gpui",
     "destination": "browse",
     "query": "ripgrep",
     "view_mode": "table",
@@ -40,26 +40,26 @@ Output:
 ### 2. Automated Search & Inspection Workflow
 ```bash
 # Navigate to browse surface and execute search query
-shelly-gpui search ripgrep
+calix-gpui search ripgrep
 
 # Inspect the selected package
-shelly-gpui inspect ripgrep
+calix-gpui inspect ripgrep
 
 # Switch inspector to dependencies tab
-shelly-gpui inspector dependencies
+calix-gpui inspector dependencies
 
 # Verify state programmatically
-shelly-gpui status --json
+calix-gpui status --json
 ```
 
 ### 3. Automated Configuration Workflow
 ```bash
 # Read setting
-shelly-gpui settings get theme
+calix-gpui settings get theme
 
 # Atomically update setting
-shelly-gpui settings set theme dark
+calix-gpui settings set theme dark
 
 # Reset to defaults
-shelly-gpui settings reset theme
+calix-gpui settings reset theme
 ```

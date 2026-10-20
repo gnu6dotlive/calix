@@ -7,9 +7,9 @@
 > **Reading note (2026-10-20).** This is an internal working plan, originally written in
 > French, and it uses the names that were current when it was written. Calix is
 > historically forked from Shelly (`Seafoam-Labs/Shelly-ALPM`) and has since been deeply
-> refactored into a distinct project; some backend names remain transitional. See
-> [`legacy-references.md`](legacy-references.md). Where this plan and the README disagree
-> about current state, the README and the code are authoritative.
+> refactored into a distinct project. The rename is complete; the old names below are
+> historical. See [`legacy-references.md`](legacy-references.md). Where this plan and the
+> README disagree about current state, the README and the code are authoritative.
 
 ---
 

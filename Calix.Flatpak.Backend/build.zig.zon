@@ -1,0 +1,14 @@
+.{
+    .name = .calix_flatpak_backend,
+    .version = "3.1.3",
+    .fingerprint = 0xf1b173ab79c48e91,
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{
+        .calix_diagnostics = .{ .path = "../Calix.Diagnostics" },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}

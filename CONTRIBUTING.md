@@ -12,20 +12,20 @@ discussion so the approach can be agreed on first.
 
 Calix is split into a native frontend, a state service and a package-management backend:
 
-- **`Shelly.Ui.Gpui/` (Rust)** — the `calix-gpui` desktop application.
+- **`Calix.Ui.Gpui/` (Rust)** — the `calix-gpui` desktop application.
   Built on [GPUI 0.2](https://github.com/zed-industries/zed/tree/main/crates/gpui), the
   GPU framework behind Zed. It owns rendering, layout, search orchestration, the package
   inspector and the operation console.
-- **`Shelly.Cli.Zig/src/daemon/` (Zig)** — `calix-daemon`. Serves a versioned JSON-lines
+- **`Calix.Cli.Zig/src/daemon/` (Zig)** — `calix-daemon`. Serves a versioned JSON-lines
   inventory over a Unix socket. The frontend reads the daemon rather than opening state
   files.
-- **`Shelly.Cli.Zig/` (Zig)** — the `shelly` CLI. Package operations (search, install,
+- **`Calix.Cli.Zig/` (Zig)** — the `calix` CLI. Package operations (search, install,
   remove, upgrade, builds, keyring) run here. The binary name is transitional; the
   project rename is not complete. See [`docs/legacy-references.md`](docs/legacy-references.md).
-- **`Shelly.PackageManager/` (Zig)** — the shared backend library. ALPM through
+- **`Calix.PackageManager/` (Zig)** — the shared backend library. ALPM through
   `libalpm`, AUR, Flatpak, AppImage, Cargo, NPM, the unified inventory record and the
   release registry.
-- **`Shelly.Flatpak.Backend/` (Zig)** — optional `libflatpak` bridge, loaded at runtime
+- **`Calix.Flatpak.Backend/` (Zig)** — optional `libflatpak` bridge, loaded at runtime
   so the base CLI does not depend on Flatpak.
 - **`packaging/`** — the AUR symlink and systemd units. The current package definition is
   `PKGBUILD-calix`.
@@ -47,7 +47,7 @@ pkexec pacman -S --needed base-devel git rust cargo pacman clang pkgconf \
   libxkbcommon-x11 mesa vulkan-icd-loader polkit
 ```
 
-Zig **0.16.0** is required (`Shelly.Cli.Zig/build.zig.zon` declares
+Zig **0.16.0** is required (`Calix.Cli.Zig/build.zig.zon` declares
 `minimum_zig_version = "0.16.0"`). Zig 0.17 changed the build API and this tree does not
 build with it; Arch's `zig` package has moved past 0.16. The README explains how to
 extract a 0.16.0 package into `vendor/zig-0.16` and put it first on `PATH`.
@@ -64,8 +64,8 @@ code paths that invoke those tools.
    cd calix
    ```
 
-2. **Build the Zig backend** (produces `Shelly.Cli.Zig/zig-out/bin/shelly` and
-   `Shelly.Cli.Zig/zig-out/bin/calix-daemon`):
+2. **Build the Zig backend** (produces `Calix.Cli.Zig/zig-out/bin/calix` and
+   `Calix.Cli.Zig/zig-out/bin/calix-daemon`):
 
    ```bash
    make zig
@@ -74,7 +74,7 @@ code paths that invoke those tools.
 3. **Start the daemon** in one terminal:
 
    ```bash
-   ./Shelly.Cli.Zig/zig-out/bin/calix-daemon
+   ./Calix.Cli.Zig/zig-out/bin/calix-daemon
    ```
 
 4. **Run the frontend** in another:
@@ -93,8 +93,8 @@ code paths that invoke those tools.
 
    ```bash
    make test
-   (cd Shelly.Cli.Zig && zig build test)
-   (cd Shelly.PackageManager && zig build test)
+   (cd Calix.Cli.Zig && zig build test)
+   (cd Calix.PackageManager && zig build test)
    ```
 
 7. **Test the package build:**

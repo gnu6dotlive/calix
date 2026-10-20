@@ -3,15 +3,15 @@
 This document tracks manual testing procedures for Calix components that require human
 verification beyond automated tests.
 
-> **Naming note.** The Zig backend executable is still named `shelly`, so the commands
-> below are literal. The desktop application is Calix (`calix-gpui`). Some sections were
-> inherited from upstream Shelly and describe components that are not part of the
+> **Naming note.** The Zig backend executable is named `calix`, so the commands below
+> are literal. The desktop application is Calix (`calix-gpui`). Some sections were
+> inherited from the upstream project and describe components that are not part of the
 > current Calix UI; check them against the current tree before treating a missing
 > feature as a regression. See [`docs/legacy-references.md`](docs/legacy-references.md).
 
 ## Tray refresh after CLI updates (#1591)
 
-- [ ] With pending updates visible in the tray, run `shelly upgrade` in a terminal. After completion, verify the tray rechecks and updates its icon and package submenus without restarting it.
+- [ ] With pending updates visible in the tray, run `calix upgrade` in a terminal. After completion, verify the tray rechecks and updates its icon and package submenus without restarting it.
 - [ ] Repeat for individual `upgrade standard`, `upgrade aur`, `upgrade flatpak`, and `update` commands. Packages still awaiting updates should remain listed.
 - [ ] Run an update through `sudo` or the configured privilege elevator; verify the original user's tray refreshes.
 - [ ] Complete a CLI update while the tray is already checking. Verify it checks again after the in-progress check finishes.
@@ -20,9 +20,9 @@ verification beyond automated tests.
 
 ## Terminal PKGBUILD review (#1385)
 
-- [ ] With a configuration missing `CollapsePkgbuildDiff`, verify `shelly config get CollapsePkgbuildDiff` returns `True`.
+- [ ] With a configuration missing `CollapsePkgbuildDiff`, verify `calix config get CollapsePkgbuildDiff` returns `True`.
 - [ ] Review an AUR update with a long PKGBUILD: each change has three unchanged context lines on either side, nearby sections merge, and omitted sections show their line counts.
-- [ ] Run `shelly config set CollapsePkgbuildDiff false`, then repeat the review and verify the full file appears. Restore `true` and verify the collapsed view returns.
+- [ ] Run `calix config set CollapsePkgbuildDiff false`, then repeat the review and verify the full file appears. Restore `true` and verify the collapsed view returns.
 - [ ] Review a package without a previous PKGBUILD and verify the entire new file appears.
 - [ ] Confirm security warnings and related source files remain visible, and declining approval still cancels the operation.
 - [ ] Repeat with color disabled and redirected output; omission markers and changes remain readable.
@@ -30,22 +30,22 @@ verification beyond automated tests.
 
 ## AppImage checks during combined upgrades
 
-- [ ] Verify `shelly config get DisableAppImageUpdateCheck` returns `False` for a configuration without the new key.
-- [ ] Set `DisableAppImageUpdateCheck` to `true` and run `shelly upgrade all`: the preview omits AppImages, and execution performs no AppImage update check or upgrade.
-- [ ] Repeat with bare `shelly`, `shelly -U`, and `shelly upgrade standard --all`, including privilege elevation.
-- [ ] Verify `shelly upgrade appimage` and `shelly list-updates appimage` still check AppImages explicitly.
+- [ ] Verify `calix config get DisableAppImageUpdateCheck` returns `False` for a configuration without the new key.
+- [ ] Set `DisableAppImageUpdateCheck` to `true` and run `calix upgrade all`: the preview omits AppImages, and execution performs no AppImage update check or upgrade.
+- [ ] Repeat with bare `calix`, `calix -U`, and `calix upgrade standard --all`, including privilege elevation.
+- [ ] Verify `calix upgrade appimage` and `calix list-updates appimage` still check AppImages explicitly.
 - [ ] Restore `false` and verify combined upgrades include AppImages again; `--no-appimage` still skips them for one run.
 
 ## Flatpak checks during combined upgrades
 
-- [ ] Verify `shelly config get DisableFlatpakUpdateCheck` returns `False` for a configuration without the new key.
-- [ ] Set `DisableFlatpakUpdateCheck` to `true` and run `shelly upgrade all`: the preview omits Flatpak, and execution performs no Flatpak update check or upgrade.
-- [ ] Repeat with bare `shelly`, `shelly -U`, and `shelly upgrade standard --all`, including privilege elevation.
+- [ ] Verify `calix config get DisableFlatpakUpdateCheck` returns `False` for a configuration without the new key.
+- [ ] Set `DisableFlatpakUpdateCheck` to `true` and run `calix upgrade all`: the preview omits Flatpak, and execution performs no Flatpak update check or upgrade.
+- [ ] Repeat with bare `calix`, `calix -U`, and `calix upgrade standard --all`, including privilege elevation.
 - [ ] Enable both `DisableFlatpakUpdateCheck` and `DisableAppImageUpdateCheck`; verify combined upgrades skip both backends.
-- [ ] Verify `shelly upgrade flatpak` and `shelly list-updates flatpak` still check Flatpak explicitly.
+- [ ] Verify `calix upgrade flatpak` and `calix list-updates flatpak` still check Flatpak explicitly.
 - [ ] Restore `false` and verify combined upgrades include Flatpak again when the backend is installed; `--no-flatpak` still skips it for one run.
 
-## UI Testing (Shelly-UI)
+## UI Testing (Calix-UI)
 
 ### Installation & Startup
 
@@ -58,8 +58,8 @@ verification beyond automated tests.
 ### AppImage Environment Variables (#1719)
 
 - [ ] Open an installed AppImage and enter `WEBKIT_DISABLE_DMABUF_RENDERER=1` in Environment Variables, then select Save Environment.
-- [ ] Launch from the desktop menu and `shelly run appimage <name>`; confirm the variable reaches the application.
-- [ ] Restart Shelly, sync one/all AppImages, update, and replace the AppImage with a newer filename; confirm the setting survives.
+- [ ] Launch from the desktop menu and `calix run appimage <name>`; confirm the variable reaches the application.
+- [ ] Restart Calix, sync one/all AppImages, update, and replace the AppImage with a newer filename; confirm the setting survives.
 - [ ] Add/edit/remove multiple lines, including an empty value (`KEY=`); verify duplicate or invalid keys prevent saving.
 - [ ] Navigate away with unsaved changes and return; confirm the draft remains. Back prompts to discard it.
 - [ ] Verify a failed save keeps the draft and the previously saved launcher/settings.
@@ -69,9 +69,9 @@ verification beyond automated tests.
 CLI equivalents (use the exact installed name):
 
 ```sh
-shelly config appimage YARC --set-env WEBKIT_DISABLE_DMABUF_RENDERER=1
-shelly config appimage YARC --unset-env WEBKIT_DISABLE_DMABUF_RENDERER
-shelly config appimage YARC --clear-env
+calix config appimage YARC --set-env WEBKIT_DISABLE_DMABUF_RENDERER=1
+calix config appimage YARC --unset-env WEBKIT_DISABLE_DMABUF_RENDERER
+calix config appimage YARC --clear-env
 ```
 
 ### Package Search & Display
@@ -99,7 +99,7 @@ shelly config appimage YARC --clear-env
 
 ### Dynamic AUR Sources
 
-- [ ] `shelly install aur gpu-screen-recorder-ui-git` resolves its `$(sed ...)` source URL and reaches normal Git source acquisition
+- [ ] `calix install aur gpu-screen-recorder-ui-git` resolves its `$(sed ...)` source URL and reaches normal Git source acquisition
 - [ ] The PKGBUILD review warns before a `source=()` command substitution executes
 - [ ] Declining the PKGBUILD review executes no source command
 - [ ] A command substitution that resolves to a local source shows a supplemental related-file review before the file is copied
@@ -137,10 +137,10 @@ shelly config appimage YARC --clear-env
 ### Flatpak Integration
 
 - [ ] A base-only installation does not install `flatpak` or
-  `shelly-flatpak-backend` as a required dependency
-- [ ] `shelly --help`, `shelly --version`, and completion generation work with
+  `calix-flatpak-backend` as a required dependency
+- [ ] `calix --help`, `calix --version`, and completion generation work with
   no backend installed
-- [ ] A direct Flatpak command explains that `shelly-flatpak-backend` and
+- [ ] A direct Flatpak command explains that `calix-flatpak-backend` and
   Flatpak must be installed
 - [ ] `list-updates all` warns, skips Flatpak, and continues other backends when
   the backend is missing
@@ -150,7 +150,7 @@ shelly config appimage YARC --clear-env
   a broken Flatpak backend as a failed upgrade step
 - [ ] Backup warns and exports standard/AUR records without Flatpak records
   when the backend is missing
-- [ ] Installing `shelly-flatpak-backend` enables Flatpak without rebuilding
+- [ ] Installing `calix-flatpak-backend` enables Flatpak without rebuilding
   or reinstalling the base package
 - [ ] An ABI-incompatible backend is rejected with an upgrade-together message
 - [ ] Flatpak packages are listed separately
@@ -186,15 +186,15 @@ shelly config appimage YARC --clear-env
 - [ ] Invalid input is rejected with clear feedback
 - [ ] Application doesn't crash on unexpected errors
 
-## CLI Testing (Shelly-CLI)
+## CLI Testing (Calix-CLI)
 
 ### Basic Commands
 
-- [ ] `shelly --help` displays help information
-- [ ] `shelly --version` shows correct version
+- [ ] `calix --help` displays help information
+- [ ] `calix --version` shows correct version
 - [ ] Command syntax errors show helpful messages
-- [ ] Running `shelly` with no arguments still displays and confirms the combined upgrade plan
-- [ ] `shelly firefox` searches standard repositories and the AUR, while recognized commands and shortcodes retain their
+- [ ] Running `calix` with no arguments still displays and confirms the combined upgrade plan
+- [ ] `calix firefox` searches standard repositories and the AUR, while recognized commands and shortcodes retain their
       normal behavior
 - [ ] Bare-value results count down toward `1`, with the closest match displayed last as `1` and selected by Enter
 - [ ] Entering `0` cancels SearchInstall without starting a transaction
@@ -202,11 +202,11 @@ shelly config appimage YARC --clear-env
 
 ### Package Operations
 
-- [ ] `shelly search <package>` returns results
-- [ ] `shelly install <package>` installs successfully
-- [ ] `shelly remove <package>` removes successfully
-- [ ] `shelly update` updates all packages
-- [ ] `shelly info <package>` shows package details
+- [ ] `calix search <package>` returns results
+- [ ] `calix install <package>` installs successfully
+- [ ] `calix remove <package>` removes successfully
+- [ ] `calix update` updates all packages
+- [ ] `calix info <package>` shows package details
 
 ### Removal Confirmation (#1845)
 
@@ -214,28 +214,28 @@ Use disposable packages in a VM/container with an unused dependency and an
 unused optional dependency; keep another optional dependency required by a
 separate installed package.
 
-- [ ] `shelly -Rso <package>` lists the complete removal set, versions, and
+- [ ] `calix -Rso <package>` lists the complete removal set, versions, and
   total removed size before `Proceed with package removal? (Y/n)`.
 - [ ] The unused dependencies appear; the dependency still required elsewhere
   stays installed and does not appear in the removal plan.
 - [ ] `n`, Ctrl-D/EOF, and Ctrl-C cancel without removing packages or associated
   configuration. A subsequent transaction can acquire the database lock.
 - [ ] Enter and `y` remove the displayed packages.
-- [ ] `shelly remove standard --opt-deps <package>` behaves identically.
+- [ ] `calix remove standard --opt-deps <package>` behaves identically.
 - [ ] `-n`/`--no-confirm` displays the plan and removes packages without prompting.
 - [ ] AUR removal confirms before removal and cache cleanup; declining preserves
   both. GTK removal shows the plan and honors accept/cancel.
 - [ ] `purify` and automatic build-dependency cleanup retain their existing
   approval flow without a second removal prompt.
 
-Automated coverage: `(cd Shelly.PackageManager && zig build alpm-removal-test)`
-and `(cd Shelly.Cli.Zig && zig build test)`. Run the focused removal target as
+Automated coverage: `(cd Calix.PackageManager && zig build alpm-removal-test)`
+and `(cd Calix.Cli.Zig && zig build test)`. Run the focused removal target as
 root in the disposable environment to exercise DB-only commits; those cases
 are skipped when unprivileged.
 
 ### Repository Operations
 
-- [ ] `shelly sync` synchronizes repositories
+- [ ] `calix sync` synchronizes repositories
 - [ ] Repository refresh works correctly
 - [ ] Database updates complete successfully
 
@@ -247,20 +247,20 @@ are skipped when unprivileged.
 
 ### Custom AUR Base URL (Atoll Compatibility)
 
-- [ ] Configure custom base URL: `shelly config set AurUrl https://atoll.seafoam-labs.org`
+- [ ] Configure custom base URL: `calix config set AurUrl https://atoll.seafoam-labs.org`
 - [ ] Verify RPC search and package info queries against the configured base
-- [ ] Verify `shelly search aur --pkgbuild <pkg>` retrieves `PKGBUILD` via Git checkout instead of cgit
+- [ ] Verify `calix search aur --pkgbuild <pkg>` retrieves `PKGBUILD` via Git checkout instead of cgit
 - [ ] Install normal package and split package from the custom base
 - [ ] Verify AUR dependency and provider resolution work against custom base
 - [ ] Verify list, list-updates, update, remove, and upgrade operations work with custom base
 - [ ] Verify aggregate commands (`upgrade all`, `list-updates all`) use custom base for their AUR branch
 - [ ] Verify elevated operations still use the invoking user's `AurUrl` setting
 - [ ] Verify `--aur-url` overrides the persistent `AurUrl` setting per command
-- [ ] Switch back to official base (`shelly config set AurUrl https://aur.archlinux.org`) and verify checkout origin replacement safeguard
+- [ ] Switch back to official base (`calix config set AurUrl https://aur.archlinux.org`) and verify checkout origin replacement safeguard
 
 ### Sandboxed AUR Builds (Landlock)
 Requires a kernel with Landlock enabled (check `cat /sys/kernel/security/lsm`).
-- [ ] `shelly build --makesrcinfo --reviewed PKGBUILD > .SRCINFO` matches
+- [ ] `calix build --makesrcinfo --reviewed PKGBUILD > .SRCINFO` matches
   `makepkg --printsrcinfo`, including split-package and architecture-specific
   fields
 - [ ] `--makesrcinfo` writes progress/review output to stderr and only SRCINFO
@@ -269,9 +269,9 @@ Requires a kernel with Landlock enabled (check `cat /sys/kernel/security/lsm`).
   `build()`, `check()`, or `package()`, and does not create package artifacts
 - [ ] A split PKGBUILD that conditionally appends an enabled member to
   `pkgname` builds that member when no `--package` selection is supplied
-- [ ] `shelly build --package <dynamic-member> PKGBUILD` builds only that
+- [ ] `calix build --package <dynamic-member> PKGBUILD` builds only that
   enabled member and rejects it when its condition evaluates false
-- [ ] With `[sandbox] enabled = true` in `shellybuild.conf`, a PKGBUILD whose
+- [ ] With `[sandbox] enabled = true` in `calixbuild.conf`, a PKGBUILD whose
   `build()` runs `ls "$HOME"` fails that listing with "Permission denied" in
   the step output while the build itself completes
 - [ ] The same PKGBUILD lists `$HOME` normally with the sandbox disabled
@@ -288,8 +288,8 @@ Requires a kernel with Landlock enabled (check `cat /sys/kernel/security/lsm`).
 
 ### Keyring Management
 
-- [ ] `shelly keyring init` initializes keyring
-- [ ] `shelly keyring populate` populates keys
+- [ ] `calix keyring init` initializes keyring
+- [ ] `calix keyring populate` populates keys
 - [ ] Keyring operations complete without errors
 
 ### Output Formatting
@@ -308,16 +308,16 @@ Requires a kernel with Landlock enabled (check `cat /sys/kernel/security/lsm`).
 
 ### Shell Completions
 
-- [ ] `shelly utility --completions bash|fish|zsh` writes each script
-- [ ] Shortcode tokens expand in a live shell (`shelly -Sa<tab>` offers
-  `-Sap` and `-Sad`; `shelly -N<tab>` offers `-N` and `-Na`)
-- [ ] Options complete after a shortcode (`shelly -U -<tab>` offers the
-  combined-upgrade options; `shelly -B -<tab>` offers the backup options)
+- [ ] `calix utility --completions bash|fish|zsh` writes each script
+- [ ] Shortcode tokens expand in a live shell (`calix -Sa<tab>` offers
+  `-Sap` and `-Sad`; `calix -N<tab>` offers `-N` and `-Na`)
+- [ ] Options complete after a shortcode (`calix -U -<tab>` offers the
+  combined-upgrade options; `calix -B -<tab>` offers the backup options)
 
 **Note:** isolate the generated script from completions installed by an
 older package build before live-testing it. Fish lazily loads every
-`shelly.fish` found on `fish_complete_path` on the first completion request,
-so a stale `/usr/share/fish/vendor_completions.d/shelly.fish` mixes silently
+`calix.fish` found on `fish_complete_path` on the first completion request,
+so a stale `/usr/share/fish/vendor_completions.d/calix.fish` mixes silently
 with the script under test and produces confusing candidates. Point
 `fish_complete_path` at an empty directory while testing (or reinstall the
 package first); for bash and zsh use a clean shell, and regenerate
@@ -328,13 +328,13 @@ package first); for bash and zsh use a clean shell, and regenerate
 ### PKGBUILD Installation
 
 - [ ] `makepkg -si` builds and installs successfully
-- [ ] `shelly` and `shelly-flatpak-backend` can be packaged and installed
+- [ ] `calix` and `calix-flatpak-backend` can be packaged and installed
   independently
-- [ ] `/usr/lib/shelly/libshelly-flatpak-backend.so.1` belongs only to the
+- [ ] `/usr/lib/calix/libcalix-flatpak-backend.so.1` belongs only to the
   backend package
-- [ ] `readelf -d /usr/bin/shelly` has no `libflatpak.so.0` or
+- [ ] `readelf -d /usr/bin/calix` has no `libflatpak.so.0` or
   `libostree-1.so.1` `NEEDED` entry
-- [ ] The backend has SONAME `libshelly-flatpak-backend.so.1` and a
+- [ ] The backend has SONAME `libcalix-flatpak-backend.so.1` and a
   `libflatpak.so.0` `NEEDED` entry
 - [ ] All dependencies are correctly specified
 - [ ] Post-install scripts execute properly
@@ -366,22 +366,22 @@ package first); for bash and zsh use a clean shell, and regenerate
 - [ ] Root/sudo operations work correctly
 - [ ] Permission errors are handled gracefully
 - [ ] User is prompted for elevation when needed
-- [ ] `zig build --build-file Shelly.Cli.Zig/build.zig isolated-build-test`
+- [ ] `zig build --build-file Calix.Cli.Zig/build.zig isolated-build-test`
   passes under umasks `0022`, `0007`, `0027`, and `0077`, preserving reviewed
   file modes, guest traversal permissions, readable configuration, and the
   private host operation boundary
 - [ ] From an authenticated normal-user sudo session,
-  `Shelly.Cli.Zig/scripts/test-isolated-build.sh` passes all four coordinator
+  `Calix.Cli.Zig/scripts/test-isolated-build.sh` passes all four coordinator
   umasks through real nspawn, checks UID/GID 1000 and guest configuration,
   exports artifacts to the invoking user, and removes operation roots;
   exit `77` means skipped, not passed
 - [ ] Build the pinned endcord PKGBUILD with `--isolated` using the rebuilt
   CLI under coordinator umasks `0022` and `0077`; validate the exported
   archives without installing them and record the recipe revision/source hash
-- [ ] `Shelly.Cli.Zig/scripts/test-elevation-cancellation.sh` passes without
+- [ ] `Calix.Cli.Zig/scripts/test-elevation-cancellation.sh` passes without
   privileges for both SIGINT and SIGTERM
 - [ ] From a normal user session with a working elevator,
-  `Shelly.Cli.Zig/scripts/test-isolated-cancellation.sh` exits successfully and
+  `Calix.Cli.Zig/scripts/test-isolated-cancellation.sh` exits successfully and
   leaves neither nspawn descendants nor an isolated operation directory
 
 ### File System

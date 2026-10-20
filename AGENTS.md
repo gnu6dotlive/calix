@@ -1,7 +1,7 @@
 # AGENTS.md — Calix
 
-Calix is historically forked from Shelly and is now a distinct project. Some paths and
-binaries still use the `shelly` name; see `docs/legacy-references.md`.
+Calix is a distinct project with a recorded lineage; see
+`docs/legacy-references.md`. Its code, paths and binaries use the Calix name.
 
 ## Engineering Standards: Zero Deadcode Policy & No Warning Suppression
 

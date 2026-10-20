@@ -9,7 +9,7 @@
 #   5. emit <out>.roi.png + <out>.manifest.json
 #
 # Env:
-#   SHELLY_BIN       calix-gpui binary (required)
+#   CALIX_BIN       calix-gpui binary (required)
 #   RUNTIME_DIR      XDG_RUNTIME_DIR of the lab instance (required)
 #   EXPECTED_ROI     optional exact ROI dimensions "WxH" (fails on mismatch)
 #   RUNTIME_COMMIT   exact runtime source commit recorded in the manifest
@@ -21,7 +21,7 @@ FIXTURE="$1"
 OUT="$2"
 TOOLS="$(cd "$(dirname "$0")" && pwd)"
 
-cli() { XDG_RUNTIME_DIR="$RUNTIME_DIR" "$SHELLY_BIN" "$@"; }
+cli() { XDG_RUNTIME_DIR="$RUNTIME_DIR" "$CALIX_BIN" "$@"; }
 window_address() {
   hyprctl clients -j | jq -r 'map(select(.class=="calix-gpui")) | if length == 1 then .[0].address else empty end'
 }
@@ -36,13 +36,13 @@ assert_target_client() {
   [ "$(printf '%s' "$client" | jq -r '.xwayland')" = "false" ] || { echo "TARGET_NOT_NATIVE_WAYLAND address=$address"; exit 1; }
   pid="$(printf '%s' "$client" | jq -r '.pid')"
   exe="$(readlink -f "/proc/$pid/exe")"
-  expected="$(readlink -f "$SHELLY_BIN")"
+  expected="$(readlink -f "$CALIX_BIN")"
   [ "$exe" = "$expected" ] || {
     echo "RUNTIME_EXECUTABLE_MISMATCH pid=$pid expected=$expected actual=$exe"
     exit 1
   }
   STABLE_ID="$(printf '%s' "$client" | jq -r '.stableId')"
-  [ -n "$STABLE_ID" ] && [ "$STABLE_ID" != "null" ] || { echo "SHELLY_STABLE_ID_ABSENT address=$address"; exit 1; }
+  [ -n "$STABLE_ID" ] && [ "$STABLE_ID" != "null" ] || { echo "CALIX_STABLE_ID_ABSENT address=$address"; exit 1; }
   TARGET_PID="$pid"
 }
 assert_same_target() {
@@ -100,7 +100,7 @@ sleep 2
 
 PRE_FIXTURE="$(status_fixture pre)" || exit 1
 [ "$PRE_FIXTURE" = "$FIXTURE" ] || { echo "ASSERT-PRE-FAILED want=$FIXTURE got=$PRE_FIXTURE"; exit 1; }
-ADDRESS="$(window_address)"; [ -n "$ADDRESS" ] || { echo "SHELLY_WINDOW_NOT_UNIQUE"; exit 1; }
+ADDRESS="$(window_address)"; [ -n "$ADDRESS" ] || { echo "CALIX_WINDOW_NOT_UNIQUE"; exit 1; }
 assert_target_client "$ADDRESS"
 PID="$TARGET_PID"
 grim -T "$STABLE_ID" "${OUT}.a.png" || exit 1

@@ -2,12 +2,12 @@
 
 ## Dual Authority Separation
 
-Configuration in Shelly GPUI is strictly segregated across two distinct authorities:
+Configuration in Calix GPUI is strictly segregated across two distinct authorities:
 
 | Authority | Disk Location | Scope |
 |:---|:---|:---|
-| **`gpui-ui`** | `~/.config/shelly/gpui-ui.json` | Presentation layout, themes, view mode, drawer dimensions, motion policy |
-| **`settings`** | `~/.config/shelly/settings.json` | Backend source enablement (AUR, Flatpak, AppImage) and package manager flags |
+| **`gpui-ui`** | `~/.config/calix/gpui-ui.json` | Presentation layout, themes, view mode, drawer dimensions, motion policy |
+| **`settings`** | `~/.config/calix/settings.json` | Backend source enablement (AUR, Flatpak, AppImage) and package manager flags |
 
 ## Supported Typed Settings
 
@@ -52,7 +52,7 @@ To prevent race conditions between the graphical Settings UI and external CLI / 
 1. **Dirty Draft Protection**: If the GUI user has modified settings in the UI draft without committing (`SettingsView.is_dirty == true`), any incoming `settings set` or `settings reset` command is immediately rejected with an explicit conflict error (`Settings edit conflict: settings view has uncommitted changes in GUI`). Zero disk mutation takes place.
 2. **Single Authority Pipeline**: When valid, changes flow through a unified sequence:
    - Atomic disk write via `ConfigManager`.
-   - Re-reading committed configuration state from disk (`load_shelly_settings` & `load_gpui_config_sanitized`).
+   - Re-reading committed configuration state from disk (`load_calix_settings` & `load_gpui_config_sanitized`).
    - Updating `WorkspaceView` committed models and resetting `SettingsView` drafts.
    - Synchronizing all affected runtime effects: `theme`, `view_mode`, `compact_view`, `reduce_motion`, `log_drawer_open`, `log_drawer_height`, `aur_enabled`, `flatpak_enabled`, `appimage_enabled`, `cascade_delete`, and `remove_configs`.
    - Dispatching reactive notifications (`cx.notify()`) to render the changes immediately.

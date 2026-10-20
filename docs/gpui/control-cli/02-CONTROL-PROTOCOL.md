@@ -4,12 +4,12 @@
 
 The control protocol runs over a Unix Domain Socket located at:
 ```text
-$XDG_RUNTIME_DIR/shelly-gpui/control.sock
+$XDG_RUNTIME_DIR/calix-gpui/control.sock
 ```
-On typical Linux systems, this resolves to `/run/user/<UID>/shelly-gpui/control.sock`.
+On typical Linux systems, this resolves to `/run/user/<UID>/calix-gpui/control.sock`.
 
 ### File Security & Permissions
-- The directory `$XDG_RUNTIME_DIR/shelly-gpui/` is created with mode `0700` (`rwx------`).
+- The directory `$XDG_RUNTIME_DIR/calix-gpui/` is created with mode `0700` (`rwx------`).
 - The socket file `control.sock` is created with mode `0600` (`rw-------`).
 - Only the current user session has read/write privileges.
 

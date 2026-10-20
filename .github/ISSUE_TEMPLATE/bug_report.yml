@@ -28,7 +28,7 @@ body:
       label: Affected Component
       options:
         - label: Calix UI (GPUI Rust frontend)
-        - label: Zig backend CLI (currently installed as `shelly`)
+        - label: Zig backend CLI (currently installed as `calix`)
         - label: Package Inspector / Details View
         - label: Live Search / Input
         - label: Terminal Log Drawer

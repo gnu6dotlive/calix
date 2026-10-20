@@ -29,35 +29,35 @@ jobs:
         with:
           filters: |
             backend:
-              - 'Shelly.Flatpak.Backend/**'
-              - 'Shelly.Diagnostics/**'
+              - 'Calix.Flatpak.Backend/**'
+              - 'Calix.Diagnostics/**'
             http:
-              - 'Shelly.Http/**'
+              - 'Calix.Http/**'
             packagemanager:
-              - 'Shelly.PackageManager/**'
-              - 'Shelly.Diagnostics/**'
+              - 'Calix.PackageManager/**'
+              - 'Calix.Diagnostics/**'
             cli:
-              - 'Shelly.Cli.Zig/**'
-              - 'Shelly.Diagnostics/**'
-              - 'Shelly.PackageManager/**'
-              - 'Shelly.Flatpak.Backend/**'
+              - 'Calix.Cli.Zig/**'
+              - 'Calix.Diagnostics/**'
+              - 'Calix.PackageManager/**'
+              - 'Calix.Flatpak.Backend/**'
               - 'scripts/**'
             gtk:
-              - 'Shelly.Ui.Gtk/**'
-              - 'Shelly.Diagnostics/**'
+              - 'Calix.Ui.Gtk/**'
+              - 'Calix.Diagnostics/**'
             tui:
-              - 'Shelly.Tui/**'
-              - 'Shelly.Diagnostics/**'
+              - 'Calix.Tui/**'
+              - 'Calix.Diagnostics/**'
             key:
-              - 'Shelly.Key/**'
-              - 'Shelly.Diagnostics/**'
+              - 'Calix.Key/**'
+              - 'Calix.Diagnostics/**'
             notifications:
-              - 'Shelly.Notifications.Zig/**'
-              - 'Shelly.Diagnostics/**'
+              - 'Calix.Notifications.Zig/**'
+              - 'Calix.Diagnostics/**'
             pkgbuild:
               - 'PKGBUILD*'
               - '*.desktop'
-              - 'shelly-flatpak-integrate'
+              - 'calix-flatpak-integrate'
 
   backend:
     needs: changes
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Build and test Flatpak backend
         run: |
-          cd Shelly.Flatpak.Backend
+          cd Calix.Flatpak.Backend
           zig build
           zig build test
           zig build abi-test
@@ -95,7 +95,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Build and test HTTP client
         run: |
-          cd Shelly.Http
+          cd Calix.Http
           zig build
           zig build test
 
@@ -114,7 +114,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Build and test PackageManager
         run: |
-          cd Shelly.PackageManager
+          cd Calix.PackageManager
           zig build
           zig build test
           zig build flatpak-test
@@ -133,24 +133,24 @@ jobs:
           pacman -S --needed --noconfirm zig flatpak base-devel glibc git libarchive ripgrep
       - uses: actions/checkout@v6
       - name: Test shared diagnostics
-        run: cd Shelly.Diagnostics && zig build test
+        run: cd Calix.Diagnostics && zig build test
       - name: Build CLI and test
         run: |
-          cd Shelly.Cli.Zig
+          cd Calix.Cli.Zig
           zig build
           zig build test
       - name: Build backend for boundary check
         run: |
-          cd Shelly.Flatpak.Backend
+          cd Calix.Flatpak.Backend
           zig build
       - name: Verify optional Flatpak boundary
         run: |
           scripts/check-flatpak-separation.sh \
-            Shelly.Cli.Zig/zig-out/bin/shelly \
-            Shelly.Flatpak.Backend/zig-out/lib/libshelly-flatpak-backend.so.1
-          Shelly.Cli.Zig/zig-out/bin/shelly --help >/dev/null
-          Shelly.Cli.Zig/zig-out/bin/shelly --version >/dev/null
-          Shelly.Cli.Zig/zig-out/bin/shelly utility --completions bash >/dev/null
+            Calix.Cli.Zig/zig-out/bin/calix \
+            Calix.Flatpak.Backend/zig-out/lib/libcalix-flatpak-backend.so.1
+          Calix.Cli.Zig/zig-out/bin/calix --help >/dev/null
+          Calix.Cli.Zig/zig-out/bin/calix --version >/dev/null
+          Calix.Cli.Zig/zig-out/bin/calix utility --completions bash >/dev/null
 
   gtk:
     needs: changes
@@ -167,12 +167,12 @@ jobs:
       - uses: actions/checkout@v6
       - name: Build GTK GUI and test without a display
         run: |
-          cd Shelly.Ui.Gtk
+          cd Calix.Ui.Gtk
           zig build
           env -u DISPLAY -u WAYLAND_DISPLAY zig build test
       - name: Test GTK widgets with a virtual display
         run: |
-          cd Shelly.Ui.Gtk
+          cd Calix.Ui.Gtk
           GDK_BACKEND=x11 GSK_RENDERER=cairo GTK_A11Y=none xvfb-run -a zig build test
 
   tui:
@@ -190,7 +190,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Build TUI and test
         run: |
-          cd Shelly.Tui
+          cd Calix.Tui
           zig build
           zig build test
 
@@ -209,7 +209,7 @@ jobs:
       - uses: actions/checkout@v6
       - name: Build keys & test
         run: |
-          cd Shelly.Key
+          cd Calix.Key
           zig build
           zig build test
 
@@ -226,9 +226,9 @@ jobs:
           pacman -Syu --noconfirm
           pacman -S --needed --noconfirm base-devel glibc git zig clang gettext
       - uses: actions/checkout@v6
-      - name: Build Shelly.Notifications.Zig
+      - name: Build Calix.Notifications.Zig
         run: |
-          cd Shelly.Notifications.Zig
+          cd Calix.Notifications.Zig
           zig build --verbose \
             --prefix ../zig-out-notifications \
             -Dcpu=baseline \
@@ -249,8 +249,8 @@ jobs:
         run: bash -n PKGBUILD PKGBUILD-git PKGBUILD-bin PKGBUILD-cli
       - name: Validate packaged desktop entries
         run: |
-          desktop-file-validate com.shellyorg.shelly.desktop com.shellyorg.shelly-notifications.desktop
-          bash -n shelly-flatpak-integrate
+          desktop-file-validate com.calixorg.calix.desktop com.calixorg.calix-notifications.desktop
+          bash -n calix-flatpak-integrate
 
   all-pass:
     if: ${{ always() }}

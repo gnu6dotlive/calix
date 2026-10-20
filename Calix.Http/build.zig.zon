@@ -1,0 +1,11 @@
+.{
+    .name = .CalixHttp,
+    .version = "3.1.3",
+    .fingerprint = 0xa11625d45877b11c,
+    .minimum_zig_version = "0.16.0",
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}

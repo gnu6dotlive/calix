@@ -6,7 +6,7 @@ The CLI surface supports global options and subcommands for window management, n
 
 - `-j`, `--json`: Emits machine-readable JSON for scripting, automated verification, and agent pipelines.
 - `-h`, `--help`: Prints comprehensive help text detailing available commands and exits 0.
-- `-V`, `--version`: Prints executable version and protocol version (`shelly-gpui 0.1.0 (control protocol v1)`).
+- `-V`, `--version`: Prints executable version and protocol version (`calix-gpui 0.1.0 (control protocol v1)`).
 
 ## Exit Code Semantics
 
@@ -16,20 +16,20 @@ The CLI guarantees strict exit code determinism across all invocations:
 
 ## Runtime Commands
 
-### `shelly-gpui open`
+### `calix-gpui open`
 - **Behavior**:
   - If the GUI is currently running: brings the existing window to focus via IPC and Wayland/Hyprland focus dispatcher.
   - If the GUI is not running: acquires the exclusive lifetime instance lock (`instance.lock`) and launches the desktop GUI. Secondary concurrent launches detect lock contention, forward intent over the control socket, and exit cleanly with code 0.
 - **Output**:
-  - Human: `Focused existing Shelly window`
-  - JSON: `{"version": 1, "ok": true, "message": "Shelly window focused"}`
+  - Human: `Focused existing Calix window`
+  - JSON: `{"version": 1, "ok": true, "message": "Calix window focused"}`
 
-### `shelly-gpui focus`
+### `calix-gpui focus`
 - **Behavior**:
   - If the GUI is running: focuses the window and exits 0.
   - If not running: reports error and exits with code 1.
 
-### `shelly-gpui status [--json]`
+### `calix-gpui status [--json]`
 - **Behavior**:
   - Reports current operational status of the frontend.
 - **Fields Reported**:
@@ -44,32 +44,32 @@ The CLI guarantees strict exit code determinism across all invocations:
   - `selected_package`: package name currently displayed in inspector (or `null`)
   - `operation_running`: boolean indicating active background task or search in flight
 
-### `shelly-gpui quit`
+### `calix-gpui quit`
 - **Behavior**:
   - Gracefully terminates running GUI instance, cleans up Unix domain socket, and exits 0.
   - If already offline, reports error and exits 1.
 
-### `shelly-gpui navigate <destination>`
+### `calix-gpui navigate <destination>`
 - **Arguments**: `updates`, `installed`, `browse`, `news`, `settings`.
 - **Behavior**:
   - If destination is valid: navigates running view, updates state, and exits 0.
   - If destination is invalid: returns an explicit error and exits 1.
   - If offline: bootstraps the desktop GUI in the background, waits boundedly for socket readiness, sends the navigate command over the control socket, and exits deterministically (0 on valid destination, 1 on invalid).
 
-### `shelly-gpui search <query>`
+### `calix-gpui search <query>`
 - **Behavior**:
   - Synchronously updates `session.search_query = query` and search input text before returning the ACK response, ensuring immediate read-your-writes consistency for subsequent status queries.
   - Sets destination to Browse and dispatches debounced background backend search execution.
   - If offline: bootstraps the desktop GUI in the background, waits boundedly for socket readiness, executes the search over the control socket, and returns the response.
 
-### `shelly-gpui view <table|cards>`
+### `calix-gpui view <table|cards>`
 - **Behavior**:
   - Validates argument. Rejects invalid modes with exit code 1.
   - Switches workstation presentation mode between tabular rows and card tiles.
   - Persists preference in `gpui-ui.json` and updates live runtime state atomically.
   - Works both online (live UI update + save) and offline (atomic save).
 
-### `shelly-gpui inspect <package>`
+### `calix-gpui inspect <package>`
 - **Behavior**:
   - Resolves package provenance accurately without fabricating fallback keys:
     - Supports optional explicit source prefix: `alpm:ripgrep`, `aur:yay`, `flatpak:org.mozilla.firefox`, `appimage:obsidian`.
@@ -80,13 +80,13 @@ The CLI guarantees strict exit code determinism across all invocations:
   - If exactly one package matches: selects package key in `AppSession`, triggers inspector load, and exits 0.
   - If offline: bootstraps the desktop GUI in the background, waits boundedly for socket readiness, dispatches the inspect command over the control socket, and returns the response with exit code 0 or 1.
 
-### `shelly-gpui inspector <tab>`
+### `calix-gpui inspector <tab>`
 - **Arguments**: `overview`, `dependencies` (or `deps`), `files` (or `files-build`).
 - **Behavior**:
   - If tab name is valid: switches active inspector tab and exits 0.
   - If tab name is invalid: returns error and exits 1.
 
-### `shelly-gpui logs <show|hide|clear>`
+### `calix-gpui logs <show|hide|clear>`
 - **Behavior**:
   - `show`: opens bottom operation drawer and persists state.
   - `hide`: closes bottom operation drawer and persists state.

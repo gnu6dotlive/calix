@@ -25,10 +25,8 @@ Calix is built from three native pieces:
 - **`calix-daemon`** — the inventory service. Zig, serving a versioned JSON-lines
   protocol over a Unix socket. The frontend reads the daemon rather than opening state
   files, so there is one place where installed-package state is assembled.
-- **`shelly`** — the package-management CLI and the shared backend library behind it.
-  Zig, talking to `libalpm`, the AUR, Flatpak, AppImages, Cargo and NPM. The binary is
-  still named `shelly`; the rename to Calix is deliberately incomplete
-  ([why](docs/legacy-references.md)).
+- **`calix`** — the package-management CLI and the shared backend library behind it.
+  Zig, talking to `libalpm`, the AUR, Flatpak, AppImages, Cargo and NPM.
 
 The UI and the daemon run unprivileged. Operations that need root go through the CLI and
 polkit (`pkexec`); the project's engineering policy forbids `sudo`, `su` and `doas`.
@@ -59,9 +57,8 @@ Upstream Shelly continues independently. Calix maintains historical lineage with
 without being equivalent to the original fork — the lineage is context for how this
 codebase came to be, not the definition of what it is now.
 
-Some directories, binaries and configuration paths still carry the old name. That is a
-known, documented state of transition, not a claim of identity:
-see [`docs/legacy-references.md`](docs/legacy-references.md).
+The rename is complete. The historical mapping and the reasons behind the new
+identifiers are recorded in [`docs/legacy-references.md`](docs/legacy-references.md).
 
 ---
 
@@ -152,9 +149,9 @@ graph TD
         Inventory["Unified inventory service"]
     end
 
-    subgraph Backend["shelly CLI — Zig"]
+    subgraph Backend["calix CLI — Zig"]
         CLI["Search · install · remove · upgrade · build"]
-        Lib["Shelly.PackageManager"]
+        Lib["Calix.PackageManager"]
     end
 
     Workspace -->|inventory| Protocol
@@ -173,19 +170,19 @@ graph TD
     CLI --> Polkit["polkit / pkexec"]
 ```
 
-- **`Shelly.Ui.Gpui/`** builds `calix-gpui`: GPUI layout and rendering, search
+- **`Calix.Ui.Gpui/`** builds `calix-gpui`: GPUI layout and rendering, search
   orchestration, the inspector, and the operation console. Mutating operations are
   spawned on a Tokio worker and streamed; the render thread is not blocked by process
   I/O.
-- **`Shelly.Cli.Zig/`** builds two executables from one library: the `shelly` CLI and
+- **`Calix.Cli.Zig/`** builds two executables from one library: the `calix` CLI and
   `calix-daemon`. The daemon checks its protocol version before dispatching an action,
   so a mismatched client is told so rather than misread.
-- **`Shelly.PackageManager/`** is the backend library (`Zigalpm` to its Zig consumers):
+- **`Calix.PackageManager/`** is the backend library (`Zigalpm` to its Zig consumers):
   ALPM through `libalpm`, AUR, Flatpak, AppImage, Cargo and NPM managers, the flat
   inventory record shared by every ecosystem, the release registry, and upstream
   provenance verification.
 - **Flatpak is optional by construction.** `libflatpak` lives in a separate
-  `Shelly.Flatpak.Backend` shared library loaded at runtime, so the base CLI starts and
+  `Calix.Flatpak.Backend` shared library loaded at runtime, so the base CLI starts and
   works on a system without Flatpak installed.
 
 ### Transitional state
@@ -210,7 +207,7 @@ pkexec pacman -S --needed base-devel git rust cargo pacman clang pkgconf \
   libxkbcommon-x11 mesa vulkan-icd-loader polkit
 ```
 
-Zig **0.16.0** is required. `Shelly.Cli.Zig/build.zig.zon` declares
+Zig **0.16.0** is required. `Calix.Cli.Zig/build.zig.zon` declares
 `minimum_zig_version = "0.16.0"`; Zig 0.17 changed the build API and this tree does not
 build with it. Arch's `zig` package has moved past 0.16, so check `zig version` before
 building.
@@ -234,7 +231,7 @@ Linux Archive, or `zig` will fail to start.
 shell that runs them.
 
 Flatpak support additionally needs the Flatpak development files and a separately built
-`Shelly.Flatpak.Backend`; the base CLI does not link `libflatpak`.
+`Calix.Flatpak.Backend`; the base CLI does not link `libflatpak`.
 
 ### Build and run from source
 
@@ -242,20 +239,20 @@ Flatpak support additionally needs the Flatpak development files and a separatel
 git clone https://github.com/tension-atoi/calix.git
 cd calix
 
-# 1. Build the Zig backend: produces Shelly.Cli.Zig/zig-out/bin/shelly
-#    and Shelly.Cli.Zig/zig-out/bin/calix-daemon
+# 1. Build the Zig backend: produces Calix.Cli.Zig/zig-out/bin/calix
+#    and Calix.Cli.Zig/zig-out/bin/calix-daemon
 make zig
 
 # 2. Start the daemon (serves the unified inventory on
 #    $XDG_RUNTIME_DIR/calix/daemon.sock)
-./Shelly.Cli.Zig/zig-out/bin/calix-daemon
+./Calix.Cli.Zig/zig-out/bin/calix-daemon
 
 # 3. In another terminal, run the UI in development mode
 make run
 ```
 
 `make run` builds the Zig CLI if the binary is missing, then starts `cargo run` with
-`SHELLY_BIN` pointed at the in-tree backend. The daemon is a separate process and is not
+`CALIX_BIN` pointed at the in-tree backend. The daemon is a separate process and is not
 started by the UI: without it, the window still opens but only the packages the backend
 CLI reports are shown.
 
@@ -276,15 +273,15 @@ Other `make` targets:
 Backend tests run from the component directories:
 
 ```bash
-(cd Shelly.Cli.Zig && zig build test)
-(cd Shelly.PackageManager && zig build test)
+(cd Calix.Cli.Zig && zig build test)
+(cd Calix.PackageManager && zig build test)
 ```
 
 ### Release build
 
 ```bash
 make build
-# binary: Shelly.Ui.Gpui/target/release/calix-gpui
+# binary: Calix.Ui.Gpui/target/release/calix-gpui
 ```
 
 ---
@@ -310,24 +307,24 @@ CLI output. Root operations raise a polkit prompt.
 
 ### Command line
 
-The backend CLI is still invoked as `shelly`:
+The backend CLI is invoked as `calix`:
 
 ```bash
 # Search
-./Shelly.Cli.Zig/zig-out/bin/shelly search standard firefox
-./Shelly.Cli.Zig/zig-out/bin/shelly search aur <package>
+./Calix.Cli.Zig/zig-out/bin/calix search standard firefox
+./Calix.Cli.Zig/zig-out/bin/calix search aur <package>
 
 # Install / remove / upgrade
-./Shelly.Cli.Zig/zig-out/bin/shelly install standard <package>
-./Shelly.Cli.Zig/zig-out/bin/shelly install aur <package>
-./Shelly.Cli.Zig/zig-out/bin/shelly remove standard <package>
-./Shelly.Cli.Zig/zig-out/bin/shelly upgrade all
+./Calix.Cli.Zig/zig-out/bin/calix install standard <package>
+./Calix.Cli.Zig/zig-out/bin/calix install aur <package>
+./Calix.Cli.Zig/zig-out/bin/calix remove standard <package>
+./Calix.Cli.Zig/zig-out/bin/calix upgrade all
 
 # The unified inventory document (all six ecosystems, versioned JSON)
-./Shelly.Cli.Zig/zig-out/bin/shelly inventory standard
+./Calix.Cli.Zig/zig-out/bin/calix inventory standard
 
 # Full command surface
-./Shelly.Cli.Zig/zig-out/bin/shelly --help
+./Calix.Cli.Zig/zig-out/bin/calix --help
 ```
 
 The daemon's defaults follow the XDG base directory specification:
@@ -359,12 +356,13 @@ The package (`calix-gpui-git`) installs:
 
 | Path | Contents |
 |---|---|
-| `/usr/bin/calix-gpui` | Wrapper that sets `SHELLY_BIN` and execs the frontend |
+| `/usr/bin/calix-gpui` | Wrapper that sets `CALIX_BIN` and execs the frontend |
+| `/usr/bin/calix` | Symlink to the backend CLI |
 | `/usr/lib/calix/calix-gpui` | GPUI frontend binary |
-| `/usr/lib/shelly/shelly` | Zig backend CLI (transitional path and name) |
-| `/usr/share/applications/com.calix.calix-gpui.desktop` | XDG desktop entry |
-| `/usr/share/icons/hicolor/scalable/apps/calix-gpui.svg` | Application icon |
-| `/usr/share/polkit-1/actions/com.calix.calix-gpui.policy` | Polkit actions for install / remove / upgrade |
+| `/usr/lib/calix/calix` | Zig backend CLI (canonical polkit path) |
+| `/usr/share/applications/live.gnu6.calix.desktop` | XDG desktop entry |
+| `/usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg` | Application icon |
+| `/usr/share/polkit-1/actions/live.gnu6.calix.policy` | Polkit actions for install / remove / upgrade |
 
 Two notable things the package does **not** yet install, and that are deliberately called
 out here rather than glossed over:
@@ -374,10 +372,6 @@ out here rather than glossed over:
 - **The legacy systemd units in `packaging/systemd/` run the frozen Python engine**
   (`calix sync`), not the daemon. They are part of the transitional state described
   above.
-
-Several older PKGBUILDs from the upstream project are still present in the repository
-root. They are not the Calix packaging path; see
-[`docs/legacy-references.md`](docs/legacy-references.md).
 
 ---
 
@@ -389,19 +383,18 @@ more optimistic document elsewhere in the tree, this table is the one to trust.
 | Area | State |
 |---|---|
 | GPUI frontend (`calix-gpui`) | Primary interface; active development |
-| Zig backend CLI (`shelly`) | Works; binary name not yet renamed |
+| Zig backend CLI (`calix`) | Works |
 | `calix-daemon` | Serves inventory and release state on demand; **no scheduler yet** |
 | Unified inventory | ALPM, AUR, Flatpak, AppImage, Cargo, NPM, tracked releases |
 | Release tracking | Zig registry and provenance checks landed; a frozen Python engine still writes the tracked-release observation file |
 | UI mutations | ALPM, AUR, Flatpak only |
 | UI search | ALPM, AUR, Flatpak, installed AppImages only |
 | Packaging | Installs frontend + backend CLI; does not install `calix-daemon` |
-| Naming | Partial: binaries, directories, config paths and some assets still say `shelly` |
+| Naming | Complete: code, paths, binaries and packaging use `calix` and `live.gnu6.calix` |
 | Platform | Arch Linux, `x86_64` |
 
 Planned next steps, in rough order: the daemon scheduler and release watcher, the
-application flow (root helper + polkit rule), removal of the frozen Python engine, and
-the completion of the `shelly` → `calix` rename.
+application flow (root helper + polkit rule), and removal of the frozen Python engine.
 
 The frontend crate is version `0.1.0`. The Zig backend reports `3.1.9-dev`, a version
 string inherited from the Shelly tree it descends from; it is not the Calix product
@@ -413,22 +406,19 @@ version.
 
 | Path | Contents |
 |---|---|
-| `Shelly.Ui.Gpui/` | Rust + GPUI frontend (crate `calix-gpui`) |
-| `Shelly.Cli.Zig/` | Zig CLI (`shelly`) and daemon (`calix-daemon`) |
-| `Shelly.PackageManager/` | Zig backend library: ALPM, AUR, Flatpak, AppImage, Cargo, NPM, release registry |
-| `Shelly.Flatpak.Backend/` | Optional `libflatpak` shared library, loaded at runtime |
-| `Shelly.Http/`, `Shelly.Diagnostics/` | Supporting Zig components |
+| `Calix.Ui.Gpui/` | Rust + GPUI frontend (crate `calix-gpui`) |
+| `Calix.Cli.Zig/` | Zig CLI (`calix`) and daemon (`calix-daemon`) |
+| `Calix.PackageManager/` | Zig backend library: ALPM, AUR, Flatpak, AppImage, Cargo, NPM, release registry |
+| `Calix.Flatpak.Backend/` | Optional `libflatpak` shared library, loaded at runtime |
+| `Calix.Http/`, `Calix.Diagnostics/` | Supporting Zig components |
 | `scripts/` | Frozen Python engine and operational scripts (transitional) |
-| `docs/` | Architecture, slice records, render-lab evidence, [legacy references](docs/legacy-references.md) |
+| `docs/` | Current docs plus dated slice records and render-lab evidence; historical names may appear in the dated records |
 | `packaging/` | AUR symlink and systemd units |
 | `PKGBUILD-calix` | The current Arch package definition |
 | `vendor/` | Local toolchain cache, git-ignored |
 
-Directory names retain the `Shelly.` prefix because the rename is a separate, deliberate
-change: the Zig package fingerprint, the on-disk config and state paths, and the
-installed binary name are all coupled to it. See
-[`docs/legacy-references.md`](docs/legacy-references.md) for the full list of what was
-left alone and what a future rename would touch.
+All live directories use the `Calix.` prefix. The historical `Shelly.` names are
+recorded only in [`docs/legacy-references.md`](docs/legacy-references.md).
 
 ---
 
@@ -464,7 +454,7 @@ endorsement of or active involvement in Calix.
 
 Calix is maintained by **tension-atoi**
 ([@tension-atoi](https://github.com/tension-atoi)). The `authors` field in
-`Shelly.Ui.Gpui/Cargo.toml` still lists Seafoam Labs alongside the current maintainer
+`Calix.Ui.Gpui/Cargo.toml` still lists Seafoam Labs alongside the current maintainer
 for historical attribution; it does not describe current maintenance.
 
 Parts of the recent Calix work were produced with AI coding agents under maintainer
@@ -475,7 +465,7 @@ direction and review. The maintainer is responsible for what is merged.
 ## License
 
 Calix is distributed under the **GNU General Public License v3.0 only**
-(`GPL-3.0-only`), as declared in `Shelly.Ui.Gpui/Cargo.toml` and `PKGBUILD-calix`. See
+(`GPL-3.0-only`), as declared in `Calix.Ui.Gpui/Cargo.toml` and `PKGBUILD-calix`. See
 [`LICENSE`](LICENSE) for the full text.
 
 The project inherits its license from its Shelly lineage; upstream Shelly is also

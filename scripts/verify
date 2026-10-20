@@ -210,20 +210,24 @@ echo
 # ---- the steps --------------------------------------------------------------
 
 packagemanager_tests() {
-    (cd Shelly.PackageManager && zig build test --summary all)
+    (cd Calix.PackageManager && zig build test --summary all)
 }
 
 cli_tests() {
-    (cd Shelly.Cli.Zig && zig build test --summary all)
+    (cd Calix.Cli.Zig && zig build test --summary all)
+}
+
+naming_check() {
+    scripts/check-naming
 }
 
 cli_release_build() {
-    (cd Shelly.Cli.Zig && zig build -Doptimize=ReleaseSafe)
+    (cd Calix.Cli.Zig && zig build -Doptimize=ReleaseSafe)
 }
 
 cli_smoke() {
     local output
-    output=$(./Shelly.Cli.Zig/zig-out/bin/shelly --version) || return 1
+    output=$(./Calix.Cli.Zig/zig-out/bin/calix --version) || return 1
     printf '%s\n' "$output"
     # A binary that prints nothing, or prints a version it does not have, is
     # not a smoke test.
@@ -231,17 +235,18 @@ cli_smoke() {
 }
 
 rust_check() {
-    (cd Shelly.Ui.Gpui && cargo check --quiet)
+    (cd Calix.Ui.Gpui && cargo check --quiet)
 }
 
 rust_tests() {
-    (cd Shelly.Ui.Gpui && cargo test --quiet)
+    (cd Calix.Ui.Gpui && cargo test --quiet)
 }
 
 rust_release_build() {
-    (cd Shelly.Ui.Gpui && cargo build --release --quiet)
+    (cd Calix.Ui.Gpui && cargo build --release --quiet)
 }
 
+step "naming-check" naming_check
 step "packagemanager-tests" packagemanager_tests
 require_count "package manager" "$(zig_test_count "$LOG_DIR/packagemanager-tests.log")" "$PACKAGEMANAGER_FLOOR" || finish failed
 
@@ -252,7 +257,7 @@ step "cli-release-build" cli_release_build
 step "cli-smoke" cli_smoke
 # The UI resolves the CLI at runtime, so the tests that launch it need to be
 # pointed at the binary this run just built rather than one on PATH.
-export SHELLY_BIN="$ROOT/Shelly.Cli.Zig/zig-out/bin/shelly"
+export CALIX_BIN="$ROOT/Calix.Cli.Zig/zig-out/bin/calix"
 
 step "rust-check" rust_check
 step "rust-tests" rust_tests

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# bump-version.sh — one-shot release version bump for Shelly.
+# bump-version.sh — one-shot release version bump for Calix.
 #
 # Sets the release version in every top-level build.zig.zon and every
 # top-level PKGBUILD* in a single command instead of manual edits:
@@ -11,12 +11,12 @@
 #                   variants
 #
 # Skipped by default (versioned independently; pass --all to include):
-#   Shelly.Flatpak.Backend/build.zig.zon
-#   Shelly.Http/build.zig.zon
+#   Calix.Flatpak.Backend/build.zig.zon
+#   Calix.Http/build.zig.zon
 #
 # Never touched, on purpose:
 #   src/ and pkg/                       makepkg build artifacts
-#   Shelly.Flatpak.Backend/build.zig    the ABI/SONAME version has its own
+#   Calix.Flatpak.Backend/build.zig    the ABI/SONAME version has its own
 #                                       procedure (docs/flatpak-backend-abi.md)
 #   sha256sums                          depend on release artifacts that do
 #                                       not exist yet at bump time
@@ -26,7 +26,7 @@
 #
 # Options:
 #   -n, --dry-run       Show what would change without editing anything
-#   -a, --all           Also bump Shelly.Flatpak.Backend and Shelly.Http
+#   -a, --all           Also bump Calix.Flatpak.Backend and Calix.Http
 #       --keep-pkgrel   Do not reset pkgrel to 1
 #       --skip <glob>   Skip files whose path matches <glob> (repeatable)
 #       --only <glob>   Only touch files whose path matches <glob> (repeatable)
@@ -50,12 +50,12 @@ Bumps .version in every top-level build.zig.zon and pkgver in every
 top-level PKGBUILD* (also resets pkgrel to 1 and updates the VCS pkgver()
 printf baseline in PKGBUILD-git / PKGBUILD-cli).
 
-Skips Shelly.Flatpak.Backend and Shelly.Http by default because they are
+Skips Calix.Flatpak.Backend and Calix.Http by default because they are
 versioned independently; pass --all to bump them too.
 
 Options:
   -n, --dry-run       Show what would change without editing anything
-  -a, --all           Also bump Shelly.Flatpak.Backend and Shelly.Http
+  -a, --all           Also bump Calix.Flatpak.Backend and Calix.Http
       --keep-pkgrel   Do not reset pkgrel to 1
       --skip <glob>   Skip files whose path matches <glob> (repeatable)
       --only <glob>   Only touch files whose path matches <glob> (repeatable)
@@ -114,10 +114,10 @@ if [[ ! "${new_version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\+[0-9A-Za-z.]+)?$ ]]; then
     exit 2
 fi
 
-# Shelly.Flatpak.Backend and Shelly.Http carry their own versions and are
+# Calix.Flatpak.Backend and Calix.Http carry their own versions and are
 # skipped unless --all is given.
 if [[ ${include_all} -eq 0 ]]; then
-    skip_patterns+=("Shelly.Flatpak.Backend/*" "Shelly.Http/*")
+    skip_patterns+=("Calix.Flatpak.Backend/*" "Calix.Http/*")
 fi
 
 selected() {
@@ -267,7 +267,7 @@ if [[ ${dry_run} -eq 0 && ${changed} -gt 0 ]]; then
 Reminders:
   * sha256sums in PKGBUILD and PKGBUILD-bin must be regenerated once the
     release artifacts exist (e.g. with updpkgsums).
-  * The Flatpak backend ABI/SONAME version in Shelly.Flatpak.Backend/build.zig
+  * The Flatpak backend ABI/SONAME version in Calix.Flatpak.Backend/build.zig
     is intentionally untouched; follow docs/flatpak-backend-abi.md if the ABI
     changed.
 EOF

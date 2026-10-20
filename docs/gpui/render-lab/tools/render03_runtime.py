@@ -37,7 +37,7 @@ def percentile(values: list[float], fraction: float) -> float:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--recipes", type=Path, required=True)
-    parser.add_argument("--binary", default="shelly-gpui")
+    parser.add_argument("--binary", default="calix-gpui")
     parser.add_argument("--warmup", type=int, default=2)
     parser.add_argument("--samples", type=int, default=10)
     parser.add_argument("--output", type=Path, required=True)

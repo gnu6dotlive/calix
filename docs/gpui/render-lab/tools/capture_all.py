@@ -20,7 +20,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[3]
 EVIDENCE_DIR = ROOT / "docs/gpui/render-lab/evidence/render01"
-SHELLY_BIN = os.environ.get("SHELLY_BIN", "/mnt/workbench/target/release/shelly-gpui")
+CALIX_BIN = os.environ.get("CALIX_BIN", "/mnt/workbench/target/release/calix-gpui")
 WIN_GEOM = os.environ.get("WIN_GEOM", "-621,653 1263x1302")
 RUNTIME_DIR = os.environ.get("XDG_RUNTIME_DIR", "/run/user/1000")
 
@@ -89,7 +89,7 @@ FIXTURES = [
 def cli(*args):
     env = dict(os.environ)
     env["XDG_RUNTIME_DIR"] = RUNTIME_DIR
-    res = subprocess.run([SHELLY_BIN, *args], env=env, capture_output=True, text=True)
+    res = subprocess.run([CALIX_BIN, *args], env=env, capture_output=True, text=True)
     return res.stdout.strip()
 
 

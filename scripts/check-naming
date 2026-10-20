@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Enforce the naming boundary after the old product name -> Calix rename.
+#
+# The old product name is allowed only in the historical record:
+#   - README.md (history and credits)
+#   - docs/** (dated slice records and historical design documents)
+#   - evidence/** (immutable run records)
+#
+# Everything else -- code, build files, packaging, scripts, tests, fixtures,
+# configuration samples and file names -- must use Calix names. This script is
+# the tripwire; it is intentionally simple so a failure is easy to explain.
+#
+# It deliberately does not depend on git: CI replays run it in a plain tree
+# produced by `git archive`, where no .git directory exists. The needle is
+# assembled from two pieces so this file does not match itself.
+#
+# The shell concatenates 'shel' and 'ly' before using the value.
+
+set -euo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+cd "$ROOT" || exit 1
+
+old_name='shel''ly'
+status=0
+
+# Prune build outputs and the historical record before looking at names.
+bad_paths=$(find . \
+    \( -path ./.git -o -path ./docs -o -path ./evidence -o -path ./vendor \
+       -o -name .zig-cache -o -name zig-out -o -name target -o -name node_modules \) -prune \
+    -o -iname "*${old_name}*" -print | sed 's|^\./||' || true)
+if [ -n "$bad_paths" ]; then
+    echo "error: tracked path still carries the old product name:" >&2
+    printf '%s\n' "$bad_paths" >&2
+    status=1
+fi
+
+# -I skips binary files; the historical record is excluded explicitly.
+if grep -r -I -i -n \
+    --exclude-dir=.git --exclude-dir=docs --exclude-dir=evidence \
+    --exclude-dir=vendor --exclude-dir=.zig-cache --exclude-dir=zig-out \
+    --exclude-dir=target --exclude-dir=node_modules --exclude=README.md \
+    -- "$old_name" .; then
+    echo "error: tracked content still carries the old product name outside the historical record" >&2
+    status=1
+fi
+
+if [ "$status" -ne 0 ]; then
+    echo "naming: use 'calix' in code and packaging; keep the old name only in README/docs/evidence." >&2
+    exit 1
+fi
+
+echo "naming: no stale product name outside README.md, docs/ and evidence/."
