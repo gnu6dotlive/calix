@@ -1,0 +1,18 @@
+verify: local-verify-20261020T105330Z
+verify: zig 0.16.0 (/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/bin/zig)
+verify: commit 0a2658c8
+
+  naming-check                     ok   (0s)
+  packagemanager-tests             ok   (52s)
+  package manager                  1386 tests (>1380)
+  cli-tests                        ok   (4s)
+  cli                              388 tests (>380)
+  cli-release-build                ok   (99s)
+  cli-smoke                        ok   (0s)
+  rust-check                       ok   (0s)
+  rust-tests                       ok   (0s)
+  ui                               201 tests (>195)
+  rust-release-build               ok   (0s)
+
+verify: PASSED at 0a2658c8.
+verify: record /home/tension_atoi/.local/state/calix/verify/local-verify-20261020T105330Z/run.json

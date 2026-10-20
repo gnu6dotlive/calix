@@ -1,0 +1,152 @@
+test
++- run test w
+[default] (warn): AppImage Editor already exists. Overwriting...
+[default] (warn): Could not extract metadata from AppImage /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/DcCg4RZQYSb370h_/install/Editor.AppImage.calix-install-18cd97555ada7201.tmp.
+[default] (warn): Could not extract metadata from the selected AppImage file.
+[default] (warn): AppImage Editor already exists. Overwriting...
+[default] (warn): Could not refresh /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/0AyHJMlDHreMCcPW/data/applications: update-desktop-database exited with status 1. Application menu entries may not update until the desktop database is rebuilt.
+
+Technical details: Invalid desktop entry: broken.desktop
+[default] (warn): Could not refresh /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/0AyHJMlDHreMCcPW/data/icons/hicolor: gtk-update-icon-cache exited with status 1. Installed icons may not appear in menus until the icon cache is rebuilt.
+
+Technical details: Invalid icon filename : Weather Icon.png
+[default] (warn): Could not refresh /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/ZLp3zYQlQOSA2zBn/data/applications because cache utility update-desktop-database is unavailable. Application menu entries may not update until the desktop database is rebuilt.
+[default] (warn): AppImage Editor already exists. Overwriting...
+[default] (warn): Could not read the local AppImage database. Calix did not provide a more specific reason. Include the technical details when reporting this problem.
+
+Technical details: MissingField
+[default] (warn): Could not refresh /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/4U10kwRIjirh1QTt/data/applications: update-desktop-database exited with status 1. Application menu entries may not update until the desktop database is rebuilt.
+
+Technical details: The databases in [/home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/4U10kwRIjirh1QTt/data/applications] could not be updated.
+[default] (warn): Could not refresh /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/4U10kwRIjirh1QTt/data/icons/hicolor: gtk-update-icon-cache exited with status 1. Installed icons may not appear in menus until the icon cache is rebuilt.
+
+Technical details: gtk-update-icon-cache: Failed to open file /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/4U10kwRIjirh1QTt/data/icons/hicolor/.icon-theme.cache : No such file or directory
+[default] (warn): Could not refresh /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/IvZvE8SV3ilHE5eI/data/applications: update-desktop-database exited with status 1. Application menu entries may not update until the desktop database is rebuilt.
+
+Technical details: The databases in [/home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/IvZvE8SV3ilHE5eI/data/applications] could not be updated.
+[default] (warn): Could not refresh /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/IvZvE8SV3ilHE5eI/data/icons/hicolor: gtk-update-icon-cache exited with status 1. Installed icons may not appear in menus until the icon cache is rebuilt.
+
+Technical details: gtk-update-icon-cache: Failed to open file /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/IvZvE8SV3ilHE5eI/data/icons/hicolor/.icon-theme.cache : No such file or directory
+[default] (warn): Could not sign package archive /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/K7ZHZG5OkldxXbhk/payload. gpg: keyblock resource '/home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/K7ZHZG5OkldxXbhk/gnupg-home/pubring.kbx': No such file or directory
+gpg: skipped "missing-key-id": No secret key
+gpg: signing failed: No secret key
+ Review the GPG output and selected signing key.
+
+Technical details: 2
+[default] (warn): Could not refresh /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/3O3vkwTyI4EMfvpj/data/applications: update-desktop-database exited with status 1. Application menu entries may not update until the desktop database is rebuilt.
+
+Technical details: update cache rejected broken.desktop
+[default] (warn): Could not save updated AppImage metadata for Editor. Calix did not provide a more specific reason. Include the technical details when reporting this problem. Attempting to restore the previous version.
+
+Technical details: InjectedDatabaseCommitFailure
+[default] (warn): Could not sign package archive .zig-cache/tmp/QYZx9T6E8_6SqX3_/.tmp.demo.db.tar.zst.  Review the GPG output and selected signing key.
+
+Technical details: 9
+[default] (warn): Could not sign repository database demo.db.tar.zst. Calix did not provide a more specific reason. Include the technical details when reporting this problem. Review the signing key and signer output.
+
+Technical details: PackageSigningFailed
+[default] (warn): Could not sign package archive .zig-cache/tmp/QYZx9T6E8_6SqX3_/.tmp.demo.files.tar.zst.  Review the GPG output and selected signing key.
+
+Technical details: 9
+[default] (warn): Could not sign repository database demo.files.tar.zst. Calix did not provide a more specific reason. Include the technical details when reporting this problem. Review the signing key and signer output.
+
+Technical details: PackageSigningFailed
+[default] (warn): Could not sign package archive /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/p7W-mOyLqzJMcvGR/.calix-30a218304566688a-signing-failure-demo-1-1-any.pkg.tar.zst. gpg: skipped "CE4814F7337B98A2527A32F8FCEBF9274CA93649": No secret key
+gpg: signing failed: No secret key
+ Review the GPG output and selected signing key.
+
+Technical details: 2
+[builder-test] building vendored PKGBUILD-bin (7109 bytes) as package 'calix-bin'
+[builder-test] build directory: /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/WNAuqlALBejdGX1A
+[builder-test] BuildPackage succeeded: artifact 'calix-bin' at /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/WNAuqlALBejdGX1A/representative-packages/calix-bin-3.0.3-1-x86_64.pkg.tar.zst
+[builder-test] staged package tree: /home/tension_atoi/Projects/calix/Calix.PackageManager/.zig-cache/tmp/WNAuqlALBejdGX1A/representative-work/pkg/calix-bin
+[builder-test]   directory     0755 usr
+[builder-test]   directory     0755 usr/bin
+[builder-test]   file          0755 usr/bin/calix-ui
+[builder-test]   file          0755 usr/bin/calix-notifications
+[builder-test]   file          0755 usr/bin/calix
+[builder-test]   file          0755 usr/bin/calix-key
+[builder-test]   file          0755 usr/bin/calix-flatpak-integrate
+[builder-test]   directory     0755 usr/share
+[builder-test]   directory     0755 usr/share/applications
+[builder-test]   file          0644 usr/share/applications/live.gnu6.calix.desktop
+[builder-test]   file          0644 usr/share/applications/live.gnu6.calix-notifications.desktop
+[builder-test]   directory     0755 usr/share/polkit-1
+[builder-test]   directory     0755 usr/share/polkit-1/actions
+[builder-test]   file          0644 usr/share/polkit-1/actions/live.gnu6.calix.policy
+[builder-test]   directory     0755 usr/share/icons
+[builder-test]   directory     0755 usr/share/icons/hicolor
+[builder-test]   directory     0755 usr/share/icons/hicolor/256x256
+[builder-test]   directory     0755 usr/share/icons/hicolor/256x256/apps
+[builder-test]   file          0644 usr/share/icons/hicolor/256x256/apps/calix.png
+[builder-test]   file          0644 usr/share/icons/hicolor/256x256/apps/calix-tray.png
+[builder-test]   file          0644 usr/share/icons/hicolor/256x256/apps/calix-update.png
+[builder-test]   directory     0755 usr/share/fish
+[builder-test]   directory     0755 usr/share/fish/vendor_completions.d
+[builder-test]   file          0644 usr/share/fish/vendor_completions.d/calix.fish
+[builder-test]   directory     0755 usr/share/zsh
+[builder-test]   directory     0755 usr/share/zsh/site-functions
+[builder-test]   file          0644 usr/share/zsh/site-functions/_calix
+[builder-test]   file          0644 .PKGINFO
+[builder-test]   file          0644 .BUILDINFO
+[builder-test]   file          0644 .MTREE
+[builder-test]   executable installed: usr/bin/calix-ui
+[builder-test]   executable installed: usr/bin/calix-notifications
+[builder-test]   executable installed: usr/bin/calix
+[builder-test]   executable installed: usr/bin/calix-key
+[builder-test]   executable installed: usr/bin/calix-flatpak-integrate
+[builder-test]   file installed:       usr/share/applications/live.gnu6.calix.desktop
+[builder-test]   file installed:       usr/share/applications/live.gnu6.calix-notifications.desktop
+[builder-test]   file installed:       usr/share/polkit-1/actions/live.gnu6.calix.policy
+[builder-test]   file installed:       usr/share/icons/hicolor/256x256/apps/calix.png
+[builder-test]   file installed:       usr/share/icons/hicolor/256x256/apps/calix-tray.png
+[builder-test]   file installed:       usr/share/icons/hicolor/256x256/apps/calix-update.png
+[builder-test]   file installed:       usr/share/fish/vendor_completions.d/calix.fish
+[builder-test]   file installed:       usr/share/zsh/site-functions/_calix
+[builder-test] quoted heredoc preserved: $HOME and ${filename%.desktop} intact in installed script
+[builder-test] operation completed: success
+Could not resolve dependency version constraint somepkg>=$_missing_var; using somepkg. Review the dependency requirements before building.
+Could not resolve dependency version constraint somelib>=$_missing_var; using somelib. Review the dependency requirements before building.
+Skipped conditional PKGBUILD function depends at offset 33.
+
+Technical details: =
+Skipped conditional PKGBUILD function pkgname at offset 224.
+
+Technical details: +=
+Could not evaluate PKGBUILD command substitution $(echo hello) in the PKGBUILD.
+Could not evaluate PKGBUILD command substitution $(cmd1) in the PKGBUILD.
+Could not evaluate PKGBUILD command substitution $(cmd2) in the PKGBUILD.
+Could not evaluate PKGBUILD command substitution $(cmd) in the PKGBUILD.
+Could not evaluate PKGBUILD command substitution $(cmd2) in the PKGBUILD.
+Could not evaluate PKGBUILD command substitution $(echo hello) in the PKGBUILD.
+Could not resolve dependency version constraint bash>=; using bash. Review the dependency requirements before building.
+Could not resolve dependency version constraint foo<; using foo. Review the dependency requirements before building.
+Could not resolve dependency version constraint bar=; using bar. Review the dependency requirements before building.
+Could not resolve dependency version constraint x>=; using x. Review the dependency requirements before building.
+Could not resolve dependency version constraint y<; using y. Review the dependency requirements before building.
+failed command: ./.zig-cache/o/765111dded5b432b1f5bf90b1454c7f2/test --cache-dir=./.zig-cache --seed=0xb098ca59 --listen=-
+
+Build Summary: 19/19 steps succeeded; 1386/1390 tests passed (4 skipped)
+test success
++- run test 1341 pass, 4 skip (1345 total) 53s MaxRSS:71M
+|  +- compile test Debug native cached 22ms MaxRSS:56M
+|     +- translate-c cached 16ms MaxRSS:55M
+|     +- options cached
+|     +- options cached
++- run test 3 pass (3 total) 5ms MaxRSS:10M
+|  +- compile test Debug native cached 19ms MaxRSS:56M
+|     +- translate-c (reused)
+|     +- options (reused)
+|     +- options (reused)
++- run test 4 pass (4 total) 6ms MaxRSS:10M
+|  +- compile test Debug native cached 18ms MaxRSS:53M
++- run test calixbuild-test 27 pass (27 total) 289ms MaxRSS:10M
+|  +- compile test calixbuild-test Debug native cached 18ms MaxRSS:53M
++- run test flatpak-backend-test 8 pass (8 total) 12ms MaxRSS:10M
+|  +- compile test flatpak-backend-test Debug native cached 18ms MaxRSS:52M
+|  |  +- options cached
+|  +- install calix-flatpak-backend-package-manager-test cached
+|     +- compile lib calix-flatpak-backend-package-manager-test Debug native cached 18ms MaxRSS:52M
++- run test source-compression-test 3 pass (3 total) 11ms MaxRSS:20M
+   +- compile test source-compression-test Debug native cached 17ms MaxRSS:57M
+

@@ -1,0 +1,125 @@
+{
+  "run_id": "calix-privilege-policy-20261020",
+  "kind": "security-policy",
+  "status": "ok",
+  "started_at": "2026-10-20T10:43:00Z",
+  "finished_at": "2026-10-20T11:04:12Z",
+  "commit": "0a2658c8f7e3776dbc4ea1ddd9778e9a89f0776c",
+  "parent_commit": "32d76f95c1206d42763cad75c5c6fe404c7560f2",
+  "working_tree_dirty": false,
+  "objective": "Close the privilege-policy debt left open by the rename: remove every code path that invokes a privilege-bypass tool, make pkexec the only default elevation mechanism, and remove the dead sudo-named CLI surface.",
+  "scope": [
+    "findElevator defaults to pkexec and rejects CALIX_ELEVATOR=sudo, doas or su with error.ForbiddenElevator",
+    "pkexec invoking-user drops use pkexec's native --user option instead of sudo/doas's -u convention",
+    "SOURCE_DATE_EPOCH AUR builds drop to the invoking user through runuser instead of sudo",
+    "database-lock remediation now prints pkexec rm and all affected expectations were updated",
+    "the no-op calix utility --sudo/-s flag was removed from the catalog and option handling",
+    "isolated-build and cancellation harnesses use pkexec/runuser and skip with exit 77 without a polkit session",
+    "operational documentation and manual-test instructions now describe polkit/pkexec",
+    "SUDO_USER and DOAS_USER remain detection-only markers for externally launched processes; Calix never invokes those tools"
+  ],
+  "policy": {
+    "default_elevator": "pkexec",
+    "allowed_explicit_overrides": [
+      "pkexec",
+      "run0",
+      "test-only wrapper scripts"
+    ],
+    "forbidden_overrides": [
+      "sudo",
+      "doas",
+      "su"
+    ],
+    "forbidden_error": "error.ForbiddenElevator",
+    "invoking_user_drop": "pkexec --user USER /usr/bin/env -i ...; test harness drops use runuser",
+    "public_sudo_flag": "removed"
+  },
+  "verification": {
+    "local": {
+      "command": "scripts/verify",
+      "commit": "0a2658c8",
+      "working_tree_dirty": false,
+      "naming_check": "pass",
+      "packagemanager_tests": 1386,
+      "packagemanager_total": 1390,
+      "packagemanager_skipped": 4,
+      "packagemanager_floor": 1380,
+      "cli_tests": 388,
+      "cli_floor": 380,
+      "rust_tests": 201,
+      "rust_floor": 195,
+      "release_builds": "pass",
+      "cli_smoke": "pass"
+    },
+    "container": {
+      "command": "scripts/ci-replay",
+      "image": "archlinux:latest",
+      "snapshot": "2026/10/01",
+      "mode": "HEAD archive, no .git",
+      "commit_under_test": "0a2658c8",
+      "naming_check": "pass",
+      "packagemanager_tests": 1388,
+      "cli_tests": 388,
+      "rust_tests": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass"
+    },
+    "isolated_harnesses": {
+      "build_syntax": "pass",
+      "cancellation_syntax": "pass",
+      "noninteractive_build_exit": 77,
+      "noninteractive_cancellation_exit": 77,
+      "reason": "no interactive polkit authentication agent is available to the unattended harness"
+    },
+    "forbidden_elevator_test": "pass",
+    "pkexec_user_argument_test": "pass"
+  },
+  "artifacts": [
+    {
+      "path": "evidence/logs/calix-privilege-policy-20261020-ci-replay.log",
+      "bytes": 21797,
+      "sha256": "4ed09e31575630da8de6b051d004d9ba0d380308c732e7e5f6333fb60f6cc25b"
+    },
+    {
+      "path": "evidence/logs/calix-privilege-policy-20261020-cli-tests.log",
+      "bytes": 6668,
+      "sha256": "8bc99ecd3b5891b7d9e79d4fab4a29f152ea79440f3894997a62aa8fffbffdc6"
+    },
+    {
+      "path": "evidence/logs/calix-privilege-policy-20261020-isolated-build-skip.log",
+      "bytes": 69,
+      "sha256": "5c0d97bd8b1f6c96175eeaf448a1749c7e309d16a819502c16cfa7e9758fe957"
+    },
+    {
+      "path": "evidence/logs/calix-privilege-policy-20261020-isolated-cancellation-skip.log",
+      "bytes": 76,
+      "sha256": "029507b9383e02873092ae7c0be2d7cb50324ae7ef3bf61f18d171e3b9dec09d"
+    },
+    {
+      "path": "evidence/logs/calix-privilege-policy-20261020-packagemanager-tests.log",
+      "bytes": 12158,
+      "sha256": "74f34e50830401c6bbcb14ee08ed5360075917ace8d6451f5e1e86aa2d76eeca"
+    },
+    {
+      "path": "evidence/logs/calix-privilege-policy-20261020-verify-local.log",
+      "bytes": 794,
+      "sha256": "f8f6522cd1a74b3dfb699d6a6126fd051a2efa108e86ae780e0c4d895b4799c1"
+    },
+    {
+      "path": "evidence/runs/calix-privilege-policy-20261020/verify-local.json",
+      "bytes": 1075,
+      "sha256": "0f44b99ef9d15290bd56583c4da5c4800804b0c7bd0d6671b476ff2b2b2677aa"
+    }
+  ],
+  "known_gaps": [
+    "Real pkexec plus systemd-nspawn execution was not run unattended: both harnesses correctly exit 77 rather than prompting without a polkit agent.",
+    "The --sudo/-s utility flag was removed rather than aliased; scripts that used the no-op flag now receive an unknown-option error.",
+    "calix-daemon packaging and the user service remain the next approved phase.",
+    "GitHub Actions was not triggered for this commit; the container replay is the pre-push proof."
+  ],
+  "not_run": [
+    "interactive polkit prompt and live desktop-session elevation",
+    "real isolated build and cancellation flows through systemd-nspawn",
+    "pacman package installation on the host"
+  ]
+}
