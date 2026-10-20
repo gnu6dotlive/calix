@@ -73,7 +73,7 @@ Five decisions follow from that:
 Every release publishes a tarball and its checksum:
 
 ```bash
-gh release download v0.2.2 --repo tension-atoi/calix \
+gh release download v0.2.3 --repo tension-atoi/calix \
   --pattern 'calix-gpui-linux-x86_64.tar.gz*'
 sha256sum -c calix-gpui-linux-x86_64.tar.gz.sha256
 mkdir -p /tmp/calix && tar -xzf calix-gpui-linux-x86_64.tar.gz -C /tmp/calix
@@ -520,7 +520,7 @@ more optimistic document elsewhere in the tree, this table is the one to trust.
 | Naming | Complete: code, paths, binaries and packaging use `calix` and `live.gnu6.calix` |
 | Platform | Arch Linux, `x86_64` |
 
-The frontend crate is version `0.2.2`. The Zig backend reports `3.1.9-dev`, a version
+The frontend crate is version `0.2.3`. The Zig backend reports `3.1.9-dev`, a version
 string inherited from the tree it descends from; it is not the Calix product version.
 
 ---
@@ -529,21 +529,29 @@ string inherited from the tree it descends from; it is not the Calix product ver
 
 In rough order of value:
 
-1. **The daemon scheduler and the Zig release watcher.** The daemon currently answers
+1. **Requalify the navigation.** The contract is published in
+   [`docs/gpui/slice-07/`](docs/gpui/slice-07/): the current state, the information
+   architecture, the wireframes, fifty-three numbered requirements and the acceptance
+   matrix. Slice-08 implements it — a context header that names the scope, a scope
+   switcher, the filter controls in every scope, a back path — and Slice-09 produces
+   the runtime evidence.
+2. **The daemon scheduler and the Zig release watcher.** The daemon currently answers
    on demand; a scheduler and a native release watcher would retire the frozen Python
    bridge and make tracked releases continuous instead of sampled.
-2. **Wire the application flow.** A dedicated root helper and a narrower polkit action
+3. **Wire the application flow.** A dedicated root helper and a narrower polkit action
    set, so the UI asks for exactly the operation it needs instead of a general CLI
    invocation.
-3. **Close the mutation gap.** Installing and removing Cargo and NPM packages from the
+4. **Close the mutation gap.** Installing and removing Cargo and NPM packages from the
    UI, and searching the sources that are currently inventory-only.
-4. **Cut the frozen Python engine.** Once the watcher is native, `scripts/calix_*.py`
+5. **Cut the frozen Python engine.** Once the watcher is native, `scripts/calix_*.py`
    and the legacy `packaging/systemd/calix-sync.*` units can go.
 
-Just before this list: `v0.2.2` shipped the optional Flatpak backend in the package,
-stopped a command from running the inventory instead of its own job, and rebuilt every
-Zig binary for the x86_64 baseline so the artifact runs on Intel CPUs as well as AMD
-ones. All three were wrong in `v0.2.1`.
+Just before this list: `v0.2.3` revived the Updates scope, which had never loaded in
+any released version, and made the layout follow the window the compositor grants
+instead of the one the application asked for. `v0.2.2` shipped the optional Flatpak
+backend in the package, stopped a command from running the inventory instead of its own
+job, and rebuilt every Zig binary for the x86_64 baseline so the artifact runs on
+Intel CPUs as well as AMD ones.
 
 ---
 

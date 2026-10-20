@@ -556,8 +556,25 @@ mod tests {
     };
     use core::prelude::v1::test;
 
+    /// The identity cache and the pending set are process-wide, and
+    /// `clear_cache` wipes both. Cargo runs the tests of a binary in parallel,
+    /// so one test was erasing the state another one was waiting for: the
+    /// settlement test watched an empty cache for its whole budget while its
+    /// own package was resolved and thrown away.
+    ///
+    /// The lock is what makes the tests deterministic. It is held for the
+    /// duration of each test that touches the global state.
+    static IDENTITY_STATE: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+    fn identity_state() -> std::sync::MutexGuard<'static, ()> {
+        IDENTITY_STATE
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+
     #[test]
     fn test_resolve_identity_3_tier_chain() {
+        let _state = identity_state();
         PackageIdentity::clear_cache();
 
         // Tier 1: Authentic icon from existing file on disk
@@ -674,6 +691,7 @@ mod tests {
 
     #[test]
     fn test_identity_cache_zero_io_and_preload() {
+        let _state = identity_state();
         PackageIdentity::clear_cache();
 
         let pkg = UnifiedPackage {
@@ -706,6 +724,7 @@ mod tests {
 
     #[test]
     fn test_alpm_uninstalled_never_checks_disk() {
+        let _state = identity_state();
         PackageIdentity::clear_cache();
 
         // Even with a name matching a real app like "firefox", if uninstalled it must be Symbolic
@@ -837,6 +856,7 @@ mod tests {
 
     #[test]
     fn test_resolver_dedup_and_settlement() {
+        let _state = identity_state();
         PackageIdentity::clear_cache();
 
         let pkg = UnifiedPackage {
@@ -860,9 +880,15 @@ mod tests {
         // Second miss before settlement: does NOT duplicate or fail
         PackageIdentity::enqueue(&pkg);
 
-        // Wait for worker settlement
+        // Wait for worker settlement.
+        //
+        // The resolver is a single background thread shared by every test in
+        // this binary, and cargo runs the tests in parallel: the worker may be
+        // busy with another package, and it does file system work on the way.
+        // The budget is generous on purpose — a test that waits 1.5s and then
+        // fails is a flaky gate, not a failing gate.
         let mut settled = false;
-        for _ in 0..150 {
+        for _ in 0..1000 {
             std::thread::sleep(std::time::Duration::from_millis(10));
             if let Ok(cache) = get_identity_cache().read() {
                 if cache.contains_key(&key) {
