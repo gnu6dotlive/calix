@@ -4,7 +4,7 @@
   "status": "ok",
   "started_at": "2026-10-20T16:15:00Z",
   "finished_at": "2026-10-20T16:50:00Z",
-  "commit": "pending",
+  "commit": "dbf17e30",
   "objective": "Bring the Calix mark into the application and let the user choose its colour, in the settings and from the control surface.",
   "the_pack": {
     "source": "/home/tension_atoi/Pictures/calix-logo-pack.zip",
@@ -77,5 +77,13 @@
       "bytes": 175420,
       "sha256": "c3f46f1696d0bddde02a33711cac6ad0c8a71de4dcf8ff0f9e0206950c9f224c"
     }
-  ]
+  ],
+  "release": {
+    "tag": "v0.2.4",
+    "note": "the release notes of the tag carry the brand"
+  },
+  "toolchain": {
+    "the_zig_0_16_toolchain": "the vendored Zig 0.16 needs libclang-cpp.so.21.1 and liblldELF.so.21.1, which the clang21 and lld21 packages provide; they had been removed from the machine, and the system Zig is 0.17, which the repository does not support. They were reinstalled through polkit.",
+    "elevation": "pkexec only; no sudo, su or doas"
+  }
 }
