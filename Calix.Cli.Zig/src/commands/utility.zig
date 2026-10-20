@@ -129,7 +129,6 @@ fn isPacfileOption(name: []const u8) bool {
         std.mem.eql(u8, name, "--backup") or
         std.mem.eql(u8, name, "--cachedir") or
         std.mem.eql(u8, name, "--output") or
-        std.mem.eql(u8, name, "--sudo") or
         std.mem.eql(u8, name, "--threeway") or
         std.mem.eql(u8, name, "--nocolor") or
         std.mem.eql(u8, name, "--search-path") or

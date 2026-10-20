@@ -5,7 +5,7 @@ if [[ $(id -u) -eq 0 ]]; then
   printf 'skipping isolated smoke test: run from an authenticated normal-user session\n' >&2
   exit 77
 fi
-for command in sudo systemd-nspawn unshare jq pgrep; do
+for command in pkexec systemd-nspawn unshare jq pgrep runuser; do
   if ! command -v "$command" >/dev/null; then
     printf 'skipping isolated smoke test: %s is unavailable\n' "$command" >&2
     exit 77
@@ -13,11 +13,15 @@ for command in sudo systemd-nspawn unshare jq pgrep; do
 done
 # Authenticate before any supervised build runs in the background.
 if [[ -t 0 ]]; then
-  sudo -v
-elif ! sudo -n true; then
-  printf 'skipping isolated smoke test: sudo authentication is required\n' >&2
+  if ! pkexec /bin/true; then
+    printf 'skipping isolated smoke test: polkit authentication failed or was cancelled\n' >&2
+    exit 77
+  fi
+else
+  printf 'skipping isolated smoke test: run from an interactive polkit session\n' >&2
   exit 77
 fi
+pkexec_bin=$(command -v pkexec)
 
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 project_dir=$(cd -- "$script_dir/.." && pwd)
@@ -84,16 +88,20 @@ package() {
 PKGBUILD
 printf "sha256sums=('%s')\n" "$source_digest" >>"$fixture_dir/PKGBUILD"
 
-# This test-only wrapper runs after sudo, so sudo's umask policy cannot mask
-# the regression. SUDO_USER/UID/GID continue to identify the normal caller.
+# This test-only wrapper runs after pkexec, so pkexec's authorization and
+# process environment cannot mask the regression. PKEXEC_UID continues to
+# identify the normal caller.
 cat >"$fixture_dir/root-wrapper" <<'WRAPPER'
 #!/usr/bin/env bash
 set -euo pipefail
 mask=$1
 shift
 umask "$mask"
-# Inner review subprocesses use sudo's ordinary -u invocation, not this wrapper.
-export CALIX_ELEVATOR=/usr/bin/sudo
+# Inner review subprocesses drop to the invoking user without another polkit
+# prompt. The wrapper still uses the same -u calling convention as the legacy
+# elevator interface.
+wrapper_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+export CALIX_ELEVATOR="$wrapper_dir/run-as-user"
 coordinator=""
 cleanup() {
   if [[ -n $coordinator ]]; then
@@ -148,6 +156,19 @@ test "$status" = 0
 test ! -e "$operation_path"
 WRAPPER
 
+# The root coordinator cannot invoke pkexec again for the invoking-user drop:
+# it is already root and must not re-enter polkit. This test-only wrapper
+# implements the -u convention Calix uses for a non-pkexec elevator.
+cat >"$fixture_dir/run-as-user" <<'RUN_AS_USER'
+#!/usr/bin/env bash
+set -euo pipefail
+[[ ${1:-} == -u ]] || { echo 'run-as-user: expected -u USER' >&2; exit 2; }
+user=$2
+shift 2
+exec runuser -u "$user" -- "$@"
+RUN_AS_USER
+chmod 0755 "$fixture_dir/run-as-user"
+
 if [[ -z ${CALIX_BIN:-} ]]; then
   env ZIG_GLOBAL_CACHE_DIR="${ZIG_GLOBAL_CACHE_DIR:-/tmp/calix-zig-global-cache}" \
     zig build --build-file "$project_dir/build.zig"
@@ -167,8 +188,8 @@ for mask in 0022 0007 0027 0077; do
   case_dir="$fixture_dir/$mask"
   mkdir "$case_dir"
   # %q preserves literal paths and arguments in the generated shell wrapper.
-  printf '#!/usr/bin/env bash\nexec /usr/bin/sudo -n /bin/bash %q %q "$@"\n' \
-    "$fixture_dir/root-wrapper" "$mask" >"$case_dir/elevator"
+  printf '#!/usr/bin/env bash\nexec %q /bin/bash %q %q "$@"\n' \
+    "$pkexec_bin" "$fixture_dir/root-wrapper" "$mask" >"$case_dir/elevator"
   chmod 0755 "$case_dir/elevator"
   CALIX_ELEVATOR="$case_dir/elevator" "$calix_bin" build \
     --isolated \

@@ -13,7 +13,7 @@ verification beyond automated tests.
 
 - [ ] With pending updates visible in the tray, run `calix upgrade` in a terminal. After completion, verify the tray rechecks and updates its icon and package submenus without restarting it.
 - [ ] Repeat for individual `upgrade standard`, `upgrade aur`, `upgrade flatpak`, and `update` commands. Packages still awaiting updates should remain listed.
-- [ ] Run an update through `sudo` or the configured privilege elevator; verify the original user's tray refreshes.
+- [ ] Run an update through `pkexec` or the configured privilege elevator; verify the original user's tray refreshes.
 - [ ] Complete a CLI update while the tray is already checking. Verify it checks again after the in-progress check finishes.
 - [ ] Run a combined upgrade where one backend fails after another succeeds; verify the tray reflects the remaining updates and the command still returns failure.
 - [ ] Repeat with the tray stopped or the session bus unavailable; verify no notification errors appear and the CLI retains its normal exit status.
@@ -363,14 +363,14 @@ package first); for bash and zsh use a clean shell, and regenerate
 
 ### Permissions
 
-- [ ] Root/sudo operations work correctly
+- [ ] Root operations work correctly
 - [ ] Permission errors are handled gracefully
 - [ ] User is prompted for elevation when needed
 - [ ] `zig build --build-file Calix.Cli.Zig/build.zig isolated-build-test`
   passes under umasks `0022`, `0007`, `0027`, and `0077`, preserving reviewed
   file modes, guest traversal permissions, readable configuration, and the
   private host operation boundary
-- [ ] From an authenticated normal-user sudo session,
+- [ ] From an authenticated normal-user polkit session,
   `Calix.Cli.Zig/scripts/test-isolated-build.sh` passes all four coordinator
   umasks through real nspawn, checks UID/GID 1000 and guest configuration,
   exports artifacts to the invoking user, and removes operation roots;

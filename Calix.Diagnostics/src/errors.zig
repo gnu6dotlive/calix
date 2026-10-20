@@ -211,8 +211,9 @@ pub fn cause(err: anyerror) []const u8 {
         error.SystemResources, error.ProcessFdQuotaExceeded, error.SystemFdQuotaExceeded => "The operating system could not provide the resources needed for this operation. Close unused applications and retry; include the technical details if it persists.",
         error.AuthorizationDenied => authorization_denied,
         error.ElevationFailed => "Could not request administrator privileges. Review the authorization helper output before retrying.",
+        error.ForbiddenElevator => "CALIX_ELEVATOR points at a privilege-bypass tool. Calix elevates through pkexec; remove the override or set it to pkexec.",
         error.ElevationRequired => "Administrator privileges are required. Run Calix from your regular user session and approve authorization when requested.",
-        error.NoElevator => "No authorization helper was found. Install or configure sudo, doas, or pkexec.",
+        error.NoElevator => "No authorization helper was found. Install or configure pkexec.",
         error.InvokingUserUnavailable, error.CannotBuildAsRoot => "Could not identify a regular user to run the build. Start Calix from your regular user session and approve authorization when requested.",
         error.AccessDenied, error.PermissionDenied => "Access was denied. Check that the invoking user has the required permissions for the selected files and directories.",
         error.NoSpaceLeft => "The destination has insufficient capacity. Check the filesystem space or the reported buffer limit before retrying.",
@@ -313,7 +314,7 @@ pub fn databaseLocked(allocator: std.mem.Allocator, database_path: []const u8) !
     var command: std.Io.Writer.Allocating = .init(allocator);
     defer command.deinit();
     // Quote the configured path as one shell argument, including embedded quotes.
-    try command.writer.writeAll("sudo rm -- '");
+    try command.writer.writeAll("pkexec rm -- '");
     for (path) |byte| {
         if (byte == '\'') try command.writer.writeAll("'\\''") else try command.writer.writeByte(byte);
     }
@@ -331,7 +332,7 @@ test "lock instructions use and shell quote the configured database path" {
     const message = try databaseLocked(std.testing.allocator, "/tmp/Calix's database/");
     defer std.testing.allocator.free(message);
     try std.testing.expect(std.mem.indexOf(u8, message, "Lock file: /tmp/Calix's database/db.lck") != null);
-    try std.testing.expect(std.mem.indexOf(u8, message, "sudo rm -- '/tmp/Calix'\\''s database/db.lck'") != null);
+    try std.testing.expect(std.mem.indexOf(u8, message, "pkexec rm -- '/tmp/Calix'\\''s database/db.lck'") != null);
     try std.testing.expect(std.mem.indexOf(u8, message, "If no package manager is running") != null);
 }
 

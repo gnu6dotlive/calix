@@ -103,9 +103,9 @@ code paths that invoke those tools.
    make package
    ```
 
-   The target runs `makepkg -si`, which uses `sudo` for the install step on a default
-   `makepkg` configuration. To stay within the polkit-only policy, run `makepkg
-   --noconfirm` and install the result with `pkexec pacman -U` instead.
+   Do not use `makepkg -si`: its install step invokes `sudo` on a default
+   `makepkg` configuration. Run `makepkg --noconfirm` and install the result
+   with `pkexec pacman -U` instead.
 
 ---
 

@@ -5,7 +5,7 @@ if [[ $(id -u) -eq 0 ]]; then
   printf 'run this test from the normal invoking-user session, not directly as root\n' >&2
   exit 77
 fi
-for command in systemd-nspawn unshare pgrep ps; do
+for command in pkexec systemd-nspawn unshare pgrep ps runuser; do
   if ! command -v "$command" >/dev/null; then
     printf 'skipping isolated cancellation test: %s is unavailable\n' "$command" >&2
     exit 77
@@ -17,7 +17,7 @@ project_dir=$(cd -- "$script_dir/.." && pwd)
 fixture_dir=$(mktemp -d /tmp/calix-isolated-cancel.XXXXXX)
 active_calix_pid=""
 observed_pids=()
-elevator=${CALIX_ELEVATOR:-sudo}
+elevator=${CALIX_ELEVATOR:-pkexec}
 test_elevator=$elevator
 cleanup() {
   if [[ -n $active_calix_pid ]]; then
@@ -32,16 +32,32 @@ cleanup() {
 trap cleanup EXIT
 
 # The Calix process must run in the background so this fixture can send a
-# signal specifically to its original PID. An uncached sudo prompt in that
+# signal specifically to its original PID. An uncached polkit prompt in that
 # background process cannot safely read from the controlling terminal. Prompt
-# once in the foreground, then make every test-time sudo call fail instead of
-# trying to prompt again.
-if [[ ${elevator##*/} == sudo ]]; then
-  printf 'Authenticating sudo before starting the background cancellation test...\n' >&2
-  "$elevator" -v
-  sudo_path=$(command -v -- "$elevator")
-  test_elevator="$fixture_dir/sudo-noninteractive"
-  printf '#!/usr/bin/env bash\nexec %q -n "$@"\n' "$sudo_path" >"$test_elevator"
+# once in the foreground, then route both the outer elevation and the
+# invoking-user drop through a deterministic wrapper.
+if [[ ${elevator##*/} == pkexec ]]; then
+  if [[ ! -t 0 ]]; then
+    printf 'skipping isolated cancellation test: run from an interactive polkit session\n' >&2
+    exit 77
+  fi
+  printf 'Authenticating polkit before starting the background cancellation test...\n' >&2
+  if ! pkexec /bin/true; then
+    printf 'skipping isolated cancellation test: polkit authentication failed or was cancelled\n' >&2
+    exit 77
+  fi
+  test_elevator="$fixture_dir/pkexec-elevator"
+  cat >"$test_elevator" <<'PKEXEC_WRAPPER'
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ ${1:-} == -u ]]; then
+  shift
+  user=$1
+  shift
+  exec runuser -u "$user" -- "$@"
+fi
+exec pkexec /bin/bash -c 'export CALIX_ELEVATOR="$1"; shift; exec "$@"' bash "$0" "$@"
+PKEXEC_WRAPPER
   chmod 0755 "$test_elevator"
 fi
 

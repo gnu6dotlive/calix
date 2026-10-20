@@ -61,7 +61,7 @@ Requirements:
 
 - `systemd-nspawn` (provided by Arch's `systemd` package)
 - `unshare` (provided by Arch's `util-linux` package) for private provisioning
-- an invoking-user-preserving elevator such as sudo, doas, run0, or pkexec
+- polkit (`pkexec`), plus `runuser` for the invoking-user drop
 
 Dependency review refreshes the repositories configured in the host's
 `/etc/pacman.conf` into a private temporary database before classifying
@@ -122,15 +122,15 @@ through the CLI's `test` target, or directly with:
 zig build --build-file Calix.Cli.Zig/build.zig isolated-source-keys-test
 ```
 
-Run the root-required smoke test from a normal user session with `jq` and
-`sudo` installed:
+Run the root-required smoke test from a normal user session with `jq`,
+`pkexec` and `runuser` installed:
 
 ```sh
 Calix.Cli.Zig/scripts/test-isolated-build.sh
 ```
 
-The smoke fixture runs all four umasks, applying each mask after sudo elevation
-and checking the coordinator's effective mask. Inside real nspawn it verifies
+The smoke fixture runs all four umasks, applying each mask after pkexec
+elevation and checking the coordinator's effective mask. Inside real nspawn it verifies
 UID/GID 1000, root-owned traversal-directory and executable permissions,
 configuration readability and destinations, and build-directory ownership.
 A host supervisor checks the operation's `0700` boundary before allowing the
@@ -140,9 +140,9 @@ Each case also reviews a group-writable (`0660`) local source, passes the
 returned digest through `--review-digest`, checks the staged input in the guest,
 and verifies that the package artifact is exported with the invoking user's UID
 and GID. Standard purge targets must be absent when stripping is disabled.
-Set `CALIX_BIN` to test an already-built CLI. The script authenticates sudo
-interactively when run from a terminal; unattended runs require an existing
-sudo credential and exit `77` (skipped) if authentication is unavailable.
+Set `CALIX_BIN` to test an already-built CLI. The script authenticates through
+polkit (`pkexec`) interactively when run from a terminal; unattended runs exit
+`77` (skipped) because they cannot answer a polkit prompt.
 
 Cancellation across the elevation boundary has a rootless integration fixture
 that uses a deterministic fake elevator:
@@ -154,7 +154,7 @@ Calix.Cli.Zig/scripts/test-elevation-cancellation.sh
 The full fixture requires a working invoking-user-preserving elevator and the
 same privileges as a real isolated build. It sends SIGINT and SIGTERM only to
 the original Calix process and verifies that nspawn descendants and the
-operation root are gone. When sudo is selected, the fixture authenticates once
+operation root are gone. When pkexec is selected, the fixture authenticates once
 in the foreground before starting Calix as the background process under test:
 
 ```sh

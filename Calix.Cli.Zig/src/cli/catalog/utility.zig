@@ -30,7 +30,6 @@ pub const variants = [_]types.Variant{
             flag("--backup", &.{"-b"}, "Save the old original as .bak before overwriting"),
             stringOption("--cachedir", &.{"-C"}, "Package cache directory for three-way base archives; repeat to add directories", false),
             flag("--output", &.{"-o"}, "Print discovered pacfile paths without modifying them"),
-            flag("--sudo", &.{"-s"}, "Explicitly request elevation; interactive pacfile maintenance elevates automatically"),
             flag("--threeway", &.{"-3"}, "Use a cached older package as the third input when viewing differences"),
             flag("--nocolor", &.{}, "Disable colored pacfile status output"),
             stringOption("--search-path", &.{}, "Path to scan with --find; repeat to add paths", false),

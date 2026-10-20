@@ -420,7 +420,7 @@ pub fn invokingUserCommand(
     }
 
     if (environ.getPosix("SUDO_USER")) |sudo_user| {
-        try appendOwned(allocator, &argv, &.{ "sudo", "--preserve-env=PATH", "-u", sudo_user, command });
+        try appendOwned(allocator, &argv, &.{ "/usr/bin/runuser", "-u", sudo_user, "-w", "PATH", "--", command });
     } else if (environ.getPosix("DOAS_USER")) |doas_user| {
         try appendOwned(allocator, &argv, &.{ "/usr/bin/runuser", "-u", doas_user, "-w", "PATH", "--", command });
     } else if (environ.getPosix("PKEXEC_UID")) |uid| {

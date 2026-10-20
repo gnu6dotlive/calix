@@ -8,6 +8,7 @@ const signals = @import("signals.zig");
 pub const Error = error{
     UnsupportedPlatform,
     ElevationFailed,
+    ForbiddenElevator,
 };
 
 pub fn isRoot() bool {
@@ -27,7 +28,7 @@ pub fn relaunchIfNeeded(
     const executable = try std.process.executablePathAlloc(context.io, context.allocator);
     const safe_executable: []const u8 = std.mem.trimEnd(u8, executable, " (deleted)");
     defer context.allocator.free(executable);
-    const elevator = findElevator(context);
+    const elevator = try findElevator(context);
     const elevated_arguments = try buildArguments(context.allocator, elevator, safe_executable, arguments);
     defer context.allocator.free(elevated_arguments);
 
@@ -70,7 +71,7 @@ pub fn relaunchIfNeededCancellable(
     defer context.allocator.free(executable);
     const elevated_arguments = try buildArguments(
         context.allocator,
-        findElevator(context),
+        try findElevator(context),
         safe_executable,
         arguments,
     );
@@ -223,8 +224,8 @@ fn processExists(pid: std.posix.pid_t) bool {
     return true;
 }
 
-/// Runs the current executable as the user who invoked sudo/doas/pkexec/run0. This
-/// keeps per-user package stores (notably Flatpak) attached to the calling
+/// Runs the current executable as the user who invoked the elevated process.
+/// This keeps per-user package stores (notably Flatpak) attached to the calling
 /// user when an aggregate command is already running as root. The child also
 /// receives the calling user's runtime directory and session bus address so
 /// system-scope Flatpak operations can authenticate through the Flatpak
@@ -281,7 +282,7 @@ pub fn runAsInvokingUser(
     defer context.allocator.free(bus_environment);
     const child_arguments = try buildInvokingUserArguments(
         context.allocator,
-        findElevator(context),
+        try findElevator(context),
         identity.username,
         safe_executable,
         home_environment,
@@ -345,7 +346,7 @@ pub fn runAsInvokingUserCapture(
     defer context.allocator.free(bus_environment);
     const child_arguments = try buildInvokingUserArguments(
         context.allocator,
-        findElevator(context),
+        try findElevator(context),
         identity.username,
         executable,
         home_environment,
@@ -413,8 +414,9 @@ pub fn invokingUserIds(context: *const context_module.RuntimeContext) !?UserIds 
 
 /// Selects the mechanism used to escalate privileges.
 ///
-/// `CALIX_ELEVATOR` wins: it is an explicit, deliberate choice by the
-/// operator, and it is how a caller opts into `run0` or any other mechanism.
+/// `CALIX_ELEVATOR` wins for allowed mechanisms: it is an explicit,
+/// deliberate choice by the operator, and it is how a caller opts into
+/// `run0` or another non-default elevator.
 ///
 /// Failing that, the default is `pkexec`. The previous behaviour scanned
 /// `PATH` and silently selected `doas`, `sudo` or `run0` — in that order.
@@ -425,18 +427,33 @@ pub fn invokingUserIds(context: *const context_module.RuntimeContext) !?UserIds 
 /// host, which is not a property worth inheriting.
 ///
 /// `run0` remains available through an explicit `CALIX_ELEVATOR=run0`.
-fn findElevator(context: *const context_module.RuntimeContext) []const u8 {
+/// Privilege-bypass tools are rejected even through the override.
+fn findElevator(context: *const context_module.RuntimeContext) Error![]const u8 {
     if (context.environment) |environment| {
         if (environment.get("CALIX_ELEVATOR")) |configured| {
             const trimmed = std.mem.trim(u8, configured, " \t\r\n");
-            if (trimmed.len > 0) return trimmed;
+            if (trimmed.len > 0) {
+                if (isForbiddenElevator(trimmed)) return error.ForbiddenElevator;
+                return trimmed;
+            }
         }
     }
     return "pkexec";
 }
 
+fn isForbiddenElevator(elevator: []const u8) bool {
+    const name = std.fs.path.basename(elevator);
+    return std.mem.eql(u8, name, "sudo") or
+        std.mem.eql(u8, name, "doas") or
+        std.mem.eql(u8, name, "su");
+}
+
 fn isRun0(elevator: []const u8) bool {
     return std.mem.eql(u8, std.fs.path.basename(elevator), "run0");
+}
+
+fn isPkexec(elevator: []const u8) bool {
+    return std.mem.eql(u8, std.fs.path.basename(elevator), "pkexec");
 }
 
 fn buildArguments(
@@ -466,6 +483,26 @@ fn buildInvokingUserArguments(
     bus_environment: []const u8,
     arguments: []const []const u8,
 ) ![]const []const u8 {
+    if (isPkexec(elevator)) {
+        const result = try allocator.alloc([]const u8, arguments.len + 14);
+        result[0] = elevator;
+        result[1] = "--user";
+        result[2] = user;
+        result[3] = "/usr/bin/env";
+        result[4] = "-i";
+        result[5] = home_environment;
+        result[6] = config_environment;
+        result[7] = data_environment;
+        result[8] = cache_environment;
+        result[9] = bin_environment;
+        result[10] = runtime_environment;
+        result[11] = bus_environment;
+        result[12] = "PATH=" ++ Zigalpm.process_runner.build_path.baseline;
+        result[13] = executable;
+        @memcpy(result[14..], arguments);
+        return result;
+    }
+
     if (isRun0(elevator)) {
         const result = try allocator.alloc([]const u8, arguments.len + 20);
         result[0] = elevator;
@@ -725,17 +762,23 @@ test "automatic elevator selection honours the override and otherwise defaults t
 
     // Privilege-bypass tools are never selected implicitly, even when they
     // are the first thing on PATH.
-    try std.testing.expectEqualStrings("pkexec", findElevator(&context));
+    try std.testing.expectEqualStrings("pkexec", try findElevator(&context));
     try temporary.dir.deleteFile(std.testing.io, "sudo");
     try temporary.dir.deleteFile(std.testing.io, "doas");
-    try std.testing.expectEqualStrings("pkexec", findElevator(&context));
+    try std.testing.expectEqualStrings("pkexec", try findElevator(&context));
 
-    // An explicit override still wins, including for the mechanisms that are
-    // no longer discovered automatically.
+    // An explicit override still wins for allowed mechanisms, including
+    // those that are no longer discovered automatically.
     try environment.put("CALIX_ELEVATOR", "  pkexec \n");
-    try std.testing.expectEqualStrings("pkexec", findElevator(&context));
+    try std.testing.expectEqualStrings("pkexec", try findElevator(&context));
     try environment.put("CALIX_ELEVATOR", "run0");
-    try std.testing.expectEqualStrings("run0", findElevator(&context));
+    try std.testing.expectEqualStrings("run0", try findElevator(&context));
+
+    // The override is not a loophole for privilege-bypass tools.
+    try environment.put("CALIX_ELEVATOR", "/usr/bin/sudo");
+    try std.testing.expectError(error.ForbiddenElevator, findElevator(&context));
+    try environment.put("CALIX_ELEVATOR", "doas");
+    try std.testing.expectError(error.ForbiddenElevator, findElevator(&context));
 }
 
 test "elevation child status maps to shell exit codes" {
@@ -764,6 +807,47 @@ test "calling-user arguments use a clean invoking-user environment" {
     const expected = [_][]const u8{
         "sudo",
         "-u",
+        "tester",
+        "/usr/bin/env",
+        "-i",
+        "HOME=/home/tester",
+        "XDG_CONFIG_HOME=/home/tester/.config",
+        "XDG_DATA_HOME=/home/tester/.local/share",
+        "XDG_CACHE_HOME=/home/tester/.cache",
+        "XDG_BIN_HOME=/home/tester/.local/bin",
+        "XDG_RUNTIME_DIR=/run/user/1000",
+        "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus",
+        "PATH=" ++ Zigalpm.process_runner.build_path.baseline,
+        "/usr/bin/calix",
+        "upgrade",
+        "flatpak",
+        "--no-confirm",
+    };
+    try std.testing.expectEqual(expected.len, actual.len);
+    for (expected, actual) |wanted, value| try std.testing.expectEqualStrings(wanted, value);
+}
+
+test "pkexec invoking-user arguments use the native --user option" {
+    const arguments = [_][]const u8{ "upgrade", "flatpak", "--no-confirm" };
+    const actual = try buildInvokingUserArguments(
+        std.testing.allocator,
+        "/usr/bin/pkexec",
+        "tester",
+        "/usr/bin/calix",
+        "HOME=/home/tester",
+        "XDG_CONFIG_HOME=/home/tester/.config",
+        "XDG_DATA_HOME=/home/tester/.local/share",
+        "XDG_CACHE_HOME=/home/tester/.cache",
+        "XDG_BIN_HOME=/home/tester/.local/bin",
+        "XDG_RUNTIME_DIR=/run/user/1000",
+        "DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus",
+        &arguments,
+    );
+    defer std.testing.allocator.free(actual);
+
+    const expected = [_][]const u8{
+        "/usr/bin/pkexec",
+        "--user",
         "tester",
         "/usr/bin/env",
         "-i",
