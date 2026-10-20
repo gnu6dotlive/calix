@@ -1,0 +1,128 @@
+{
+  "run_id": "calix-tranche1b2-20261020",
+  "kind": "calix-tranche1b2",
+  "status": "ok",
+  "started_at": "2026-10-20T03:20:00Z",
+  "finished_at": "2026-10-20T04:35:00Z",
+  "objective": "Tranche 1b2: upstream provenance verification, the release registry, and calix-daemon serving the unified inventory over a Unix socket.",
+  "host": {
+    "kernel": "7.2.9-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "zig": "0.16.0"
+  },
+  "steps": [
+    {
+      "name": "provenance-module",
+      "status": "ok",
+      "detail": "shared/provenance.zig: parse a forge's digest (api field, bare hex, coreutils sums line), hash and compare a file, select a checksum asset, and carry a Trust level whose describe() states what the check does and does not prove.",
+      "tests_added": 21
+    },
+    {
+      "name": "provenance-wired-into-apply",
+      "status": "ok",
+      "detail": "appimage/update_manager.zig verifies the downloaded artefact before the swap. A published digest that does not match refuses the update and changes nothing; an absent digest is reported as unverified rather than silently accepted. The verified message names the digest and whether it came from release metadata or a checksum file.",
+      "tests_added": 0
+    },
+    {
+      "name": "release-registry",
+      "status": "ok",
+      "detail": "release/registry.zig: JSON state in the daemon's state directory. record() answers 'is there news?' and never marks anything told; markNotified() is called only after the notification happened. A forge rolling back to a prerelease is not news (release_version.isNewer). Atomic save via a flushed sibling and rename.",
+      "tests_added": 17
+    },
+    {
+      "name": "inventory-service-extraction",
+      "status": "ok",
+      "detail": "The gathering moved out of commands/inventory.zig into inventory/service.zig so the CLI and the daemon serve one implementation rather than two that drift."
+    },
+    {
+      "name": "calix-daemon",
+      "status": "ok",
+      "detail": "New executable: JSON-lines protocol over a Unix socket ($XDG_RUNTIME_DIR/calix/daemon.sock), actions ping/status/inventory/releases/mark-notified, protocol version checked before dispatch, one-request arena, per-day operational journal in the state directory, stale-socket detection. Built by the same backend library as the CLI.",
+      "tests_added": 11
+    },
+    {
+      "name": "live-daemon-smoke",
+      "status": "ok",
+      "detail": "Ran the built binary against a temporary socket and state directory.",
+      "observed": {
+        "protocol_version_rejected": "version 99 -> ok=false, error=unsupported-version",
+        "unknown_action": "ok=false, error=unknown-action",
+        "malformed_request": "ok=false, error=bad-request",
+        "inventory_packages": 1966,
+        "inventory_by_source": {
+          "ALPM": 1880,
+          "AUR": 17,
+          "Flatpak": 24,
+          "AppImage": 16,
+          "Cargo": 20,
+          "NPM": 9
+        },
+        "generated_at": "wall clock (verified against the host date)",
+        "releases": "GitHub Copilot probed via static_url, recorded in releases.json",
+        "mark_notified": "persisted; after a daemon restart the same version reports is_news=false",
+        "journal": "daemon-2026-10-20.jsonl, one JSON object per event"
+      }
+    },
+    {
+      "name": "full-test-suites",
+      "status": "ok",
+      "detail": "PackageManager 1382 passed / 4 skipped; CLI 387 passed; UI (cargo) 195 passed."
+    }
+  ],
+  "defects_found_and_fixed": [
+    {
+      "defect": "The response envelope's closing brace was lost while the writer block was assembled; every response was truncated JSON.",
+      "caught_by": "live socket smoke test, not by unit tests",
+      "fix": "writeAll(\"}\\n\")"
+    },
+    {
+      "defect": "Timestamps used std.Io.Timestamp.now(io, .awake), which is monotonic since boot: status reported started_at=226883 and the journal dated itself in 1970.",
+      "caught_by": "live socket smoke test",
+      "fix": ".real for wall-clock fields; uptime measured monotonically so a clock jump cannot make it negative"
+    },
+    {
+      "defect": "Server.init freed the journal's directory string on return, so the journal appended to freed memory and silently wrote nothing.",
+      "caught_by": "live socket smoke test (no journal file appeared)",
+      "fix": "the journal owns its directory; deinit frees it"
+    },
+    {
+      "defect": "Month.jan is 1, not 0; adding one to @intFromEnum shifted every journal file a month, and the test that read the file back failed with FileNotFound.",
+      "caught_by": "the journal test itself",
+      "fix": "Month.numeric()"
+    },
+    {
+      "defect": "A test used /proc as an unwritable directory and hung the suite at 100% CPU instead of failing.",
+      "caught_by": "the test suite timing out; bisected by running the module test binary and reading the last line it printed",
+      "fix": "use a regular file as a parent directory: NotDir, immediately"
+    },
+    {
+      "defect": "Adding a second test artifact for the daemon re-ran the whole CLI suite in parallel with itself, contending for the same on-disk fixtures.",
+      "caught_by": "suite timeout",
+      "fix": "removed the duplicate artifact; the daemon's tests are reachable from src/root.zig"
+    }
+  ],
+  "incident": {
+    "summary": "Zig 0.17.0 replaced 0.16.0 as /usr/bin/zig during the session. Every build then failed with 'no field named args in struct Build' — in this repository and in vendored dependency build scripts alike.",
+    "detection": "zig version reported 0.17.0; /usr/bin/zig mtime matched the change",
+    "resolution": "Extracted the cached zig-0.16.0-1.1 package into vendor/zig-0.16 with bsdtar (no root, no package-manager change) and built with that binary. vendor/ added to .gitignore.",
+    "note": "The system default remains 0.17.0. The repository targets 0.16.0; nothing in this tranche was validated against 0.17."
+  },
+  "artifacts": [
+    "Shelly.PackageManager/src/shared/provenance.zig",
+    "Shelly.PackageManager/src/shared/json.zig",
+    "Shelly.PackageManager/src/release/registry.zig",
+    "Shelly.Cli.Zig/src/inventory/service.zig",
+    "Shelly.Cli.Zig/src/daemon/protocol.zig",
+    "Shelly.Cli.Zig/src/daemon/journal.zig",
+    "Shelly.Cli.Zig/src/daemon/server.zig",
+    "Shelly.Cli.Zig/src/daemon/main.zig"
+  ],
+  "known_gaps": [
+    "The GPUI frontend still reads the Python-written state files through calix_state.rs. The daemon serves the inventory, but nothing in the product consumes it yet; the cutover is the next slice.",
+    "The apply flow (bump PKGBUILD, makepkg, root helper, rollback) is not implemented. Provenance is wired into the AppImage update path, which is user-scoped, not root.",
+    "No root helper binary and no polkit rule yet.",
+    "A .static_url AppImage is recorded against its ETag token, which is the existing prober's idea of a version; is_news therefore fires once per ETag change.",
+    "The daemon serves connections one at a time. Correct, and the stated trade-off, but unmeasured under concurrent clients."
+  ],
+  "ok": true
+}

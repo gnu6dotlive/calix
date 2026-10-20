@@ -290,9 +290,20 @@ Tranche 1b1 (Done)  : Backends Cargo et NPM en Zig + contrat d'inventaire
                           sérialisée, le modèle Rust analyse un échantillon capturé depuis lui.
                         → `shelly inventory` imprime le document : 1962 paquets (1876 ALPM,
                           24 Flatpak, 20 Cargo, 17 AUR, 16 AppImage, 9 NPM).
-Tranche 1b2 (Next)  : Registre de releases, vérification de provenance amont, flux
-                        d'application, helper root + polkit, calix-daemon (socket, scheduler,
-                        journal), calix CLI, UI sur daemon, suppression du moteur Python.
+Tranche 1b2 (Done)  : Provenance amont (digest du forge, refus si divergence, Trust qui dit ce
+                        qui est prouvé), registre de releases (« déjà notifié »), et
+                        `calix-daemon` : socket JSON-lines versionné, `ping`/`status`/`inventory`/
+                        `releases`/`mark-notified`, journal quotidien, une arène par requête.
+                        Vérifié en live : 1966 paquets servis, protocole refusé si la version
+                        diffère, « déjà notifié » survit au redémarrage.
+                      → La vérification est câblée dans le chemin de mise à jour AppImage : un
+                        artefact qui ne correspond pas au digest publié n'atteint jamais le
+                        chemin live.
+                      → Un défaut trouvé seulement en live, pas par les tests : `.awake` est
+                        monotone depuis le boot, pas l'époque Unix. Trois champs dataient en 1970.
+Tranche 1b3 (Next)  : UI sur le daemon (le cutover supprime la fusion côté frontend, pas
+                        seulement le fichier), scheduler du daemon, flux d'application, helper
+                        root + polkit, `calix` CLI, suppression du moteur Python.
 ```
 
 ---
@@ -491,19 +502,47 @@ Travail réellement nouveau, en Zig :
    la course à deux propriétaires sur `appimage-metadata-v2.db` a disparu.
 3b. ~~**Contrat d'inventaire**~~ — **fait** (tranche 1b1) : enregistrement plat, versionné, figé
    des deux côtés.
-4. **Registre de releases** + état (JSON, répertoire d'état du daemon).
-5. **Vérification de provenance amont** — récupérer le `SHA256SUMS.txt` du forge et le comparer à
-   l'artefact téléchargé. *Cette capacité n'existe pas dans le Zig aujourd'hui* : `checksums.zig`
-   vérifie l'artefact contre les sommes du PKGBUILD, ce qui est circulaire quand `updpkgsums` régénère
-   ces sommes depuis le fichier qu'il vient de télécharger.
+4. ~~**Registre de releases** + état~~ — **fait** (tranche 1b2) : `release/registry.zig`, JSON dans le
+   répertoire d'état du daemon, écriture atomique. `record()` répond « y a-t-il du nouveau ? » et ne
+   marque jamais rien comme notifié ; `markNotified()` n'est appelé qu'après la notification réelle.
+   Un forge qui rebascule son « latest » sur une préversion n'est pas une nouvelle : `release_version.isNewer`.
+5. ~~**Vérification de provenance amont**~~ — **fait** (tranche 1b2) : `shared/provenance.zig` lit le
+   digest que le forge publie (champ `digest` du release asset, ou fichier de sommes livré avec la
+   release), vérifie l'artefact téléchargé avant la bascule, et **refuse** en cas de divergence.
+   `Trust::describe()` dit ce que la vérification prouve — la correspondance à ce que le forge a
+   publié — et ce qu'elle ne prouve pas : ni le forge, ni le compte détenteur de la release, ni
+   l'identité de l'éditeur. Câblé dans `appimage/update_manager.zig` avant `applyDownloadedUpdate`.
 6. **Flux d'application** — bump PKGBUILD → vérif amont → `makepkg` → helper root → vérif → rollback.
 7. **Helper root** à capacité étroite + règle polkit dédiée.
 8. **Agrégation de l'inventaire** + document versionné (schéma versionné, test de compatibilité Zig↔Rust).
-9. **`calix-daemon`** — socket, scheduler, journal opérationnel, persistance du « déjà notifié ».
+9. ~~**`calix-daemon`**~~ — **fait pour le socket, le journal et le « déjà notifié »** (tranche 1b2) :
+   `calix-daemon` est un exécutable séparé, bâti sur la même bibliothèque que la CLI. Protocole
+   JSON-lines versionné (vérifié avant le dispatch), actions `ping` / `status` / `inventory` /
+   `releases` / `mark-notified`, une arène par requête, journal opérationnel quotidien dans son
+   propre répertoire d'état, détection de socket périmé. **Le scheduler reste à faire** : le daemon
+   interroge quand on le lui demande, pas encore en continu.
 10. **`calix` CLI** en Zig, partageant la bibliothèque, fonctionnant en autonome *et* contre le daemon.
 11. **L'UI passe par le daemon** — la lecture directe de `~/.local/state/calix/*.json` (Phase 7b)
-    disparaît ; le modèle `UnifiedPackage` Rust devient un pur rendu.
+    disparaît ; le modèle `UnifiedPackage` Rust devient un pur rendu. **Prochaine tranche** : le
+    daemon sert déjà l'inventaire complet (1966 paquets), mais `calix_state.rs` lit encore les
+    fichiers. Le cutover n'est pas un simple changement de transport : le document du daemon est
+    plat et contient *tous* les écosystèmes, alors que `EcosystemInventory` attend trois maps
+    (`cargo.json`, `npm.json`, `releases.json`) fusionnées avec ALPM côté frontend. C'est cette
+    fusion — et non le socket — qui disparaît.
 12. **Suppression du moteur Python.**
+
+### Outillage : Zig 0.16.0, pas 0.17.0
+
+Le 2026-10-20, `/usr/bin/zig` est passé à **0.17.0** en cours de session. Tous les builds ont alors
+échoué — y compris ceux des dépendances vendues — sur `no field named 'args' in struct 'Build'`.
+Le dépôt cible **0.16.0**. La copie 0.16.0 du cache pacman a été extraite sans privilèges :
+
+```sh
+bsdtar -xf /var/cache/pacman/pkg/zig-0.16.0-1.1-x86_64_v3.pkg.tar.zst -C vendor/zig-0.16
+PATH="$PWD/vendor/zig-0.16/usr/bin:$PATH" zig build
+```
+
+`vendor/` est ignoré par git. Rien de cette tranche n'a été validé sous 0.17.
 
 ### Après la tranche 1
 
