@@ -6,7 +6,7 @@ The CLI surface supports global options and subcommands for window management, n
 
 - `-j`, `--json`: Emits machine-readable JSON for scripting, automated verification, and agent pipelines.
 - `-h`, `--help`: Prints comprehensive help text detailing available commands and exits 0.
-- `-V`, `--version`: Prints executable version and protocol version (`calix-gpui 0.2.0 (control protocol v4)`).
+- `-V`, `--version`: Prints executable version and protocol version (`calix-gpui 0.2.1 (control protocol v4)`).
 
 ## Exit Code Semantics
 

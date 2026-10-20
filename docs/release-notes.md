@@ -1,18 +1,45 @@
-# Calix v0.2.0
+# Calix v0.2.1
 
-Calix v0.2.0 is the first release after the rename from Shelly. It is a **hard cut**:
-there is no runtime compatibility layer, and Calix does not read the old Shelly paths,
-environment variables or Flatpak ABI names.
+Calix v0.2.1 adds the desktop notification bridge on top of the v0.2.0 rename. The
+rename itself is a **hard cut**: there is no runtime compatibility layer, and Calix does
+not read the old Shelly paths, environment variables or Flatpak ABI names. If you are
+coming from Shelly, the migration below still applies unchanged.
 
 ## What is in this release
 
 - `calix-gpui`, the GPUI desktop application.
 - `calix`, the Zig package-management CLI.
 - `calix-daemon`, the per-user inventory service, packaged with a systemd user unit.
+- `calix-notify`, the session-bus notification bridge, packaged with its own user unit.
 - The desktop entry, icon and polkit policy under the `live.gnu6.calix` namespace.
-- Packaging through `PKGBUILD-calix`; the package is `calix-gpui-git`.
+- Packaging through `PKGBUILD-calix`; the package is `calix-gpui-git` and now depends
+  on `dbus`, which the bridge links.
 - `pkexec` as the only elevation path. `sudo`, `doas` and `su` are rejected.
 - A single-profile CI gate: the Rust tests and release binary share one release build.
+
+## Desktop notifications
+
+`calix` already emits `live.gnu6.calix.Refresh` on the session bus after an operation
+that changed installed state. `calix-notify` is a small bridge that subscribes to that
+signal and turns it into one `org.freedesktop.Notifications` notification. It links
+libdbus directly: there is no `dbus-monitor` output to parse and no `notify-send`
+process in the path.
+
+The bridge is installed but not enabled, like the daemon. Enable it per account:
+
+```bash
+systemctl --user enable --now calix-notify.service
+systemctl --user status calix-notify.service
+```
+
+Two things it deliberately does not do:
+
+- **It never autolaunches a session bus.** It takes `DBUS_SESSION_BUS_ADDRESS`, or
+  `XDG_RUNTIME_DIR` when that is absolute, and exits otherwise. A machine with no
+  desktop session must not grow a bus because a package was installed.
+- **It never fails a package operation.** A missing notification daemon means the
+  notification is dropped, not that the install is rolled back. Only a dropped bus
+  stops the service, and systemd restarts it.
 
 ## Migration from Shelly
 
@@ -59,8 +86,8 @@ make package
 pkexec pacman -U /tmp/calix-gpui-pkg/*.pkg.tar.zst
 ```
 
-The package installs the user service but does not enable it. Enabling a user unit is a
-per-account decision:
+The package installs both user services but does not enable them. Enabling a user unit
+is a per-account decision:
 
 ```bash
 systemctl --user enable --now calix-daemon.service
@@ -89,11 +116,13 @@ The GitHub release contains `calix-gpui-linux-x86_64.tar.gz`, its
 
 - `usr/lib/calix/calix`
 - `usr/lib/calix/calix-daemon`
+- `usr/lib/calix/calix-notify`
 - `usr/lib/calix/calix-gpui`
-- `usr/bin/calix` and `usr/bin/calix-daemon` symlinks
+- `usr/bin/calix`, `usr/bin/calix-daemon` and `usr/bin/calix-notify` symlinks
 - `usr/bin/calix-gpui` wrapper
 - the desktop entry, icon and polkit policy
 - `usr/lib/systemd/user/calix-daemon.service`
+- `usr/lib/systemd/user/calix-notify.service`
 
 It is not an installer. Use the package recipe or copy the tree deliberately.
 
@@ -102,6 +131,10 @@ It is not an installer. Use the package recipe or copy the tree deliberately.
 - `calix-daemon` serves inventory and release state on demand; it has no scheduler yet.
 - The tracked-release observation file is still written by the frozen Python bridge.
 - UI mutations cover ALPM, AUR and Flatpak.
+- `calix-notify` is desktop-only: it needs a session bus and a notification daemon.
+  Neither is required for the package manager itself.
+- The bridge was validated against a private D-Bus, not against a live notification
+  daemon, and the packaged unit was not enabled on a live session.
 - Calix is pre-1.0; the backend reports the inherited `3.1.9-dev` string, not the
   product version.
 
