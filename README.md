@@ -73,7 +73,7 @@ Five decisions follow from that:
 Every release publishes a tarball and its checksum:
 
 ```bash
-gh release download v0.2.4 --repo tension-atoi/calix \
+gh release download v0.2.5 --repo tension-atoi/calix \
   --pattern 'calix-gpui-linux-x86_64.tar.gz*'
 sha256sum -c calix-gpui-linux-x86_64.tar.gz.sha256
 mkdir -p /tmp/calix && tar -xzf calix-gpui-linux-x86_64.tar.gz -C /tmp/calix
@@ -520,7 +520,7 @@ more optimistic document elsewhere in the tree, this table is the one to trust.
 | Naming | Complete: code, paths, binaries and packaging use `calix` and `live.gnu6.calix` |
 | Platform | Arch Linux, `x86_64` |
 
-The frontend crate is version `0.2.4`. The Zig backend reports `3.1.9-dev`, a version
+The frontend crate is version `0.2.5`. The Zig backend reports `3.1.9-dev`, a version
 string inherited from the tree it descends from; it is not the Calix product version.
 
 ---
@@ -529,12 +529,11 @@ string inherited from the tree it descends from; it is not the Calix product ver
 
 In rough order of value:
 
-1. **Requalify the navigation.** The contract is published in
-   [`docs/gpui/slice-07/`](docs/gpui/slice-07/): the current state, the information
-   architecture, the wireframes, fifty-three numbered requirements and the acceptance
-   matrix. Slice-08 implements it — a context header that names the scope, a scope
-   switcher, the filter controls in every scope, a back path — and Slice-09 produces
-   the runtime evidence.
+1. **Close the requalification.** The contract is published in
+   [`docs/gpui/slice-07/`](docs/gpui/slice-07/) and implemented in
+   [`docs/gpui/slice-08/`](docs/gpui/slice-08/). What is left: the clicks, which
+   the synthetic pointer could not exercise, and the focus a place change should
+   move to the first element of the new place.
 2. **The daemon scheduler and the Zig release watcher.** The daemon currently answers
    on demand; a scheduler and a native release watcher would retire the frozen Python
    bridge and make tracked releases continuous instead of sampled.
@@ -546,9 +545,11 @@ In rough order of value:
 5. **Cut the frozen Python engine.** Once the watcher is native, `scripts/calix_*.py`
    and the legacy `packaging/systemd/calix-sync.*` units can go.
 
-Just before this list: `v0.2.4` brought the new mark — a chalice whose cup is a
-scallop shell — and the user's choice of colour, which follows the accent of the
-interface. `v0.2.3` revived the Updates scope, which had never loaded in any
+Just before this list: `v0.2.5` requalified the navigation — a context header
+that names the scope, the filters in every scope, and a search box that narrows
+what you are looking at. `v0.2.4` brought the new mark — a chalice whose cup is
+a scallop shell — and the user's choice of colour, which follows the accent of
+the interface. `v0.2.3` revived the Updates scope, which had never loaded in any
 released version, and made the layout follow the window the compositor grants
 instead of the one the application asked for. `v0.2.2` shipped the optional Flatpak
 backend in the package, stopped a command from running the inventory instead of its own

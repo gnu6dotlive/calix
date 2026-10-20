@@ -1,14 +1,81 @@
-# Calix v0.2.4
+# Calix v0.2.5
 
-Calix v0.2.4 is the brand release. The application wears the new mark — a
-chalice whose cup is a scallop shell — and the user chooses its colour, in the
-settings or from the control surface. The colour follows the accent of the
-interface, so the mark and the application speak the same colour.
+Calix v0.2.5 is the navigation release. The application says where it is: a
+context header names the scope, counts what it shows, and states which
+ecosystems that scope can contain. The filters are in every scope, and they
+mean what they say. The search box narrows what you are looking at.
 
-It also carries the v0.2.3 correctness fixes, for the accounts that have not
-taken them yet.
+The requalification was contracted before it was written — the contract is
+published in [`docs/gpui/slice-07/`](docs/gpui/slice-07/), the implementation
+record in [`docs/gpui/slice-08/`](docs/gpui/slice-08/).
 
-## The mark, and the colour the user chooses
+## The context header
+
+A permanent header, 48 pixels, between the rail and the surface. It answers the
+question the rail never answered: where am I?
+
+- the **scope** — the results, what is installed, what can be updated — and the
+  switcher that changes it, bound to the rail: the two always show the same
+  value;
+- the **count** of the rows the scope shows;
+- the **coverage**: the ecosystems the scope can contain, with the three it
+  lists but cannot query marked as such — `alpm · aur · flatpak · appimage +
+  cargo · npm · release (inventory only)`;
+- the **filters in force**, and a way to clear them;
+- a source that **did not answer**, with its retry.
+
+## The filters are in every scope
+
+The filters were applied to all three scopes while the controls that changed
+them lived in one of them: a source set in Search silently governed Installed
+and Updates, in surfaces that could neither show it nor undo it. The search
+box, the sources, the state and the sort now stand in every scope, and the
+scope's own action beside them — *Upgrade all* in Updates.
+
+The sources are the scope's, not the four the filter knew about. A scope that
+lists Cargo, NPM and the tracked releases offers them, marked as the ones it
+lists but cannot query — and a Cargo row no longer disappears when ALPM is
+switched off, which is what folding every unknown source into ALPM meant.
+
+The state filter offers only what can be true of the rows: *not installed* is
+not offered where every row is installed, and a filter that cannot be true of
+the rows is withdrawn rather than emptying the list.
+
+## The search narrows the scope
+
+In the results, the query goes to the backend, as it always did. In what is
+installed and in what can be updated, the rows are already loaded and the query
+reduces them. Searching among the 1914 installed packages is now possible at
+all — it was not, before.
+
+## The back path, and the keys
+
+Escape is the local back: it clears the search, then leaves the place, then
+empties the selection. It is never a key that does nothing.
+
+| Key | Action |
+|---|---|
+| `⌘1` … `⌘5` | The five entries of the rail |
+| `⌥←` / `⌥→` | The previous and the next scope |
+| `⌘F` | The search box |
+| `⌘L` | The operation console |
+| `⌘⌥C` | The rail |
+
+## The control surface
+
+```bash
+calix-gpui scope installed
+calix-gpui status --json
+```
+
+`status` now reports the place, the scope, the ecosystems the scope can
+contain, the inventory-only ones, the filters in force and the row count.
+`destination` is kept as a deprecated alias of `scope`, so the automation that
+reads it keeps working. The protocol is version 5.
+
+## What v0.2.4 brought, and what v0.2.3 fixed
+
+## The mark, and the colour the user chooses (v0.2.4)
 
 The rail header now shows the shell in a chalice, painted by the accent of the
 interface. Two colourways, one geometry, and the choice is the user's:
@@ -96,21 +163,19 @@ what the compositor really granted, and the inspector stays inside
 - `pkexec` as the only elevation path. `sudo`, `doas` and `su` are rejected.
 - A single-profile CI gate: the Rust tests and release binary share one release build.
 
-## The front-end requalification has started
+## The front-end requalification, and where it stands
 
-The navigation of the application is being requalified before it is redrawn.
-The contract is published in `docs/gpui/slice-07/`: the current state with
-code pointers, the information architecture, the wireframes at three widths,
-fifty-three numbered requirements and the acceptance matrix.
+The navigation of the application was requalified before it was redrawn. The
+contract is published in `docs/gpui/slice-07/`: the current state with code
+pointers, the information architecture, the wireframes at three widths,
+fifty-three numbered requirements and the acceptance matrix. The
+implementation record is in `docs/gpui/slice-08/`.
 
-It is a contract, not a change: no screen moves in this release. It records
-what the next slices are measured against, and the three arbitration points
-it leaves open (the shape of the rail, the meaning of the search box in each
-scope, and when the next release lands) are decisions for the operator.
-
-Two of the findings that shaped it are the defects fixed in this release: the
-Updates scope that could not load, and the layout that ignored the window it
-was given.
+This release implements it. Two things are not yet proved: the clicks, because
+the synthetic pointer events never reached the Wayland client on the machine
+where the evidence was taken — the wheel did not scroll and the clicks did not
+land — and the focus that a place change should move to the first element of
+the new place, because the surfaces do not hold a focus handle for it.
 
 ## Desktop notifications
 
