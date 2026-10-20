@@ -12,6 +12,21 @@ A push is a claim, not an experiment. Before anything goes to GitHub:
 without being remembered. (2) is for changes that touch the toolchain, the
 workflow, or anything the host might be quietly providing.
 
+## Why the gate compiles Rust once
+
+`scripts/verify` runs the Rust suite with `cargo test --release --locked` and
+then `cargo build --release --locked` in the same target directory. The old
+gate ran a debug `cargo check` and `cargo test` first, then compiled the
+release profile separately. On a cold runner that compiled GPUI's dependency
+graph twice; the release build alone took 14m24s in the last green remote run,
+and the debug work added several more minutes.
+
+The workflow caches `~/.cargo`, `Calix.Ui.Gpui/target`, and `~/.cache/zig`,
+keyed by `Cargo.lock` and the Zig manifests. The first run after a dependency
+change still pays for a cold compile; later runs restore the artifacts.
+`Verify` has a 35-minute step timeout and the job a 45-minute timeout, so an
+unexpectedly slow run fails instead of consuming hours.
+
 ## Why the job is pinned to a date
 
 `archlinux:latest` is a moving target, and the job used to install `zig` from
@@ -55,6 +70,10 @@ so a local pass and a CI pass cannot mean different things.
 Tags (`v*`), pull requests, and `workflow_dispatch`. Not every push: the
 per-commit gate is the local hook, and the replay covers the container. A push
 that only re-runs what the hook just ran spends minutes to learn nothing.
+
+`ci.yml` is the only workflow. It owns the tag build and the GitHub release;
+the old `release.yml` and `build-and-publish.yml` were deleted because they
+referenced removed components and a `master` branch that no longer exists.
 
 ## Diagnosing a red run
 

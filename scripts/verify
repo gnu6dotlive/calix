@@ -6,11 +6,13 @@
 # the workflow runs the same file rather than a copy of its steps.
 #
 # What it adds over `ci.yml` as it stood:
-#   - the PackageManager suite (1386 tests), which CI never ran;
+#   - the PackageManager suite, which CI never ran;
 #   - a Zig version check, because the repository is built with 0.16 and a
 #     newer system Zig fails in ways that look like source errors;
 #   - a floor on the number of tests that actually ran, so a harness that
 #     silently executes nothing cannot pass;
+#   - the Rust suite in the release profile, so CI compiles one dependency
+#     graph rather than a debug graph and a release graph;
 #   - a machine-readable record of the run, so "it passed locally" is a
 #     file and not a claim.
 #
@@ -234,16 +236,15 @@ cli_smoke() {
     printf '%s' "$output" | grep -qE '[0-9]+\.[0-9]+\.[0-9]+'
 }
 
-rust_check() {
-    (cd Calix.Ui.Gpui && cargo check --quiet)
-}
-
+# Tests and the release binary share one release target directory. The old
+# debug check/test pair compiled the dependency graph once, then the release
+# build compiled it again; that duplicate work was most of a cold CI run.
 rust_tests() {
-    (cd Calix.Ui.Gpui && cargo test --quiet)
+    (cd Calix.Ui.Gpui && cargo test --release --locked --quiet)
 }
 
 rust_release_build() {
-    (cd Calix.Ui.Gpui && cargo build --release --quiet)
+    (cd Calix.Ui.Gpui && cargo build --release --locked --quiet)
 }
 
 step "naming-check" naming_check
@@ -259,7 +260,6 @@ step "cli-smoke" cli_smoke
 # pointed at the binary this run just built rather than one on PATH.
 export CALIX_BIN="$ROOT/Calix.Cli.Zig/zig-out/bin/calix"
 
-step "rust-check" rust_check
 step "rust-tests" rust_tests
 require_count "ui" "$(rust_test_count "$LOG_DIR/rust-tests.log")" "$RUST_FLOOR" || finish failed
 

@@ -17,6 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: archlinux:latest
+    # A cold build used to spend ~30 minutes in Verify and then keep running
+    # invisibly. Cap the job so a stuck or unexpectedly slow runner fails
+    # rather than burning credit.
+    timeout-minutes: 45
 
     steps:
       # The base image has no git, and checkout has to happen before the
@@ -32,9 +36,40 @@ jobs:
       - name: Pin the Arch snapshot
         run: ./scripts/ci-setup
 
+      # A cold GPUI release build is the expensive part of this job. Restore
+      # downloads and compiled artifacts keyed by the lockfile, so only the
+      # first run after a dependency change pays for a full compile. The
+      # release target is cached because `verify` no longer builds debug.
+      - name: Cache Cargo downloads
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('Calix.Ui.Gpui/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Cache Rust release target
+        uses: actions/cache@v4
+        with:
+          path: Calix.Ui.Gpui/target
+          key: ${{ runner.os }}-rust-target-${{ hashFiles('Calix.Ui.Gpui/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-rust-target-
+
+      - name: Cache Zig compilation
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/zig
+          key: ${{ runner.os }}-zig-${{ hashFiles('Calix.Cli.Zig/build.zig.zon', 'Calix.PackageManager/build.zig.zon') }}
+          restore-keys: |
+            ${{ runner.os }}-zig-
+
       # Compile, test and smoke exactly what `scripts/verify` checks, so a
       # local pass and a CI pass cannot mean different things.
       - name: Verify
+        timeout-minutes: 35
         run: ./scripts/verify
 
       - name: Prepare Release Artifacts
