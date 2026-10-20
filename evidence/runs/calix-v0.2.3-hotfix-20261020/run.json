@@ -3,7 +3,7 @@
   "kind": "fix",
   "status": "ok",
   "started_at": "2026-10-20T19:15:00Z",
-  "finished_at": "2026-10-20T19:35:00Z",
+  "finished_at": "2026-10-20T19:55:00Z",
   "commit": "eceb4862",
   "objective": "Revive the Updates scope, which had never loaded in any released version, and make the layout follow the window the compositor grants instead of the one the application asked for.",
   "how_the_defects_were_found": "A pre-change capture of the application on a live Wayland session, driven through the control surface, one frame per place and per scope. The code had been read; the capture showed the Updates scope answering 'Failed to check for updates'.",
@@ -92,8 +92,8 @@
     },
     {
       "path": "evidence/runs/calix-v0.2.3-hotfix-20261020/measure.py",
-      "bytes": 3584,
-      "sha256": "51333032b6a8e7360d7c3ff0bafab3ed6fc1f88ec377dfb9aa071bb8f6a3516d"
+      "bytes": 3598,
+      "sha256": "1b837363c34704bc96f1756f5c433421fece8bdfdf0d513c49a5f54493e93320"
     },
     {
       "path": "evidence/runs/calix-v0.2.3-hotfix-20261020/updates-after.png",
@@ -105,5 +105,101 @@
     "The runtime measurement of the wide window was taken on a window the compositor had resized by hand; the compositor's own dispatchers for fullscreen and floating are broken in this Hyprland build (the legacy dispatcher names are parsed as Lua), so the width could not be requested by name.",
     "The list pane's width is clamped to the window it is drawn in and the clamped value is kept: narrowing the window and widening it back does not restore the width the user had chosen. The clamp has always written back, so that the splitter drag stays a pure differential; separating the preference from the clamped value is a layout decision for the requalification.",
     "The three capture sessions were taken with different windows on the desktop, so the tile the compositor granted differed between them. The before and after captures of the 2542px window were taken in the same session, one build after the other."
-  ]
+  ],
+  "verification": {
+    "local": {
+      "command": "scripts/verify",
+      "commit": "eceb4862",
+      "working_tree_dirty": false,
+      "naming_check": "pass",
+      "packagemanager_tests": 1386,
+      "cli_tests": 392,
+      "rust_tests": 208,
+      "rust_tests_before": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass",
+      "flatpak_backend_tests": "pass",
+      "portable_binaries": "pass"
+    },
+    "container": {
+      "command": "scripts/ci-replay",
+      "image": "archlinux:latest",
+      "snapshot": "2026/10/01",
+      "mode": "HEAD archive, no .git",
+      "commit_under_test": "eceb4862",
+      "packagemanager_tests": 1388,
+      "cli_tests": 392,
+      "rust_tests": 208,
+      "portable_binaries": "pass"
+    },
+    "package_build": {
+      "command": "makepkg --noconfirm --cleanbuild --force",
+      "build_root": "/var/tmp/calix-gpui-pkg (not /tmp: the tmpfs holds 16 GiB)",
+      "source": "the pushed main branch, r4816.gf3fba09d",
+      "ZIG": "/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/bin/zig",
+      "exit": 0,
+      "package": "calix-gpui-git-r4816.gf3fba09d-1-x86_64.pkg.tar.zst",
+      "package_bytes": 11441823,
+      "package_sha256": "91cb0bd84d4a56c41804b00df4617c0870e20d57d958e613e462bbfca387b49e"
+    },
+    "live_install": {
+      "command": "pkexec pacman -U --noconfirm",
+      "elevation": "polkit only; no sudo, su or doas",
+      "installed_version": "calix-gpui-git r4816.gf3fba09d-1",
+      "exit": 0,
+      "live_verification": "the installed frontend opens the Updates scope and lists the two pending AUR updates; the rail entry carries the count badge (2); the installed CLI answers search, news, inventory (1974 packages over seven ecosystems) and list-updates",
+      "geometry_at_1062px": {
+        "list_px": 546,
+        "inspector_px": 321,
+        "inspector_cap_px": 373.7,
+        "verdict": "inside the bounds"
+      }
+    },
+    "remote_run": {
+      "run_id": 39485689571,
+      "workflow": "CI & Release",
+      "event": "push",
+      "ref": "v0.2.3",
+      "conclusion": "success",
+      "created_at": "2026-10-20T19:42:08Z",
+      "release_job": "the GitHub Release job published the release in 15s"
+    },
+    "github_release": {
+      "url": "https://github.com/tension-atoi/calix/releases/tag/v0.2.3",
+      "name": "Calix v0.2.3",
+      "published_at": "2026-10-20T19:53:11Z",
+      "body_bytes": 8625,
+      "assets": [
+        {
+          "name": "calix-gpui-linux-x86_64.tar.gz",
+          "bytes": 23330209
+        },
+        {
+          "name": "calix-gpui-linux-x86_64.tar.gz.sha256",
+          "bytes": 97
+        }
+      ],
+      "published_sha256": "7c6d0040cb033101291ef95b8e4200a3962c6e918fad43b0d911ac692c8c1018"
+    },
+    "artifact_check": {
+      "method": "the published tarball was downloaded, its checksum verified, its binaries disassembled, and the whole tree run on the machine that found the defects",
+      "checksum": "ok",
+      "instructions_above_the_baseline": {
+        "usr/lib/calix/calix": 0,
+        "usr/lib/calix/calix-daemon": 0,
+        "usr/lib/calix/calix-notify": 0,
+        "usr/lib/calix/libcalix-flatpak-backend.so.1.0.0": 0
+      },
+      "calix_version": "3.1.9-dev",
+      "calix_news": "No new news found (the HTTPS path that killed v0.2.0 and v0.2.1)",
+      "frontend": "the published binary was run from the unpacked tarball; its Updates scope lists the two pending AUR updates and the rail badge shows 2",
+      "geometry_at_1263px": {
+        "list_px": 717,
+        "inspector_px": 351,
+        "inspector_cap_px": 459.9,
+        "verdict": "inside the bounds"
+      },
+      "result": "pass"
+    }
+  }
 }

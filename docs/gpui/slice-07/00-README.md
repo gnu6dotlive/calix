@@ -49,18 +49,18 @@ were wrong, and the capture is kept as the evidence of both:
   set in Browse silently governs Installed and Updates, in surfaces that cannot show
   it.
 
-A third finding is not about the navigation but about the layout the navigation is
-drawn on: the workstation's geometry is computed once and never recomputed when the
-compositor resizes the window, so the inspector has been measured at $137px$ — below
-its floor — and at $1622px$ — above its cap — in the same session. The contract now
-requires the geometry to follow the mapped window (N53), because the wireframes
-describe a layout the application does not currently produce.
+Two more findings are not about the navigation, but about what the navigation stands
+on. Both were fixed in the **v0.2.3** release, before the requalification started
+(`evidence/runs/calix-v0.2.3-hotfix-20261020/`):
 
-A fourth finding is a dead rail entry: the **Updates** scope has never loaded, in any
-released version. The frontend reads the CLI's grouped updates payload as if it were
-a flat list, so the scope always answers *Failed to check for updates*. The contract
-states the requirement (N33); whether it is closed in the implementation slice or in
-a hotfix release first is a decision for the operator.
+- **The layout ignored the window it was given.** The workstation's geometry was
+  computed from the size the application requested, so the inspector has been measured
+  at $137px$ — below its floor — and at $1622px$ — above its cap — in the same
+  session. The contract requires the geometry to follow the mapped window (N53).
+- **One of the five rail entries was dead.** The **Updates** scope had never loaded,
+  in any released version: the frontend read the CLI's grouped updates payload as if
+  it were a flat list, so the scope always answered *Failed to check for updates*. The
+  contract states the requirement (N33).
 
 ---
 
@@ -69,7 +69,7 @@ a hotfix release first is a decision for the operator.
 | Document | What it fixes |
 |---|---|
 | [`00-README.md`](00-README.md) | This kit: the target slice, the decision, the reading order |
-| [`01-CURRENT-STATE.md`](01-CURRENT-STATE.md) | What navigation is today, with code pointers, the two findings of the baseline capture, and the five questions it fails to answer |
+| [`01-CURRENT-STATE.md`](01-CURRENT-STATE.md) | What navigation is today, with code pointers, the findings of the baseline capture, and the five questions it fails to answer |
 | [`02-IA.md`](02-IA.md) | The information architecture: places, scopes, queries, filters, naming, the coverage rules |
 | [`03-WIREFRAMES.md`](03-WIREFRAMES.md) | The wireframes: the shell, one per surface, at three widths, with the states |
 | [`04-NAVIGATION-CONTRACT.md`](04-NAVIGATION-CONTRACT.md) | The behavioural contract: switching, back path, keyboard, control CLI, focus, states, layout |

@@ -74,7 +74,7 @@ def measure(tag: str) -> dict:
     )
     if rail_edge is None:
         raise SystemExit(f"le bord du rail est introuvable dans la capture : {found}")
-    after_rail = [(x, c) for x, c in found if x > rail_edge + 200]
+    after_rail = [(x, c) for x, c in found if x > rail_edge + 200 and x < w - 4]
     if not after_rail:
         raise SystemExit(f"le séparateur est introuvable dans la capture : {found}")
     splitter = max(after_rail, key=lambda pair: pair[1])[0]
