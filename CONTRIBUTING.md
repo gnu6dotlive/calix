@@ -20,15 +20,15 @@ Calix is split into a native frontend, a state service and a package-management 
   inventory over a Unix socket. The frontend reads the daemon rather than opening state
   files.
 - **`Calix.Cli.Zig/` (Zig)** — the `calix` CLI. Package operations (search, install,
-  remove, upgrade, builds, keyring) run here. The binary name is transitional; the
-  project rename is not complete. See [`docs/legacy-references.md`](docs/legacy-references.md).
+  remove, upgrade, builds, keyring) run here. The rename is complete; see
+  [`docs/legacy-references.md`](docs/legacy-references.md) for the old-name boundary.
 - **`Calix.PackageManager/` (Zig)** — the shared backend library. ALPM through
   `libalpm`, AUR, Flatpak, AppImage, Cargo, NPM, the unified inventory record and the
   release registry.
 - **`Calix.Flatpak.Backend/` (Zig)** — optional `libflatpak` bridge, loaded at runtime
   so the base CLI does not depend on Flatpak.
-- **`packaging/`** — the AUR symlink and systemd units. The current package definition is
-  `PKGBUILD-calix`.
+- **`packaging/`** — the AUR symlink, the `calix-daemon` user service and the legacy
+  sync units. The current package definition is `PKGBUILD-calix`.
 
 The Python engine in `scripts/` is **frozen**. It is a transitional bridge for release
 tracking and receives fixes only, no new features. New work belongs in Zig.

@@ -327,9 +327,16 @@ package first); for bash and zsh use a clean shell, and regenerate
 
 ### PKGBUILD Installation
 
-- [ ] `makepkg -si` builds and installs successfully
+- [ ] `makepkg --noconfirm` builds successfully; install with
+  `pkexec pacman -U --noconfirm <package>`
 - [ ] `calix` and `calix-flatpak-backend` can be packaged and installed
   independently
+- [ ] The package installs `/usr/lib/calix/calix-daemon`, the
+  `/usr/bin/calix-daemon` symlink and
+  `/usr/lib/systemd/user/calix-daemon.service`
+- [ ] `systemctl --user enable --now calix-daemon.service` starts the service;
+  the socket appears under `$XDG_RUNTIME_DIR/calix/` and systemd restarts the
+  daemon after it is killed
 - [ ] `/usr/lib/calix/libcalix-flatpak-backend.so.1` belongs only to the
   backend package
 - [ ] `readelf -d /usr/bin/calix` has no `libflatpak.so.0` or

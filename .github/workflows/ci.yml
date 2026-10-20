@@ -40,11 +40,15 @@ jobs:
       - name: Prepare Release Artifacts
         if: startsWith(github.ref, 'refs/tags/v')
         run: |
-          mkdir -p dist/usr/bin dist/usr/lib/calix dist/usr/lib/calix dist/usr/share/applications dist/usr/share/icons/hicolor/scalable/apps dist/usr/share/polkit-1/actions
+          mkdir -p dist/usr/bin dist/usr/lib/calix dist/usr/lib/systemd/user dist/usr/share/applications dist/usr/share/icons/hicolor/scalable/apps dist/usr/share/polkit-1/actions
 
           # Binaires
           install -Dm755 Calix.Cli.Zig/zig-out/bin/calix dist/usr/lib/calix/calix
+          install -Dm755 Calix.Cli.Zig/zig-out/bin/calix-daemon dist/usr/lib/calix/calix-daemon
           install -Dm755 Calix.Ui.Gpui/target/release/calix-gpui dist/usr/lib/calix/calix-gpui
+
+          ln -s /usr/lib/calix/calix dist/usr/bin/calix
+          ln -s /usr/lib/calix/calix-daemon dist/usr/bin/calix-daemon
 
           cat > dist/usr/bin/calix-gpui << 'EOF'
           #!/bin/sh
@@ -56,6 +60,7 @@ jobs:
           install -Dm644 Calix.Ui.Gpui/assets/live.gnu6.calix.desktop dist/usr/share/applications/
           install -Dm644 Calix.Ui.Gpui/assets/live.gnu6.calix.svg dist/usr/share/icons/hicolor/scalable/apps/
           install -Dm644 Calix.Ui.Gpui/assets/live.gnu6.calix.policy dist/usr/share/polkit-1/actions/
+          install -Dm644 packaging/systemd/calix-daemon.service dist/usr/lib/systemd/user/calix-daemon.service
 
           cd dist
           tar -czvf ../calix-gpui-linux-x86_64.tar.gz usr/

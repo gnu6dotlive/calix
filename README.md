@@ -352,26 +352,37 @@ makepkg --noconfirm
 pkexec pacman -U --noconfirm calix-gpui-git-*.pkg.tar.zst
 ```
 
+Enable the per-user inventory service after installation:
+
+```bash
+systemctl --user enable --now calix-daemon.service
+```
+
+The package installs the unit but does not enable it, so installing Calix never
+changes a session the package manager was not asked to touch.
+
 The package (`calix-gpui-git`) installs:
 
 | Path | Contents |
 |---|---|
 | `/usr/bin/calix-gpui` | Wrapper that sets `CALIX_BIN` and execs the frontend |
 | `/usr/bin/calix` | Symlink to the backend CLI |
+| `/usr/bin/calix-daemon` | Symlink to the inventory daemon |
 | `/usr/lib/calix/calix-gpui` | GPUI frontend binary |
 | `/usr/lib/calix/calix` | Zig backend CLI (canonical polkit path) |
+| `/usr/lib/calix/calix-daemon` | Zig inventory daemon |
+| `/usr/lib/systemd/user/calix-daemon.service` | Per-user inventory service |
 | `/usr/share/applications/live.gnu6.calix.desktop` | XDG desktop entry |
 | `/usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg` | Application icon |
 | `/usr/share/polkit-1/actions/live.gnu6.calix.policy` | Polkit actions for install / remove / upgrade |
 
-Two notable things the package does **not** yet install, and that are deliberately called
-out here rather than glossed over:
+Two boundaries are deliberate:
 
-- **`calix-daemon` is not packaged.** The package installs the frontend and the backend
-  CLI; the daemon must be built and run from the source tree until packaging catches up.
+- **The daemon service is installed but not enabled.** Enabling a user unit is a
+  per-account decision; the package leaves it to `systemctl --user enable --now`.
 - **The legacy systemd units in `packaging/systemd/` run the frozen Python engine**
-  (`calix sync`), not the daemon. They are part of the transitional state described
-  above.
+  (`calix sync`), not the daemon. They are not installed by this package and remain
+  part of the transitional state described above.
 
 ---
 
@@ -389,7 +400,7 @@ more optimistic document elsewhere in the tree, this table is the one to trust.
 | Release tracking | Zig registry and provenance checks landed; a frozen Python engine still writes the tracked-release observation file |
 | UI mutations | ALPM, AUR, Flatpak only |
 | UI search | ALPM, AUR, Flatpak, installed AppImages only |
-| Packaging | Installs frontend + backend CLI; does not install `calix-daemon` |
+| Packaging | Installs frontend, backend CLI and the `calix-daemon` user service |
 | Naming | Complete: code, paths, binaries and packaging use `calix` and `live.gnu6.calix` |
 | Platform | Arch Linux, `x86_64` |
 
@@ -413,7 +424,7 @@ version.
 | `Calix.Http/`, `Calix.Diagnostics/` | Supporting Zig components |
 | `scripts/` | Frozen Python engine and operational scripts (transitional) |
 | `docs/` | Current docs plus dated slice records and render-lab evidence; historical names may appear in the dated records |
-| `packaging/` | AUR symlink and systemd units |
+| `packaging/` | AUR symlink, daemon user service and legacy sync units |
 | `PKGBUILD-calix` | The current Arch package definition |
 | `vendor/` | Local toolchain cache, git-ignored |
 

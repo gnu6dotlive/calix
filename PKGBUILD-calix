@@ -1,6 +1,7 @@
 # Maintainer: tension-atoi <tension-atoi@users.noreply.github.com>
-# Paquet: frontend GPUI natif Rust pour Calix — gestionnaire de paquets Arch Linux
-#          (ALPM, AUR, Flatpak, AppImage, Cargo, NPM, releases GitHub/GitLab)
+# Paquet: frontend GPUI natif Rust et service d’inventaire Zig pour Calix —
+#          gestionnaire de paquets Arch Linux (ALPM, AUR, Flatpak, AppImage,
+#          Cargo, NPM, releases GitHub/GitLab)
 #
 # Le backend CLI Zig est installé sous /usr/lib/calix/calix ; le frontend
 # Calix l'atteint via la variable CALIX_BIN.
@@ -8,7 +9,7 @@
 pkgname=calix-gpui-git
 pkgver=r0.git
 pkgrel=1
-pkgdesc="Frontend GPUI natif Rust pour Calix — gestionnaire de paquets Arch Linux (ALPM, AUR, Flatpak, AppImage)"
+pkgdesc="Frontend GPUI natif Rust et service d’inventaire Zig pour Calix — gestionnaire de paquets Arch Linux (ALPM, AUR, Flatpak, AppImage)"
 arch=('x86_64')
 url="https://github.com/tension-atoi/calix"
 license=('GPL-3.0-only')
@@ -86,10 +87,14 @@ package() {
     # ── Binaries ─────────────────────────────────────────────────────────────
     install -Dm755 "Calix.Cli.Zig/zig-out/bin/calix" \
         "${pkgdir}/usr/lib/calix/calix"
+    install -Dm755 "Calix.Cli.Zig/zig-out/bin/calix-daemon" \
+        "${pkgdir}/usr/lib/calix/calix-daemon"
 
-    # The CLI is also reachable on PATH; polkit keeps the canonical lib path.
+    # Both binaries are also reachable on PATH; polkit and the user service
+    # keep the canonical lib paths.
     install -dm755 "${pkgdir}/usr/bin"
     ln -s /usr/lib/calix/calix "${pkgdir}/usr/bin/calix"
+    ln -s /usr/lib/calix/calix-daemon "${pkgdir}/usr/bin/calix-daemon"
 
     install -Dm755 "Calix.Ui.Gpui/target/release/calix-gpui" \
         "${pkgdir}/usr/lib/calix/calix-gpui"
@@ -119,4 +124,8 @@ EOF
     # ── Polkit Policy ────────────────────────────────────────────────────────
     install -Dm644 "Calix.Ui.Gpui/assets/live.gnu6.calix.policy" \
         "${pkgdir}/usr/share/polkit-1/actions/live.gnu6.calix.policy"
+
+    # ── User Service ─────────────────────────────────────────────────────────
+    install -Dm644 "packaging/systemd/calix-daemon.service" \
+        "${pkgdir}/usr/lib/systemd/user/calix-daemon.service"
 }
