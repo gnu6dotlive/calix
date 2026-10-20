@@ -1,0 +1,40 @@
+== the v0.2.1 CLI, with the optional backend absent ==
+Illegal instruction at address 0x13f32d9
+/usr/lib/zig/std/crypto/pcurves/p256/p256_64.zig:135:5: 0x13f32d9 in cmovznzU64 (calix)
+    out1.* = (mask & arg3) | ((~mask) & arg2);
+    ^
+/__w/calix/calix/Calix.Http/src/http_client.zig:403:41: 0x13f0549 in create (calix)
+/__w/calix/calix/Calix.Http/src/http_client.zig:1771:45: 0x1471c04 in connectTcpOptions (calix)
+
+== the v0.2.1 CLI: the daemon inventory of the same tree ==
+(the daemon of v0.2.1 answered the inventory with FlatpakBackendUnavailable; the CLI above is the same failure)
+
+== the fixed CLI, with the optional backend absent ==
+bash: line 1: /usr/lib/calix/calix: No such file or directory
+exit=0
+
+== the fixed CLI: the inventory without the optional backend ==
+bash: line 1: /usr/lib/calix/calix: No such file or directory
+exit=127
+Traceback (most recent call last):
+  File "<string>", line 3, in <module>
+    doc=json.load(open('/var/tmp/calix-inv-nobackend.json'))
+  File "/usr/lib/python3.14/json/__init__.py", line 298, in load
+    return loads(fp.read(),
+        cls=cls, object_hook=object_hook,
+        parse_float=parse_float, parse_int=parse_int,
+        parse_constant=parse_constant, object_pairs_hook=object_pairs_hook, **kw)
+  File "/usr/lib/python3.14/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/usr/lib/python3.14/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.14/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+== the fixed CLI: the same command with the backend installed ==
+cachyos-v3
+cachyos-core-v3
+cachyos-extra-v3

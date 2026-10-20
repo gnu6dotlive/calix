@@ -1,0 +1,64 @@
+
+== package ==
+calix-gpui-git r4809.ga62f27b1-1
+calix-gpui-git /usr/bin/calix-daemon
+calix-gpui-git /usr/bin/calix-notify
+calix-gpui-git /usr/lib/calix/calix-daemon
+calix-gpui-git /usr/lib/calix/calix-notify
+calix-gpui-git /usr/lib/calix/libcalix-flatpak-backend.so
+calix-gpui-git /usr/lib/calix/libcalix-flatpak-backend.so.1
+calix-gpui-git /usr/lib/calix/libcalix-flatpak-backend.so.1.0.0
+calix-gpui-git /usr/lib/systemd/user/
+calix-gpui-git /usr/lib/systemd/user/calix-daemon.service
+calix-gpui-git /usr/lib/systemd/user/calix-notify.service
+
+== the backend the loader asks for ==
+lrwxrwxrwx 1 root root      29 Oct 20 12:22 /usr/lib/calix/libcalix-flatpak-backend.so -> libcalix-flatpak-backend.so.1
+lrwxrwxrwx 1 root root      33 Oct 20 12:22 /usr/lib/calix/libcalix-flatpak-backend.so.1 -> libcalix-flatpak-backend.so.1.0.0
+-rwxr-xr-x 1 root root 1016208 Oct 20 12:22 /usr/lib/calix/libcalix-flatpak-backend.so.1.0.0
+	libflatpak.so.0 => /usr/lib/libflatpak.so.0 (0x00007f6a8708a000)
+
+== user services ==
+active
+active
+enabled
+enabled
+
+== commands that used to be swallowed by the inventory ==
+ok   calix search standard --repos
+cachyos-v3
+cachyos-core-v3
+cachyos-extra-v3
+cachyos
+ok   calix resolve bash --json
+{"schemaVersion":1,"results":[{"requestedName":"bash","sourceKind":null,"name":null,"packageBase":null,"repository":null,"version":null,"sourceUrl":null,"error":{"code":"Ambiguous","message":"The package name exists in more than one allowed repository."}}]}
+
+ok   calix news
+No new news found
+
+== the unified inventory document ==
+ok   calix inventory
+version 1 total 1998
+{'ALPM': 1881, 'AUR': 47, 'Flatpak': 24, 'AppImage': 16, 'Cargo': 20, 'NPM': 9, 'Release': 1}
+
+== the daemon serves the same document (checked after the restart above) ==
+ok: True error: None
+total: 1998 {'ALPM': 1881, 'AUR': 47, 'Flatpak': 24, 'AppImage': 16, 'Cargo': 20, 'NPM': 9, 'Release': 1}
+
+== flatpak support ==
+ok   calix search flatpak gimp
+┌────────────────────────────────┬───────────────┬──────────────────────────────────────────┬─────────┬───────────────┬────────────────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│ Name                           │ AppId         │ Summary                                  │ Remote  │ Download Size │ Installed Size │ Permissions                                                                                                                                                                                                                                                                                                                                                                   │
+├────────────────────────────────┼───────────────┼──────────────────────────────────────────┼─────────┼───────────────┼────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ GNU Image Manipulation Program │ org.gimp.GIMP │ High-end image creation and manipulation │ flathub │ 97.36 MiB     │ 255.73 MiB     │ Context=shared:ipc, Context=shared:network, Context=sockets:fallback-x11, Context=sockets:wayland, Context=devices:all, Context=filesystems:xdg-config/GIMP:create, Context=filesystems:xdg-config/gtk-3.0:ro, Context=filesystems:/tmp, Context=filesystems:xdg-run/gvfsd, Context=filesystems:host, Context=filesystems:xdg-run/gvfs, Context=unset-environment:GTK_MODULES │
+│ GNU Image Manipulation Program │ org.gimp.GIMP │ High-end image creation and manipulation │ flathub │ 97.36 MiB     │ 255.73 MiB     │ Context=shared:ipc, Context=shared:network, Context=sockets:fallback-x11, Context=sockets:wayland, Context=devices:all, Context=filesystems:xdg-config/GIMP:create, Context=filesystems:xdg-config/gtk-3.0:ro, Context=filesystems:/tmp, Context=filesystems:xdg-run/gvfsd, Context=filesystems:host, Context=filesystems:xdg-run/gvfs, Context=unset-environment:GTK_MODULES │
+└────────────────────────────────┴───────────────┴──────────────────────────────────────────┴─────────┴───────────────┴────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+ok   calix list flatpak
+┌──────────────────────────────────────────────┬──────────────────────────────────────────────┬──────────────────────────┬────────┬─────────────┬────────────────────────────────────────────────────┬───────────────────────┐
+│ Name                                         │ Id                                           │ Version                  │ Arch   │ Branch      │ Summary                                            │ Remote                │
+├──────────────────────────────────────────────┼──────────────────────────────────────────────┼──────────────────────────┼────────┼─────────────┼────────────────────────────────────────────────────┼───────────────────────┤
+│ Loomfy                                       │ ai.loomfy.Loomfy                             │ 1.8.2                    │ x86_64 │ stable      │ Transcribe meetings locally                        │ flathub               │
+│ Pinta                                        │ com.github.PintaProject.Pinta                │ 3.1.2                    │ x86_64 │ stable      │ Edit images and paint digitally                    │ flathub               │
+│ com.github.PintaProject.Pinta.Locale         │ com.github.PintaProject.Pinta.Locale         │ stable                   │ x86_64 │ stable      │                                                    │ flathub               │
+
+live verification: PASS

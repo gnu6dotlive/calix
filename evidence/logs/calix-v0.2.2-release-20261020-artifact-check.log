@@ -1,0 +1,62 @@
+
+== download ==
+ok   downloaded v0.2.2
+
+== checksum ==
+calix-gpui-linux-x86_64.tar.gz: OK
+ok   published checksum verifies
+
+== contents ==
+usr/
+usr/bin/
+usr/bin/calix
+usr/bin/calix-daemon
+usr/bin/calix-gpui
+usr/bin/calix-notify
+usr/lib/
+usr/lib/calix/
+usr/lib/calix/calix
+usr/lib/calix/calix-daemon
+usr/lib/calix/calix-gpui
+usr/lib/calix/calix-notify
+usr/lib/calix/libcalix-flatpak-backend.so
+usr/lib/calix/libcalix-flatpak-backend.so.1
+usr/lib/calix/libcalix-flatpak-backend.so.1.0.0
+usr/lib/systemd/
+usr/lib/systemd/user/
+usr/lib/systemd/user/calix-daemon.service
+usr/lib/systemd/user/calix-notify.service
+usr/share/
+usr/share/applications/
+usr/share/applications/live.gnu6.calix.desktop
+usr/share/icons/
+usr/share/icons/hicolor/
+usr/share/icons/hicolor/scalable/
+usr/share/icons/hicolor/scalable/apps/
+usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg
+usr/share/polkit-1/
+usr/share/polkit-1/actions/
+usr/share/polkit-1/actions/live.gnu6.calix.policy
+
+== extract ==
+ok   extracted
+
+== instructions above the x86_64 baseline ==
+usr/lib/calix/calix                                  non-baseline instructions: 0
+usr/lib/calix/calix-daemon                           non-baseline instructions: 0
+usr/lib/calix/calix-notify                           non-baseline instructions: 0
+usr/lib/calix/libcalix-flatpak-backend.so.1.0.0      non-baseline instructions: 0
+ok   every shipped binary stays inside the baseline
+
+== the binary runs here ==
+3.1.9-dev
+ok   calix --version
+
+== the TLS path that killed v0.2.0 and v0.2.1 ==
+No new news found
+ok   calix news (HTTPS)
+
+== the frontend starts and renders ==
+ok   the window is mapped: {"at":[61,1217],"size":[662,804]}
+
+artifact check for v0.2.2: PASS

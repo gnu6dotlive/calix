@@ -1,0 +1,66 @@
+1/6 isolated_build.test.reviewed input paths cannot escape the staged source root...OK
+2/6 isolated_build.test.reviewed inputs are materialized with exact bytes and permissions...OK
+3/6 isolated_build.test.staged reviewed inputs preserve the host digest and reject real changes...OK
+4/6 isolated_build.test.isolated guest traversal permissions survive restrictive umasks...OK
+5/6 isolated_build.test.isolated configuration permissions survive restrictive umasks and replacement...OK
+6/6 isolated_build.test.isolated public source key bundle is readable under restrictive umasks...OK
+All 6 tests passed.
+1/6 isolated_build.test.reviewed input paths cannot escape the staged source root...OK
+2/6 isolated_build.test.reviewed inputs are materialized with exact bytes and permissions...OK
+3/6 isolated_build.test.staged reviewed inputs preserve the host digest and reject real changes...OK
+4/6 isolated_build.test.isolated guest traversal permissions survive restrictive umasks...OK
+5/6 isolated_build.test.isolated configuration permissions survive restrictive umasks and replacement...OK
+6/6 isolated_build.test.isolated public source key bundle is readable under restrictive umasks...OK
+All 6 tests passed.
+1/6 isolated_build.test.reviewed input paths cannot escape the staged source root...OK
+2/6 isolated_build.test.reviewed inputs are materialized with exact bytes and permissions...OK
+3/6 isolated_build.test.staged reviewed inputs preserve the host digest and reject real changes...OK
+4/6 isolated_build.test.isolated guest traversal permissions survive restrictive umasks...OK
+5/6 isolated_build.test.isolated configuration permissions survive restrictive umasks and replacement...OK
+6/6 isolated_build.test.isolated public source key bundle is readable under restrictive umasks...OK
+All 6 tests passed.
+1/6 isolated_build.test.reviewed input paths cannot escape the staged source root...OK
+2/6 isolated_build.test.reviewed inputs are materialized with exact bytes and permissions...OK
+3/6 isolated_build.test.staged reviewed inputs preserve the host digest and reject real changes...OK
+4/6 isolated_build.test.isolated guest traversal permissions survive restrictive umasks...OK
+5/6 isolated_build.test.isolated configuration permissions survive restrictive umasks and replacement...OK
+6/6 isolated_build.test.isolated public source key bundle is readable under restrictive umasks...OK
+All 6 tests passed.
+test
++- run test w
+unexpected errno: 111
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/std/posix.zig:1672:40: 0x12582bb in unexpectedErrno (std.zig)
+        std.debug.dumpCurrentStackTrace(.{});
+                                       ^
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/std/Io/Threaded.zig:11983:63: 0x13197a1 in posixConnectUnix (std.zig)
+                    else => |err| return posix.unexpectedErrno(err),
+                                                              ^
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/std/Io/Threaded.zig:12141:25: 0x1319af3 in netConnectUnixPosix (std.zig)
+    try posixConnectUnix(socket_fd, &storage.any, addr_len);
+                        ^
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/std/Io/net.zig:911:51: 0x13b1fbb in connect (std.zig)
+            .handle = try io.vtable.netConnectUnix(io.userdata, ua),
+                                                  ^
+/home/tension_atoi/Projects/calix/Calix.Cli.Zig/src/daemon/server.zig:379:35: 0x13b14da in isServing (root.zig)
+    const stream = address.connect(io) catch return false;
+                                  ^
+/home/tension_atoi/Projects/calix/Calix.Cli.Zig/src/daemon/server.zig:437:38: 0x13b1ab2 in test.isServing: a bound socket with no daemon behind it is not a running daemon (root.zig)
+    try testing.expect(!try isServing(testing.io, &address));
+                                     ^
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/compiler/test_runner.zig:140:68: 0x13446bb in mainServer (test_runner.zig)
+                const status: TestResults.Status = if (test_fn.func()) |v| s: {
+                                                                   ^
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/compiler/test_runner.zig:71:26: 0x134551e in main (test_runner.zig)
+        return mainServer(init) catch |err| panic("internal test runner failure: {t}", .{err});
+                         ^
+/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/lib/zig/std/start.zig:699:88: 0x134211d in callMain (std.zig)
+    if (fn_info.params[0].type.? == std.process.Init.Minimal) return wrapMain(root.main(.{
+                                                                                       ^
+../sysdeps/nptl/libc_start_call_main.h:59:16: 0x7f521ae27d0d in __libc_start_call_main (../sysdeps/x86/libc-start.c)
+../csu/libc-start.c:372:3: 0x7f521ae27e4a in __libc_start_main_impl (../sysdeps/x86/libc-start.c)
+???:?:?: 0x2698504 in ??? (???)
+[default] (warn): calix-daemon: could not append to the journal: NotDir
+failed command: /tmp/calix-flatpak-separation.CIAEWj/cache/o/a12519d508606817616567d98ed14dd7/test --cache-dir=/tmp/calix-flatpak-separation.CIAEWj/cache --seed=0x643c967f --listen=-
+
+Flatpak backend separation checks passed.
+Flatpak separation build and core-only smoke tests passed.

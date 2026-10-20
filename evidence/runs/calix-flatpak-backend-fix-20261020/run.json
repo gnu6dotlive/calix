@@ -1,0 +1,136 @@
+{
+  "run_id": "calix-flatpak-backend-fix-20261020",
+  "kind": "fix",
+  "status": "ok",
+  "started_at": "2026-10-20T15:30:00Z",
+  "finished_at": "2026-10-20T16:30:00Z",
+  "commit": "1850b22646e353ee3808df9f81752d8e59859c4f",
+  "parent_commit": "0566ee6e",
+  "working_tree_dirty": false,
+  "objective": "Fix the packaged CLI, which could not search, resolve, read news or print an inventory on a machine without the optional Flatpak backend, because the inventory command answered for every command that came after it in the dispatcher.",
+  "scope": [
+    "calix inventory claims only its own command path, so it no longer swallows the commands listed after it",
+    "an absent optional Flatpak backend contributes no rows instead of failing the whole inventory document",
+    "the service says once per process that the optional backend is missing, so the omission is never silent",
+    "the package builds and ships libcalix-flatpak-backend.so.1, the library the loader asks for",
+    "the gate builds the backend and checks that the library is there, and the release artifact carries it"
+  ],
+  "defect": {
+    "how_it_was_found": "a live install of calix-gpui-git answered every command after list with FlatpakBackendUnavailable",
+    "symptom": "calix search standard, calix resolve, calix news and calix inventory all failed with 'Flatpak support is not installed'; calix list standard worked",
+    "the_dispatcher_trace": "commands/dispatcher.zig -> commands/inventory.zig:22 -> inventory/service.zig:69 -> inventory/service.zig:146 -> flatpak/manager.zig:367 -> flatpak/client.zig:31 -> flatpak/backend_loader.zig:41 -> flatpak/backend_loader.zig:76",
+    "root_cause": "commands/inventory.zig never compared the invocation's command path, so it built the inventory snapshot and printed it for every command the dispatcher asked after it",
+    "second_cause": "the inventory service contradicted its own documented contract: 'a backend that is absent contributes nothing rather than failing the whole gathering'",
+    "daemon_impact": "the daemon serves the same document and answered {\"ok\":false,\"message\":\"FlatpakBackendUnavailable\"} for an inventory request"
+  },
+  "verification": {
+    "local": {
+      "command": "scripts/verify",
+      "commit": "1850b226",
+      "working_tree_dirty": false,
+      "naming_check": "pass",
+      "packagemanager_tests": 1386,
+      "cli_tests": 392,
+      "cli_floor": 380,
+      "rust_tests": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass"
+    },
+    "container": {
+      "command": "scripts/ci-replay",
+      "image": "archlinux:latest",
+      "snapshot": "2026/10/01",
+      "mode": "HEAD archive, no .git",
+      "commit_under_test": "1850b226",
+      "naming_check": "pass",
+      "packagemanager_tests": 1388,
+      "cli_tests": 392,
+      "rust_tests": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass",
+      "elapsed": "6m03.60s"
+    },
+    "flatpak_separation_suite": {
+      "command": "scripts/test-flatpak-separation.sh",
+      "result": "pass",
+      "asserts": "the CLI has no Flatpak or OSTree dependency, the backend does, its SONAME is ABI 1 and its entry point is exported"
+    },
+    "package_build": {
+      "command": "makepkg --noconfirm --cleanbuild --force",
+      "build_root": "/var/tmp/calix-gpui-pkg (not /tmp: the tmpfs holds 16 GiB)",
+      "source": "the pushed main branch, r4809.ga62f27b1",
+      "ZIG": "/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/bin/zig",
+      "zig_version": "0.16.0",
+      "exit": 0,
+      "elapsed": "4m33.59s",
+      "package": "calix-gpui-git-r4809.ga62f27b1-1-x86_64.pkg.tar.zst",
+      "package_bytes": 11403255,
+      "package_sha256": "ae0f33c3473cb18927a0fc64ceb25367ae36a15a3f8212b81a152cb2a9253569",
+      "cargo_test_result": "201 passed; 0 failed",
+      "new_contents": [
+        "usr/lib/calix/libcalix-flatpak-backend.so.1.0.0",
+        "usr/lib/calix/libcalix-flatpak-backend.so.1",
+        "usr/lib/calix/libcalix-flatpak-backend.so"
+      ]
+    },
+    "live_install": {
+      "command": "pkexec pacman -U --noconfirm",
+      "elevation": "polkit only; no sudo, su or doas",
+      "installed_version": "calix-gpui-git r4809.ga62f27b1-1",
+      "installed_size": "33.53 MiB",
+      "exit": 0
+    },
+    "live_verification": {
+      "calix search standard --repos": "the repository list, not an inventory",
+      "calix resolve bash --json": "a resolve answer",
+      "calix news": "the news feed",
+      "calix inventory": "1968 packages: ALPM 1881, AUR 17, Flatpak 24, AppImage 16, Cargo 20, NPM 9, Release 1",
+      "daemon inventory action": "ok: true, the same 1968 packages",
+      "calix search flatpak gimp": "flathub results with permissions and sizes",
+      "calix list flatpak": "the installed Flatpak applications",
+      "user_services": "calix-daemon and calix-notify enabled and active"
+    },
+    "before_and_after": {
+      "method": "a mount namespace that hides /usr/lib/calix, so the optional backend cannot be loaded",
+      "v0_2_1_cli": "the published v0.2.1 CLI cannot run at all in that state: it dies with SIGILL in the TLS path",
+      "fixed_cli": "the fixed CLI answers the same commands and says once that the optional backend is missing"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "evidence/logs/calix-flatpak-fix-20261020-ci-replay.log",
+      "bytes": 41186,
+      "sha256": "9ce895401a9391ee26913b7517952b31326eb0ccd3c7e297603e865520d2ffc7"
+    },
+    {
+      "path": "evidence/logs/calix-flatpak-fix-20261020-makepkg.log",
+      "bytes": 35187,
+      "sha256": "d198f79bfe4768519fc5063058b3cc21aa68e194f7f06c2a1b4cae030a2f167f"
+    },
+    {
+      "path": "evidence/logs/calix-flatpak-fix-20261020-package.sha256",
+      "bytes": 118,
+      "sha256": "77db3939c73304e65d737e8029cce802b2840d3032e22011f6f3f7d94e4eff72"
+    },
+    {
+      "path": "evidence/logs/calix-flatpak-fix-20261020-pacman-install.log",
+      "bytes": 1010,
+      "sha256": "f78bacd37c3a9ffe7936dfd1a6a10a2a8252676dab96c53be164334a2a1fef07"
+    },
+    {
+      "path": "evidence/logs/calix-flatpak-fix-20261020-live-verify.log",
+      "bytes": 10382,
+      "sha256": "82e88bdc99340e148ccd97544e2449163de0230ded1fac93807fd458a572bfd0"
+    },
+    {
+      "path": "evidence/logs/calix-flatpak-fix-20261020-before-after.log",
+      "bytes": 1893,
+      "sha256": "b9f523951299cd77b6fdee8237a6f9c1ac35a862d879098864bfdc1098fb5202"
+    }
+  ],
+  "known_gaps": [
+    "The frozen Python engine is still installed as ~/.local/bin/calix, a symlink to scripts/calix, and it shadows the packaged CLI in PATH. The live verification used the absolute path /usr/lib/calix/calix; the name collision is a real footgun and is not fixed here.",
+    "The Flatpak ecosystem in the live inventory comes from the machine's own flathub installation, not from a test fixture.",
+    "The package was installed from the pushed tree, not from a release tarball; the tarball is not an installer."
+  ]
+}

@@ -1,0 +1,180 @@
+{
+  "run_id": "calix-v0.2.2-release-20261020",
+  "kind": "release",
+  "status": "ok",
+  "started_at": "2026-10-20T16:20:00Z",
+  "finished_at": "2026-10-20T17:31:00Z",
+  "commit": "29a1ed6f32394423fa862986ea536acbd642a544",
+  "tag": "v0.2.2",
+  "tag_object": "annotated",
+  "working_tree_dirty": false,
+  "objective": "Publish a release whose binaries run on the machine that downloads them, and prove it on a CPU that the previous artifacts did not support.",
+  "the_defect": {
+    "summary": "The v0.2.0 and v0.2.1 release tarballs were built on an AMD runner with Zig's native CPU model, so they carried SSE4a instructions, which do not exist on Intel CPUs.",
+    "symptom": "the backend CLI died with SIGILL the first time it opened a TLS connection: `calix news` and `calix search` were dead on an ordinary Arch machine",
+    "faulting_instruction": "extrq $0x8,$0x18,%xmm4 (SSE4a) in Zig's std.crypto pcurves/p256, reached from Calix.Http/src/http_client.zig",
+    "evidence": {
+      "published_v0_2_1_cli_sse4a_instructions": 86,
+      "published_v0_2_1_rust_frontend_sse4a_instructions": 40,
+      "this_cpu_has_sse4a": false,
+      "published_v0_2_1_cli_avx512_registers": 0,
+      "published_rust_frontend_avx512_registers": 26,
+      "rust_note": "the Rust frontend dispatches to wider implementations at runtime, so it runs on a CPU without AVX-512 or SSE4a; the Zig binaries had no such dispatch"
+    }
+  },
+  "the_fix": {
+    "scope": [
+      "Calix.Cli.Zig, Calix.Flatpak.Backend and Calix.PackageManager resolve the x86_64 baseline CPU model instead of the build machine's",
+      "the gate disassembles every shipped binary and fails it when it uses an instruction above the baseline",
+      "the frontend moves to 0.2.2 and the release notes state plainly that v0.2.0 and v0.2.1 crash on Intel CPUs"
+    ],
+    "negative_test": "a build asked for the native CPU model is caught by the gate; the default build is not"
+  },
+  "verification": {
+    "local": {
+      "command": "scripts/verify",
+      "commit": "29a1ed6f",
+      "working_tree_dirty": false,
+      "naming_check": "pass",
+      "packagemanager_tests": 1386,
+      "cli_tests": 392,
+      "rust_tests": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass",
+      "flatpak_backend_tests": "pass",
+      "flatpak_backend_release_build": "pass",
+      "portable_binaries": "pass"
+    },
+    "container": {
+      "command": "scripts/ci-replay",
+      "image": "archlinux:latest",
+      "snapshot": "2026/10/01",
+      "mode": "HEAD archive, no .git",
+      "commit_under_test": "29a1ed6f",
+      "packagemanager_tests": 1388,
+      "cli_tests": 392,
+      "rust_tests": 201,
+      "portable_binaries": "pass",
+      "elapsed": "6m02.28s"
+    },
+    "package_build": {
+      "command": "makepkg --noconfirm --cleanbuild --force",
+      "build_root": "/var/tmp/calix-gpui-pkg",
+      "source": "the pushed main branch, r4810.g29a1ed6f",
+      "ZIG": "/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/bin/zig",
+      "exit": 0,
+      "elapsed": "4m34.87s",
+      "package": "calix-gpui-git-r4810.g29a1ed6f-1-x86_64.pkg.tar.zst",
+      "package_bytes": 11428018,
+      "package_sha256": "1399cc6676f8c7ce63f188457f6cf71490b9dca85e29d320e22e8b5597cbc11f",
+      "instructions_above_the_baseline_in_the_package": 0
+    },
+    "live_install": {
+      "command": "pkexec pacman -U --noconfirm",
+      "elevation": "polkit only; no sudo, su or doas",
+      "installed_version": "calix-gpui-git r4810.g29a1ed6f-1",
+      "exit": 0,
+      "installed_binaries_above_the_baseline": 0,
+      "live_verification": "search, resolve, news, the unified inventory with 1968 packages, the daemon's inventory action and the Flatpak search all answer on the installed package"
+    },
+    "remote_run": {
+      "run_id": 39463412059,
+      "workflow": "CI & Release",
+      "event": "push",
+      "ref": "v0.2.2",
+      "conclusion": "success",
+      "created_at": "2026-10-20T17:08:09Z",
+      "build_job": "17:08:13Z -> 17:24:42Z (16m29s)",
+      "release_job": "17:24:47Z -> 17:25:00Z (13s)",
+      "total": "16m52s"
+    },
+    "github_release": {
+      "url": "https://github.com/tension-atoi/calix/releases/tag/v0.2.2",
+      "name": "Calix v0.2.2",
+      "published_at": "2026-10-20T17:24:58Z",
+      "body_bytes": 7973,
+      "assets": [
+        {
+          "name": "calix-gpui-linux-x86_64.tar.gz",
+          "bytes": 23317660
+        },
+        {
+          "name": "calix-gpui-linux-x86_64.tar.gz.sha256",
+          "bytes": 97
+        }
+      ],
+      "published_sha256": "efcf996dc475daac8e327885e22101fc5a2a0d15d71aaaaacec74bd8e1bd19a5"
+    },
+    "artifact_check": {
+      "method": "the published tarball was downloaded, its checksum verified, its binaries disassembled, and the whole tree run on the machine that found the defect",
+      "checksum": "ok",
+      "instructions_above_the_baseline": {
+        "usr/lib/calix/calix": 0,
+        "usr/lib/calix/calix-daemon": 0,
+        "usr/lib/calix/calix-notify": 0,
+        "usr/lib/calix/libcalix-flatpak-backend.so.1.0.0": 0
+      },
+      "calix_version": "3.1.9-dev",
+      "calix_news": "No new news found (the HTTPS path that killed v0.2.0 and v0.2.1)",
+      "frontend": "the window is mapped: at [61,1217] size [662,804]",
+      "result": "pass"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "evidence/logs/calix-portable-build-20261020-verify-clean.log",
+      "bytes": 883,
+      "sha256": "4cf26858cb7c26cc6b114328bb04f2c5e81f6579928608638ec35deafbbc7f73"
+    },
+    {
+      "path": "evidence/logs/calix-portable-build-20261020-ci-replay.log",
+      "bytes": 41231,
+      "sha256": "53745f9707da978491884f1631c68d505b9306f16ab248eb5fbea6b5fbfa326d"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.2-makepkg.log",
+      "bytes": 35187,
+      "sha256": "ca5128df70ef66e5da436da3c17b47100d5612243f2048dde8c59f80c0424f42"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.2-package.sha256",
+      "bytes": 118,
+      "sha256": "d7da1244ec5dc52b5fbede08833c6105bfcaa285ce77b33258e6fb8c0b63e07e"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.2-pacman-install.log",
+      "bytes": 1010,
+      "sha256": "a4df29c2b21b940d83a808f94209a70ca45ef6a9ddcffebbd54635f429aeb399"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.2-live-verify.log",
+      "bytes": 10382,
+      "sha256": "b17e7c06b378b2ec9d40e8a58a3cb817f79470f5c49c4a8d8cbcfa04b8ecb4fe"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.2-release-20261020-run-watch.log",
+      "bytes": 22970,
+      "sha256": "1ce17a5a5cd7e028957ba4cb142fad38c5644d7036301807482a03f639982584"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.2-release-20261020-artifact-check.log",
+      "bytes": 1701,
+      "sha256": "469b0fc29624a00768585b7f55cb9b0b66c638f9ae415c988c69fdbecc42f30c"
+    },
+    {
+      "path": "evidence/logs/calix-v0.2.2-release-20261020-release.json",
+      "bytes": 328,
+      "sha256": "7d65177af956933b95c6e165777deb9e00f7eb868df8746e8a0c4e02edbf5de9"
+    },
+    {
+      "path": "evidence/logs/calix-flatpak-separation-20261020.log",
+      "bytes": 5317,
+      "sha256": "666749c5f2ac583d5d1c7b3f4f91e34cceed369b984e2d62c33f76dfb5e38b6d"
+    }
+  ],
+  "known_gaps": [
+    "The v0.2.0 and v0.2.1 release tarballs stay published and broken on Intel CPUs. The release notes of v0.2.2 say so, but the old artifacts were not withdrawn.",
+    "The Rust frontend is not covered by the portability gate: its disassembly contains instructions above the baseline, dispatched at runtime. A static check cannot tell dispatched code from straight-line code, so the gate leaves it alone and the artifact check runs it instead.",
+    "The CI cache key includes Cargo.lock, so every version bump makes the tag run a cold Rust build: this run took 16m29s against a 35-minute step timeout."
+  ]
+}
