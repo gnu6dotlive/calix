@@ -1,0 +1,88 @@
+{
+  "run_id": "calix-v0.2.5-release-20261020",
+  "kind": "release",
+  "objective": "Record the Slice-08 surfaces: the context header, the query surface in every scope, and the places.",
+  "method": {
+    "compositor": "Hyprland",
+    "capture": "grim, on the window geometry read from `hyprctl clients -j`",
+    "driver": "the control surface (`calix-gpui navigate`, `calix-gpui status --json`)",
+    "pairing": "each capture is stored next to the control surface's status document"
+  },
+  "captures": [
+    {
+      "state": "scope-results",
+      "target": "results",
+      "file": "scope-results.png",
+      "region": "1939,1388 1062x913",
+      "bytes": 99309
+    },
+    {
+      "state": "scope-installed",
+      "target": "installed",
+      "file": "scope-installed.png",
+      "region": "1939,1388 1062x913",
+      "bytes": 157408
+    },
+    {
+      "state": "scope-updates",
+      "target": "updates",
+      "file": "scope-updates.png",
+      "region": "1939,1388 1062x913",
+      "bytes": 110793
+    },
+    {
+      "state": "place-news",
+      "target": "news",
+      "file": "place-news.png",
+      "region": "1939,1388 1062x913",
+      "bytes": 68079
+    },
+    {
+      "state": "place-settings",
+      "target": "settings",
+      "file": "place-settings.png",
+      "region": "1939,1388 1062x913",
+      "bytes": 127108
+    }
+  ],
+  "commit": "77d1381a",
+  "tag": "v0.2.5",
+  "release": {
+    "url": "https://github.com/tension-atoi/calix/releases/tag/v0.2.5",
+    "published_at": "2026-10-20T23:33:30Z",
+    "published_sha256": "3c94ff40cc6eddad1e322e2b762e69d72a3943f55b0df205b9bac9727f2b532c",
+    "run_id": 39514342303,
+    "conclusion": "success",
+    "duration": "13m12s"
+  },
+  "package": {
+    "name": "calix-gpui-git-r4827.g77d1381a-1-x86_64.pkg.tar.zst",
+    "bytes": 11545595,
+    "sha256": "352689127aada82c5107cf499016399fd7c2e3576b8d513ad5c0c5215344d3cb",
+    "build_root": ".ci-cache/pkg (in the repository, not /tmp)",
+    "elevation": "pkexec only; no sudo, su or doas"
+  },
+  "live_install": {
+    "version": "calix-gpui-git r4827.g77d1381a-1",
+    "verification": "the installed application reports the place, the scope, the coverage, the inventory-only sources and the row count; `calix-gpui scope installed` answers; the protocol is version 5",
+    "captures": [
+      "scope-results.png",
+      "scope-installed.png",
+      "scope-updates.png",
+      "place-news.png",
+      "place-settings.png"
+    ]
+  },
+  "artifact_check": {
+    "method": "the published tarball was downloaded, its checksum verified, its binaries disassembled, and the whole tree run on the machine",
+    "checksum": "ok",
+    "instructions_above_the_baseline": {
+      "usr/lib/calix/calix": 0,
+      "usr/lib/calix/calix-daemon": 0,
+      "usr/lib/calix/calix-notify": 0,
+      "usr/lib/calix/libcalix-flatpak-backend.so.1.0.0": 0
+    },
+    "frontend": "the published binary runs and speaks the protocol 5",
+    "result": "pass"
+  }
+}

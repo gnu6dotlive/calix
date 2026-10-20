@@ -1,0 +1,50 @@
+{
+  "version": 5,
+  "ok": true,
+  "message": "Running",
+  "data": {
+    "protocol_version": 5,
+    "gui_running": true,
+    "pid": 1889522,
+    "executable": "/usr/lib/calix/calix-gpui",
+    "place": "packages",
+    "scope": "installed",
+    "scope_sources": [
+      "alpm",
+      "aur",
+      "flatpak",
+      "appimage",
+      "cargo",
+      "npm",
+      "release"
+    ],
+    "inventory_only_sources": [
+      "cargo",
+      "npm",
+      "release"
+    ],
+    "filters": {
+      "sources": [
+        "alpm",
+        "aur",
+        "flatpak",
+        "appimage",
+        "cargo",
+        "npm",
+        "release"
+      ],
+      "state": "all states",
+      "sort": "relevance",
+      "view": "table"
+    },
+    "row_count": 1914,
+    "checked_at": null,
+    "destination": "installed",
+    "query": "",
+    "view_mode": "table",
+    "inspector_tab": "overview",
+    "selected_package": null,
+    "operation_running": false,
+    "render_lab_active": false
+  }
+}
