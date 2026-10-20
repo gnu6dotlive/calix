@@ -6,7 +6,8 @@
 #   make check     — cargo check (rapide, sans lier)
 #   make zig       — (re)compile le backend CLI Zig
 #   make clean     — nettoie les artefacts Rust et Zig
-#   make package   — lance makepkg dans un répertoire isolé
+#   make package   — construit le paquet dans un répertoire isolé (sans installer)
+#   make package-install — construit puis installe le paquet via pkexec
 #   make install   — copie les binaires en /usr/local (sans PKGBUILD)
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -32,7 +33,7 @@ export SHELLY_BIN
 
 # ─── Cibles principales ───────────────────────────────────────────────────────
 
-.PHONY: run build check test zig clean package install help
+.PHONY: run build check test zig clean package package-install install help
 
 ## Lance l'application en mode développement (cargo run)
 run: zig
@@ -68,13 +69,18 @@ zig-rebuild:
 	@echo ">>> Recompilation forcée du CLI Zig..."
 	cd $(ZIG_SRC) && zig build -Doptimize=ReleaseSafe
 
-## Lance makepkg dans /tmp pour tester le PKGBUILD complet
+## Construit le paquet dans /tmp sans installer (jamais sudo)
 package:
 	@echo ">>> Test PKGBUILD dans /tmp/calix-gpui-pkg..."
 	rm -rf /tmp/calix-gpui-pkg
 	mkdir -p /tmp/calix-gpui-pkg
 	cp $(PKGBUILD) /tmp/calix-gpui-pkg/PKGBUILD
-	cd /tmp/calix-gpui-pkg && makepkg -si --noconfirm
+	cd /tmp/calix-gpui-pkg && makepkg --noconfirm
+
+## Installe le paquet construit via polkit
+package-install: package
+	@echo ">>> Installation via pkexec..."
+	pkexec pacman -U --noconfirm /tmp/calix-gpui-pkg/*.pkg.tar.zst
 
 ## Installe directement sans PKGBUILD (pour dev rapide)
 install: build
