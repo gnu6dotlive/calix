@@ -1,0 +1,109 @@
+{
+  "run_id": "calix-v0.2.3-hotfix-20261020",
+  "kind": "fix",
+  "status": "ok",
+  "started_at": "2026-10-20T19:15:00Z",
+  "finished_at": "2026-10-20T19:35:00Z",
+  "commit": "eceb4862",
+  "objective": "Revive the Updates scope, which had never loaded in any released version, and make the layout follow the window the compositor grants instead of the one the application asked for.",
+  "how_the_defects_were_found": "A pre-change capture of the application on a live Wayland session, driven through the control surface, one frame per place and per scope. The code had been read; the capture showed the Updates scope answering 'Failed to check for updates'.",
+  "defects": [
+    {
+      "id": "D1",
+      "summary": "The Updates scope never loaded: the frontend read the CLI's grouped payload as a flat list.",
+      "where": "Calix.Ui.Gpui/src/backend/client.rs:129 parsed `list-updates all -j` as Vec<PackageUpdateItem>; Calix.Cli.Zig/src/commands/list_updates.zig:362 answers the `all` variant with a grouped object (Packages / Aur / AppImage / Flatpak), while the flat array is what the per-backend variants return (list_updates.zig:346-354).",
+      "symptom": "The scope showed 'Failed to check for updates: Deserialisation de la liste des mises a jour' with a Retry button that could never succeed.",
+      "fix": "The frontend reads the grouped answer into a typed payload and flattens it per backend, with the source type the interface already filters on.",
+      "regression_guard": "The CLI's own test pins the shape of its answer; the frontend parses that exact string (models.rs), the recorded real answer parses (models.rs), and a test parses the answer of the real CLI binary when it is present (client.rs).",
+      "caught_by_the_test": "serde's PascalCase turns `appimage` into `Appimage`, which is not the `AppImage` the CLI writes. The field needed an explicit rename; the test found it."
+    },
+    {
+      "id": "D2",
+      "summary": "The workstation computed its geometry from the size the application requested, not from the mapped size.",
+      "where": "Calix.Ui.Gpui/src/views/package_workstation.rs used window.window_bounds(), which on Wayland is the requested geometry; the mapped size is window.viewport_size().",
+      "symptom": "The inspector was measured at 137px (floor 320px) in a 1056px window and at 1622px (cap 520px) in a 2542px window, in the same session.",
+      "fix": "The workstation measures the mapped window, through the named helper `content_width`.",
+      "regression_guard": "A unit test asserts the inspector's bounds at the two widths a tiling compositor used during the measurement; the runtime measurement below is the proof on the screen."
+    }
+  ],
+  "runtime_measurements": {
+    "method": "grim captures of the mapped window, with the rail's border and the splitter read from the pixels (measure.py). The inspector's width is the window's width, less the rail (190px), less the splitter (5px), less the list pane.",
+    "before": [
+      {
+        "window_px": 2542,
+        "list_px": 724,
+        "inspector_px": 1622,
+        "inspector_cap_px": 520,
+        "verdict": "above the cap"
+      },
+      {
+        "window_px": 1263,
+        "list_px": 730,
+        "inspector_px": 338,
+        "inspector_cap_px": 459.9,
+        "verdict": "inside the bounds"
+      }
+    ],
+    "after": [
+      {
+        "window_px": 2542,
+        "list_px": 1826,
+        "inspector_px": 521,
+        "inspector_cap_px": 520,
+        "verdict": "inside the bounds"
+      },
+      {
+        "window_px": 1263,
+        "list_px": 724,
+        "inspector_px": 344,
+        "inspector_cap_px": 459.9,
+        "verdict": "inside the bounds"
+      }
+    ],
+    "before_captures": [
+      "evidence/runs/calix-slice-07-baseline-20261020/installed.png",
+      "evidence/runs/calix-v0.2.3-hotfix-20261020/geometry-before-1263.png"
+    ],
+    "after_captures": [
+      "evidence/runs/calix-v0.2.3-hotfix-20261020/geometry-after-2542.png",
+      "evidence/runs/calix-v0.2.3-hotfix-20261020/geometry-after-1263.png"
+    ]
+  },
+  "runtime_state": {
+    "the_updates_scope": "The scope lists the pending updates (browseros-neo-bin -> 0.51.1.2-2, qbittorrent-git -> latest-commit, both AUR), and the rail entry carries the count badge (2).",
+    "capture": "evidence/runs/calix-v0.2.3-hotfix-20261020/updates-after.png",
+    "before_capture": "evidence/runs/calix-slice-07-baseline-20261020/updates.png"
+  },
+  "artifacts": [
+    {
+      "path": "evidence/runs/calix-v0.2.3-hotfix-20261020/geometry-after-1263.png",
+      "bytes": 206891,
+      "sha256": "fbb84c4132eaae2890fef40123fb980820750c6b30ba4d524c2fdc10c7cb7337"
+    },
+    {
+      "path": "evidence/runs/calix-v0.2.3-hotfix-20261020/geometry-after-2542.png",
+      "bytes": 398528,
+      "sha256": "2486f6e417f574813162613cdd6089af92b3ece1ca54deadc3c34e25fe2b63d8"
+    },
+    {
+      "path": "evidence/runs/calix-v0.2.3-hotfix-20261020/geometry-before-1263.png",
+      "bytes": 207199,
+      "sha256": "7c9a3ce34dba2e3c3a9553ab27216ff0680ac0aa6e60c9c27805b1a3c45d48fe"
+    },
+    {
+      "path": "evidence/runs/calix-v0.2.3-hotfix-20261020/measure.py",
+      "bytes": 3584,
+      "sha256": "51333032b6a8e7360d7c3ff0bafab3ed6fc1f88ec377dfb9aa071bb8f6a3516d"
+    },
+    {
+      "path": "evidence/runs/calix-v0.2.3-hotfix-20261020/updates-after.png",
+      "bytes": 68387,
+      "sha256": "58f4f8459f44c59a3bc0913ec10bbb1b6fb63d16b1efb3ddef0677971f019900"
+    }
+  ],
+  "known_gaps": [
+    "The runtime measurement of the wide window was taken on a window the compositor had resized by hand; the compositor's own dispatchers for fullscreen and floating are broken in this Hyprland build (the legacy dispatcher names are parsed as Lua), so the width could not be requested by name.",
+    "The list pane's width is clamped to the window it is drawn in and the clamped value is kept: narrowing the window and widening it back does not restore the width the user had chosen. The clamp has always written back, so that the splitter drag stays a pure differential; separating the preference from the clamped value is a layout decision for the requalification.",
+    "The three capture sessions were taken with different windows on the desktop, so the tile the compositor granted differed between them. The before and after captures of the 2542px window were taken in the same session, one build after the other."
+  ]
+}
