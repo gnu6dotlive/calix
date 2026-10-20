@@ -1,7 +1,13 @@
-# Manual Testing Checklist for Shelly
+# Manual testing checklist
 
-This document tracks manual testing procedures for Shelly components that require human verification beyond automated
-tests.
+This document tracks manual testing procedures for Calix components that require human
+verification beyond automated tests.
+
+> **Naming note.** The Zig backend executable is still named `shelly`, so the commands
+> below are literal. The desktop application is Calix (`calix-gpui`). Some sections were
+> inherited from upstream Shelly and describe components that are not part of the
+> current Calix UI; check them against the current tree before treating a missing
+> feature as a regression. See [`docs/legacy-references.md`](docs/legacy-references.md).
 
 ## Tray refresh after CLI updates (#1591)
 

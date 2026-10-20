@@ -1,5 +1,10 @@
 # Shelly libalpm-Compatible Dependency Resolution Gap Analysis
 
+> **Naming note.** This document describes the Zig package-management backend. The
+> backend executable and several identifiers are still named `shelly`; Calix is a
+> distinct project historically forked from Shelly. See
+> [legacy references](legacy-references.md).
+
 ## Bottom Line
 
 Shelly does not yet have independent, libalpm-compatible dependency resolution.

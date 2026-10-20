@@ -1,5 +1,10 @@
 # Shelly Flatpak backend ABI
 
+> **Naming note.** This document describes the Zig package-management backend. The
+> backend executable and several identifiers are still named `shelly`; Calix is a
+> distinct project historically forked from Shelly. See
+> [legacy references](legacy-references.md).
+
 Flatpak support is an optional native backend. The base CLI and
 `Shelly.PackageManager` do not link libflatpak, GLib, GIO, GObject, or OSTree
 for Flatpak support. Native Flatpak objects and generated bindings live only in

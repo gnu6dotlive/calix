@@ -1,85 +1,142 @@
-# Contributing to Shelly GPUI
+# Contributing to Calix
 
-Thank you for your interest in contributing to **Shelly GPUI**!  
-We welcome bug reports, feature suggestions, documentation improvements, and code contributions.
+Thank you for your interest in Calix. Bug reports, design discussion, documentation
+fixes and code contributions are welcome.
 
----
-
-## 🏛 Project Architecture
-
-Shelly GPUI is built as a modular system separating high-performance GUI rendering from system transaction logic:
-
-- **`Shelly.Ui.Gpui/` (Rust)**:
-  - Frontend built on [GPUI 0.2](https://github.com/zed-industries/zed/tree/main/crates/gpui) (the GPU framework powering the Zed editor).
-  - Handles vector GPU rendering via Vulkan/Wayland/X11, layout, keyboard events, and asynchronous UI state.
-  - Implements the interactive live search with non-blocking debounce, collapsible log drawer, and rich package inspector.
-
-- **`Shelly.Cli.Zig/` (Zig)**:
-  - High-performance CLI backend interacting with `libalpm.so` (Arch Linux Package Management), AUR RPC, Flatpaks, and AppImages.
-  - Generates structured JSON (`-j`) for queries and framed streams (`--ui-mode`) for live operation logging.
-
-- **`packaging/`**:
-  - Contains Arch Linux `PKGBUILD` scripts for local building and AUR deployment (`shelly-gpui-git`).
+Calix is pre-1.0 and changes quickly. Before starting a large change, open an issue or a
+discussion so the approach can be agreed on first.
 
 ---
 
-## 🛠 Local Development Setup
+## Project architecture
+
+Calix is split into a native frontend, a state service and a package-management backend:
+
+- **`Shelly.Ui.Gpui/` (Rust)** — the `calix-gpui` desktop application.
+  Built on [GPUI 0.2](https://github.com/zed-industries/zed/tree/main/crates/gpui), the
+  GPU framework behind Zed. It owns rendering, layout, search orchestration, the package
+  inspector and the operation console.
+- **`Shelly.Cli.Zig/src/daemon/` (Zig)** — `calix-daemon`. Serves a versioned JSON-lines
+  inventory over a Unix socket. The frontend reads the daemon rather than opening state
+  files.
+- **`Shelly.Cli.Zig/` (Zig)** — the `shelly` CLI. Package operations (search, install,
+  remove, upgrade, builds, keyring) run here. The binary name is transitional; the
+  project rename is not complete. See [`docs/legacy-references.md`](docs/legacy-references.md).
+- **`Shelly.PackageManager/` (Zig)** — the shared backend library. ALPM through
+  `libalpm`, AUR, Flatpak, AppImage, Cargo, NPM, the unified inventory record and the
+  release registry.
+- **`Shelly.Flatpak.Backend/` (Zig)** — optional `libflatpak` bridge, loaded at runtime
+  so the base CLI does not depend on Flatpak.
+- **`packaging/`** — the AUR symlink and systemd units. The current package definition is
+  `PKGBUILD-calix`.
+
+The Python engine in `scripts/` is **frozen**. It is a transitional bridge for release
+tracking and receives fixes only, no new features. New work belongs in Zig.
+
+---
+
+## Local development setup
 
 ### Prerequisites
 
 On Arch Linux or an Arch-based distribution:
 
 ```bash
-sudo pacman -S --needed base-devel git rust cargo zig pacman libglvnd fontconfig freetype2 wayland mesa vulkan-icd-loader polkit
+pkexec pacman -S --needed base-devel git rust cargo pacman clang pkgconf \
+  libglvnd fontconfig freetype2 wayland libx11 libxcb libxkbcommon \
+  libxkbcommon-x11 mesa vulkan-icd-loader polkit
 ```
 
-### Development Workflow
+Zig **0.16.0** is required (`Shelly.Cli.Zig/build.zig.zon` declares
+`minimum_zig_version = "0.16.0"`). Zig 0.17 changed the build API and this tree does not
+build with it; Arch's `zig` package has moved past 0.16. The README explains how to
+extract a 0.16.0 package into `vendor/zig-0.16` and put it first on `PATH`.
+
+This project elevates through polkit (`pkexec`), not `sudo`, `su` or `doas`. Do not add
+code paths that invoke those tools.
+
+### Workflow
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/tension-atoi/calix.git
-   cd shelly-gpui
+   cd calix
    ```
 
-2. **Run in development mode:**
+2. **Build the Zig backend** (produces `Shelly.Cli.Zig/zig-out/bin/shelly` and
+   `Shelly.Cli.Zig/zig-out/bin/calix-daemon`):
+
+   ```bash
+   make zig
+   ```
+
+3. **Start the daemon** in one terminal:
+
+   ```bash
+   ./Shelly.Cli.Zig/zig-out/bin/calix-daemon
+   ```
+
+4. **Run the frontend** in another:
+
    ```bash
    make run
    ```
-   This compiles the Zig CLI backend automatically (if not already compiled) and executes `cargo run` pointing to the local backend.
 
-3. **Check compilation without linking (fast check):**
+5. **Check compilation without linking:**
+
    ```bash
    make check
    ```
 
-4. **Build an optimized release binary:**
+6. **Run tests:**
+
    ```bash
-   make build
+   make test
+   (cd Shelly.Cli.Zig && zig build test)
+   (cd Shelly.PackageManager && zig build test)
    ```
 
-5. **Test the package build:**
+7. **Test the package build:**
+
    ```bash
    make package
    ```
 
----
-
-## 📐 Code Guidelines & Quality Standards
-
-- **Zero Compiler Warnings**: All Rust code must compile with **0 warnings** (`cargo check`). No `#[allow(dead_code)]` or quick hacks are accepted without an explicit, documented reason.
-- **Idiomatic Rust**: Follow standard Rust formatting (`cargo fmt`) and clippy recommendations (`cargo clippy`).
-- **Non-blocking UI**: Never run synchronous blocking I/O, heavy process calls, or network requests on the main GPUI render thread. Use `ProcessRunner::run_json_command` (Tokio background workers) and GPUI's `cx.spawn(...)` with `cx.background_executor().timer(...)`.
-- **Consistent Visual Design**: All UI elements should follow the Catppuccin Mocha palette defined in `Shelly.Ui.Gpui/src/theme.rs`.
-- **Commit Messages**: Write concise, conventional commit messages (e.g. `feat: ...`, `fix: ...`, `docs: ...`, `refactor: ...`).
+   The target runs `makepkg -si`, which uses `sudo` for the install step on a default
+   `makepkg` configuration. To stay within the polkit-only policy, run `makepkg
+   --noconfirm` and install the result with `pkexec pacman -U` instead.
 
 ---
 
-## 📬 Submitting Changes
+## Code guidelines
 
-1. Fork the repository and create your feature branch:
-   ```bash
-   git checkout -b feature/my-new-feature
-   ```
-2. Commit your changes and ensure `make check` passes cleanly.
-3. Push to your branch and open a Pull Request against `main`.
-4. Provide a clear description of the problem solved or feature implemented.
+- **Zero warnings.** Rust crates deny dead code, unused variables, unused imports and
+  unused `must_use` values at the crate root. Do not silence warnings with `allow`
+  attributes; remove the dead code or wire it up.
+- **Keep I/O off the render thread.** Never run blocking process calls or network
+  requests on the GPUI render thread. Use the Tokio worker (`ProcessRunner`) and GPUI's
+  background executor.
+- **Respect the protocol boundary.** The daemon's JSON-lines protocol and the inventory
+  document are versioned. A breaking change needs a version bump and a compatibility
+  test on both sides (Zig and Rust).
+- **Keep the privilege boundary explicit.** The UI and daemon stay unprivileged. Root
+  operations belong in the CLI path and go through polkit.
+- **Idiomatic formatting.** Run `cargo fmt` for Rust; follow the surrounding Zig style.
+- **Commit messages.** Use concise conventional messages (`feat:`, `fix:`, `docs:`,
+  `refactor:`, `test:`, `chore:`).
+
+---
+
+## Submitting changes
+
+1. Fork the repository and create a feature branch.
+2. Make the change, keeping unrelated refactors out of the same commit.
+3. Run the relevant checks (`make check`, `make test`, and the Zig tests for the
+   component you touched).
+4. Open a pull request against `main`. Describe the problem, the approach, and what you
+   verified — including anything you could not verify.
+
+If a change touches naming, packaging, the inventory schema, the daemon protocol or the
+polkit policy, say so explicitly in the pull request. Those areas have transitional
+constraints documented in [`docs/legacy-references.md`](docs/legacy-references.md).

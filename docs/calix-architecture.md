@@ -3,6 +3,14 @@
 > Base: `~/Projects/shelly-gpui` (renommé in-place, historique préservé)  
 > Date: 2026-10-19
 
+> [!NOTE]
+> **Reading note (2026-10-20).** This is an internal working plan, originally written in
+> French, and it uses the names that were current when it was written. Calix is
+> historically forked from Shelly (`Seafoam-Labs/Shelly-ALPM`) and has since been deeply
+> refactored into a distinct project; some backend names remain transitional. See
+> [`legacy-references.md`](legacy-references.md). Where this plan and the README disagree
+> about current state, the README and the code are authoritative.
+
 ---
 
 ## 🗺 Vision
@@ -10,7 +18,9 @@
 **Calix** est le hub central de gestion de paquets du bureau gnosix. Il remplace Shelly officiel (`/usr/bin/shelly`) et unifie tous les canaux d'installation en un seul outil cohérent : GPU-accéléré, self-healing, daemon-driven, et prêt pour l'intégration LLM-agent.
 
 > [!IMPORTANT]
-> Calix n'est pas un fork de Shelly — c'est une continuation de Shelly-GPUI, évoluant vers un projet indépendant. Le code GPUI, le backend Zig, l'architecture AppImage/AUR/Flatpak existants sont la fondation.
+> Calix est historiquement un fork de Shelly (`Seafoam-Labs/Shelly-ALPM`), ensuite
+> profondément refactorisé en un projet distinct. Le code GPUI, le backend Zig,
+> l'architecture AppImage/AUR/Flatpak existants sont la fondation.
 
 ---
 

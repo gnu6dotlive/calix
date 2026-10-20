@@ -2,7 +2,8 @@
 
 ## Supported Versions
 
-We provide active security fixes for the latest release on the `main` branch.
+Calix is pre-1.0. We provide active security fixes for the latest code on the `main`
+branch.
 
 | Version | Supported |
 |---|---|
@@ -11,7 +12,7 @@ We provide active security fixes for the latest release on the `main` branch.
 
 ## Reporting a Vulnerability
 
-We take the security of Shelly GPUI and its interaction with root privileges (via Polkit and ALPM) seriously.
+We take the security of Calix and its interaction with root privileges (via Polkit and ALPM) seriously.
 
 If you discover a security vulnerability or privilege escalation bug:
 

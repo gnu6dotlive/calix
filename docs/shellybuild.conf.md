@@ -1,5 +1,10 @@
 # `shellybuild.conf`
 
+> **Naming note.** This document describes the Zig package-management backend. The
+> backend executable and several identifiers are still named `shelly`; Calix is a
+> distinct project historically forked from Shelly. See
+> [legacy references](legacy-references.md).
+
 `shellybuild.conf` is Shelly's data-only configuration for the in-process AUR builder. It replaces `makepkg.conf` for that builder only; external `makepkg` commands and clean-chroot builds do not read it.
 
 ## Precedence

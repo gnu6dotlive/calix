@@ -1,5 +1,10 @@
 # Isolated package builds
 
+> **Naming note.** This document describes the Zig package-management backend. The
+> backend executable and several identifiers are still named `shelly`; Calix is a
+> distinct project historically forked from Shelly. See
+> [legacy references](legacy-references.md).
+
 `shelly build --isolated` executes the native Shelly package builder in a
 fresh, operation-scoped Arch root through `systemd-nspawn`.
 

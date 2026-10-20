@@ -1,4 +1,7 @@
-# AGENTS.md — Shelly GPUI Project
+# AGENTS.md — Calix
+
+Calix is historically forked from Shelly and is now a distinct project. Some paths and
+binaries still use the `shelly` name; see `docs/legacy-references.md`.
 
 ## Engineering Standards: Zero Deadcode Policy & No Warning Suppression
 

@@ -1,5 +1,5 @@
 name: "🐛 Bug Report"
-description: Report a bug to help us improve Shelly GPUI
+description: Report a bug to help us improve Calix
 title: "[Bug]: "
 labels: ["bug"]
 body:
@@ -11,13 +11,13 @@ body:
       options:
         - label: I have searched existing issues and this is not a duplicate.
           required: true
-        - label: I have verified the issue is reproducible on the latest commit/release of Shelly GPUI.
+        - label: I have verified the issue is reproducible on the latest commit/release of Calix.
           required: true
 
   - type: input
     id: version
     attributes:
-      label: Shelly GPUI version or commit
+      label: Calix version or commit
       placeholder: e.g. v0.1.0 or git commit hash
     validations:
       required: true
@@ -27,8 +27,8 @@ body:
     attributes:
       label: Affected Component
       options:
-        - label: Shelly UI (GPUI Rust Frontend)
-        - label: Shelly CLI (Zig Backend)
+        - label: Calix UI (GPUI Rust frontend)
+        - label: Zig backend CLI (currently installed as `shelly`)
         - label: Package Inspector / Details View
         - label: Live Search / Input
         - label: Terminal Log Drawer
@@ -61,7 +61,7 @@ body:
       label: Steps to Reproduce
       description: Minimal steps needed to trigger the issue.
       placeholder: |
-        1. Open Shelly GPUI
+        1. Open Calix
         2. Click on ...
         3. Type ...
         4. See error
