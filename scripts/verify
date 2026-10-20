@@ -41,6 +41,11 @@ for argument in "$@"; do
     esac
 done
 
+command -v python3 >/dev/null 2>&1 || {
+    echo "verify: python3 is required; the run record is written by it." >&2
+    exit 1
+}
+
 # ---- the floors -------------------------------------------------------------
 #
 # These are not targets, they are tripwires. A suite that suddenly runs 300
@@ -245,6 +250,10 @@ require_count "cli" "$(zig_test_count "$LOG_DIR/cli-tests.log")" "$CLI_FLOOR" ||
 
 step "cli-release-build" cli_release_build
 step "cli-smoke" cli_smoke
+# The UI resolves the CLI at runtime, so the tests that launch it need to be
+# pointed at the binary this run just built rather than one on PATH.
+export SHELLY_BIN="$ROOT/Shelly.Cli.Zig/zig-out/bin/shelly"
+
 step "rust-check" rust_check
 step "rust-tests" rust_tests
 require_count "ui" "$(rust_test_count "$LOG_DIR/rust-tests.log")" "$RUST_FLOOR" || finish failed

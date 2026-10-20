@@ -2,10 +2,10 @@ name: CI & Release
 
 on:
   push:
-    branches: [ "main", "feature/**" ]
     tags: [ "v*" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,38 +19,23 @@ jobs:
       image: archlinux:latest
 
     steps:
-      - name: Update system & Install dependencies
-        run: |
-          pacman -Syu --noconfirm --needed \
-            base-devel git rust cargo zig pkgconf clang \
-            pacman libglvnd fontconfig freetype2 wayland mesa vulkan-icd-loader polkit
+      # The base image has no git, and checkout has to happen before the
+      # snapshot pin can run from the repository. Bootstrap only; the
+      # toolchain itself is pinned by the next step.
+      - name: Bootstrap git
+        run: pacman -Sy --noconfirm --needed git
 
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
-      - name: Compile Zig Backend (Shelly.Cli.Zig)
-        run: |
-          cd Shelly.Cli.Zig
-          zig build -Doptimize=ReleaseSafe
+      # One date pins Zig, the LLD it links, and the libc it links against.
+      - name: Pin the Arch snapshot
+        run: ./scripts/ci-setup
 
-      - name: Verify Shelly CLI
-        run: |
-          ./Shelly.Cli.Zig/zig-out/bin/shelly --version
-
-      - name: Cargo Check & Test (Shelly.Ui.Gpui)
-        run: |
-          cd Shelly.Ui.Gpui
-          export CARGO_TARGET_DIR="target"
-          SHELLY_BIN="../Shelly.Cli.Zig/zig-out/bin/shelly" cargo check
-          SHELLY_BIN="../Shelly.Cli.Zig/zig-out/bin/shelly" cargo test --release
-
-      - name: Cargo Build Release
-        run: |
-          cd Shelly.Ui.Gpui
-          export CARGO_TARGET_DIR="target"
-          SHELLY_BIN="../Shelly.Cli.Zig/zig-out/bin/shelly" cargo build --release
+      # Compile, test and smoke exactly what `scripts/verify` checks, so a
+      # local pass and a CI pass cannot mean different things.
+      - name: Verify
+        run: ./scripts/verify
 
       - name: Prepare Release Artifacts
         if: startsWith(github.ref, 'refs/tags/v')

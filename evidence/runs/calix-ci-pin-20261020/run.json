@@ -1,0 +1,123 @@
+{
+  "run_id": "calix-ci-pin-20261020",
+  "kind": "infrastructure",
+  "status": "passed",
+  "scope": "GitHub Actions correctness and cost for tension-atoi/calix",
+  "summary": "CI had been failing for reasons outside the source tree. The job is now pinned to one Arch snapshot and runs the same gate as the pre-push hook; the fix was proven in archlinux:latest locally before any push.",
+  "failed_runs": [
+    {
+      "id": 39394487668,
+      "duration": "2m38s",
+      "conclusion": "failure",
+      "cause": "zig 0.17"
+    },
+    {
+      "id": 39392808445,
+      "duration": "2m33s",
+      "conclusion": "failure",
+      "cause": "zig 0.17"
+    },
+    {
+      "id": 39345125586,
+      "duration": "6m34s",
+      "conclusion": "failure",
+      "cause": "zig 0.17"
+    },
+    {
+      "id": 39337180915,
+      "duration": "14m03s",
+      "conclusion": "failure",
+      "cause": "missing libxkbcommon after zig passed"
+    },
+    {
+      "id": 39328596008,
+      "duration": "14m57s",
+      "conclusion": "failure",
+      "cause": "missing libxkbcommon after zig passed"
+    }
+  ],
+  "root_causes": [
+    {
+      "id": "rolling-image-zig",
+      "symptom": "build.zig:75:11: error: no field named 'args' in struct 'Build'",
+      "cause": "archlinux:latest installs zig from pacman; on 2026-10-12 that became 0.17 while the tree targets 0.16"
+    },
+    {
+      "id": "upstream-zig-linker",
+      "symptom": "fatal linker error: unhandled relocation type R_X86_64_PC64 at offset 0x1c, in crt1.o:.sframe",
+      "cause": "the upstream ziglang.org 0.16.0 tarball links with its own linker, which does not handle .sframe; the distro build links system LLD 21 and does. Reproduced on the host: the upstream binary fails where the distro binary passes"
+    },
+    {
+      "id": "incomplete-deps",
+      "symptom": "ld.lld: error: unable to find library -lxkbcommon / -lxkbcommon-x11",
+      "cause": "ci.yml never installed libxkbcommon or libxkbcommon-x11; pre-existing, hidden behind the compiler failure"
+    }
+  ],
+  "fix": {
+    "unit": "dated Arch userland snapshot, not a compiler binary",
+    "snapshot": "2026/10/01",
+    "resolved": {
+      "zig": "0.16.0-1",
+      "glibc": "2.44+r50+g1848099f063e-1",
+      "gcc": "16.2.1+r23+gd564253eb6c8-1",
+      "rust": "1:1.98.1-2"
+    },
+    "gate": "scripts/verify",
+    "workflow_commands": [
+      "pacman -Sy --noconfirm --needed git",
+      "actions/checkout@v4",
+      "./scripts/ci-setup",
+      "./scripts/verify"
+    ],
+    "triggers": [
+      "push tags v*",
+      "pull_request main",
+      "workflow_dispatch"
+    ]
+  },
+  "verification": {
+    "command": "scripts/ci-replay --worktree",
+    "container": "archlinux:latest",
+    "exit_code": 0,
+    "tests": {
+      "packagemanager": 1388,
+      "cli": 387,
+      "ui": 201
+    },
+    "steps": [
+      "packagemanager-tests",
+      "cli-tests",
+      "cli-release-build",
+      "cli-smoke",
+      "rust-check",
+      "rust-tests",
+      "rust-release-build"
+    ],
+    "note": "replay stages a git-archive export, so ignored paths (vendor/, target/, zig-out/) cannot make it pass"
+  },
+  "deviations": [
+    "The host reports 1386 PackageManager tests; the pinned container reports 1388. Both exceed the floor; the difference was not investigated in this run."
+  ],
+  "artifacts": [
+    {
+      "path": "scripts/verify",
+      "sha256": "8e54bb1a8e722daade04f1d3458add2117ed8fdba508d6de6332fb40968da706"
+    },
+    {
+      "path": "scripts/ci-setup",
+      "sha256": "f7003d9330aa9fdcf461848f17ef8099bdc09f3930970be9f022635829192501"
+    },
+    {
+      "path": "scripts/ci-replay",
+      "sha256": "afec8253dd1c0b6e7de890442bab4cb5d079cd0b44b22ec83edb2416015597c8"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "76065b617cc37ca23df06b7bdb1bfd804e69667fa3453b279e523246e58b1284"
+    },
+    {
+      "path": "docs/ci.md",
+      "sha256": "fb49ef1342d1dd1c8a0041039d355e9d959d33c3bfc78e9c67df1cb19db0899c"
+    }
+  ]
+}

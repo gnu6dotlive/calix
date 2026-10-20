@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Replays the CI job locally, in the same container image, on your machine.
+#
+# A push that teaches you something is a push that should not have happened.
+# This runs `scripts/verify` where CI runs it -- `archlinux:latest`, a clean
+# checkout of only the files git would carry -- so the green is earned before
+# it is spent.
+#
+#   scripts/ci-replay              # the last commit
+#   scripts/ci-replay --worktree   # tracked plus untracked-not-ignored files
+#
+# Ignored paths (vendor/, target/, zig-out/, caches) are excluded on purpose:
+# a CI checkout does not have them, and a replay that quietly uses them is
+# testing a different tree.
+set -euo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+IMAGE=archlinux:latest
+
+MODE=head
+case "${1:-}" in
+    "") ;;
+    --worktree) MODE=worktree ;;
+    -h | --help)
+        sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'
+        exit 0
+        ;;
+    *)
+        echo "ci-replay: unknown argument: $1" >&2
+        exit 2
+        ;;
+esac
+
+command -v podman >/dev/null || {
+    echo "ci-replay: podman is required" >&2
+    exit 1
+}
+
+STAGE=$(mktemp -d "${TMPDIR:-/tmp}/calix-ci.XXXXXX")
+trap 'podman unshare rm -rf "$STAGE" 2>/dev/null || rm -rf "$STAGE"' EXIT
+
+if [ "$MODE" = worktree ]; then
+    # Everything a `git add -A` would carry, and nothing a `.gitignore` hides.
+    (cd "$ROOT" && git ls-files -z -co --exclude-standard | tar --null -T - -c -f -) |
+        tar -x -C "$STAGE" -f -
+else
+    git -C "$ROOT" archive --format=tar HEAD | tar -x -C "$STAGE" -f -
+fi
+
+echo "ci-replay: $IMAGE, $MODE tree, $(du -sh "$STAGE" | cut -f1)"
+echo
+
+podman run --rm -i --network=host -v "$STAGE":/work -w /work "$IMAGE" bash -s <<'IN_CONTAINER'
+set -euo pipefail
+
+echo "== toolchain =="
+bash ./scripts/ci-setup
+
+echo
+echo "== gate =="
+bash ./scripts/verify
+IN_CONTAINER

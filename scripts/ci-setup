@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Pins the container's userland to one Arch snapshot.
+#
+# `archlinux:latest` is not a toolchain, it is a moving target: on 2026-10-12
+# Zig became 0.17 and this tree stopped building. Pinning a Zig binary is not
+# enough either -- the distro build links the system LLD, and that LLD is what
+# knows how to relocate the .sframe sections a current glibc emits. The unit
+# that has to be pinned is the whole userland.
+#
+# 2026-10-01 is the last convenient snapshot where extra/ still carried
+# zig 0.16.0-1 with clang21/lld21/llvm21-libs. Bump this date deliberately,
+# in its own commit, and expect to re-run `scripts/ci-replay`.
+set -euo pipefail
+
+SNAPSHOT=2026/10/01
+
+cat > /etc/pacman.d/mirrorlist <<EOF
+Server = https://archive.archlinux.org/repos/$SNAPSHOT/\$repo/os/\$arch
+EOF
+
+# -yyuu: refresh the sync databases and permit the downgrades a snapshot
+# rollback implies. Without -uu pacman keeps the newer image packages and the
+# result is a half-pinned system, which is the state that produced the linker
+# failure in the first place.
+pacman -Syyuu --noconfirm \
+    base-devel git rust cargo zig pkgconf clang \
+    pacman libglvnd fontconfig freetype2 wayland mesa vulkan-icd-loader polkit \
+    libxkbcommon libxkbcommon-x11 \
+    curl xz python3
+
+installed=$(zig version)
+if [ "$installed" != "0.16.0" ]; then
+    echo "ci-setup: expected zig 0.16.0 from the snapshot, got $installed" >&2
+    exit 1
+fi
+
+echo "ci-setup: snapshot $SNAPSHOT"
+pacman -Q glibc gcc zig rust cargo | sed 's/^/  /'
