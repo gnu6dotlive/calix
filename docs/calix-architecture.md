@@ -274,10 +274,25 @@ Tranche 1a (Done)   : Discovery AppImage dans le backend Zig
                           sync entier avorté), et le renommage laissait 20 entrées .desktop
                           cassées. Plus : les tests AppImage écrivaient dans le
                           ~/.local/share/applications de l'utilisateur (17 sites isolés).
-Tranche 1b (Next)   : Backends Cargo et NPM en Zig, registre de releases, vérification de
-                        provenance amont, flux d'application, helper root + polkit, inventaire
-                        unifié versionné, calix-daemon, calix CLI, UI sur daemon, suppression
-                        du moteur Python.
+Tranche 1b1 (Done)  : Backends Cargo et NPM en Zig + contrat d'inventaire
+                        → cargo/manager.zig lit ~/.cargo/.crates2.json (l'index que cargo
+                          uninstall consulte) ; npm/manager.zig lance `npm list -g --depth=0
+                          --json` (la source de vérité de npm lui-même). Un npm absent ou un
+                          préfixe global vide n'est pas une erreur.
+                        → inventory/record.zig définit UN enregistrement plat pour tous les
+                          écosystèmes, à champs optionnels et non union taguée : une union
+                          rendrait chaque nouvel écosystème cassant pour le consommateur.
+                        → Les noms de champs sont le vocabulaire du frontend (source_type,
+                          repository_or_remote) : un snapshot se consomme sans couche de
+                          traduction. Un snapshot de version inconnue est refusé, pas rendu
+                          à moitié compris.
+                        → Le schéma est figé des deux côtés : le Zig asserte la forme exacte
+                          sérialisée, le modèle Rust analyse un échantillon capturé depuis lui.
+                        → `shelly inventory` imprime le document : 1962 paquets (1876 ALPM,
+                          24 Flatpak, 20 Cargo, 17 AUR, 16 AppImage, 9 NPM).
+Tranche 1b2 (Next)  : Registre de releases, vérification de provenance amont, flux
+                        d'application, helper root + polkit, calix-daemon (socket, scheduler,
+                        journal), calix CLI, UI sur daemon, suppression du moteur Python.
 ```
 
 ---
@@ -470,10 +485,12 @@ lancement de processus, classification des forges et des assets, et le probing l
 
 Travail réellement nouveau, en Zig :
 
-1. **Backend Cargo** — lecture de `~/.cargo/.crates2.json`.
-2. **Backend NPM** — `npm list -g`.
+1. ~~**Backend Cargo**~~ — **fait** (tranche 1b1) : `~/.cargo/.crates2.json`.
+2. ~~**Backend NPM**~~ — **fait** (tranche 1b1) : `npm list -g --depth=0 --json`.
 3. ~~**Discovery `~/Applications`**~~ — **fait** (tranche 1a). Le backend lit son propre répertoire ;
    la course à deux propriétaires sur `appimage-metadata-v2.db` a disparu.
+3b. ~~**Contrat d'inventaire**~~ — **fait** (tranche 1b1) : enregistrement plat, versionné, figé
+   des deux côtés.
 4. **Registre de releases** + état (JSON, répertoire d'état du daemon).
 5. **Vérification de provenance amont** — récupérer le `SHA256SUMS.txt` du forge et le comparer à
    l'artefact téléchargé. *Cette capacité n'existe pas dans le Zig aujourd'hui* : `checksums.zig`
