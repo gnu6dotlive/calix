@@ -240,6 +240,35 @@ flatpak_backend_release_build() {
     test -f Calix.Flatpak.Backend/zig-out/lib/libcalix-flatpak-backend.so.1
 }
 
+# A released binary has to run on every x86_64 machine, not only on the one
+# that built it. Zig's native CPU model bakes the build machine's
+# instruction set into the binary, and Zig emits it without a runtime check:
+# an AMD-only instruction (SSE4a) in a published binary kills it with
+# SIGILL on an Intel CPU the first time it opens a TLS connection. The
+# builds resolve the baseline CPU model, and this step makes sure they did.
+#
+# The Rust frontend is not checked here: Rust compiles for the baseline
+# target and dispatches to wider implementations at runtime, so its
+# disassembly legitimately contains instructions the baseline lacks.
+portable_binaries() {
+    local binary
+    for binary in \
+        Calix.Cli.Zig/zig-out/bin/calix \
+        Calix.Cli.Zig/zig-out/bin/calix-daemon \
+        Calix.Cli.Zig/zig-out/bin/calix-notify \
+        Calix.Flatpak.Backend/zig-out/lib/libcalix-flatpak-backend.so.1.0.0
+    do
+        if [ ! -f "$binary" ]; then
+            echo "portable-binaries: $binary was not built" >&2
+            return 1
+        fi
+        if objdump -d "$binary" | grep -qE '%(y|z)mm[0-9]|extrq'; then
+            echo "portable-binaries: $binary uses instructions above the x86_64 baseline" >&2
+            return 1
+        fi
+    done
+}
+
 cli_smoke() {
     local output
     output=$(./Calix.Cli.Zig/zig-out/bin/calix --version) || return 1
@@ -271,6 +300,7 @@ step "cli-release-build" cli_release_build
 step "cli-smoke" cli_smoke
 step "flatpak-backend-tests" flatpak_backend_tests
 step "flatpak-backend-release-build" flatpak_backend_release_build
+step "portable-binaries" portable_binaries
 # The UI resolves the CLI at runtime, so the tests that launch it need to be
 # pointed at the binary this run just built rather than one on PATH.
 export CALIX_BIN="$ROOT/Calix.Cli.Zig/zig-out/bin/calix"

@@ -11,11 +11,14 @@ accelerated application, backed by a Zig package-management engine.
 [![UI](https://img.shields.io/badge/UI-Rust%20%2B%20GPUI%200.2-orange.svg)](https://github.com/zed-industries/zed/tree/main/crates/gpui)
 [![Backend](https://img.shields.io/badge/backend-Zig%200.16-f7a41d.svg)](https://ziglang.org/)
 
-![Calix showing the unified inventory of every installed package on the machine](docs/media/calix-installed.png)
+<p align="center">
+  <img src="docs/media/calix-browse.png" width="49%" alt="Calix Browse view: eighteen results for ripgrep across the ALPM repositories and the AUR">
+  <img src="docs/media/calix-installed.png" width="49%" alt="Calix Installed view: 1911 installed packages from every ecosystem in one table">
+</p>
 
-<sub>Calix 0.2.1 on Arch Linux: one inventory document covering ALPM, AUR, Flatpak,
-AppImage, Cargo, NPM and tracked releases — 1 881 packages on the machine that took
-this screenshot.</sub>
+<sub>Left — Browse: one search across the ALPM repositories and the AUR, every result
+labelled with its source. Right — Installed: 1 911 packages from ALPM, AUR, Flatpak,
+AppImage, Cargo, NPM and tracked releases in one table.</sub>
 
 ---
 
@@ -70,7 +73,7 @@ Five decisions follow from that:
 Every release publishes a tarball and its checksum:
 
 ```bash
-gh release download v0.2.1 --repo tension-atoi/calix \
+gh release download v0.2.2 --repo tension-atoi/calix \
   --pattern 'calix-gpui-linux-x86_64.tar.gz*'
 sha256sum -c calix-gpui-linux-x86_64.tar.gz.sha256
 mkdir -p /tmp/calix && tar -xzf calix-gpui-linux-x86_64.tar.gz -C /tmp/calix
@@ -110,6 +113,12 @@ make run                    # the GPUI frontend against the in-tree backend
 
 Full prerequisites, including how to obtain a Zig 0.16 toolchain on a modern Arch
 system, are in [Development](#development).
+
+### Migrating from Shelly
+
+Calix v0.2.0 was a hard cut from the Shelly name. There is no compatibility layer and
+the old state paths are not read. The one-time state move, the renamed surfaces and the
+old package names are in [`docs/release-notes.md`](docs/release-notes.md).
 
 ---
 
@@ -467,7 +476,14 @@ Every change is proven locally before it is pushed. There is no "try it on CI" s
 release builds and a CLI smoke test. `scripts/ci-replay` replays that gate inside a
 pinned Arch snapshot, so a local pass and a CI pass cannot mean different things.
 
-Current counts: **1 386** PackageManager tests, **391** CLI tests, **201** Rust tests.
+The gate also checks that every shipped binary stays inside the x86_64 baseline. Zig's
+native CPU model bakes the build machine's instruction set into a binary and emits it
+without a runtime check, so an artifact built on an AMD machine dies with `SIGILL` on
+an Intel one the first time it opens a TLS connection. Every Zig build in this tree
+resolves the baseline CPU model, and a binary that uses an instruction above it fails
+the gate.
+
+Current counts: **1 386** PackageManager tests, **392** CLI tests, **201** Rust tests.
 
 ### Evidence
 
@@ -504,7 +520,7 @@ more optimistic document elsewhere in the tree, this table is the one to trust.
 | Naming | Complete: code, paths, binaries and packaging use `calix` and `live.gnu6.calix` |
 | Platform | Arch Linux, `x86_64` |
 
-The frontend crate is version `0.2.1`. The Zig backend reports `3.1.9-dev`, a version
+The frontend crate is version `0.2.2`. The Zig backend reports `3.1.9-dev`, a version
 string inherited from the tree it descends from; it is not the Calix product version.
 
 ---
@@ -524,9 +540,10 @@ In rough order of value:
 4. **Cut the frozen Python engine.** Once the watcher is native, `scripts/calix_*.py`
    and the legacy `packaging/systemd/calix-sync.*` units can go.
 
-Just before this list: the optional Flatpak backend now ships in the package, and a
-command that does not touch Flatpak never builds an inventory on the way to running.
-Both were wrong in `v0.2.1`, and both are fixed on `main`.
+Just before this list: `v0.2.2` shipped the optional Flatpak backend in the package,
+stopped a command from running the inventory instead of its own job, and rebuilt every
+Zig binary for the x86_64 baseline so the artifact runs on Intel CPUs as well as AMD
+ones. All three were wrong in `v0.2.1`.
 
 ---
 

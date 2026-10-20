@@ -33,6 +33,20 @@ it, so a backend that no longer builds would ship a package whose Flatpak
 support silently never works. The container installs the Flatpak development
 files for the same reason.
 
+## Why the gate checks the binaries are portable
+
+Zig's native CPU model bakes the build machine's instruction set into the
+binary, and Zig emits it without a runtime check. The v0.2.0 and v0.2.1
+release artifacts were built on an AMD runner and contained SSE4a
+instructions, which do not exist on an Intel CPU: the backend CLI died with
+`SIGILL` the first time it opened a TLS connection.
+
+Every Zig build in the tree now resolves the x86_64 baseline CPU model, and
+the gate disassembles each shipped binary and fails it if it uses an
+instruction above that baseline. The Rust frontend is not checked that way:
+Rust compiles for the baseline target and dispatches to wider
+implementations at runtime.
+
 ## Why the job is pinned to a date
 
 `archlinux:latest` is a moving target, and the job used to install `zig` from

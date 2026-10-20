@@ -7,12 +7,31 @@ const package_manifest = @import("build.zig.zon");
 // for defining build steps and express dependencies between them, allowing the
 // build runner to parallelize the build automatically (and the cache system to
 // know when a step doesn't need to be re-run).
+/// The target the backend library is built for.
+///
+/// The baseline CPU model keeps a build portable: a build with the native
+/// model bakes the build machine's instruction set in, and Zig emits it
+/// without a runtime check.
+fn portableTarget(b: *std.Build) std.Build.ResolvedTarget {
+    const requested = b.standardTargetOptions(.{});
+    return switch (requested.query.cpu_model) {
+        // The default: a native target would use the build machine's CPU.
+        .determined_by_arch_os, .native => b.resolveTargetQuery(.{
+            .cpu_arch = requested.query.cpu_arch,
+            .os_tag = requested.query.os_tag,
+            .abi = requested.query.abi,
+            .cpu_model = .baseline,
+        }),
+        else => requested,
+    };
+}
+
 pub fn build(b: *std.Build) void {
     // Standard target options allow the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
     // means any target is allowed, and the default is native. Other options
     // for restricting supported target set are available.
-    const target = b.standardTargetOptions(.{});
+    const target = portableTarget(b);
     // Standard optimization options allow the person running `zig build` to select
     // between Debug, ReleaseSafe, ReleaseFast, and ReleaseSmall. Here we do not
     // set a preferred release mode, allowing the user to decide how to optimize.

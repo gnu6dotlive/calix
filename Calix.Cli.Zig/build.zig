@@ -1,8 +1,31 @@
 const std = @import("std");
 const package_manifest = @import("build.zig.zon");
 
+/// The target every Calix binary is built for.
+///
+/// A build with the native CPU model bakes the build machine's instruction
+/// set into the binary, and Zig's code generation uses it without a runtime
+/// check: a package built on an AMD machine then dies with SIGILL on an
+/// Intel one, because SSE4a does not exist there. The baseline model keeps
+/// a binary portable to every x86_64 machine, which is what a package and
+/// a release artifact have to be. A developer who wants the faster local
+/// build can ask for it with `-Dcpu=native`.
+fn portableTarget(b: *std.Build) std.Build.ResolvedTarget {
+    const requested = b.standardTargetOptions(.{});
+    return switch (requested.query.cpu_model) {
+        // The default: a native target would use the build machine's CPU.
+        .determined_by_arch_os, .native => b.resolveTargetQuery(.{
+            .cpu_arch = requested.query.cpu_arch,
+            .os_tag = requested.query.os_tag,
+            .abi = requested.query.abi,
+            .cpu_model = .baseline,
+        }),
+        else => requested,
+    };
+}
+
 pub fn build(b: *std.Build) void {
-    const target = b.standardTargetOptions(.{});
+    const target = portableTarget(b);
     const optimize = b.standardOptimizeOption(.{});
     const diagnostics = b.dependency("calix_diagnostics", .{ .target = target, .optimize = optimize }).module("diagnostics");
     const flatpak_backend_path = b.option(

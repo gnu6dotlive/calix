@@ -1,7 +1,27 @@
 const std = @import("std");
 
+/// The target the backend library is built for.
+///
+/// The baseline CPU model keeps the shipped library loadable on every
+/// x86_64 machine: a build with the native model bakes the build machine's
+/// instruction set in, and Zig emits it without a runtime check. Pass
+/// `-Dcpu=native` for a faster local build.
+fn portableTarget(b: *std.Build) std.Build.ResolvedTarget {
+    const requested = b.standardTargetOptions(.{});
+    return switch (requested.query.cpu_model) {
+        // The default: a native target would use the build machine's CPU.
+        .determined_by_arch_os, .native => b.resolveTargetQuery(.{
+            .cpu_arch = requested.query.cpu_arch,
+            .os_tag = requested.query.os_tag,
+            .abi = requested.query.abi,
+            .cpu_model = .baseline,
+        }),
+        else => requested,
+    };
+}
+
 pub fn build(b: *std.Build) void {
-    const target = b.standardTargetOptions(.{});
+    const target = portableTarget(b);
     const optimize = b.standardOptimizeOption(.{});
     const diagnostics = b.dependency("calix_diagnostics", .{ .target = target, .optimize = optimize }).module("diagnostics");
 
