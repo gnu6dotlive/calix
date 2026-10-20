@@ -1,0 +1,163 @@
+{
+  "run_id": "calix-daemon-packaging-20261020",
+  "kind": "packaging",
+  "status": "ok",
+  "started_at": "2026-10-20T11:20:00Z",
+  "finished_at": "2026-10-20T11:38:50Z",
+  "duration_ms": 1130000,
+  "commit": "ee24150296a5015e195c6ce99f99ca43a4e3d705",
+  "parent_commit": "f7a63665511268e6bf34c7897f31db6f29f51350",
+  "working_tree_dirty": false,
+  "objective": "Package calix-daemon and its per-user service in the Arch package, make the package build reproducible with the required Zig 0.16 toolchain, and validate the produced package from a clean source checkout.",
+  "scope": [
+    "PKGBUILD-calix installs /usr/lib/calix/calix-daemon and the /usr/bin/calix-daemon symlink",
+    "PKGBUILD-calix installs /usr/lib/systemd/user/calix-daemon.service without enabling it",
+    "the user service runs the unprivileged daemon with a private runtime directory and conservative hardening",
+    "the GitHub release artifact contains the daemon, symlink and service",
+    "make package selects vendor/zig-0.16 and exports ZIG",
+    "PKGBUILD-calix rejects Zig versions other than 0.16.x with an actionable error",
+    "README, CONTRIBUTING and MANUAL_TESTING document package and service verification"
+  ],
+  "verification": {
+    "local": {
+      "command": "scripts/verify",
+      "commit": "ee241502",
+      "working_tree_dirty": false,
+      "naming_check": "pass",
+      "packagemanager_tests": 1386,
+      "packagemanager_total": 1390,
+      "packagemanager_skipped": 4,
+      "packagemanager_floor": 1380,
+      "cli_tests": 388,
+      "cli_floor": 380,
+      "rust_tests": 201,
+      "rust_floor": 195,
+      "release_builds": "pass",
+      "cli_smoke": "pass"
+    },
+    "container": {
+      "command": "scripts/ci-replay",
+      "image": "archlinux:latest",
+      "snapshot": "2026/10/01",
+      "mode": "HEAD archive, no .git",
+      "commit_under_test": "ee241502",
+      "naming_check": "pass",
+      "packagemanager_tests": 1388,
+      "cli_tests": 388,
+      "rust_tests": 201,
+      "release_builds": "pass",
+      "cli_smoke": "pass",
+      "retry_reason": "The first replay exhausted the 16 GiB /tmp tmpfs during cargo test; the retry used TMPDIR=/var/tmp/calix-ci-replay on the host filesystem."
+    },
+    "package_build": {
+      "command": "makepkg --noconfirm --cleanbuild --force",
+      "source": "clean local clone at commit ee241502, source rewritten to file:// for the validation build",
+      "ZIG": "/home/tension_atoi/Projects/calix/vendor/zig-0.16/usr/bin/zig",
+      "zig_version": "0.16.0",
+      "exit": 0,
+      "package": "calix-gpui-git-r4797.gee241502-1-x86_64.pkg.tar.zst",
+      "package_version": "r4797.gee241502-1",
+      "package_bytes": 10932225,
+      "package_sha256": "05bd67925af6a1bbbbd095c89ed1b9fc45f0b2ca141b36835a93aa24bc4bacde",
+      "cargo_test_result": "201 passed; 0 failed",
+      "nonfatal_noise": "libfakeroot internal error: payload not recognized! appeared after stripping; makepkg still exited 0 and the package manifest and extracted binaries were validated."
+    },
+    "package_contents": {
+      "daemon": "usr/lib/calix/calix-daemon",
+      "daemon_symlink": "usr/bin/calix-daemon -> /usr/lib/calix/calix-daemon",
+      "cli": "usr/lib/calix/calix",
+      "cli_symlink": "usr/bin/calix -> /usr/lib/calix/calix",
+      "service": "usr/lib/systemd/user/calix-daemon.service",
+      "frontend": "usr/lib/calix/calix-gpui"
+    },
+    "package_smoke": {
+      "calix_version": "3.1.9-dev",
+      "daemon_version": "calix-daemon 3.1.9-dev",
+      "daemon_ping": "{\"version\":1,\"ok\":true,\"data\":{\"protocol\":1}}",
+      "socket_directory_mode": "700",
+      "socket_mode": "600",
+      "note": "The package was extracted into a temporary root and the daemon ran from that extraction; it was not installed with pacman."
+    },
+    "zig_override": {
+      "system_zig": "/usr/bin/zig reports 0.17.0",
+      "system_zig_build_gate": "rejected with exit 1 and an actionable message",
+      "vendor_zig": "0.16.0 accepted"
+    },
+    "static_checks": {
+      "pkgbuild_syntax": "pass",
+      "service_syntax": "pass with ExecStart substituted with /bin/true because the install path is only present after package extraction"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "evidence/logs/calix-daemon-packaging-20261020-ci-replay.log",
+      "bytes": 21797,
+      "sha256": "91cf6012a3938299c36c1f24ef999bfe7477d040966c97f0d852b1c9c36fc5d0"
+    },
+    {
+      "path": "evidence/logs/calix-daemon-packaging-20261020-ci-replay-no-space.log",
+      "bytes": 24576,
+      "sha256": "c223b070b4477bf763918977d27fec154f82f1b3aedd3424bb8370d4cea2d6c5"
+    },
+    {
+      "path": "evidence/logs/calix-daemon-packaging-20261020-makepkg.log",
+      "bytes": 35165,
+      "sha256": "d3b72749d0f81672ce8d92cbde4f01e747a15eb1396f58178311bb3eac61f264"
+    },
+    {
+      "path": "evidence/logs/calix-daemon-packaging-20261020-package-contents.log",
+      "bytes": 2217,
+      "sha256": "0e47dd6e3a8d2c142a5a76b3c49a26c29354adfda794197d6ec782f6de23e5a5"
+    },
+    {
+      "path": "evidence/logs/calix-daemon-packaging-20261020-package-smoke.log",
+      "bytes": 546,
+      "sha256": "b0d8d5a5d3d3e63e02c2549257d2bb36b070ee6f2124393090bb189a7186c65c"
+    },
+    {
+      "path": "evidence/logs/calix-daemon-packaging-20261020-package.sha256",
+      "bytes": 118,
+      "sha256": "d93827d8e035bd1c2cd4ac56dc9c89b6a884bb8c8600a37d708ee34922b00dcb"
+    },
+    {
+      "path": "evidence/logs/calix-daemon-packaging-20261020-static-checks.log",
+      "bytes": 117,
+      "sha256": "72eac029a9000e7e09639d338afc4801680cfe773c47a30b281ea951dba658b5"
+    },
+    {
+      "path": "evidence/logs/calix-daemon-packaging-20261020-verify-local.log",
+      "bytes": 793,
+      "sha256": "bee40bbcddab4b55a0db40b82b085e439fa706868be1401e8629dcdb098c21f2"
+    },
+    {
+      "path": "evidence/logs/calix-daemon-packaging-20261020-zig-gate.log",
+      "bytes": 119,
+      "sha256": "3b52f55e97ecd21987c06d8c244b10f2bcccf83216fa7226ed010328d4db4607"
+    },
+    {
+      "path": "evidence/runs/calix-daemon-packaging-20261020/verify-local.json",
+      "bytes": 1072,
+      "sha256": "6016b939bc0ad457919391b2bf272e8d95c773654fd2f2ceb5640b9411e1ac4c"
+    }
+  ],
+  "package_artifact": {
+    "path": "/tmp/opencode/calix-gpui-git-r4797.gee241502-1-x86_64.pkg.tar.zst",
+    "bytes": 10932225,
+    "sha256": "05bd67925af6a1bbbbd095c89ed1b9fc45f0b2ca141b36835a93aa24bc4bacde",
+    "committed": false,
+    "reason": "Large build artifact; repository policy forbids committing packages. The SHA-256 and manifest are retained in evidence."
+  },
+  "known_gaps": [
+    "The package was not installed with pacman: installation and the live systemctl --user service check require an interactive pkexec/polkit session and were not run unattended.",
+    "The package service was syntax-checked and its extracted binary was smoke-tested, but systemd did not supervise the process in this run.",
+    "The clean package source was a local clone at the same commit rather than the remote URL; the committed tree is identical.",
+    "The first ci-replay attempt failed because /tmp was full; the successful retry used a host-filesystem TMPDIR and is the authoritative replay.",
+    "GitHub Actions was not triggered by this commit; the container replay remains the pre-push proof."
+  ],
+  "not_run": [
+    "pacman -U package installation on the host",
+    "systemctl --user enable --now calix-daemon.service under a live desktop session",
+    "remote CI",
+    "push to origin/main"
+  ]
+}

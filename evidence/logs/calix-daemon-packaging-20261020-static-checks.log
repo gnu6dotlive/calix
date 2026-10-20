@@ -1,0 +1,3 @@
+$ bash -n PKGBUILD-calix
+$ systemd-analyze verify calix-daemon.service (ExecStart substituted with /bin/true)
+exit=0

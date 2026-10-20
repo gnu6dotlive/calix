@@ -1,0 +1,12 @@
+package: /tmp/opencode/calix-gpui-git-r4797.gee241502-1-x86_64.pkg.tar.zst
+sha256: 05bd67925af6a1bbbbd095c89ed1b9fc45f0b2ca141b36835a93aa24bc4bacde
+--- calix --version ---
+3.1.9-dev
+--- calix-daemon --version ---
+calix-daemon 3.1.9-dev
+--- socket mode ---
+700 tension_atoi:tension_atoi /tmp/calix-package-smoke-log.88mZNv/run/calix
+600 tension_atoi:tension_atoi /tmp/calix-package-smoke-log.88mZNv/run/calix/daemon.sock
+--- ping ---
+{"version":1,"ok":true,"data":{"pid":3335310,"protocol":1,"started_at":1792496312}}
+--- daemon stderr/stdout ---

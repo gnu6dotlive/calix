@@ -1,0 +1,30 @@
+-rw-r--r--  0 root   root    80561 Oct 20 07:21 .BUILDINFO
+-rw-r--r--  0 root   root      908 Oct 20 07:21 .MTREE
+-rw-r--r--  0 root   root     1001 Oct 20 07:21 .PKGINFO
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/bin/
+lrwxrwxrwx  0 root   root        0 Oct 20 07:21 usr/bin/calix -> /usr/lib/calix/calix
+lrwxrwxrwx  0 root   root        0 Oct 20 07:21 usr/bin/calix-daemon -> /usr/lib/calix/calix-daemon
+-rwxr-xr-x  0 root   root       77 Oct 20 07:21 usr/bin/calix-gpui
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/lib/
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/lib/calix/
+-rwxr-xr-x  0 root   root  5867976 Oct 20 07:21 usr/lib/calix/calix
+-rwxr-xr-x  0 root   root  1881280 Oct 20 07:21 usr/lib/calix/calix-daemon
+-rwxr-xr-x  0 root   root 25799984 Oct 20 07:21 usr/lib/calix/calix-gpui
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/lib/systemd/
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/lib/systemd/user/
+-rw-r--r--  0 root   root      507 Oct 20 07:21 usr/lib/systemd/user/calix-daemon.service
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/share/
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/share/applications/
+-rw-r--r--  0 root   root      660 Oct 20 07:21 usr/share/applications/live.gnu6.calix.desktop
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/share/icons/
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/share/icons/hicolor/
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/share/icons/hicolor/scalable/
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/share/icons/hicolor/scalable/apps/
+-rw-r--r--  0 root   root     2965 Oct 20 07:21 usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/share/licenses/
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/share/licenses/calix-gpui-git/
+-rw-r--r--  0 root   root    35149 Oct 20 07:21 usr/share/licenses/calix-gpui-git/LICENSE
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/share/polkit-1/
+drwxr-xr-x  0 root   root        0 Oct 20 07:21 usr/share/polkit-1/actions/
+-rw-r--r--  0 root   root     3530 Oct 20 07:21 usr/share/polkit-1/actions/live.gnu6.calix.policy
