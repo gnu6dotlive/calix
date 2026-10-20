@@ -417,8 +417,7 @@ version.
 | `Shelly.Cli.Zig/` | Zig CLI (`shelly`) and daemon (`calix-daemon`) |
 | `Shelly.PackageManager/` | Zig backend library: ALPM, AUR, Flatpak, AppImage, Cargo, NPM, release registry |
 | `Shelly.Flatpak.Backend/` | Optional `libflatpak` shared library, loaded at runtime |
-| `Shelly.Http/`, `Shelly.Key/`, `Shelly.Diagnostics/`, `Shelly.Notifications.Zig/` | Supporting Zig components |
-| `Shelly.Tui/`, `Shelly.Ui.Gtk/` | Older upstream interfaces, retained in the tree |
+| `Shelly.Http/`, `Shelly.Diagnostics/` | Supporting Zig components |
 | `scripts/` | Frozen Python engine and operational scripts (transitional) |
 | `docs/` | Architecture, slice records, render-lab evidence, [legacy references](docs/legacy-references.md) |
 | `packaging/` | AUR symlink and systemd units |
