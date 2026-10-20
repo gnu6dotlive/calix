@@ -236,7 +236,10 @@ graph TD
   inventory record shared by every ecosystem, the release registry and upstream
   provenance verification.
 - **`Calix.Flatpak.Backend/`** is an optional `libflatpak` shared library loaded at
-  runtime, so the base binary has no hard Flatpak dependency.
+  runtime, so the base binary has no hard Flatpak dependency. The package builds and
+  ships it at `/usr/lib/calix/libcalix-flatpak-backend.so.1`; the Flatpak runtime
+  itself stays optional, and without it the library cannot load and Calix runs with
+  every other ecosystem.
 
 ### The daemon protocol
 
@@ -376,6 +379,7 @@ The package (`calix-gpui-git`) installs:
 | `/usr/lib/calix/calix` | Zig backend CLI (the canonical polkit path) |
 | `/usr/lib/calix/calix-daemon` | Zig inventory daemon |
 | `/usr/lib/calix/calix-notify` | Session-bus notification bridge |
+| `/usr/lib/calix/libcalix-flatpak-backend.so.1` | Optional Flatpak backend, loaded at runtime |
 | `/usr/lib/systemd/user/calix-daemon.service` | Per-user inventory service |
 | `/usr/lib/systemd/user/calix-notify.service` | Per-user notification bridge |
 | `/usr/share/applications/live.gnu6.calix.desktop` | XDG desktop entry |
@@ -425,8 +429,9 @@ That binary is linked against LLVM 21 (`libLLVM.so.21.1`, `libclang-cpp.so.21.1`
 versioned packages — `clang21 lld21 llvm21-libs` — from the same snapshot or the Arch
 Linux Archive, or `zig` will fail to start.
 
-Flatpak support additionally needs the Flatpak development files and a separately built
-`Calix.Flatpak.Backend`; the base CLI does not link `libflatpak`.
+Flatpak support is a separate shared library that the CLI loads at runtime. The
+package builds and ships it; to build it from source you need the Flatpak development
+files, and the base CLI never links `libflatpak`.
 
 ### Make targets
 
@@ -481,7 +486,7 @@ more optimistic document elsewhere in the tree, this table is the one to trust.
 | Area | State |
 |---|---|
 | GPUI frontend (`calix-gpui`) | Primary interface; active development |
-| Zig backend CLI (`calix`) | Works for installed-state queries; `search`, `inventory` and `news` fail without the optional Flatpak backend present — see [What is next](#what-is-next) |
+| Zig backend CLI (`calix`) | Works. The Flatpak ecosystem is optional: without the backend the inventory document carries every other ecosystem and nothing else |
 | `calix-daemon` | Serves inventory and release state on demand; **no scheduler yet** |
 | Unified inventory | ALPM, AUR, Flatpak, AppImage, Cargo, NPM, tracked releases |
 | Release tracking | Zig registry and provenance checks landed; a frozen Python engine still writes the tracked-release observation file |
@@ -501,29 +506,20 @@ string inherited from the tree it descends from; it is not the Calix product ver
 
 In rough order of value:
 
-1. **Ship the Flatpak backend in the package, or make the CLI degrade.** The package
-   declares `flatpak` as an optional dependency but never installs
-   `/usr/lib/calix/libcalix-flatpak-backend.so.1`. On a machine without that library,
-   `calix search`, `calix inventory` and `calix news` fail with
-   `FlatpakBackendUnavailable` — including operations that have nothing to do with
-   Flatpak — while `calix list` keeps working. Either the backend becomes part of the
-   package, or the ALPM and AUR paths stop depending on the Flatpak loader.
-
-   ![The packaged build on a machine without the optional Flatpak backend: the inventory loads, the package detail does not](docs/media/calix-inspector.png)
-
-   <sub>The packaged build, installed from `calix-gpui-git`, on a machine with `flatpak`
-   installed but without the optional backend library. The inventory renders; the package
-   detail request fails.</sub>
-2. **The daemon scheduler and the Zig release watcher.** The daemon currently answers
+1. **The daemon scheduler and the Zig release watcher.** The daemon currently answers
    on demand; a scheduler and a native release watcher would retire the frozen Python
    bridge and make tracked releases continuous instead of sampled.
-3. **Wire the application flow.** A dedicated root helper and a narrower polkit action
+2. **Wire the application flow.** A dedicated root helper and a narrower polkit action
    set, so the UI asks for exactly the operation it needs instead of a general CLI
    invocation.
-4. **Close the mutation gap.** Installing and removing Cargo and NPM packages from the
+3. **Close the mutation gap.** Installing and removing Cargo and NPM packages from the
    UI, and searching the sources that are currently inventory-only.
-5. **Cut the frozen Python engine.** Once the watcher is native, `scripts/calix_*.py`
+4. **Cut the frozen Python engine.** Once the watcher is native, `scripts/calix_*.py`
    and the legacy `packaging/systemd/calix-sync.*` units can go.
+
+Just before this list: the optional Flatpak backend now ships in the package, and a
+command that does not touch Flatpak never builds an inventory on the way to running.
+Both were wrong in `v0.2.1`, and both are fixed on `main`.
 
 ---
 

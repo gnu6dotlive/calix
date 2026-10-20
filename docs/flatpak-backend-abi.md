@@ -18,6 +18,11 @@ It does not search the working directory, `PATH`, or an environment variable.
 A build-time `-Dflatpak-backend-path=/absolute/path` option exists only for
 development and fake-backend tests; release packages do not set it.
 
+The Arch package builds this library and installs it at that path, so a normal
+install has the backend the loader asks for. The Flatpak runtime stays
+optional: without it the library cannot be loaded, the backend reports itself
+unavailable, and Calix runs with every other ecosystem.
+
 ## Component boundary
 
 ```text
@@ -195,8 +200,14 @@ Discovery failures map to `FlatpakBackendUnavailable`; ABI failures map to
 upgrade commands emit a warning, skip only Flatpak, and continue other
 backends. Backup emits a warning and omits Flatpak records.
 
+The unified inventory document behaves the same way: an absent backend
+contributes no Flatpak rows and the rest of the document is still a true view
+of the machine. The document is never failed by a missing optional backend.
+
 Non-Flatpak commands, parsing, help, version, and completion generation do not
-load or probe the backend.
+load or probe the backend. Every command claims only its own path in the
+dispatcher, so a command that does not touch Flatpak never builds an inventory
+on the way to running.
 
 ## Building and testing
 
