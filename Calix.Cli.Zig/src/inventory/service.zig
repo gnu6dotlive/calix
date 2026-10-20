@@ -140,6 +140,16 @@ fn appendAur(context: *runtime.RuntimeContext, records: *std.ArrayList(record.Re
 
 /// Appends the installed Flatpak applications.
 fn appendFlatpak(context: *runtime.RuntimeContext, records: *std.ArrayList(record.Record)) !void {
+    // The Flatpak backend is optional: it is a separate library loaded at
+    // runtime, and neither it nor the Flatpak runtime has to be installed.
+    // An absent backend contributes nothing; the rest of the document is
+    // still a true view of what is on the machine.
+    switch (flatpakContribution(Zigalpm.flatpak.backendStatus())) {
+        .contribute => {},
+        .skip => return,
+        .fail => return Zigalpm.flatpak.errors.Error.FlatpakBackendIncompatible,
+    }
+
     var manager = Zigalpm.FlatpakManager{ .allocator = context.allocator, .io = context.io };
     defer manager.deinit();
 
@@ -156,6 +166,44 @@ fn appendFlatpak(context: *runtime.RuntimeContext, records: *std.ArrayList(recor
             .size_on_disk = @intCast(@max(0, native.installed_size)),
         });
     }
+}
+
+/// What the state of the optional Flatpak backend means for the gathering.
+const FlatpakContribution = enum {
+    /// The backend is installed and speaks this ABI: gather its applications.
+    contribute,
+    /// The backend is not installed, or the Flatpak runtime it needs is not:
+    /// this ecosystem contributes nothing and the document stays true.
+    skip,
+    /// The backend is installed but speaks another ABI: the operator has to
+    /// know, because the Flatpak rows would be wrong.
+    fail,
+};
+
+fn flatpakContribution(status: Zigalpm.flatpak.BackendStatus) FlatpakContribution {
+    return switch (status) {
+        .available => .contribute,
+        .unavailable => .skip,
+        .incompatible => .fail,
+    };
+}
+
+test "an absent Flatpak backend contributes nothing instead of failing the document" {
+    try std.testing.expectEqual(
+        FlatpakContribution.skip,
+        flatpakContribution(.unavailable),
+    );
+    try std.testing.expectEqual(
+        FlatpakContribution.contribute,
+        flatpakContribution(.{ .available = .{
+            .abi_version = 1,
+            .path = "/usr/lib/calix/libcalix-flatpak-backend.so.1",
+        } }),
+    );
+    try std.testing.expectEqual(
+        FlatpakContribution.fail,
+        flatpakContribution(.{ .incompatible = 1 }),
+    );
 }
 
 /// Appends the AppImages the backend knows about.

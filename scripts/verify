@@ -227,6 +227,19 @@ cli_release_build() {
     (cd Calix.Cli.Zig && zig build -Doptimize=ReleaseSafe)
 }
 
+# The optional Flatpak backend is a separate shared library that the CLI
+# loads at runtime, and the package ships it. A build that produces no
+# library would ship a package whose Flatpak support silently never works,
+# so the gate builds it and checks that the library is there.
+flatpak_backend_tests() {
+    (cd Calix.Flatpak.Backend && zig build test --summary all)
+}
+
+flatpak_backend_release_build() {
+    (cd Calix.Flatpak.Backend && zig build -Doptimize=ReleaseSafe)
+    test -f Calix.Flatpak.Backend/zig-out/lib/libcalix-flatpak-backend.so.1
+}
+
 cli_smoke() {
     local output
     output=$(./Calix.Cli.Zig/zig-out/bin/calix --version) || return 1
@@ -256,6 +269,8 @@ require_count "cli" "$(zig_test_count "$LOG_DIR/cli-tests.log")" "$CLI_FLOOR" ||
 
 step "cli-release-build" cli_release_build
 step "cli-smoke" cli_smoke
+step "flatpak-backend-tests" flatpak_backend_tests
+step "flatpak-backend-release-build" flatpak_backend_release_build
 # The UI resolves the CLI at runtime, so the tests that launch it need to be
 # pointed at the binary this run just built rather than one on PATH.
 export CALIX_BIN="$ROOT/Calix.Cli.Zig/zig-out/bin/calix"

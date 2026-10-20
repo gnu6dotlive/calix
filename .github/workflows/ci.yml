@@ -82,6 +82,9 @@ jobs:
           install -Dm755 Calix.Cli.Zig/zig-out/bin/calix-daemon dist/usr/lib/calix/calix-daemon
           install -Dm755 Calix.Cli.Zig/zig-out/bin/calix-notify dist/usr/lib/calix/calix-notify
           install -Dm755 Calix.Ui.Gpui/target/release/calix-gpui dist/usr/lib/calix/calix-gpui
+          install -Dm755 Calix.Flatpak.Backend/zig-out/lib/libcalix-flatpak-backend.so.1.0.0 dist/usr/lib/calix/libcalix-flatpak-backend.so.1.0.0
+          ln -s libcalix-flatpak-backend.so.1.0.0 dist/usr/lib/calix/libcalix-flatpak-backend.so.1
+          ln -s libcalix-flatpak-backend.so.1 dist/usr/lib/calix/libcalix-flatpak-backend.so
 
           ln -s /usr/lib/calix/calix dist/usr/bin/calix
           ln -s /usr/lib/calix/calix-daemon dist/usr/bin/calix-daemon

@@ -37,6 +37,7 @@ makedepends=(
     'zig'
     'pkgconf'
     'clang'
+    'flatpak'
 )
 optdepends=(
     'flatpak: support des applications Flatpak'
@@ -83,7 +84,16 @@ build() {
     "$zig_bin" build -Doptimize=ReleaseSafe
     cd ..
 
-    # 2. Compile the Calix GPUI frontend (Rust)
+    # 2. Compile the optional Flatpak backend.
+    # The CLI loads this library at runtime. Without it the Flatpak
+    # ecosystem contributes nothing and the rest of Calix still works, so
+    # the library is shipped but the Flatpak runtime stays optional.
+    echo ">>> Compiling the Calix Flatpak backend with Zig ${zig_version}..."
+    cd Calix.Flatpak.Backend
+    "$zig_bin" build -Doptimize=ReleaseSafe
+    cd ..
+
+    # 3. Compile the Calix GPUI frontend (Rust)
     echo ">>> Compiling the Calix GPUI frontend (Rust)..."
     cd Calix.Ui.Gpui
     export CARGO_TARGET_DIR="target"
@@ -118,6 +128,17 @@ package() {
 
     install -Dm755 "Calix.Ui.Gpui/target/release/calix-gpui" \
         "${pkgdir}/usr/lib/calix/calix-gpui"
+
+    # The optional Flatpak backend. The CLI loads it from this exact path at
+    # runtime; the versioned library and its SONAME link are what the loader
+    # asks for, and the unversioned link keeps the library usable by a
+    # third-party consumer that links against it.
+    install -Dm755 "Calix.Flatpak.Backend/zig-out/lib/libcalix-flatpak-backend.so.1.0.0" \
+        "${pkgdir}/usr/lib/calix/libcalix-flatpak-backend.so.1.0.0"
+    ln -s libcalix-flatpak-backend.so.1.0.0 \
+        "${pkgdir}/usr/lib/calix/libcalix-flatpak-backend.so.1"
+    ln -s libcalix-flatpak-backend.so.1 \
+        "${pkgdir}/usr/lib/calix/libcalix-flatpak-backend.so"
 
     # Wrapper /usr/bin/calix-gpui setting CALIX_BIN and executing the binary
     install -dm755 "${pkgdir}/usr/bin"
