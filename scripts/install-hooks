@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Points this clone at the repository's hooks.
+#
+# Hooks are not cloned with a repository, so this is the one command a fresh
+# checkout needs. It changes local git configuration only.
+set -euo pipefail
+
+root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+git -C "$root" config core.hooksPath .githooks
+chmod +x "$root"/.githooks/*
+echo "hooks installed: $(git -C "$root" config core.hooksPath)"
+echo "pre-push runs scripts/verify"

@@ -1,0 +1,8 @@
+#!/bin/sh
+# A push is a claim that the tree is green.
+#
+# This runs the same script CI runs, so the claim is checked before it costs
+# anything. `git push --no-verify` bypasses it; that is a deliberate act, and
+# it should be a rare one.
+root=$(git rev-parse --show-toplevel) || exit 1
+exec "$root/scripts/verify"

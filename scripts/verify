@@ -1,0 +1,258 @@
+#!/usr/bin/env bash
+# The one definition of "green".
+#
+# Local proof has to mean the same thing as CI, or it is a guess about what
+# CI will do. This script is that definition: the pre-push hook runs it, and
+# the workflow runs the same file rather than a copy of its steps.
+#
+# What it adds over `ci.yml` as it stood:
+#   - the PackageManager suite (1386 tests), which CI never ran;
+#   - a Zig version check, because the repository is built with 0.16 and a
+#     newer system Zig fails in ways that look like source errors;
+#   - a floor on the number of tests that actually ran, so a harness that
+#     silently executes nothing cannot pass;
+#   - a machine-readable record of the run, so "it passed locally" is a
+#     file and not a claim.
+#
+# Usage:
+#   scripts/verify            # everything
+#   scripts/verify --quick    # skip the two release builds
+#
+# Exits non-zero on the first failing step. `git push --no-verify` exists;
+# using it is a decision the pusher owns, not something this script hides.
+
+set -uo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+cd "$ROOT" || exit 1
+
+QUICK=0
+for argument in "$@"; do
+    case "$argument" in
+        --quick) QUICK=1 ;;
+        --help | -h)
+            sed -n '2,28p' "$0" | sed 's/^# \{0,1\}//'
+            exit 0
+            ;;
+        *)
+            echo "verify: unknown argument: $argument" >&2
+            exit 2
+            ;;
+    esac
+done
+
+# ---- the floors -------------------------------------------------------------
+#
+# These are not targets, they are tripwires. A suite that suddenly runs 300
+# tests instead of 380 is not "faster", it is a suite that stopped being
+# compiled or collected. Raise a floor when the real count grows; never lower
+# one to make a run pass.
+PACKAGEMANAGER_FLOOR=1380
+CLI_FLOOR=380
+RUST_FLOOR=195
+
+# ---- plumbing ---------------------------------------------------------------
+
+RUN_ID="local-verify-$(date -u +%Y%m%dT%H%M%SZ)"
+# Operational, not research: this is a gate, not an experiment, so its record
+# belongs with the other operational records in the state directory rather
+# than in the repository's evidence tree.
+RECORD_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/calix/verify/$RUN_ID"
+LOG_DIR="$RECORD_DIR/logs"
+mkdir -p "$LOG_DIR" || exit 1
+
+STARTED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+DIRTY=0
+if [ -n "$(git status --porcelain 2>/dev/null)" ]; then DIRTY=1; fi
+
+STEP_NAMES=()
+STEP_STATUS=()
+STEP_MS=()
+
+now_ms() { date +%s%3N; }
+
+step() {
+    local name="$1"
+    shift
+    local started finished elapsed log
+    started=$(now_ms)
+    log="$LOG_DIR/$name.log"
+    printf '  %-32s ' "$name"
+    if "$@" >"$log" 2>&1; then
+        finished=$(now_ms)
+        elapsed=$((finished - started))
+        printf 'ok   (%ss)\n' "$((elapsed / 1000))"
+        STEP_NAMES+=("$name")
+        STEP_STATUS+=("ok")
+        STEP_MS+=("$elapsed")
+    else
+        finished=$(now_ms)
+        elapsed=$((finished - started))
+        printf 'FAIL (%ss)\n' "$((elapsed / 1000))"
+        echo
+        echo "  ---- $name ----"
+        tail -n 40 "$log" | sed 's/^/  /'
+        echo "  ---- end ----"
+        STEP_NAMES+=("$name")
+        STEP_STATUS+=("failed")
+        STEP_MS+=("$elapsed")
+        finish failed
+    fi
+}
+
+# Reads "Build Summary: ... 1386/1390 tests passed" from a zig build log.
+zig_test_count() {
+    grep -oE '[0-9]+/[0-9]+ tests passed' "$1" | tail -n 1 | cut -d/ -f1
+}
+
+# Reads "test result: ok. 201 passed" from a cargo test log.
+rust_test_count() {
+    grep -oE 'test result: ok\. [0-9]+ passed' "$1" | tail -n 1 | awk '{print $4}'
+}
+
+require_count() {
+    local label="$1" count="$2" floor="$3"
+    if [ -z "$count" ]; then
+        echo "verify: $label ran no tests, and the log does not say why" >&2
+        return 1
+    fi
+    if [ "$count" -lt "$floor" ]; then
+        echo "verify: $label ran $count tests, below the floor of $floor." >&2
+        echo "verify: a suite that stopped running its tests is not a passing suite." >&2
+        return 1
+    fi
+    printf '  %-32s %s tests (>%s)\n' "$label" "$count" "$floor"
+}
+
+finish() {
+    local status="$1"  # "ok" or "failed"
+    local finished_at
+    finished_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+    python3 - "$RECORD_DIR/run.json" "$RUN_ID" "$status" "$STARTED_AT" "$finished_at" \
+        "$COMMIT" "$DIRTY" "${#STEP_NAMES[@]}" \
+        "${STEP_NAMES[@]}" "${STEP_STATUS[@]}" "${STEP_MS[@]}" <<'PY'
+import json, sys
+path, run_id, status, started, finished, commit, dirty, count = sys.argv[1:9]
+count = int(count)
+values = sys.argv[9:]
+names = values[:count]
+statuses = values[count:count * 2]
+durations = values[count * 2:count * 3]
+steps = [
+    {"name": name, "status": state, "duration_ms": int(ms)}
+    for name, state, ms in zip(names, statuses, durations)
+]
+record = {
+    "run_id": run_id,
+    "kind": "local-verify",
+    "status": status,
+    "ok": status == "ok",
+    "started_at": started,
+    "finished_at": finished,
+    "commit": commit,
+    "working_tree_dirty": dirty == "1",
+    "steps": steps,
+    "note": "A dirty tree means this is a development run, not proof of the commit.",
+}
+with open(path, "w") as handle:
+    json.dump(record, handle, indent=2)
+    handle.write("\n")
+PY
+    echo
+    if [ "$status" = "ok" ] && [ "$DIRTY" = "1" ]; then
+        echo "verify: PASSED on a dirty tree — this proves the checkout, not the commit."
+    elif [ "$status" = "ok" ]; then
+        echo "verify: PASSED at $COMMIT."
+    else
+        echo "verify: FAILED at $COMMIT."
+    fi
+    echo "verify: record $RECORD_DIR/run.json"
+    [ "$status" = "ok" ] || exit 1
+    exit 0
+}
+
+# ---- Zig, exactly once ------------------------------------------------------
+
+zig_path() {
+    if [ -x "$ROOT/vendor/zig-0.16/usr/bin/zig" ]; then
+        printf '%s\n' "$ROOT/vendor/zig-0.16/usr/bin/zig"
+        return 0
+    fi
+    command -v zig || {
+        echo "verify: no zig on PATH and no vendor/zig-0.16" >&2
+        return 1
+    }
+}
+
+ZIG=$(zig_path) || exit 1
+ZIG_VERSION=$("$ZIG" version 2>/dev/null)
+case "$ZIG_VERSION" in
+    0.16.*) ;;
+    *)
+        echo "verify: this repository targets Zig 0.16, but $ZIG is $ZIG_VERSION." >&2
+        echo "verify: extract the 0.16 package into vendor/zig-0.16 (see docs/calix-architecture.md)." >&2
+        exit 1
+        ;;
+esac
+export PATH="$(dirname "$ZIG"):$PATH"
+
+echo "verify: $RUN_ID"
+echo "verify: zig $ZIG_VERSION ($ZIG)"
+echo "verify: commit $COMMIT$([ "$DIRTY" = 1 ] && echo ' (dirty)')"
+echo
+
+# ---- the steps --------------------------------------------------------------
+
+packagemanager_tests() {
+    (cd Shelly.PackageManager && zig build test --summary all)
+}
+
+cli_tests() {
+    (cd Shelly.Cli.Zig && zig build test --summary all)
+}
+
+cli_release_build() {
+    (cd Shelly.Cli.Zig && zig build -Doptimize=ReleaseSafe)
+}
+
+cli_smoke() {
+    local output
+    output=$(./Shelly.Cli.Zig/zig-out/bin/shelly --version) || return 1
+    printf '%s\n' "$output"
+    # A binary that prints nothing, or prints a version it does not have, is
+    # not a smoke test.
+    printf '%s' "$output" | grep -qE '[0-9]+\.[0-9]+\.[0-9]+'
+}
+
+rust_check() {
+    (cd Shelly.Ui.Gpui && cargo check --quiet)
+}
+
+rust_tests() {
+    (cd Shelly.Ui.Gpui && cargo test --quiet)
+}
+
+rust_release_build() {
+    (cd Shelly.Ui.Gpui && cargo build --release --quiet)
+}
+
+step "packagemanager-tests" packagemanager_tests
+require_count "package manager" "$(zig_test_count "$LOG_DIR/packagemanager-tests.log")" "$PACKAGEMANAGER_FLOOR" || finish failed
+
+step "cli-tests" cli_tests
+require_count "cli" "$(zig_test_count "$LOG_DIR/cli-tests.log")" "$CLI_FLOOR" || finish failed
+
+step "cli-release-build" cli_release_build
+step "cli-smoke" cli_smoke
+step "rust-check" rust_check
+step "rust-tests" rust_tests
+require_count "ui" "$(rust_test_count "$LOG_DIR/rust-tests.log")" "$RUST_FLOOR" || finish failed
+
+if [ "$QUICK" = 0 ]; then
+    step "rust-release-build" rust_release_build
+else
+    echo "  rust-release-build                skipped (--quick)"
+fi
+
+finish ok
