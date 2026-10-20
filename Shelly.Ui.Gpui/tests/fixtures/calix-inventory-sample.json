@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "generated_at": 197689,
+  "packages": [
+    {
+      "name": "7zip",
+      "version": "26.04-1.1",
+      "description": "File archiver for extremely high compression",
+      "source_type": "ALPM",
+      "repository_or_remote": "local",
+      "is_installed": true,
+      "has_update": false,
+      "size_on_disk": 6816127,
+      "allow_prerelease": false,
+      "overridden": false,
+      "binaries": []
+    },
+    {
+      "name": "ascii-image-converter-bin",
+      "version": "1.13.1-2",
+      "description": "Convert images into ASCII art and print them out to the console",
+      "source_type": "AUR",
+      "repository_or_remote": "ascii-image-converter-bin",
+      "is_installed": true,
+      "has_update": false,
+      "allow_prerelease": false,
+      "overridden": false,
+      "binaries": []
+    },
+    {
+      "name": "Loomfy",
+      "version": "1.8.2",
+      "description": "Transcribe meetings locally",
+      "source_type": "Flatpak",
+      "repository_or_remote": "flathub",
+      "is_installed": true,
+      "has_update": false,
+      "size_on_disk": 331761664,
+      "allow_prerelease": false,
+      "overridden": false,
+      "binaries": []
+    },
+    {
+      "name": "CADCraft",
+      "version": "0.8.0",
+      "description": "Draft, dimension and plot 2D drawings; open DXF and DWG files",
+      "source_type": "AppImage",
+      "repository_or_remote": "CADCraft",
+      "is_installed": true,
+      "has_update": false,
+      "size_on_disk": 57788920,
+      "icon_name": "cadcraft",
+      "path": "/home/tension_atoi/Applications/CADCraft.AppImage",
+      "allow_prerelease": false,
+      "overridden": false,
+      "binaries": []
+    },
+    {
+      "name": "cargo-binstall",
+      "version": "1.18.1",
+      "description": "Cargo crate \u2014 binaries: cargo-binstall",
+      "source_type": "Cargo",
+      "repository_or_remote": "registry+https://github.com/rust-lang/crates.io-index",
+      "is_installed": true,
+      "has_update": false,
+      "allow_prerelease": false,
+      "overridden": false,
+      "binaries": [
+        "cargo-binstall"
+      ]
+    },
+    {
+      "name": "@electron/asar",
+      "version": "0.0.0-development",
+      "description": "NPM global package",
+      "source_type": "NPM",
+      "repository_or_remote": "npm",
+      "is_installed": true,
+      "has_update": false,
+      "allow_prerelease": false,
+      "overridden": false,
+      "binaries": []
+    },
+    {
+      "name": "cargo-binstall",
+      "version": "1.18.1",
+      "description": "Cargo crate \u2014 binaries: cargo-binstall",
+      "source_type": "Cargo",
+      "repository_or_remote": "registry+https://github.com/rust-lang/crates.io-index",
+      "is_installed": true,
+      "has_update": false,
+      "allow_prerelease": false,
+      "overridden": false,
+      "binaries": [
+        "cargo-binstall"
+      ]
+    },
+    {
+      "name": "@electron/asar",
+      "version": "0.0.0-development",
+      "description": "NPM global package",
+      "source_type": "NPM",
+      "repository_or_remote": "npm",
+      "is_installed": true,
+      "has_update": false,
+      "allow_prerelease": false,
+      "overridden": false,
+      "binaries": []
+    }
+  ]
+}

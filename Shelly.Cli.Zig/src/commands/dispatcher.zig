@@ -5,6 +5,7 @@ const builder = @import("builder.zig");
 const install = @import("install.zig");
 const keyring = @import("keyring.zig");
 const list = @import("list.zig");
+const inventory = @import("inventory.zig");
 const list_updates = @import("list_updates.zig");
 const mark = @import("mark.zig");
 const news = @import("news.zig");
@@ -36,6 +37,7 @@ pub fn dispatch(
     if (try install.dispatch(context, invocation)) |exit_code| return exit_code;
     if (try keyring.dispatch(context, invocation)) |exit_code| return exit_code;
     if (try list.dispatch(context, invocation)) |exit_code| return exit_code;
+    if (try inventory.dispatch(context, invocation)) |exit_code| return exit_code;
     if (try list_updates.dispatch(context, invocation)) |exit_code| return exit_code;
     if (try mark.dispatch(context, invocation)) |exit_code| return exit_code;
     if (try news.dispatch(context, invocation)) |exit_code| return exit_code;

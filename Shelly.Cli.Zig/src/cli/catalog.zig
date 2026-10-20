@@ -6,6 +6,7 @@ const backup = @import("catalog/backup.zig");
 const config = @import("catalog/config.zig");
 const downgrade = @import("catalog/downgrade.zig");
 const install = @import("catalog/install.zig");
+const inventory = @import("catalog/inventory.zig");
 const keyring = @import("catalog/keyring.zig");
 const list = @import("catalog/list.zig");
 const list_updates = @import("catalog/list_updates.zig");
@@ -95,6 +96,7 @@ pub const types = [_]Type{
 
 pub const variants = search.variants ++
     install.variants ++
+    inventory.variants ++
     upgrade.variants ++
     downgrade.variants ++
     mark.variants ++

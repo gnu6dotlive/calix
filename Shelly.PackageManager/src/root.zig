@@ -161,6 +161,25 @@ pub const pkgbuild = struct {
     pub const InstallScriptScanner = install_script_scanner.InstallScriptScanner;
 };
 
+pub const inventory = struct {
+    pub const record = @import("inventory/record.zig");
+};
+
+pub const cargo = struct {
+    pub const manager = @import("cargo/manager.zig");
+    pub const Crate = manager.Crate;
+    pub const CargoManager = manager.Manager;
+    pub const CargoOptions = manager.Options;
+    pub const default_cargo_index_path = manager.default_index_path;
+};
+
+pub const npm = struct {
+    pub const manager = @import("npm/manager.zig");
+    pub const Package = manager.Package;
+    pub const NpmManager = manager.Manager;
+    pub const NpmOptions = manager.Options;
+};
+
 pub const local = struct {
     pub const manager = @import("local/manager.zig");
     pub const file_inspector = @import("local/file_inspector.zig");
@@ -343,6 +362,12 @@ test "public library surface exposes package manager APIs" {
     _ = appimage.StatusHandler;
     _ = appimage.DownloadProgressHandler;
     _ = appimage.AppImageDiscovery;
+    _ = inventory.record.Record;
+    _ = inventory.record.Source;
+    _ = cargo.CargoManager;
+    _ = cargo.Crate;
+    _ = npm.NpmManager;
+    _ = npm.Package;
     _ = pkgbuild.Parser;
     _ = pkgbuild.HomographValidator;
     _ = pkgbuild.PostInstallValidator;
