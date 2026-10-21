@@ -2,7 +2,7 @@
 
 ## Objective
 
-Deliver **SLICE-06: Search Correctness, Query Workbench & Privileged Operations** in `tension-atoi/calix` according to the Operator ratification plan.
+Deliver **SLICE-06: Search Correctness, Query Workbench & Privileged Operations** in `gnu6dotlive/calix` according to the Operator ratification plan.
 
 ---
 

@@ -2,7 +2,7 @@
 
 You are taking over Shelly GPUI at:
 
-    tension-atoi/calix
+    gnu6dotlive/calix
     main
     e43b03ffa4aaab5d99a151d6a2491370e1f65161
 

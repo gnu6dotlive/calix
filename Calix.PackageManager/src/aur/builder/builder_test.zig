@@ -4941,11 +4941,11 @@ const calix_bin_pkgbuild =
     \\pkgver=3.0.3
     \\pkgrel=1
     \\arch=('x86_64')
-    \\url="https://github.com/tension-atoi/calix"
+    \\url="https://github.com/gnu6dotlive/calix"
     \\license=('GPL-3.0-only')
     \\source=(
-    \\    "Calix-ALPM-linux-x64-${pkgver}.tar.gz::https://github.com/tension-atoi/calix/releases/download/v${pkgver}/Calix-ALPM-linux-x64.tar.gz"
-    \\    "Calix-Flatpak-Backend-linux-x64-${pkgver}.tar.gz::https://github.com/tension-atoi/calix/releases/download/v${pkgver}/Calix-Flatpak-Backend-linux-x64.tar.gz"
+    \\    "Calix-ALPM-linux-x64-${pkgver}.tar.gz::https://github.com/gnu6dotlive/calix/releases/download/v${pkgver}/Calix-ALPM-linux-x64.tar.gz"
+    \\    "Calix-Flatpak-Backend-linux-x64-${pkgver}.tar.gz::https://github.com/gnu6dotlive/calix/releases/download/v${pkgver}/Calix-Flatpak-Backend-linux-x64.tar.gz"
     \\)
     \\
     \\sha256sums=('1c696140104d7f51eaa5fe6488b32f4a0d441944c1f127ad9507399b156f8ce6'
@@ -5047,7 +5047,7 @@ const calix_bin_pkgbuild =
     \\ "http://www.freedesktop.org/standards/PolicyKit/1.0/policyconfig.dtd">
     \\<policyconfig>
     \\  <vendor>Calix</vendor>
-    \\  <vendor_url>https://github.com/tension-atoi/calix</vendor_url>
+    \\  <vendor_url>https://github.com/gnu6dotlive/calix</vendor_url>
     \\  <action id="live.gnu6.calix.pkexec.cli">
     \\    <description>Run Calix CLI as administrator</description>
     \\    <message>Run Calix CLI with administrator privileges.</message>

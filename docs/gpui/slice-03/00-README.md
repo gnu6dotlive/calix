@@ -34,7 +34,7 @@ It purposefully delivers:
 
 Repository:
 
-    tension-atoi/calix
+    gnu6dotlive/calix
 
 Canonical branch:
 

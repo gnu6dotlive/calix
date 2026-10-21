@@ -90,10 +90,22 @@ pub struct GpuiUiConfig {
 ///
 /// C'est une *cible de qualification*, pas un chiffre arbitraire : la
 /// composition doit y tenir — la colonne de navigation, le catalogue, les
-/// commandes essentielles — et le catalogue garde 560 px (son plancher
-/// qualifié), la colonne repliée 56. Le plancher est donc la somme des
-/// deux, arrondie : la colonne de navigation se replie d'elle-même quand la
-/// place manque (l'échelle du contrat spatial).
+/// commandes essentielles.
+///
+/// Le budget, mesuré, et il s'additionne :
+///
+/// ```
+/// 495  la ligne du catalogue : ses cinq colonnes fixes et son padding
+/// + 22 le glyphe d'identité, son écart, et le nom du p90 des paquets réels
+/// + 143 le nom, pour 90 % des paquets de la machine (143 px de texte)
+/// = 660 le contenu que le catalogue garde
+/// + 56  la colonne de navigation, repliée
+/// = 716  arrondi à 720
+/// ```
+///
+/// La colonne de navigation se replie d'elle-même quand la place manque
+/// (l'échelle du contrat spatial), donc elle ne coûte pas 190 px au
+/// plancher : elle coûte 56.
 ///
 /// Un plancher est une *demande* : un compositeur à tuiles peut accorder
 /// moins. La composition doit donc tenir aussi en dessous, et c'est ce que

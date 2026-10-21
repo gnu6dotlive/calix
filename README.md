@@ -4,8 +4,8 @@
 official repositories, the AUR, Flatpak, AppImages, Cargo and NPM into a single GPU-
 accelerated application, backed by a Zig package-management engine.
 
-[![CI](https://github.com/tension-atoi/calix/actions/workflows/ci.yml/badge.svg)](https://github.com/tension-atoi/calix/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/tension-atoi/calix?label=release&color=1793d1)](https://github.com/tension-atoi/calix/releases/latest)
+[![CI](https://github.com/gnu6dotlive/calix/actions/workflows/ci.yml/badge.svg)](https://github.com/gnu6dotlive/calix/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/gnu6dotlive/calix?label=release&color=1793d1)](https://github.com/gnu6dotlive/calix/releases/latest)
 [![License](https://img.shields.io/badge/license-GPL--3.0--only-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Arch%20Linux%20x86__64-1793d1.svg)](https://archlinux.org/)
 [![UI](https://img.shields.io/badge/UI-Rust%20%2B%20GPUI%200.2-orange.svg)](https://github.com/zed-industries/zed/tree/main/crates/gpui)
@@ -73,7 +73,7 @@ Five decisions follow from that:
 Every release publishes a tarball and its checksum:
 
 ```bash
-gh release download v0.2.5 --repo tension-atoi/calix \
+gh release download v0.2.5 --repo gnu6dotlive/calix \
   --pattern 'calix-gpui-linux-x86_64.tar.gz*'
 sha256sum -c calix-gpui-linux-x86_64.tar.gz.sha256
 mkdir -p /tmp/calix && tar -xzf calix-gpui-linux-x86_64.tar.gz -C /tmp/calix
@@ -104,7 +104,7 @@ systemctl --user enable --now calix-notify.service   # desktop notifications
 Zig **0.16** and a stable Rust toolchain are required:
 
 ```bash
-git clone https://github.com/tension-atoi/calix.git
+git clone https://github.com/gnu6dotlive/calix.git
 cd calix
 make zig                    # calix, calix-daemon, calix-notify
 ./Calix.Cli.Zig/zig-out/bin/calix-daemon &
