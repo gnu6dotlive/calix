@@ -226,6 +226,10 @@ pub struct MenuCheckItemProps<'a> {
     pub id: ElementId,
     pub retry_id: ElementId,
     pub label: SharedString,
+    /// What the source holds, stated before the user asks.
+    pub note: Option<&'a str>,
+    /// How many rows of the current scope the source holds.
+    pub count: Option<usize>,
     pub is_checked: bool,
     pub is_highlighted: bool,
     pub health_label: Option<&'static str>,
@@ -345,7 +349,26 @@ impl MenuCheckItem {
                                 div().into_any_element()
                             }),
                     )
-                    .child(props.label),
+                    .child(
+                        div()
+                            .flex()
+                            .flex_col()
+                            .gap(px(1.0))
+                            .child(props.label)
+                            .children(props.note.map(|note| {
+                                div()
+                                    .text_xs()
+                                    .text_color(theme.text_muted)
+                                    .child(note.to_string())
+                            }))
+                            .children(props.count.map(|count| {
+                                div()
+                                    .text_xs()
+                                    .font_family("monospace")
+                                    .text_color(theme.text_muted)
+                                    .child(count.to_string())
+                            })),
+                    ),
             )
             .child(
                 div()

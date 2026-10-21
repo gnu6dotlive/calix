@@ -8,7 +8,7 @@ use crate::components::inspector_header::{
 };
 use crate::components::semantic_value::StringActionHandler;
 use crate::icons::AppIcon;
-use crate::state::{InspectorTab, PackageCapabilities};
+use crate::state::{AlsoIn, InspectorTab, PackageCapabilities};
 use crate::theme::Theme;
 use crate::views::inspector::dependencies::{DependenciesView, DependenciesViewProps};
 use crate::views::inspector::files_build::{FilesBuildView, FilesBuildViewProps};
@@ -18,6 +18,8 @@ use gpui::*;
 pub struct PackageInspectorProps<'a> {
     pub package: Option<&'a UnifiedPackage>,
     pub alpm_details: Option<&'a AlpmPackage>,
+    /// The other sources where the same name is found.
+    pub also_in: &'a [AlsoIn],
     pub detail_error: Option<&'a str>,
     pub pkgbuild: Option<&'a String>,
     pub is_loading_pkgbuild: bool,
@@ -96,6 +98,7 @@ impl PackageInspectorView {
             InspectorTab::Overview => OverviewView::render(OverviewViewProps {
                 package: pkg,
                 alpm_details: props.alpm_details,
+                also_in: props.also_in,
                 theme,
                 on_navigate_package: props.on_navigate_package.clone(),
             })
@@ -226,6 +229,7 @@ mod tests {
         let empty_props = PackageInspectorProps {
             package: None,
             alpm_details: None,
+            also_in: &[],
             detail_error: None,
             pkgbuild: None,
             is_loading_pkgbuild: false,
@@ -259,6 +263,7 @@ mod tests {
         let populated_props = PackageInspectorProps {
             package: Some(&pkg),
             alpm_details: None,
+            also_in: &[],
             detail_error: Some("Simulated detail error"),
             pkgbuild: None,
             is_loading_pkgbuild: false,

@@ -9,6 +9,7 @@ pub mod query_workbench;
 pub mod search_input;
 pub mod semantic_value;
 pub mod sidebar;
+pub mod source_bank;
 pub mod status_pill;
 pub mod toast_overlay;
 pub mod unified_search;

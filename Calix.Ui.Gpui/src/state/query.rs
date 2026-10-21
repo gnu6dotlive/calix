@@ -186,44 +186,6 @@ impl SourceScope {
         list
     }
 
-    /// Les écosystèmes que le périmètre contient, dans l'ordre du contrôle.
-    ///
-    /// Le contrôle des sources ne propose que ce que le périmètre peut
-    /// contenir : proposer Cargo dans un périmètre de recherche serait
-    /// promettre une ligne qui n'existe pas.
-    pub fn ecosystems_for(scope: NavScope) -> Vec<SourceEntry> {
-        scope
-            .sources()
-            .iter()
-            .map(|source| {
-                let kind = match *source {
-                    "alpm" => PackageSourceKind::Alpm,
-                    "aur" => PackageSourceKind::Aur,
-                    "flatpak" => PackageSourceKind::Flatpak,
-                    "appimage" => PackageSourceKind::AppImage,
-                    "cargo" => PackageSourceKind::Cargo,
-                    "npm" => PackageSourceKind::Npm,
-                    _ => PackageSourceKind::Release,
-                };
-                let inventory_only = scope.inventory_only_sources().contains(source);
-                let label = match kind {
-                    PackageSourceKind::Alpm => "Official / ALPM",
-                    PackageSourceKind::Aur => "AUR",
-                    PackageSourceKind::Flatpak => "Flatpak",
-                    PackageSourceKind::AppImage => "AppImage",
-                    PackageSourceKind::Cargo => "Cargo (inventory only)",
-                    PackageSourceKind::Npm => "NPM (inventory only)",
-                    PackageSourceKind::Release => "Release (inventory only)",
-                };
-                SourceEntry {
-                    kind,
-                    label,
-                    inventory_only,
-                }
-            })
-            .collect()
-    }
-
     /// Les sources sélectionnées, parmi celles que le périmètre peut contenir.
     ///
     /// Le périmètre décide de ce qu'il contient ; le filtre décide de ce qui
@@ -260,15 +222,6 @@ impl SourceScope {
         }
         list
     }
-}
-
-/// Un écosystème, tel que le contrôle des sources le présente.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SourceEntry {
-    pub kind: PackageSourceKind,
-    pub label: &'static str,
-    /// L'écosystème se liste, il ne s'interroge pas.
-    pub inventory_only: bool,
 }
 
 /// Filtre d'état local des paquets
@@ -619,23 +572,19 @@ mod tests {
         assert!(scope.contains_str("NPM"));
 
         // The scope decides what the control offers.
-        let results = SourceScope::ecosystems_for(NavScope::Results);
+        let results = crate::state::sources::scope_kinds(NavScope::Results);
         assert_eq!(results.len(), 4);
-        assert!(results.iter().all(|entry| !entry.inventory_only));
+        assert!(!results.contains(&PackageSourceKind::Cargo));
 
-        let installed = SourceScope::ecosystems_for(NavScope::Installed);
+        let installed = crate::state::sources::scope_kinds(NavScope::Installed);
         assert_eq!(installed.len(), 7);
+        // The stores come before the installation methods.
         assert_eq!(
             installed
                 .iter()
-                .filter(|entry| entry.inventory_only)
-                .map(|entry| entry.kind)
-                .collect::<Vec<_>>(),
-            vec![
-                PackageSourceKind::Cargo,
-                PackageSourceKind::Npm,
-                PackageSourceKind::Release
-            ]
+                .filter(|kind| kind.family() == crate::state::sources::SourceFamily::Store)
+                .count(),
+            5
         );
 
         // The selected sources of a scope are the scope's, among the selected.

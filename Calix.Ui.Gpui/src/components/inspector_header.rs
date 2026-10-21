@@ -1,7 +1,9 @@
 use crate::backend::models::UnifiedPackage;
 use crate::components::package_identity::PackageIdentity;
 use crate::icons::AppIcon;
-use crate::state::{canonical_install_command, InspectorTab, PackageCapabilities};
+use crate::state::{
+    canonical_install_command, kind_of_source_type, limits_of, InspectorTab, PackageCapabilities,
+};
 use crate::theme::Theme;
 use gpui::prelude::FluentBuilder;
 use gpui::*;
@@ -315,6 +317,24 @@ impl InspectorHeader {
                 }
             }
             actions_row = actions_row.child(install_btn.child("Install"));
+        }
+
+        // L'absence d'une action exprime une limite, et la raison vit dans
+        // l'entrée de la source : une source que le moteur ne gère pas n'a
+        // pas de commande.
+        let limits = limits_of(kind_of_source_type(&pkg.source_type));
+        if !caps.can_install && !caps.can_remove && !limits.is_empty() {
+            let reason = limits
+                .iter()
+                .map(|limit| limit.reason())
+                .collect::<Vec<_>>()
+                .join(" · ");
+            actions_row = actions_row.child(
+                div()
+                    .text_xs()
+                    .text_color(theme.text_muted)
+                    .child(reason),
+            );
         }
 
         // Copy install command button

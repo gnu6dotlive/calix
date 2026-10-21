@@ -1,0 +1,31 @@
+{
+  "run_id": "slice-09-source-axis-20261021",
+  "kind": "implementation",
+  "status": "ok",
+  "started_at": "2026-10-21T02:20:00Z",
+  "finished_at": "2026-10-21T03:05:00Z",
+  "objective": "Requalify the sources as an axis, on the arrangement of the second design round's Instrument proposal: a bank of seven apertures under the header, each stating what it holds and how many rows it carries.",
+  "the_decisions": {
+    "the_arrangement": "the Instrument's faceplate: full-width bands read from the top down. This slice builds the first of them — the source bank — and the state the rest of the bands will read from.",
+    "the_two_families": "a source is either a store (a package manager the user goes to: ALPM, AUR, Flatpak, Cargo, NPM) or an installation method (a single file that arrives on its own: AppImage, tracked releases). The stores come first, the methods last and grouped.",
+    "the_reasons": "the absence of an action expresses a limit, and the reason lives in the source's own entry: a source the engine does not manage has no command, a source that holds no dependencies has nothing to show.",
+    "the_also_in": "a name is not a package: the card says where else the name is found, with the versions."
+  },
+  "what_changed": {
+    "state": "a new module, state/sources.rs: the family of a source, what it holds, its limits and their reasons, the counts by source, the axis the control presents, and the 'also in'.",
+    "surface": "a new component, components/source_bank.rs: seven apertures, each with the name, the kind, the count, the health and the retry, reachable by the keyboard.",
+    "card": "the inspector's overview carries an ALSO IN band; the action row states the reason of an absent action.",
+    "control": "the filters menu's source entries carry the note and the count, and the old SourceEntry/ecosystems_for are gone: the axis is the one list of the sources.",
+    "order": "PackageSourceKind::ALL and NavScope::sources() put the stores before the installation methods."
+  },
+  "the_proof": {
+    "tests": "221 passed (the floor is 195): seven new ones in state/sources.rs, covering the families, the notes, the limits, the counts, the axis, and the 'also in'.",
+    "the_gaps": "the nameplate (A9), the tape (A10) and the dial (A11) are not built; the menu still offers the sources as the narrow fallback (A8). The acceptance matrix says so, line by line."
+  },
+  "artefacts": [
+    {"path": "Calix.Ui.Gpui/src/state/sources.rs", "what": "the source axis: the families, the notes, the limits, the counts, the 'also in'"},
+    {"path": "Calix.Ui.Gpui/src/components/source_bank.rs", "what": "the bank of seven apertures"},
+    {"path": "docs/gpui/slice-09/00-README.md", "what": "the slice: the arrangement and the ten rules"},
+    {"path": "docs/gpui/slice-09/05-ACCEPTANCE-MATRIX.md", "what": "every rule, its proof, and what is not done"}
+  ]
+}

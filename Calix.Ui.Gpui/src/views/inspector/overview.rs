@@ -1,13 +1,15 @@
 use crate::backend::models::{AlpmPackage, UnifiedPackage, UnifiedPackageSource};
 use crate::components::package_table::PackageTable;
 use crate::components::semantic_value::{SemanticValue, StringActionHandler};
-use crate::state::SemanticTarget;
+use crate::state::{AlsoIn, SemanticTarget};
 use crate::theme::Theme;
 use gpui::*;
 
 pub struct OverviewViewProps<'a> {
     pub package: &'a UnifiedPackage,
     pub alpm_details: Option<&'a AlpmPackage>,
+    /// The other sources where the same name is found.
+    pub also_in: &'a [AlsoIn],
     pub theme: &'a Theme,
     pub on_navigate_package: Option<StringActionHandler>,
 }
@@ -218,11 +220,69 @@ impl OverviewView {
             meta_grid = meta_grid.child(Self::render_meta_item("INSTALL REASON", reason, theme));
         }
 
+        // 3. Le même nom, ailleurs.
+        //
+        // Un nom n'est pas un paquet : `ripgrep` est un binaire dans les
+        // dépôts officiels, une recette dans l'AUR, une crate sur crates.io.
+        // La fiche le dit, et dit où le nom se trouve encore.
+        let also_in_section = if props.also_in.is_empty() {
+            div()
+        } else {
+            div()
+                .flex()
+                .flex_col()
+                .gap(px(4.0))
+                .mt_4()
+                .child(
+                    div()
+                        .text_xs()
+                        .font_weight(FontWeight::BOLD)
+                        .text_color(theme.text_muted)
+                        .child("ALSO IN"),
+                )
+                .child(
+                    div()
+                        .flex()
+                        .flex_col()
+                        .gap_1()
+                        .children(props.also_in.iter().map(|entry| {
+                            div()
+                                .flex()
+                                .items_center()
+                                .gap_2()
+                                .child(
+                                    div()
+                                        .text_sm()
+                                        .text_color(theme.text_primary)
+                                        .child(entry.source.short_label()),
+                                )
+                                .child(
+                                    div()
+                                        .text_xs()
+                                        .font_family("monospace")
+                                        .text_color(theme.text_muted)
+                                        .child(entry.version.clone()),
+                                )
+                                .child(
+                                    div()
+                                        .text_xs()
+                                        .text_color(theme.text_muted)
+                                        .child(if entry.installed {
+                                            "installed".to_string()
+                                        } else {
+                                            entry.source.holds().to_string()
+                                        }),
+                                )
+                        })),
+                )
+        };
+
         div()
             .flex()
             .flex_col()
             .py_4()
             .child(desc_section)
             .child(meta_grid)
+            .child(also_in_section)
     }
 }

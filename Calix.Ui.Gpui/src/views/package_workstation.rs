@@ -6,12 +6,13 @@ use crate::components::query_workbench::{
     ActiveMenuState, QueryWorkbench, QueryWorkbenchProps, ScopeAction, WorkbenchMenu,
 };
 use crate::components::search_input::SearchInputView;
+use crate::components::source_bank::{SourceBank, SourceBankProps};
 use crate::components::unified_search::UnifiedSearch;
 use crate::state::console::{ConsoleEvent, ConsoleModel};
 use crate::state::query::{PackageStateFilter, SortMode, SourceScope, WorkbenchBreakpoint};
 use crate::state::{
-    canonical_install_command, AppSession, NavScope, PackageKey, PackageSourceKind,
-    PackageStore, PackageViewMode, ToastCenter, ToastKind,
+    also_in, canonical_install_command, source_axis, AlsoIn, AppSession, NavScope, PackageKey,
+    PackageSourceKind, PackageStore, PackageViewMode, ToastCenter, ToastKind,
 };
 use crate::theme::Theme;
 use crate::ui_metrics::UiMetrics;
@@ -741,6 +742,37 @@ impl Render for PackageWorkstationView {
         let breakpoint = WorkbenchBreakpoint::from_width(active_list_width);
         let store = self.store.read(cx);
 
+        // L'axe des sources : ce que chaque source tient, et combien de
+        // lignes elle porte dans le périmètre courant.
+        let source_axis = source_axis(scope, &packages, &source_scope);
+
+        // La banque : sept ouvertures, une par source. Les sources sont un
+        // axe, pas un filtre : la banque est toujours là.
+        let source_bank = SourceBank::render(SourceBankProps {
+            axis: &source_axis,
+            source_health: &store.source_health,
+            theme: &theme,
+            on_toggle: {
+                let entity = on_toggle_source.clone();
+                Rc::new(move |kind, _w, cx| {
+                    entity.update(cx, |view, cx| {
+                        view.session.update(cx, |s, cx| {
+                            s.toggle_source(kind, cx);
+                        });
+                    });
+                })
+            },
+            on_retry: {
+                let entity = on_retry.clone();
+                Rc::new(move |kind, w, cx| {
+                    let cb = entity.read(cx).on_retry_source.clone();
+                    if let Some(cb) = cb {
+                        cb(kind, w, cx);
+                    }
+                })
+            },
+        });
+
         let top_bar = QueryWorkbench::render(&QueryWorkbenchProps {
             search_input: self.search_input.clone(),
             list_pane_width: active_list_width,
@@ -755,6 +787,7 @@ impl Render for PackageWorkstationView {
             flatpak_enabled,
             appimage_enabled,
             source_health: &store.source_health,
+            source_axis: &source_axis,
             theme: &theme,
             visual_style: self.visual_style,
             filters_btn_focus: self.filters_btn_focus.clone(),
@@ -1119,6 +1152,16 @@ impl Render for PackageWorkstationView {
         let alpm_details = selected_key
             .as_ref()
             .and_then(|k| self.store.read(cx).get_cached_details(k).cloned());
+
+        // Le même nom, dans les autres sources. La fiche le dit : un nom
+        // n'est pas un paquet, et les sources ne sont pas interchangeables.
+        let also_in: Vec<AlsoIn> = match selected_pkg.as_ref() {
+            Some(package) => {
+                let store = self.store.read(cx);
+                also_in(package, &store.active_results)
+            }
+            None => Vec::new(),
+        };
         let detail_error = selected_key
             .as_ref()
             .and_then(|k| self.store.read(cx).get_detail_error(k).cloned());
@@ -1156,6 +1199,7 @@ impl Render for PackageWorkstationView {
             PackageInspectorProps {
                 package: selected_pkg.as_ref(),
                 alpm_details: alpm_details.as_ref(),
+                also_in: &also_in,
                 detail_error: detail_error.as_deref(),
                 pkgbuild: cached_pkgbuild,
                 is_loading_pkgbuild: self.is_loading_pkgbuild,
@@ -1260,7 +1304,7 @@ impl Render for PackageWorkstationView {
             div()
                 .id("package_workstation_root")
                 .flex()
-                .flex_row()
+                .flex_col()
                 .size_full()
                 .overflow_hidden()
                 .on_mouse_move(move |event, window, cx| {
@@ -1280,9 +1324,17 @@ impl Render for PackageWorkstationView {
                         view.on_pointer_up(cx);
                     });
                 })
-                .child(list_pane)
-                .child(splitter)
-                .child(details_pane)
+                .child(source_bank)
+                .child(
+                    div()
+                        .flex()
+                        .flex_row()
+                        .size_full()
+                        .flex_1()
+                        .child(list_pane)
+                        .child(splitter)
+                        .child(details_pane),
+                )
         } else {
             div()
                 .id("package_workstation_root")
@@ -1295,6 +1347,7 @@ impl Render for PackageWorkstationView {
                         view.on_pointer_up(cx);
                     });
                 })
+                .child(source_bank)
                 .child(list_pane)
                 .child(details_pane)
         }

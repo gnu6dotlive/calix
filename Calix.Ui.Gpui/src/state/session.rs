@@ -19,13 +19,17 @@ pub enum PackageSourceKind {
 
 impl PackageSourceKind {
     /// Les sept écosystèmes, dans l'ordre où le contrôle les présente.
+    ///
+    /// Les magasins d'abord : les dépôts où l'on va chercher du logiciel. Les
+    /// méthodes d'installation ensuite, groupées : un binaire unique, un
+    /// binaire suivi. Ce ne sont pas la même chose, et l'axe les sépare.
     pub const ALL: &'static [PackageSourceKind] = &[
         PackageSourceKind::Alpm,
         PackageSourceKind::Aur,
         PackageSourceKind::Flatpak,
-        PackageSourceKind::AppImage,
         PackageSourceKind::Cargo,
         PackageSourceKind::Npm,
+        PackageSourceKind::AppImage,
         PackageSourceKind::Release,
     ];
 
@@ -202,9 +206,14 @@ impl NavScope {
     /// interrogeables ; celui qui liste l'inventaire en porte sept.
     pub fn sources(self) -> &'static [&'static str] {
         match self {
+            // Les quatre dépôts que Calix interroge. Les méthodes
+            // d'installation sont dans le périmètre, et les deux écosystèmes
+            // d'inventaire n'y sont pas.
             NavScope::Results | NavScope::Updates => &["alpm", "aur", "flatpak", "appimage"],
+            // L'inventaire tient les sept : les magasins d'abord, les
+            // méthodes d'installation ensuite.
             NavScope::Installed => {
-                &["alpm", "aur", "flatpak", "appimage", "cargo", "npm", "release"]
+                &["alpm", "aur", "flatpak", "cargo", "npm", "appimage", "release"]
             }
         }
     }
@@ -439,10 +448,10 @@ impl AppSession {
         // Le périmètre ne se vide pas sous un filtre : la dernière source du
         // périmètre reste sélectionnée. Le contrôle des sources ne propose que
         // les écosystèmes du périmètre, donc c'est de ceux-là qu'on compte.
-        let scope_sources = SourceScope::ecosystems_for(self.scope);
+        let scope_sources = crate::state::scope_kinds(self.scope);
         if !scope_sources
             .iter()
-            .any(|entry| self.source_scope.is_selected(entry.kind))
+            .any(|kind| self.source_scope.is_selected(*kind))
         {
             self.source_scope.select(source, true);
         }

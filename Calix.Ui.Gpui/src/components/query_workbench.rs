@@ -6,6 +6,7 @@ use crate::components::search_input::SearchInputView;
 use crate::components::view_mode_switcher::{ViewModeSwitcher, ViewModeSwitcherProps};
 use crate::state::package_store::{SourceHealthMap, SourceHealthStatus};
 use crate::state::query::{PackageStateFilter, SortMode, SourceScope, WorkbenchBreakpoint};
+use crate::state::SourceAxisEntry;
 use crate::state::session::NavScope;
 use crate::state::{PackageSourceKind, PackageViewMode};
 use crate::theme::Theme;
@@ -54,6 +55,8 @@ pub struct QueryWorkbenchProps<'a> {
     pub flatpak_enabled: bool,
     pub appimage_enabled: bool,
     pub source_health: &'a SourceHealthMap,
+    /// L'axe des sources : ce que chaque source tient, et combien de lignes.
+    pub source_axis: &'a [SourceAxisEntry],
     pub theme: &'a Theme,
     pub visual_style: VisualStyleId,
     pub filters_btn_focus: FocusHandle,
@@ -174,7 +177,7 @@ impl QueryWorkbench {
         let mut item_index = 0;
 
         // Les sources du périmètre : celles qu'il contient, et pas d'autres.
-        for entry in SourceScope::ecosystems_for(props.scope) {
+        for entry in props.source_axis.iter() {
             let is_enabled = match entry.kind {
                 PackageSourceKind::Alpm => true,
                 PackageSourceKind::Aur => props.aur_enabled,
@@ -216,6 +219,8 @@ impl QueryWorkbench {
                     id: id.into(),
                     retry_id: retry_id.into(),
                     label: entry.label.into(),
+                    note: Some(entry.holds),
+                    count: Some(entry.count),
                     is_checked: props.source_scope.is_selected(kind),
                     is_highlighted: is_filters_open && filters_highlighted == item_index,
                     health_label: health_lbl,
