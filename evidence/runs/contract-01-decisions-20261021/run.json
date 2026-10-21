@@ -1,0 +1,76 @@
+{
+  "run_id": "contract-01-decisions-20261021",
+  "kind": "implementation",
+  "status": "ok",
+  "objective": "Implement the operator's four decisions on the spatial contract — the window's floor, the catalogue's minimum, the single owner of the vertical budget, the drawer's ceiling — on a reviewable branch, with the claims measured rather than asserted.",
+  "the_branch": "feat/contract-01-space (from main at 11831c21). Not merged, not released: the review is the point.",
+  "the_decisions": {
+    "1_the_window_floor": {
+      "done": "The floor is derived, not chosen: min_window_width = catalogue_min_width (560) + sidebar_collapsed (56); min_window_height = 480. The spine folds itself when the catalogue would lose its room, and takes back the user's shape when the window gives it room — a rule of the ladder, not a state. The narrow layout is authored: the toolbar has three distinct forms, and the two that could never run now do. There is no maximum: the compositor and the work area decide.",
+      "tests": [
+        "the_window_floor_is_derived_from_the_catalogue_and_the_spine",
+        "the_spine_folds_when_the_catalogue_needs_the_room",
+        "the_three_forms_of_the_toolbar_are_measured"
+      ]
+    },
+    "2_the_catalogue_minimum": {
+      "done": "560 px is in the token system and in the rules that use it (the spine's fold, the window's floor). The three toolbar forms are measured at 760, 560 and 420 px of content width, and the search field keeps its room in each.",
+      "not_done": "The catalogue's ROWS are still not measured: the uniform_list resolves its viewport in the bench (600 × 400 in a probe) but never paints its items. The qualification of 560 against the rows' own content is open, and the failing case is kept: a compositor granting 600 × 480 leaves 544 px — 16 px under the minimum."
+    },
+    "3_the_vertical_budget": {
+      "done": "The workspace owns it. It computes the budget once per frame from the real allocation and the chrome's heights, and attributes an explicit height to the station and to the drawer. The station no longer measures the window — it receives its band (set_assigned_height). The header's height is a token (CONTEXT_HEADER_HEIGHT = 88) and the header IS that height. The horizontal split keeps its shared mechanism (content_width), now with the catalogue's minimum in it.",
+      "measured": {
+        "before": "in a 372 px band: the readout 6.5 px, the nameplate 260 px — the caption of the catalogue kept 70 % of the band while the catalogue was reduced to a sliver",
+        "after": "in a 372 px band: the readout 170.5 px, the nameplate 96 px",
+        "why_the_plate_moved": "the plate's floor was 168 — its comfortable height, and a luxury: at the workspace's minimum it left the catalogue less than a row and a half. The floor is now the plate's own chrome (the name, the actions, the tabs: 96 px), and the plate grows only when the user pulls it, up to a ceiling computed after the catalogue's own floor."
+      },
+      "tests": [
+        "the_drawer_never_takes_the_workspace_floor",
+        "the_budget_is_a_function_and_it_does_not_oscillate",
+        "a_shallow_drawer_overlays_instead_of_squeezing",
+        "the_drawer_ceiling_is_a_share_and_a_floor",
+        "the_composition_is_measured_in_a_real_window"
+      ]
+    },
+    "4_the_drawer_ceiling": {
+      "done": "P = max(0, min(0.40 × A, A − 320)) is the drawer's total band, header included. The settings' independent 600 px ceiling is no longer a rule: it is the user's preference, bounded by the budget. Below 120 px of usable body the drawer stops being a split and overlays the catalogue, keeping its full height and displacing nothing — reversible, and the context is preserved.",
+      "tests": [
+        "the_drawer_ceiling_is_a_share_and_a_floor",
+        "a_shallow_drawer_overlays_instead_of_squeezing"
+      ]
+    }
+  },
+  "the_accessibility_and_continuity": {
+    "normal_and_150": "The layout is in logical pixels and the window's floor is a floor in logical pixels, so at 150 % the physical window grows and the logical composition keeps its room. The reasoning holds; the MEASUREMENT at 150 % is not in the bench yet, for the same reason as the rows.",
+    "wide_and_narrow": "The three toolbar forms are measured; the spine's fold is measured; the portrait case is answered by not reading the orientation at all (the composition adapts to the space it is given).",
+    "repeated_resizes": "The budget is a pure function of the window and the drawer's current band: the same input gives the same budget, and the drawer cannot make it bounce (the_budget_is_a_function_and_it_does_not_oscillate).",
+    "panels_without_losing_context": "The drawer overlays rather than displacing, and the spine keeps its five destinations in its compact form.",
+    "reduced_motion": "The spine's fold and the drawer's height are animated through the existing reduced-motion path (AnimatedScalar::snap); the presentation policy is unchanged.",
+    "compositor_constrained_dimensions": "The failing case is kept and measured: 600 × 480 granted against a 720 × 480 request leaves 544 px of content, 16 px under the catalogue's qualified minimum."
+  },
+  "the_changed_files": [
+    {"path": "Calix.Ui.Gpui/src/config.rs", "what": "the window's floor: 1024 × 680 → 720 × 480, with the derivation in the doc"},
+    {"path": "Calix.Ui.Gpui/src/ui_metrics.rs", "what": "the tokens of the two budgets: the header's band, the workspace's floor, the drawer's share and minimum, the catalogue's minimum width and height, the bank's reserved band, the plate's floor"},
+    {"path": "Calix.Ui.Gpui/src/views/workspace.rs", "what": "the owner of the vertical budget: vertical_budget, drawer_max_height, VerticalBudget, and the wiring (the station's assigned height, the drawer's budget, the drawer's placement: split or overlay)"},
+    {"path": "Calix.Ui.Gpui/src/views/package_workstation.rs", "what": "the station receives its height instead of measuring the window; the plate's bounds are computed against the band it occupies; the spine's fold rule (spine_is_forced_collapsed, effective_sidebar_width)"},
+    {"path": "Calix.Ui.Gpui/src/views/operation_console.rs", "what": "the drawer's budget: its ceiling and whether it overlays"},
+    {"path": "Calix.Ui.Gpui/src/views/sidebar.rs", "what": "the spine's forced fold, animated like a travel"},
+    {"path": "Calix.Ui.Gpui/src/components/query_workbench.rs", "what": "the three toolbar forms — the Medium and the Narrow now say something different — and the bench that measures them"},
+    {"path": "Calix.Ui.Gpui/src/components/context_header.rs", "what": "the header's height is the token, not an estimate"},
+    {"path": "Calix.Ui.Gpui/src/components/log_drawer.rs", "what": "the drawer's band is the token, not an estimate"},
+    {"path": "Calix.Ui.Gpui/src/components/search_input.rs", "what": "the handle the bench reads the search field through"},
+    {"path": "docs/gpui/CONTRACT-01-SPACE.md", "what": "the contract, revised to 1.1 with the decisions"},
+    {"path": "docs/gpui/CONTRACT-01-SPACE-AUDIT.md", "what": "the audit, revised: the measured before and after, the failing case, and what is still open"}
+  ],
+  "the_gates": {
+    "local": "scripts/verify — PASSED on the dirty tree, run local-verify-20261021T162820Z: 1386 package-manager tests, 392 CLI tests, 252 UI tests",
+    "ci_replay": "scripts/ci-replay --worktree — PASSED inside archlinux:latest on a clean worktree, run local-verify-20261021T163052Z: 1388 package-manager tests, 392 CLI tests, 252 UI tests"
+  },
+  "the_limitations": [
+    "The catalogue's rows are not measured in the bench: the uniform_list resolves its viewport but never paints its items (the probe found no harness configuration in which they appear). The catalogue's minimum of 560 px is therefore consistent with the measured geometry — the spine's fold, the toolbar's three forms, the catalogue's viewport — but it is NOT qualified against the rows' own content.",
+    "The 150 % scale is reasoned, not measured, for the same reason.",
+    "No screenshot was taken: the desktop was not touched. Every number here comes from the bench, which draws the application's own views and reads the bounds the window actually drew.",
+    "The plate's overlay alternative was not built: the plate yields first, which is the contract's ladder, and the alternative is a decision left open in the audit (§5.6).",
+    "The drawer's overlay is implemented as an absolutely positioned band over the destination; it is not a separate surface with its own focus management, and the drawer's own header remains the way in and out of it."
+  ]
+}

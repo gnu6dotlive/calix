@@ -289,8 +289,14 @@ impl ContextHeader {
             // L'en-tête ne se comprime pas : la liste prend le reste. Sa
             // hauteur est celle de son bloc — le cadran, son nom, la
             // couverture — et le contenu de l'en-tête ne se fait pas couper.
+            //
+            // Sa hauteur est un jeton, pas une mesure : le budget vertical
+            // se sert de ce nombre pour répartir la fenêtre, et un en-tête
+            // qui n'aurait pas la hauteur annoncée ferait mentir le
+            // budget.
             .flex_shrink_0()
             .w_full()
+            .h(px(crate::ui_metrics::UiMetrics::CONTEXT_HEADER_HEIGHT))
             .flex()
             .items_center()
             .justify_between()

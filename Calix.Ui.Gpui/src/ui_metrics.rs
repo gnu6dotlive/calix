@@ -17,8 +17,15 @@ impl UiMetrics {
     // The plate is read from the top down in full-width bands. The nameplate
     // is the caption of the readout: it never swallows it, and it never
     // disappears.
+    //
+    // Its floor is its *own* chrome — the name, the actions, the tabs — and
+    // nothing more. It was 168, which was the comfortable height, and a
+    // comfortable height is a luxury: at the workspace's minimum, a floor of
+    // 168 left the catalogue with less than a row and a half. The plate is a
+    // context surface — it is the first to give way — and its floor is the
+    // height at which it still shows its tabs.
     pub const SPLITTER_THICKNESS: f32 = 5.0;
-    pub const NAMEPLATE_MIN_HEIGHT: f32 = 168.0;
+    pub const NAMEPLATE_MIN_HEIGHT: f32 = 96.0;
     pub const NAMEPLATE_MAX_RATIO: f32 = 0.55;
 
     // ── Workbench Dimensions ─────────────────────────────────────────────────
@@ -36,6 +43,43 @@ impl UiMetrics {
     pub const RAIL_ROW_GAP: f32 = 2.0;
     /// Le vide au-dessus de la première entrée du rail.
     pub const RAIL_TOP_PAD: f32 = 8.0;
+
+    // ── The vertical budget ──────────────────────────────────────────────────
+    //
+    // The header's band: the place that says where we are. It is a band, not
+    // a text that happens to be there — the budget divides the window with
+    // it, so its height has to be a number everyone knows.
+    pub const CONTEXT_HEADER_HEIGHT: f32 = 88.0;
+    /// The vertical space the primary workspace keeps, whatever else is open.
+    ///
+    /// The catalogue is the body; the plate and the log are context surfaces.
+    /// When the space runs short, the context surfaces give way — never the
+    /// catalogue.
+    pub const WORKSPACE_MIN_HEIGHT: f32 = 320.0;
+    /// The log drawer's share of the available height.
+    pub const DRAWER_MAX_RATIO: f32 = 0.40;
+    /// Below this, a split drawer is not a drawer: it becomes an overlay.
+    pub const DRAWER_MIN_HEIGHT: f32 = 120.0;
+    /// The drawer's own band: the bar that says what it is and how to close
+    /// it. It is always there, even when the drawer is closed — it is how the
+    /// drawer is opened.
+    pub const DRAWER_HEADER_HEIGHT: f32 = 36.0;
+
+    // ── The horizontal budget ────────────────────────────────────────────────
+    //
+    /// The width the catalogue keeps: below it, the catalogue is not a
+    /// catalogue any more.
+    pub const CATALOGUE_MIN_WIDTH: f32 = 560.0;
+
+    // ── The vertical budget, inside the station ─────────────────────────────
+    //
+    /// The bank's band: the seven sources. Measured, and *reserved* — the
+    /// plate's share is computed after it, so the reservation has to be an
+    /// upper bound of what the bank really takes.
+    pub const BANK_HEIGHT: f32 = 100.5;
+    /// The vertical space the catalogue keeps, whatever else: two rows, and
+    /// the rest is scrolling.
+    pub const CATALOGUE_MIN_HEIGHT: f32 = 72.0;
 }
 
 #[cfg(test)]

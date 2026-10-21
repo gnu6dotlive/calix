@@ -15,6 +15,14 @@ pub struct OperationConsoleView {
     pub toast_center: Entity<ToastCenter>,
     pub height_scalar: AnimatedScalar,
     pub configured_height: f32,
+    /// Le plafond que le propriétaire de la mise en page a calculé pour le
+    /// tiroir : une part de l'espace disponible, et jamais ce que la station
+    /// garde. Le tiroir ne décide pas de sa propre taille.
+    pub budget_max: f32,
+    /// Le tiroir n'a pas la place d'être un tiroir : il passe par-dessus du
+    /// catalogue. Il garde alors sa hauteur entière — c'est une présentation
+    /// dépliée, pas une fente — et il ne déplace rien.
+    pub overlays: bool,
     pub theme: Theme,
     pub reduce_motion: bool,
     pub logs_copied_feedback: bool,
@@ -37,7 +45,7 @@ impl OperationConsoleView {
 
         let console_sub = cx.subscribe(&console, |this, _console, event, cx| match event {
             ConsoleEvent::Toggled(open) => {
-                let target = if *open { this.configured_height } else { 0.0 };
+                let target = if *open { this.open_height() } else { 0.0 };
                 let duration = if *open
                     && matches!(
                         this.console.read(cx).status,
@@ -67,6 +75,8 @@ impl OperationConsoleView {
             toast_center,
             height_scalar,
             configured_height,
+            budget_max: configured_height,
+            overlays: false,
             theme,
             reduce_motion,
             logs_copied_feedback: false,
@@ -80,6 +90,42 @@ impl OperationConsoleView {
             self.height_scalar.snap(self.height_scalar.target_value);
         }
         cx.notify();
+    }
+
+    /// La hauteur que le corps du tiroir prend quand il s'ouvre : celle que
+    /// l'utilisateur a demandée, dans la limite du budget.
+    ///
+    /// Par-dessus, le tiroir garde sa hauteur entière : il ne displace
+    /// rien, et une fente de 36 px ne serait pas un journal.
+    pub fn open_height(&self) -> f32 {
+        if self.overlays {
+            self.configured_height
+        } else {
+            self.configured_height.min(self.budget_max)
+        }
+    }
+
+    /// Le plafond du tiroir, calculé par le propriétaire de la mise en page.
+    ///
+    /// Le tiroir ne peut pas dépasser ce que la station garde : c'est la
+    /// protection du catalogue, et elle se décide ici, une fois.
+    pub fn set_budget(&mut self, max: f32, overlays: bool, cx: &mut Context<Self>) {
+        if (self.budget_max - max).abs() > 0.5 || self.overlays != overlays {
+            self.budget_max = max;
+            self.overlays = overlays;
+            // Un tiroir ouvert qui vient de perdre sa place se referme à sa
+            // nouvelle taille : pas de bond, pas de débordement.
+            if self.console.read(cx).is_open {
+                let target = self.open_height();
+                self.height_scalar.retarget(
+                    target,
+                    MotionDurations::STANDARD,
+                    Instant::now(),
+                    self.reduce_motion,
+                );
+            }
+            cx.notify();
+        }
     }
 
     pub fn set_theme(&mut self, theme: Theme, cx: &mut Context<Self>) {

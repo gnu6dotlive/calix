@@ -1,6 +1,6 @@
 # CONTRACT 01 — The spatial contract of Calix
 
-**Version 1.0 — 2026-10-21 — status: proposed**
+**Version 1.1 — 2026-10-21 — status: ratified (decisions 1–4), in implementation**
 
 Calix is a product. It is not a GPUI experiment that happens to have a
 package manager in it. The rules that decide where things are, what gives way
@@ -15,6 +15,12 @@ Two things are deliberate about its shape:
   windows and the environments Calix is actually supported in.
 - Every clause is **testable or it is not here**. A clause nobody can check
   is a wish; a wish in a contract is a lie with a number on it.
+
+**Version 1.1** folds in the operator's four decisions: the window's floor,
+the catalogue's minimum, the single owner of the vertical budget, and the
+journal drawer's ceiling. The numbers they name are *qualification targets*:
+they are measured in the audit, and where the measurement disagrees with a
+target, the audit says so and the evidence is kept.
 
 The companion audit confronts this contract with the repository as it stands.
 Where the repository disagrees with this document, the audit says so, with the
