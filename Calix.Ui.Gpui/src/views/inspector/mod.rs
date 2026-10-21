@@ -53,11 +53,15 @@ pub struct PackageInspectorProps<'a> {
 
 pub struct PackageInspectorView;
 
+/// Le voyage de la coupe : 32 px, comme la coupe du périmètre.
+const TAB_CUT_TRAVEL: f32 = 32.0;
+
 impl PackageInspectorView {
     pub fn render_with_motion(
         props: PackageInspectorProps,
         reduce_motion: bool,
         tab_epoch: u64,
+        tab_direction: f32,
     ) -> AnyElement {
         let theme = props.theme;
 
@@ -155,8 +159,17 @@ impl PackageInspectorView {
 
         // La bascule de panneau est une coupe à la courbe : le panneau
         // sortant accélère, la coupe tombe au milieu du mouvement, et le
-        // panneau entrant continue dans la même direction et décélère. Il
-        // s'allume en plein chemin, pas en fondu.
+        // panneau entrant continue dans la même direction et décélère.
+        //
+        // Le geste est **la position**, pas l'opacité. Un fondu ne ferait
+        // qu'effacer le voyage : le panneau se pose décalé du côté où l'onglet
+        // est allé, et vient à sa place. L'opacité qui s'allumait au milieu
+        // du chemin avalait les deux tiers du déplacement avant qu'il ne soit
+        // visible — le voyage était là, mais personne ne le voyait.
+        //
+        // Le décalage est un `left` : l'inset déplace l'élément sans toucher
+        // au flux, donc le corps se pose décalé sans réajuster son texte
+        // (voir `state::motion::cut_travel`).
         let animated_body = if reduce_motion {
             div()
                 .id("inspector_tab_body")
@@ -165,14 +178,17 @@ impl PackageInspectorView {
         } else {
             div()
                 .id("inspector_tab_body")
+                // The handle the proof measures: the harness reads the bounds
+                // of the body under this name. A noop outside the tests.
+                .debug_selector(|| "inspector_tab_body".to_string())
                 .child(body)
                 .with_animation(
                     ("tab-cut", tab_epoch as usize),
                     Animation::new(crate::state::MotionDurations::STANDARD)
                         .with_easing(crate::state::motion::ease_out),
-                    |elem, delta| {
-                        let (opacity, offset) = crate::state::motion::cut_entry(delta, 32.0);
-                        elem.opacity(opacity).left(px(offset))
+                    move |elem, delta| {
+                        let (opacity, offset) = crate::state::motion::cut_entry(delta, TAB_CUT_TRAVEL);
+                        elem.opacity(opacity).left(px(tab_direction * offset))
                     },
                 )
                 .into_any_element()
@@ -253,8 +269,14 @@ impl PackageInspectorView {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::backend::models::{AlpmPackage, UnifiedPackageSource};
+    // The imports are explicit, not `use super::*`: a glob would bring gpui's
+    // own `test` attribute into the module, and every `#[test]` would then
+    // resolve to it — the macro would expand into itself and the compiler
+    // would die of a stack overflow.
+    use super::{PackageInspectorProps, PackageInspectorView, QuietPlate, TAB_CUT_TRAVEL};
+    use crate::backend::models::{AlpmPackage, UnifiedPackage, UnifiedPackageSource};
+    use crate::state::session::InspectorTab;
+    use crate::theme::Theme;
 
     #[core::prelude::v1::test]
     fn test_inspector_empty_state_and_populated_render() {
@@ -287,7 +309,7 @@ mod tests {
             on_navigate_package: None,
             on_retry_details: None,
         };
-        let _empty_el = PackageInspectorView::render_with_motion(empty_props, true, 0);
+        let _empty_el = PackageInspectorView::render_with_motion(empty_props, true, 0, 1.0);
 
         // 2. Populated package with reduced motion = false
         let pkg = UnifiedPackage {
@@ -328,6 +350,114 @@ mod tests {
             on_navigate_package: None,
             on_retry_details: Some(std::rc::Rc::new(|_, _| {})),
         };
-        let _pop_el = PackageInspectorView::render_with_motion(populated_props, false, 1);
+        let _pop_el = PackageInspectorView::render_with_motion(populated_props, false, 1, 1.0);
+    }
+
+    /// La coupe de la plaque, mesurée sur l'image : le corps de l'onglet se
+    /// pose décalé du côté où l'onglet est allé, et vient à sa place.
+    ///
+    /// La première image est prise dans l'image même où l'animation naît —
+    /// l'état de l'animation est créé au premier placement, donc le premier
+    /// écart vaut zéro — et la seconde après le voyage.
+    ///
+    /// C'est la preuve que le décalage atteint le dessin. La règle
+    /// (`cut_entry`) dit de combien le corps se décale ; ce test dit que la
+    /// fenêtre le dessine décalé, et de combien.
+    #[gpui::test]
+    fn the_tab_body_lands_displaced_and_comes_to_its_place(
+        cx: &mut gpui::TestAppContext,
+    ) {
+        use gpui::prelude::*;
+        use gpui::{point, px, size, Window};
+
+        struct Fixture {
+            theme: Theme,
+            pkg: UnifiedPackage,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let theme = self.theme.clone();
+                let on_tab: crate::components::inspector_header::TabSelectHandler =
+                    std::rc::Rc::new(|_, _, _| {});
+                let props = PackageInspectorProps {
+                    package: Some(&self.pkg),
+                    alpm_details: None,
+                    also_in: &[],
+                    detail_error: None,
+                    pkgbuild: None,
+                    is_loading_pkgbuild: false,
+                    active_tab: InspectorTab::Overview,
+                    theme: &theme,
+                    is_busy: false,
+                    copy_feedback: false,
+                    quiet: QuietPlate {
+                        heading: "THE BANK",
+                        subject: "Official / ALPM".to_string(),
+                        detail: String::new(),
+                    },
+                    on_select_tab: on_tab,
+                    on_install: None,
+                    on_remove: None,
+                    on_copy_install_cmd: None,
+                    on_copy_pkgbuild: None,
+                    on_navigate_package: None,
+                    on_retry_details: None,
+                };
+                PackageInspectorView::render_with_motion(props, false, 1, 1.0)
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let fixture = cx.new(|_| Fixture {
+            theme: Theme::dark(),
+            pkg: UnifiedPackage {
+                name: "ripgrep".into(),
+                version: "14.1.0-1".into(),
+                description: "fast search".into(),
+                source_type: "ALPM".into(),
+                repository_or_remote: "extra".into(),
+                is_installed: true,
+                has_update: false,
+                new_version: None,
+                inner: UnifiedPackageSource::Standard(AlpmPackage::default()),
+            },
+        });
+
+        let draw = |cx: &mut gpui::VisualTestContext| {
+            cx.draw(
+                point(px(0.0), px(0.0)),
+                size(px(900.0), px(600.0)),
+                |_window, _cx| fixture.clone(),
+            );
+        };
+
+        draw(cx);
+        let departure = cx
+            .debug_bounds("inspector_tab_body")
+            .expect("le corps de l'onglet est dessiné");
+
+        // La coupe dure 160 ms ; on attend plus, et on dessine encore.
+        std::thread::sleep(std::time::Duration::from_millis(260));
+        draw(cx);
+        let arrival = cx
+            .debug_bounds("inspector_tab_body")
+            .expect("le corps de l'onglet est dessiné");
+
+        // Le corps est arrivé du côté où l'onglet est allé (la direction est
+        // +1) : il s'est posé 32 px plus à droite, puis il a pris sa place.
+        assert_eq!(
+            departure.origin.x - arrival.origin.x,
+            px(TAB_CUT_TRAVEL),
+            "le corps s'est posé décalé de 32 px, et il est revenu à sa place"
+        );
+        assert!(
+            departure.origin.x > arrival.origin.x,
+            "le décalage va dans le sens de la coupe"
+        );
     }
 }

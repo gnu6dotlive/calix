@@ -43,6 +43,9 @@ impl ToastOverlay {
 
             let mut toast_el = div()
                 .id(ElementId::NamedInteger("toast-item".into(), toast.id))
+                // The handle the proof measures: the harness reads the bounds
+                // of the toast under this name. A noop outside the tests.
+                .debug_selector(move || format!("toast-item-{}", toast.id))
                 .flex()
                 .flex_col()
                 .w(px(320.0))
@@ -158,17 +161,16 @@ impl ToastOverlay {
             } else {
                 match toast.lifecycle {
                     ToastLifecycle::Entering => {
-                        // The arrival: it rises and it lights up, on the out
-                        // curve — the launcher's toast, and the same tokens the
-                        // rest of the application uses.
+                        // The arrival: it rises eight pixels and lights up, on
+                        // the out curve — the launcher's toast, and the same
+                        // tokens the rest of the application uses. The delta
+                        // handed over is already eased by the curve; easing it
+                        // again would flatten the head of the movement.
                         let animated = toast_el.with_animation(
                             ElementId::NamedInteger("toast-enter".into(), toast_id),
                             Animation::new(crate::state::MotionDurations::FAST)
                                 .with_easing(crate::state::motion::ease_out),
-                            |el, delta| {
-                                let eased = crate::state::motion::ease_out(delta);
-                                el.opacity(eased).top(px(8.0 * (1.0 - eased)))
-                            },
+                            |el, delta| el.opacity(delta).top(px(8.0 * (1.0 - delta))),
                         );
                         container = container.child(animated);
                     }
@@ -176,16 +178,13 @@ impl ToastOverlay {
                         container = container.child(toast_el.opacity(1.0));
                     }
                     ToastLifecycle::Exiting => {
-                        // The exit: it goes back down and it fades, on the same
-                        // curve — the departure is the arrival reversed ✗.
+                        // The departure: it sinks back by the same eight
+                        // pixels as it goes out, on the same elapsed curve.
                         let animated = toast_el.with_animation(
                             ElementId::NamedInteger("toast-exit".into(), toast_id),
                             Animation::new(crate::state::MotionDurations::FAST)
                                 .with_easing(crate::state::motion::ease_out),
-                            |el, delta| {
-                                let eased = crate::state::motion::ease_out(delta);
-                                el.opacity(1.0 - eased).top(px(8.0 * eased))
-                            },
+                            |el, delta| el.opacity(1.0 - delta).top(px(8.0 * delta)),
                         );
                         container = container.child(animated);
                     }
@@ -194,5 +193,87 @@ impl ToastOverlay {
         }
 
         container
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{ToastOverlay, ToastOverlayProps};
+    use crate::state::toast::{Toast, ToastKind, ToastLifecycle};
+    use crate::theme::Theme;
+    use gpui::prelude::*;
+    use gpui::{point, px, size, Context, Render, Window};
+    use std::rc::Rc;
+    use std::time::Instant;
+
+    /// L'arrivée d'une notification, mesurée sur l'image : elle se pose huit
+    /// pixels plus bas, et elle monte à sa place.
+    ///
+    /// La première image est prise dans l'image même où l'animation naît —
+    /// l'état de l'animation est créé au premier placement — et la seconde
+    /// après le voyage, quand la notification est posée.
+    #[gpui::test]
+    fn the_toast_rises_by_eight_pixels_and_lands(cx: &mut gpui::TestAppContext) {
+        struct Fixture {
+            theme: Theme,
+            toast: Toast,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let theme = self.theme.clone();
+                ToastOverlay::render(ToastOverlayProps {
+                    toasts: std::slice::from_ref(&self.toast),
+                    reduce_motion: false,
+                    theme: &theme,
+                    on_dismiss: Rc::new(|_, _, _| {}),
+                    on_action: Rc::new(|_, _, _| {}),
+                })
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let fixture = cx.new(|_| Fixture {
+            theme: Theme::dark(),
+            toast: Toast {
+                id: 1,
+                kind: ToastKind::Info,
+                title: "Logs copied".to_string(),
+                message: "Console output has been copied to clipboard.".to_string(),
+                action: None,
+                lifecycle: ToastLifecycle::Entering,
+                created_at: Instant::now(),
+            },
+        });
+
+        let draw = |cx: &mut gpui::VisualTestContext| {
+            cx.draw(
+                point(px(0.0), px(0.0)),
+                size(px(800.0), px(600.0)),
+                |_window, _cx| fixture.clone(),
+            );
+        };
+
+        draw(cx);
+        let departure = cx
+            .debug_bounds("toast-item-1")
+            .expect("la notification est dessinée");
+
+        // L'arrivée dure 120 ms ; on attend plus, et on dessine encore.
+        std::thread::sleep(std::time::Duration::from_millis(220));
+        draw(cx);
+        let arrival = cx
+            .debug_bounds("toast-item-1")
+            .expect("la notification est dessinée");
+
+        assert_eq!(
+            departure.origin.y - arrival.origin.y,
+            px(8.0),
+            "la notification est arrivée huit pixels plus bas, et elle est montée à sa place"
+        );
     }
 }

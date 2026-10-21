@@ -1,0 +1,49 @@
+{
+  "run_id": "slice-09-entries-20261021",
+  "kind": "implementation",
+  "status": "ok",
+  "objective": "Make the entries real. A surface that arrives must arrive by a displacement the eye can follow, and the claim must be measured on the image the window draws — not asserted, not believed, not photographed by driving the user's desktop.",
+  "the_correction": {
+    "the_false_rule": "The acceptance matrix said: \"in this version of gpui an inset on a flow child is ignored — a probe of 240 px over two seconds moved nothing\". That was a belief, not a measurement, and it shaped the code: the readout's recess and the nameplate were laid out absolutely inside a band for no reason.",
+    "what_the_layout_actually_does": "Measured on the rendered layout (the_displacement_is_the_inset_and_it_moves_nothing_else): a child in the flow with `top(24)` is drawn 24 px lower; the band below it does not move by a pixel; the width does not change; and the same holds inside a scroller. The inset is a position, not a size.",
+    "why_the_tab_cut_looked_like_a_fade": "The cut's ignition was measured in time (35 % of the time) while the out curve is front-loaded: at 35 % of the time it has already covered 86 % of the travel. The travel was spent before the panel was visible. The ignition is now measured on the distance covered — it falls at the third of the path, at the very beginning of the time — and the fade is gone.",
+    "the_second_defect": "The toast's arrival applied the out curve twice (the animation's easing, then the animator's own easing on the already-eased value). It is eased once now."
+  },
+  "the_measurements": {
+    "how": "The test harness draws the real views and reads the bounds the window actually drew, on the first frame of the animation — the animation's state is created at the first placement, so the first measured offset is zero — and again after the travel. Each measurement was broken on purpose to prove it can fail.",
+    "the_menu": "the_menu_drops_by_four_pixels_and_lands — 4 px, the surface falls into its anchor and lands. Broken: the displacement removed → 0 px → the test fails.",
+    "the_toast": "the_toast_rises_by_eight_pixels_and_lands — 8 px, it rises and lights up. Broken: the displacement removed → 0 px → the test fails.",
+    "the_tab_body": "the_tab_body_lands_displaced_and_comes_to_its_place — 32 px, the panel lands off its seat on the side the tab went and closes the distance. Broken: the travel set to zero → 0 px → the test fails.",
+    "the_view_mark": "the_fill_travels_from_the_cell_it_left_to_the_cell_it_chose — 28 px, the mark leaves the cell it marked and lands on the cell chosen. Broken: the travel removed → the first frame is already at the destination → the test fails."
+  },
+  "the_new_mechanism": {
+    "the_view_switcher": "The Cards/Table commutateur now carries a mark that travels, over a fixed geometry (26 px cells, 2 px apart), on the same law and the same curve as the list's carrier and the rail's mark. One law, three surfaces, one porteur. The destination is lit at once by the icon's colour, and only the mark travels.",
+    "the_tab_direction": "The cut of the plate enters from the side the tab went: the workstation remembers the previous tab, and the direction follows the order of the tabs."
+  },
+  "what_the_eye_saw": {
+    "the_frames": "evidence/runs/slice-09-entries-20261021/frames/ — forty captures of the commutateur at 1080 × 935, taken during the travel, and mark-travel.png, eight of them stacked.",
+    "the_measurement_of_the_frames": "the mark's left edge, read on the fill's exact colour: 419 px at rest (the Cards cell), then 418, 419, 422, 437, 441 and 444 px over the travel. The last frames are covered by the pointer's hover, which the measurement reads as the hover and not as the mark."
+  },
+  "a_question_closed": {
+    "the_counts": "The header's 1914 is not in disagreement with the bank's 1884: it is the sum of the bank's counts in that scope — 1884 (ALPM) + 0 (AUR) + 0 (Flatpak) + 20 (Cargo) + 9 (NPM) + 0 (AppImage) + 1 (Tracked) = 1914. The Updates pill (14 to 18, it moves with the refresh) counts the updates waiting in the update source, which is a different quantity from the installed rows. No defect."
+  },
+  "the_artefacts": [
+    {"path": "Calix.Ui.Gpui/src/state/motion.rs", "what": "cut_entry now ignites on the distance covered, not on the time spent; the layout probe that measures what an inset does to a flow child, and what it leaves alone; the doc of the law"},
+    {"path": "Calix.Ui.Gpui/src/components/view_mode_switcher.rs", "what": "the travelling mark of the view commutateur, its geometry (26/2/28), and the two rules and one measurement"},
+    {"path": "Calix.Ui.Gpui/src/components/toast_overlay.rs", "what": "the arrival eased once, and its measurement"},
+    {"path": "Calix.Ui.Gpui/src/components/menu.rs", "what": "the menu's drop, and its measurement"},
+    {"path": "Calix.Ui.Gpui/src/views/inspector/mod.rs", "what": "the cut without a fade, the direction of the tab, and the measurement"},
+    {"path": "Calix.Ui.Gpui/src/views/package_workstation.rs", "what": "the third porteur: the view mark, and the direction of the cut"},
+    {"path": "Calix.Ui.Gpui/src/state/session.rs", "what": "the index of a mode and of a tab — the geometry the marks travel over"},
+    {"path": "docs/gpui/slice-09/05-ACCEPTANCE-MATRIX.md", "what": "A20 corrected, A22 to A24 added, the motion table and the gaps rewritten"}
+  ],
+  "the_gates": {
+    "local": "scripts/verify — PASSED on the dirty tree, run local-verify-20261021T131848Z: 1386 package-manager tests, 392 CLI tests, 243 UI tests",
+    "ci_replay": "scripts/ci-replay --worktree — PASSED inside archlinux:latest on a clean worktree, run local-verify-20261021T132122Z: 1388 package-manager tests, 392 CLI tests, 243 UI tests"
+  },
+  "the_gaps": [
+    "The carrier's geometry inside the virtualised list is still proved by the rule (`carrier_top`) and by the frames: a `uniform_list` does not resolve its layout in the test harness, so it cannot be measured the way the four entries above were.",
+    "The scope's cut and the nameplate's entry are still laid out absolutely inside their band. The measurement says that was not necessary — an inset moves a flow child — but those two surfaces were measured by frames before this correction, and they are left as they are rather than rewritten on the strength of a rule.",
+    "The synthetic keyboard of this machine never reaches the client: the keyboard's state menu is still proved by the rule, not by a keypress."
+  ]
+}

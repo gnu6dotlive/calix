@@ -100,8 +100,10 @@ impl MenuSurface {
                         Animation::new(std::time::Duration::from_millis(150))
                             .with_easing(crate::state::motion::ease_out),
                         |el, delta| {
-                            let offset_y = px(-4.0 * (1.0 - delta));
-                            el.opacity(delta).top(offset_y)
+                            // La surface tombe de 4 px dans son ancrage :
+                            // l'inset déplace l'élément en flux sans
+                            // pousser ce qui l'entoure.
+                            el.opacity(delta).top(px(-4.0 * (1.0 - delta)))
                         },
                     )
                     .into_any_element(),
@@ -112,8 +114,9 @@ impl MenuSurface {
                         Animation::new(std::time::Duration::from_millis(100))
                             .with_easing(crate::state::motion::ease_out),
                         |el, delta| {
-                            let offset_y = px(-2.0 * delta);
-                            el.opacity(1.0 - delta).top(offset_y)
+                            // Elle repart par où elle est venue : elle se
+                            // soulève en s'éteignant.
+                            el.opacity(1.0 - delta).top(px(-2.0 * delta))
                         },
                     )
                     .into_any_element(),
@@ -222,5 +225,78 @@ mod tests {
         assert_ne!(MenuLifecycle::Opening, MenuLifecycle::Open);
         assert_ne!(MenuLifecycle::Open, MenuLifecycle::Closing);
         assert_ne!(MenuLifecycle::Closing, MenuLifecycle::Closed);
+    }
+
+    /// L'ouverture d'un menu, mesurée sur l'image : la surface tombe de
+    /// quatre pixels dans son ancrage.
+    ///
+    /// La première image est prise dans l'image même où l'animation naît —
+    /// l'état de l'animation est créé au premier placement — et la seconde
+    /// après le voyage, quand le menu est posé.
+    #[gpui::test]
+    fn the_menu_drops_by_four_pixels_and_lands(cx: &mut gpui::TestAppContext) {
+        struct Fixture {
+            theme: Theme,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let theme = self.theme.clone();
+                let focus = _cx.focus_handle();
+                div()
+                    .size_full()
+                    .child(MenuSurface::render(MenuSurfaceProps {
+                        id: "menu_surface_probe".into(),
+                        theme: &theme,
+                        min_width: px(180.0),
+                        reduce_motion: false,
+                        lifecycle: MenuLifecycle::Opening,
+                        anim_epoch: 3,
+                        focus_handle: Some(focus),
+                        visual_style: VisualStyleId::default(),
+                        on_close: std::rc::Rc::new(|_, _| {}),
+                        on_key_navigate: None,
+                        children: vec![div()
+                            .debug_selector(|| "menu_item_probe".to_string())
+                            .child("All states")
+                            .into_any_element()],
+                    }))
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let fixture = cx.new(|_| Fixture {
+            theme: Theme::dark(),
+        });
+
+        let draw = |cx: &mut gpui::VisualTestContext| {
+            cx.draw(
+                point(px(0.0), px(0.0)),
+                size(px(600.0), px(400.0)),
+                |_window, _cx| fixture.clone(),
+            );
+        };
+
+        draw(cx);
+        let departure = cx
+            .debug_bounds("menu_item_probe")
+            .expect("le menu est dessiné");
+
+        // L'ouverture dure 150 ms ; on attend plus, et on dessine encore.
+        std::thread::sleep(std::time::Duration::from_millis(260));
+        draw(cx);
+        let arrival = cx
+            .debug_bounds("menu_item_probe")
+            .expect("le menu est dessiné");
+
+        assert_eq!(
+            arrival.origin.y - departure.origin.y,
+            px(4.0),
+            "le menu est tombé de quatre pixels, et il s'est posé"
+        );
     }
 }

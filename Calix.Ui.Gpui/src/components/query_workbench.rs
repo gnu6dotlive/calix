@@ -3,6 +3,7 @@ use crate::components::menu::{
 };
 use crate::components::search_input::SearchInputView;
 use crate::components::view_mode_switcher::{ViewModeSwitcher, ViewModeSwitcherProps};
+use crate::state::motion::SelectionMarker;
 use crate::state::query::{PackageStateFilter, SortMode, WorkbenchBreakpoint};
 use crate::state::session::NavScope;
 use crate::state::PackageViewMode;
@@ -43,6 +44,9 @@ pub struct QueryWorkbenchProps<'a> {
     pub state_filter: PackageStateFilter,
     pub sort_mode: SortMode,
     pub view_mode: PackageViewMode,
+    /// Le porteur du commutateur de vue : la marque qui voyage d'une cellule
+    /// à l'autre.
+    pub view_marker: Option<SelectionMarker>,
     pub active_menu_state: Option<ActiveMenuState>,
     pub reduce_motion: bool,
     pub theme: &'a Theme,
@@ -411,6 +415,8 @@ impl QueryWorkbench {
         let view_switcher = ViewModeSwitcher::render(ViewModeSwitcherProps {
             current_mode: props.view_mode,
             theme,
+            reduce_motion: props.reduce_motion,
+            marker: props.view_marker,
             on_select_mode: props.on_select_view_mode.clone(),
         });
 

@@ -13,8 +13,8 @@ use crate::state::console::{ConsoleEvent, ConsoleModel};
 use crate::state::motion::{advance_marker, SelectionMarker};
 use crate::state::query::{PackageStateFilter, SortMode, SourceScope};
 use crate::state::{
-    also_in, canonical_install_command, source_axis, AlsoIn, AppSession, NavScope, PackageKey,
-    PackageStore, PackageViewMode, SessionEvent, ToastCenter, ToastKind,
+    also_in, canonical_install_command, source_axis, AlsoIn, AppSession, InspectorTab, NavScope,
+    PackageKey, PackageStore, PackageViewMode, SessionEvent, ToastCenter, ToastKind,
 };
 use crate::theme::Theme;
 use crate::ui_metrics::UiMetrics;
@@ -167,6 +167,9 @@ pub struct PackageWorkstationView {
     /// La sélection est un objet qui voyage : la barre du porteur glisse d'une
     /// ligne à l'autre au lieu de sauter.
     pub marker: Option<SelectionMarker>,
+    /// Le commutateur de vue est une troisième surface du même porteur : sa
+    /// marque voyage d'une cellule à l'autre.
+    pub view_marker: Option<SelectionMarker>,
     /// Le numéro du dernier changement de sélection : la plaque de nom entre
     /// avec la sélection, pas à chaque rendu.
     pub selection_epoch: usize,
@@ -174,6 +177,9 @@ pub struct PackageWorkstationView {
     pub last_scope: NavScope,
     pub scope_epoch: usize,
     pub scope_direction: f32,
+    /// L'onglet précédent : il donne le sens de la coupe de la plaque.
+    pub last_inspector_tab: InspectorTab,
+    pub tab_direction: f32,
     pub on_mutation: Option<PackageMutationHandler>,
     pub on_upgrade_all: Option<SystemUpgradeHandler>,
     pub on_retry_source: Option<SourceRetryHandler>,
@@ -295,10 +301,13 @@ impl PackageWorkstationView {
             compact: config.compact,
             search_input,
             marker: None,
+            view_marker: None,
             selection_epoch: 0,
             last_scope: initial_scope,
             scope_epoch: 0,
             scope_direction: 1.0,
+            last_inspector_tab: InspectorTab::Overview,
+            tab_direction: 1.0,
             scope_dial,
             _scope_dial_sub: dial_subscription,
             active_menu: None,
@@ -664,6 +673,17 @@ impl Render for PackageWorkstationView {
             self.scope_epoch += 1;
         }
 
+        // L'onglet a-t-il changé ? Même règle : la coupe entre par le côté
+        // où l'onglet est allé.
+        if self.last_inspector_tab != active_tab {
+            self.tab_direction = if active_tab.index() >= self.last_inspector_tab.index() {
+                1.0
+            } else {
+                -1.0
+            };
+            self.last_inspector_tab = active_tab;
+        }
+
         let (source_scope, state_filter, sort_mode) = {
             let s = self.session.read(cx);
             (s.source_scope, s.state_filter, s.sort_mode)
@@ -718,6 +738,11 @@ impl Render for PackageWorkstationView {
         let (marker, selection_epoch) = advance_marker(self.marker, selected_index);
         self.marker = marker;
         self.selection_epoch = selection_epoch;
+
+        // Le même porteur, sur le commutateur de vue : sa marque va de la
+        // cellule quittée à la cellule choisie.
+        let (view_marker, _) = advance_marker(self.view_marker, Some(view_mode.index()));
+        self.view_marker = view_marker;
 
         let entity_mode = entity.clone();
         let entity_select = entity.clone();
@@ -778,6 +803,7 @@ impl Render for PackageWorkstationView {
             state_filter,
             sort_mode,
             view_mode,
+            view_marker: self.view_marker,
             active_menu_state: self.active_menu,
             reduce_motion: self.reduce_motion,
             theme: &theme,
@@ -1412,6 +1438,7 @@ impl Render for PackageWorkstationView {
             },
             reduce_motion,
             inspector_tab_epoch,
+            self.tab_direction,
         );
 
         // La plaque entre avec la sélection : elle ne se remplace pas d'un

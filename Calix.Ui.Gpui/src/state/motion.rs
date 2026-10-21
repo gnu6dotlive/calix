@@ -190,17 +190,24 @@ pub fn waterfall_duration(steps: &[WaterfallStep]) -> Duration {
 /// décélère. L'assombrissement s'allume en plein chemin : une apparition en
 /// fondu, de 0 à 1, se lirait comme un fondu et non comme une arrivée.
 ///
+/// L'allumage se mesure en **distance**, pas en temps. La courbe de sortie
+/// est en avance : à 35 % du temps, elle a déjà fait 86 % du chemin. Un
+/// allumage mesuré en temps avaleait donc le voyage avant qu'il ne soit
+/// visible — le geste était là, et personne ne le voyait. Mesuré en
+/// distance, il tombe au début du temps, et le reste du voyage se voit.
+///
 /// Le voyage est partiel : environ 12 % de la surface, jamais un travers
 /// complet.
 pub fn cut_entry(delta: f32, travel: f32) -> (f32, f32) {
     let t = delta.clamp(0.0, 1.0);
-    // L'assombrissement s'allume à 0,35 en plein chemin.
-    let opacity = if t < 0.35 {
-        0.0
+    let offset = cut_travel(t, travel);
+    let covered = travel - offset;
+    let opacity = if travel <= 0.0 {
+        1.0
     } else {
-        ((t - 0.35) / 0.65).clamp(0.0, 1.0)
+        (covered / (travel * 0.35)).clamp(0.0, 1.0)
     };
-    (opacity, cut_travel(t, travel))
+    (opacity, offset)
 }
 
 /// La moitié positionnelle de la coupure : le voyage qui se referme.
@@ -209,6 +216,14 @@ pub fn cut_entry(delta: f32, travel: f32) -> (f32, f32) {
 /// sortie. C'est toute la coupe quand la surface qui entre contient une liste
 /// virtualisée : une couche d'opacité autour d'elle laisse la fenêtre entière
 /// à demi éteinte, et le mouvement seul suffit.
+///
+/// Le décalage s'applique par un **inset** — `top`, `left` — et il ne
+/// déplace que l'élément : la mise en page de cette version de gpui traite
+/// l'inset d'un élément en flux comme une position, pas comme une taille, si
+/// bien que le voisin suivant garde sa place et que la largeur ne change pas.
+/// C'est pourquoi une entrée se décale sans réajuster son texte ni pousser la
+/// bande d'à côté ; une marge, elle, changerait le flux. La règle est
+/// mesurée par `the_displacement_is_the_inset_and_it_moves_nothing_else`.
 pub fn cut_travel(delta: f32, travel: f32) -> f32 {
     travel * (1.0 - ease_out(delta.clamp(0.0, 1.0)))
 }
@@ -514,8 +529,9 @@ mod tests {
     }
 
     #[test]
-    fn the_cut_entry_ignites_mid_path_and_keeps_the_direction() {
-        // Avant 0,35, rien n'est visible : l'arrivée s'allume en plein chemin.
+    fn the_cut_entry_ignites_on_the_distance_and_keeps_the_direction() {
+        // Au départ, rien n'est allumé et le panneau est encore à sa place de
+        // départ.
         let (opacity, offset) = cut_entry(0.0, 40.0);
         assert_eq!(opacity, 0.0);
         assert_eq!(offset, 40.0);
@@ -527,6 +543,36 @@ mod tests {
         assert_eq!(offset, 0.0);
         // Le voyage est partiel : il ne franchit jamais toute la surface.
         assert!(40.0 < 120.0);
+
+        // L'allumage se mesure en distance, pas en temps. La courbe de sortie
+        // est en avance : au tiers du temps, le voyage est déjà presque fait,
+        // et un allumage mesuré en temps l'aurait avalé.
+        let (opacity_at_third, offset_at_third) = cut_entry(0.35, 40.0);
+        assert!(
+            opacity_at_third > 0.0,
+            "à un tiers du temps, le panneau est déjà allumé : le voyage se voit"
+        );
+        assert!(
+            offset_at_third < 40.0 * 0.35,
+            "et il a déjà fait plus du tiers de son chemin"
+        );
+
+        // Le seuil d'allumage est bien le tiers du *chemin* : quand le voyage
+        // a couvert un tiers de sa distance, le panneau est allumé.
+        let mut ignition = None;
+        for step in 0..=1000 {
+            let delta = step as f32 / 1000.0;
+            let (opacity, offset) = cut_entry(delta, 40.0);
+            if opacity >= 1.0 {
+                ignition = Some((40.0 - offset) / 40.0);
+                break;
+            }
+        }
+        let ignition = ignition.expect("le panneau s'allume");
+        assert!(
+            (ignition - 0.35).abs() < 0.02,
+            "l'allumage tombe au tiers du chemin, pas au tiers du temps : {ignition}"
+        );
     }
 
     #[test]
@@ -618,6 +664,119 @@ mod tests {
         let (gone, closed) = advance_marker(again, None);
         assert!(gone.is_none());
         assert!(closed > same_epoch);
+    }
+
+    /// Le déplacement d'une entrée, mesuré sur la mise en page.
+    ///
+    /// C'est la moitié que la courbe ne prouve pas : `cut_travel` dit *de
+    /// combien* une entrée se décale ; cette mesure dit *si* le décalage
+    /// atteint le dessin, et ce qu'il dérange autour de lui.
+    ///
+    /// Trois questions, trois réponses : un `inset` sur un enfant en flux le
+    /// déplace-t-il ? le frère suivant bouge-t-il ? la largeur change-t-elle ?
+    ///
+    /// La réponse est oui, non, non — et elle est la même dans une bande et
+    /// dans un conteneur qui défile, ce qui compte pour la plaque : son corps
+    /// est un enfant de la zone qui défile.
+    #[gpui::test]
+    fn the_displacement_is_the_inset_and_it_moves_nothing_else(cx: &mut gpui::TestAppContext) {
+        use gpui::prelude::*;
+        use gpui::*;
+
+        struct Probe;
+
+        impl Render for Probe {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let leaf = |id: &'static str, displaced: Div| {
+                    div()
+                        .debug_selector(move || id.to_string())
+                        .h(px(40.0))
+                        .w_full()
+                        .child(displaced.h(px(20.0)).w_full())
+                };
+
+                div()
+                    .size_full()
+                    .flex()
+                    .flex_col()
+                    .p(px(10.0))
+                    // Une bande dont l'enfant est décalé de 24 px vers le bas.
+                    .child(leaf(
+                        "displaced_band",
+                        div().debug_selector(|| "displaced".to_string()).top(px(24.0)),
+                    ))
+                    // La bande suivante : elle ne doit pas bouger d'un pixel.
+                    .child(leaf(
+                        "following_band",
+                        div().debug_selector(|| "following".to_string()),
+                    ))
+                    // La même question, dans une zone qui défile : c'est là que
+                    // vit le corps de la plaque.
+                    .child(
+                        div()
+                            .id("scroller")
+                            .w_full()
+                            .h(px(120.0))
+                            .overflow_y_scroll()
+                            .child(
+                                div()
+                                    .w_full()
+                                    .h(px(400.0))
+                                    .child(
+                                        div()
+                                            .debug_selector(|| "scrolled".to_string())
+                                            .w(px(60.0))
+                                            .h(px(20.0))
+                                            .left(px(24.0)),
+                                    ),
+                            ),
+                    )
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let probe = cx.new(|_| Probe);
+        cx.draw(
+            point(px(0.0), px(0.0)),
+            size(px(400.0), px(300.0)),
+            |_window, _cx| probe.clone(),
+        );
+
+        let displaced = cx.debug_bounds("displaced").expect("dessiné");
+        let following = cx.debug_bounds("following").expect("dessiné");
+        let band = cx.debug_bounds("following_band").expect("dessiné");
+        let scrolled = cx.debug_bounds("scrolled").expect("dessiné");
+
+        // 10 px de padding, et l'enfant décalé de 24.
+        assert_eq!(
+            displaced.origin.y,
+            px(34.0),
+            "un inset déplace un enfant en flux"
+        );
+
+        // Un décalage est une position, pas une taille : la bande suivante
+        // reste à sa place. C'est ce qui distingue l'inset de la marge.
+        assert_eq!(band.origin.y, px(50.0), "la bande suivante ne bouge pas");
+        assert_eq!(
+            following.origin.y,
+            px(50.0),
+            "l'enfant de la bande suivante ne bouge pas"
+        );
+
+        // La largeur ne change pas : le texte ne se réajuste pas.
+        assert_eq!(displaced.size.width, px(380.0));
+        assert_eq!(following.size.width, px(380.0));
+
+        // Dans une zone qui défile, l'inset déplace aussi — c'est la plaque.
+        assert_eq!(
+            scrolled.origin.x,
+            px(34.0),
+            "l'inset déplace aussi l'enfant d'une zone qui défile"
+        );
     }
 
     #[test]

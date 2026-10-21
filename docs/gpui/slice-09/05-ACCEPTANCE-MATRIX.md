@@ -25,8 +25,11 @@ only until the next change.
 | A17 | The selection is a carrier: a bar that travels from the row it marked to the row chosen, and keeps its departure through the repaints the voyage crosses | `the_carrier_leaves_from_the_line_it_occupied`, `a_repaint_does_not_throw_the_carrier_at_its_destination`, `the_carrier_sits_on_the_line_it_marks`; seen at 1080 × 935: the bar crossing two rows between the frames taken at 80 ms and 107 ms | **done** |
 | A18 | The scope enters from the side the dial turned | `the_scope_dirties_the_side_of_the_cut`, `the_cut_lands_where_it_was_aimed`; seen: the readout 35 px off its seat on the first frame after the change, at rest by the fourth | **done** |
 | A19 | The nameplate enters with the selection | `PLATE_ENTRY`, `PLATE_ENTRY_TRAVEL`; seen: the name's top at 673, then 652, then 651, over 80 ms | **done** |
-| A20 | An entry is a displacement, not a fade — and it moves | `left`/`top` on a flow child is ignored by this version of gpui: a probe of 240 px over two seconds moved nothing. Every animated surface is therefore laid out absolutely inside its band, and the offset is applied there; a layer of opacity around the virtualised readout is refused, because it dims the whole window | **done**: the probe, then the frames after it |
+| A20 | An entry is a displacement, not a fade — and it moves | **the rule is now measured, and the old rule was wrong.** This version of gpui *does* displace a flow child with an inset: the child moves by the offset, the sibling below it does not move at all, and the width does not change — `the_displacement_is_the_inset_and_it_moves_nothing_else`, measured on the rendered layout, in a band and in a scroller. The old note ("a probe of 240 px over two seconds moved nothing") was a false belief, and it shaped the code: two surfaces were laid out absolutely inside a band for no reason. The reason the inspector's cut was invisible was different, and it is A22 | **done**: the measurement, then the four entries measured on the image |
 | A21 | The bank has a front: the anchor carries its full name and what it holds, the narrow apertures carry their short name, and the seven counts share a line | `anchor_index` (ties go to the first), `the_stores_come_before_the_installation_methods`; the short names are `PackageSourceKind::short_label` | **done**, by the eye |
+| A22 | An entry ignites on the *distance* it has covered, not on the time it has spent | the out curve is front-loaded: at 35 % of the time it has already covered 86 % of the travel, so an ignition measured in time swallows the gesture before anyone can see it. Measured on the distance, the ignition falls at the third of the path, at the very beginning of the time — and the rest of the travel is seen | **done**: `the_cut_entry_ignites_on_the_distance_and_keeps_the_direction` |
+| A23 | Every entry is measured on the image, not on the rule | the harness reads the bounds the window actually drew, on the first frame of the animation and after it: the menu drops 4 px and lands (`the_menu_drops_by_four_pixels_and_lands`), the toast rises 8 px and lands (`the_toast_rises_by_eight_pixels_and_lands`), the tab body lands 32 px off its seat and comes to it (`the_tab_body_lands_displaced_and_comes_to_its_place`), the switcher's mark travels a whole cell and lands on the chosen one (`the_fill_travels_from_the_cell_it_left_to_the_cell_it_chose`). Each measurement fails when its mechanism is broken | **done**: four measurements, each falsified on purpose |
+| A24 | The view switcher is a third surface of the same carrier | the mark of the list and the mark of the rail travel; the mark of the commutateur (Cards/Table) travels too, over a fixed geometry of 26 px cells 2 px apart, on the same law and the same curve | **done**: `the_fill_lands_on_the_cell_it_marks`, `the_fill_travels_from_the_cell_it_left_to_the_cell_it_chose`; seen: the mark's left edge at 419, then 422, then 437, then 444 px over the travel |
 
 ## The reference
 
@@ -50,7 +53,10 @@ the application now, and what it does:
 | The selection's move | the carrier leaves the row it marked and travels to the row chosen | the travelling marker | `the_carrier_leaves_from_the_line_it_occupied`, `a_repaint_does_not_throw_the_carrier_at_its_destination`, `the_carrier_sits_on_the_line_it_marks`; the frames |
 | The rail's mark | the accent bar leaves the entry it marked and travels to the entry chosen, while the fill lights the destination at once | the travelling marker — one law, two surfaces, one porteur | `the_carrier_leaves_from_the_line_it_occupied` (the same marker, moved into `state::motion`), `the_rail_mark_lands_on_the_row_it_marks`; `evidence/runs/slice-09-rail-mark-20261021/rail-travel.png` |
 | The plate's arrival | the nameplate's content lands 22 px low and rises into its band | the cut, positional | the frames |
-| The panel's switch | the outgoing panel accelerates, the cut lands mid-motion, the incoming panel continues in the same direction and decelerates, and it ignites at 35 % instead of fading in | the cut on the curve | `the_cut_entry_ignites_mid_path_and_keeps_the_direction` |
+| The panel's switch | the incoming panel lands displaced from the side the tab went, and closes the distance; it ignites on the distance it has covered, not on the time | the cut, positional, ignited on the distance | `the_tab_body_lands_displaced_and_comes_to_its_place`, `the_cut_entry_ignites_on_the_distance_and_keeps_the_direction` |
+| The menu's opening | the surface drops 4 px into its anchor and lands | the entry, positional | `the_menu_drops_by_four_pixels_and_lands` |
+| The toast's arrival | it rises 8 px and lights up, on the out curve, eased once | the entry, positional | `the_toast_rises_by_eight_pixels_and_lands` |
+| The view's mark | the commutateur's mark leaves the cell it marked and travels to the cell chosen, while the icon lights the destination at once | the travelling marker — one law, three surfaces, one porteur | `the_fill_travels_from_the_cell_it_left_to_the_cell_it_chose`, `the_fill_lands_on_the_cell_it_marks` |
 | A value that changes | the count re-reads and flashes once; it does not glide into place | the instrument's readout | the eye |
 | The list's scroll | a wheel notch is a movement, not a jump | the eased hand | `the_wheel_moves_the_list_by_steps` |
 
@@ -59,6 +65,12 @@ front-loaded — at a tenth of the time it has covered about half the distance �
 so a mark sent along it arrives before the eye has left the row it departed:
 it reads as a jump with a tail, not as a voyage. The carrier and the rail's
 mark both travel, and both take the aller-retour.
+
+An entry is a displacement, and the displacement is what the eye follows. The
+ignition — the moment the surface becomes visible — is measured on the
+*distance* it has covered, never on the time it has spent: the out curve is
+front-loaded, so an ignition measured in time would be over before the
+travel was visible. A rule that cannot be seen is not a rule.
 
 The user can ask for less movement: `reduce_motion` snaps the needle, skips
 the bank's arrival, snaps the rail's mark onto its entry, and leaves the
@@ -88,9 +100,14 @@ scroll as it is.
   Installed, one in Updates. It now counts and activates the same list. The
   synthetic keyboard of this machine never reaches the client, so it is proved
   by the rule, not by a keypress.
-- The inspector's tab body still animates its opacity only. Its `left` offset
+- The inspector's tab body animates its opacity only. Its `left` offset
   falls on a flow child, where this version of gpui ignores it, so the fade
-  carries the change alone.
+  carries the change alone. **Closed**: the offset was never ignored — the
+  fade was the problem. It ignited at 35 % of the *time*, and the curve is
+  front-loaded, so 86 % of the travel was spent before the panel was visible.
+  The ignition is now measured in distance (A22), the fade is gone, and the
+  travel is measured on the image: 32 px off its seat on the first frame, at
+  rest after the cut (A23).
 - The carrier's geometry inside the virtualised list is proved by the rule
   (`carrier_top`) and by the frames, not by a test that lays the list out: a
   `uniform_list` does not resolve its layout in the test harness.

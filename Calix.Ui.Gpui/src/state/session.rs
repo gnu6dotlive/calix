@@ -317,6 +317,15 @@ impl PackageViewMode {
             PackageViewMode::Table => AppIcon::Table,
         }
     }
+
+    /// La position du mode dans le commutateur : la marque y voyage d'une
+    /// cellule à l'autre, et une cellule a une largeur fixe.
+    pub const fn index(self) -> usize {
+        match self {
+            PackageViewMode::Cards => 0,
+            PackageViewMode::Table => 1,
+        }
+    }
 }
 
 /// Onglets de l'inspecteur sémantique de paquet
@@ -342,6 +351,17 @@ impl InspectorTab {
             InspectorTab::Overview => AppIcon::Overview,
             InspectorTab::Dependencies => AppIcon::Dependencies,
             InspectorTab::FilesBuild => AppIcon::FilesBuild,
+        }
+    }
+
+    /// La position de l'onglet dans la bande : elle donne le sens de la
+    /// coupe — on n'entre pas du même côté quand on va vers la droite ou
+    /// vers la gauche.
+    pub const fn index(self) -> usize {
+        match self {
+            InspectorTab::Overview => 0,
+            InspectorTab::Dependencies => 1,
+            InspectorTab::FilesBuild => 2,
         }
     }
 }
