@@ -81,6 +81,9 @@ impl QueryWorkbench {
         // ── 1. Row 1: Dominant Full-Width Search Input ────────────────────────
         let row1 = div()
             .id("workbench_row1_search")
+            // The handle the bench measures: the harness reads the bounds of
+            // the row under this name. A noop outside the tests.
+            .debug_selector(|| "workbench_row1_search".to_string())
             .w_full()
             .h(px(40.0))
             .child(props.search_input.clone());
@@ -179,11 +182,21 @@ impl QueryWorkbench {
 
             let on_toggle_state_btn = on_toggle_menu.clone();
             let on_toggle_state_key = on_toggle_menu.clone();
-            let state_label = format!("State: {} ▾", props.state_filter.label());
+            // L'état garde son mot tant qu'il y a la place ; à la forme la
+            // plus étroite, il ne dit plus que « State ».
+            let state_label = if breakpoint == WorkbenchBreakpoint::Narrow {
+                "State ▾".to_string()
+            } else {
+                format!("State: {} ▾", props.state_filter.label())
+            };
 
             Some(
                 div()
                     .id("workbench_state_btn")
+                    // The handle the bench measures: the harness reads the
+                    // bounds of the button under this name. A noop outside
+                    // the tests.
+                    .debug_selector(|| "workbench_state_btn".to_string())
                     .relative()
                     .track_focus(&props.state_btn_focus)
                     .tab_stop(true)
@@ -329,24 +342,37 @@ impl QueryWorkbench {
             None
         };
 
-        let sort_label = if breakpoint == WorkbenchBreakpoint::Narrow {
-            match props.sort_mode {
-                SortMode::Relevance => "Sort: Rel ▾",
-                SortMode::NameAsc => "Sort: A–Z ▾",
-                SortMode::NameDesc => "Sort: Z–A ▾",
-                SortMode::Source => "Sort: Src ▾",
-                SortMode::InstalledFirst => "Sort: Inst ▾",
-                SortMode::UpdatesFirst => "Sort: Upd ▾",
-            }
-        } else {
-            match props.sort_mode {
+        // Les trois formes de la barre, selon la place qui reste.
+        //
+        // À la forme large, les commandes disent ce qu'elles font. Quand la
+        // place manque, elles disent ce qu'elles *sont* : le tri se réduit à
+        // son mot, l'état à son mot. La recherche, elle, garde la sienne :
+        // c'est la commande qui porte le plus de fois.
+        let sort_label = match breakpoint {
+            WorkbenchBreakpoint::Wide => match props.sort_mode {
                 SortMode::Relevance => "Sort: Relevance ▾",
                 SortMode::NameAsc => "Sort: Name (A–Z) ▾",
                 SortMode::NameDesc => "Sort: Name (Z–A) ▾",
                 SortMode::Source => "Sort: Source ▾",
                 SortMode::InstalledFirst => "Sort: Installed First ▾",
                 SortMode::UpdatesFirst => "Sort: Updates First ▾",
-            }
+            },
+            WorkbenchBreakpoint::Medium => match props.sort_mode {
+                SortMode::Relevance => "Sort: Rel ▾",
+                SortMode::NameAsc => "Sort: A–Z ▾",
+                SortMode::NameDesc => "Sort: Z–A ▾",
+                SortMode::Source => "Sort: Src ▾",
+                SortMode::InstalledFirst => "Sort: Inst ▾",
+                SortMode::UpdatesFirst => "Sort: Upd ▾",
+            },
+            WorkbenchBreakpoint::Narrow => match props.sort_mode {
+                SortMode::Relevance => "Rel ▾",
+                SortMode::NameAsc => "A–Z ▾",
+                SortMode::NameDesc => "Z–A ▾",
+                SortMode::Source => "Src ▾",
+                SortMode::InstalledFirst => "Inst ▾",
+                SortMode::UpdatesFirst => "Upd ▾",
+            },
         };
 
         let on_toggle_sort_btn = on_toggle_menu.clone();
@@ -355,6 +381,9 @@ impl QueryWorkbench {
         // Unboxed command trigger for Sort
         let sort_btn = div()
             .id("workbench_sort_btn")
+            // The handle the bench measures: the harness reads the bounds of
+            // the button under this name. A noop outside the tests.
+            .debug_selector(|| "workbench_sort_btn".to_string())
             .relative()
             .track_focus(&props.sort_btn_focus)
             .tab_stop(true)
@@ -489,3 +518,160 @@ impl QueryWorkbench {
 }
 
 
+#[cfg(test)]
+mod tests {
+    use super::{QueryWorkbench, QueryWorkbenchProps};
+    use crate::components::search_input::SearchInputView;
+    use crate::state::query::{PackageStateFilter, SortMode};
+    use crate::state::session::PackageViewMode;
+    use crate::state::NavScope;
+    use crate::theme::Theme;
+    use crate::visual_style::VisualStyleId;
+    use gpui::prelude::*;
+    use gpui::{div, point, px, size, Context, Entity, FocusHandle, Render, Window};
+    use std::rc::Rc;
+
+    /// Les trois formes de la barre, mesurées.
+    ///
+    /// La forme large dit ce que les commandes font. Quand la place manque,
+    /// elles disent ce qu'elles *sont*. Ce test mesure les trois : il dessine
+    /// la barre aux largeurs qui séparent les formes et il lit les bornes
+    /// que la fenêtre a dessinées.
+    ///
+    /// C'est ce qui rend les branches *atteignables* : la règle du point de
+    /// rupture existe, elle a trois formes distinctes, et chacune est
+    /// exercée.
+    #[gpui::test]
+    fn the_three_forms_of_the_toolbar_are_measured(cx: &mut gpui::TestAppContext) {
+        struct Fixture {
+            theme: Theme,
+            search_input: Entity<SearchInputView>,
+            state_focus: FocusHandle,
+            sort_focus: FocusHandle,
+            menu_focus: FocusHandle,
+            width: f32,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let theme = self.theme.clone();
+                div()
+                    .w(px(self.width))
+                    .h(px(120.0))
+                    .child(QueryWorkbench::render(&QueryWorkbenchProps {
+                        search_input: self.search_input.clone(),
+                        list_pane_width: self.width,
+                        scope: NavScope::Installed,
+                        state_filter: PackageStateFilter::All,
+                        sort_mode: SortMode::Relevance,
+                        view_mode: PackageViewMode::Table,
+                        view_marker: None,
+                        active_menu_state: None,
+                        reduce_motion: false,
+                        theme: &theme,
+                        visual_style: VisualStyleId::default(),
+                        state_btn_focus: self.state_focus.clone(),
+                        sort_btn_focus: self.sort_focus.clone(),
+                        menu_surface_focus: self.menu_focus.clone(),
+                        on_select_state: Rc::new(|_, _, _| {}),
+                        on_select_sort: Rc::new(|_, _, _| {}),
+                        on_select_view_mode: Rc::new(|_, _, _| {}),
+                        on_toggle_menu: Rc::new(|_, _, _| {}),
+                        on_navigate_menu: Rc::new(|_, _, _| {}),
+                        scope_action: None,
+                    }))
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let theme = Theme::dark();
+        let search_input = cx.new(|cx| {
+            SearchInputView::new(
+                "Search packages and apps...",
+                theme,
+                false,
+                cx,
+            )
+        });
+
+        let mut measure = |width: f32| -> (f32, f32, f32) {
+            let fixture = cx.new(|cx| Fixture {
+                theme: theme.clone(),
+                search_input: search_input.clone(),
+                state_focus: cx.focus_handle(),
+                sort_focus: cx.focus_handle(),
+                menu_focus: cx.focus_handle(),
+                width,
+            });
+            cx.draw(
+                point(px(0.0), px(0.0)),
+                size(px(width), px(120.0)),
+                |_window, _cx| fixture.clone(),
+            );
+            let state = cx
+                .debug_bounds("workbench_state_btn")
+                .expect("the state button is drawn");
+            let sort = cx
+                .debug_bounds("workbench_sort_btn")
+                .expect("the sort button is drawn");
+            let search = cx
+                .debug_bounds("search_input_container")
+                .expect("the search field is drawn");
+            (
+                state.size.width.into(),
+                sort.size.width.into(),
+                search.size.width.into(),
+            )
+        };
+
+        // The wide form: the commands say what they do.
+        let (wide_state, wide_sort, wide_row) = measure(760.0);
+        // The medium form: the sort says what it is.
+        let (medium_state, medium_sort, medium_row) = measure(560.0);
+        // The narrow form: both say what they are.
+        let (narrow_state, narrow_sort, narrow_row) = measure(420.0);
+
+        assert!(
+            medium_sort < wide_sort,
+            "la forme moyenne réduit le tri : {} puis {}",
+            wide_sort,
+            medium_sort
+        );
+        assert_eq!(
+            medium_state, wide_state,
+            "l'état garde sa forme tant qu'il y a la place"
+        );
+        assert!(
+            narrow_sort < medium_sort,
+            "la forme étroite réduit le tri encore : {} puis {}",
+            medium_sort,
+            narrow_sort
+        );
+        assert!(
+            narrow_state < medium_state,
+            "et l'état se réduit à son mot : {} puis {}",
+            medium_state,
+            narrow_state
+        );
+
+        // And the search keeps its room in every form: it is the command
+        // that carries the most, and it is the last to be cut.
+        assert!(
+            wide_row > 300.0,
+            "la recherche garde sa place dans la forme large : {wide_row}"
+        );
+        assert!(
+            medium_row > 250.0,
+            "et dans la forme moyenne : {medium_row}"
+        );
+        assert!(
+            narrow_row > 150.0,
+            "et dans la forme étroite : {narrow_row}"
+        );
+        let _ = (wide_state, medium_state);
+    }
+}

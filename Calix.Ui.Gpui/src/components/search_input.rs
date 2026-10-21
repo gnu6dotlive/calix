@@ -800,6 +800,9 @@ impl Render for SearchInputView {
 
         let mut container = div()
             .id("search_input_container")
+            // The handle the bench measures: the harness reads the bounds of
+            // the search field under this name. A noop outside the tests.
+            .debug_selector(|| "search_input_container".to_string())
             .key_context("SearchInput")
             .track_focus(&self.focus_handle)
             .w_full()

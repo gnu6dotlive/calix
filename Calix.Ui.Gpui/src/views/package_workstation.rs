@@ -42,16 +42,30 @@ pub struct NameplateDragState {
 /// The nameplate's bounds: it never swallows the readout, never disappears.
 ///
 /// The plate is read from the top down in full-width bands. The nameplate is
-/// the caption of the readout: below it, always, between a floor and a share.
-pub fn nameplate_bounds(content_height: f32) -> (f32, f32) {
+/// the caption of the readout: below it, always, between a floor and a
+/// share.
+///
+/// The band is the space the station really has — not the window. The plate
+/// takes what the user asks for, up to a ceiling computed *after* the bank
+/// and the catalogue's own floor: the catalogue keeps its rows, the plate
+/// takes the rest.
+pub fn nameplate_bounds(band_height: f32) -> (f32, f32) {
     let min = UiMetrics::NAMEPLATE_MIN_HEIGHT;
-    let max = (content_height * UiMetrics::NAMEPLATE_MAX_RATIO).max(min);
+    let after_the_catalogue = band_height
+        - UiMetrics::BANK_HEIGHT
+        - UiMetrics::SPLITTER_THICKNESS
+        - UiMetrics::CATALOGUE_MIN_HEIGHT;
+    // Two ceilings: the space that is left once the catalogue has kept its
+    // rows, and the share of the band a context surface may take.
+    let max = after_the_catalogue
+        .min(band_height * UiMetrics::NAMEPLATE_MAX_RATIO)
+        .max(min);
     (min, max)
 }
 
 /// The height of the nameplate, bounded.
-pub fn nameplate_height(content_height: f32, requested: f32) -> f32 {
-    let (min, max) = nameplate_bounds(content_height);
+pub fn nameplate_height(band_height: f32, requested: f32) -> f32 {
+    let (min, max) = nameplate_bounds(band_height);
     requested.clamp(min, max)
 }
 
@@ -77,6 +91,28 @@ pub fn nameplate_height_after_drag(
 /// `viewport_size()`, qui fait foi.
 pub fn content_width(viewport_width: f32, sidebar_width: f32) -> f32 {
     (viewport_width - sidebar_width).max(0.0)
+}
+
+/// La colonne de navigation se replie-t-elle ?
+///
+/// Elle se replie quand le catalogue n'a plus la place qu'il doit garder :
+/// la colonne est la première surface qui peut rétrécir, et elle ne
+/// disparaît jamais — elle garde ses cinq destinations.
+///
+/// C'est une règle de l'échelle, pas un état : quand la fenêtre reprend de
+/// la place, la colonne reprend la forme que l'utilisateur lui avait
+/// donnée.
+pub fn spine_is_forced_collapsed(viewport_width: f32) -> bool {
+    content_width(viewport_width, UiMetrics::SIDEBAR_EXPANDED) < UiMetrics::CATALOGUE_MIN_WIDTH
+}
+
+/// La largeur de la colonne, une fois la règle appliquée.
+pub fn effective_sidebar_width(user_collapsed: bool, viewport_width: f32) -> f32 {
+    if user_collapsed || spine_is_forced_collapsed(viewport_width) {
+        UiMetrics::SIDEBAR_COLLAPSED
+    } else {
+        UiMetrics::SIDEBAR_EXPANDED
+    }
 }
 
 /// How far the wheel's distance may wait before the list is given it.
@@ -170,6 +206,14 @@ pub struct PackageWorkstationView {
     /// Le commutateur de vue est une troisième surface du même porteur : sa
     /// marque voyage d'une cellule à l'autre.
     pub view_marker: Option<SelectionMarker>,
+    /// La hauteur que le propriétaire de la mise en page lui attribue.
+    ///
+    /// La station ne mesure plus la fenêtre : elle occupe une bande, et sa
+    /// part se décide plus haut. Avant, elle croyait avoir toute la fenêtre
+    /// pendant que le tiroir lui en prenait le bas — et la plaque, qui ne
+    /// sait pas rétrécir, gardait sa part pendant que le catalogue
+    /// disparaissait.
+    pub assigned_height: f32,
     /// Le numéro du dernier changement de sélection : la plaque de nom entre
     /// avec la sélection, pas à chaque rendu.
     pub selection_epoch: usize,
@@ -283,7 +327,9 @@ impl PackageWorkstationView {
             store,
             console,
             toast_center,
-            nameplate_height: 260.0,
+            // The plate starts at its floor: it grows when the user pulls
+            // it, and it never takes the catalogue's rows to do it.
+            nameplate_height: UiMetrics::NAMEPLATE_MIN_HEIGHT,
             nameplate_drag: None,
             scroll_handle: UniformListScrollHandle::new(),
             scroll_pending: 0.0,
@@ -302,6 +348,7 @@ impl PackageWorkstationView {
             search_input,
             marker: None,
             view_marker: None,
+            assigned_height: 0.0,
             selection_epoch: 0,
             last_scope: initial_scope,
             scope_epoch: 0,
@@ -576,6 +623,18 @@ impl PackageWorkstationView {
         }
     }
 
+    /// The owner of the layout gives the station its height.
+    ///
+    /// The station occupies a band, not the window: the band is what it
+    /// composes in. A station rendered outside an owner — the bench — falls
+    /// back to the window's height, which is then the whole of its space.
+    pub fn set_assigned_height(&mut self, height: f32, cx: &mut Context<Self>) {
+        if (self.assigned_height - height).abs() > 0.5 {
+            self.assigned_height = height;
+            cx.notify();
+        }
+    }
+
     pub fn set_theme(&mut self, theme: Theme, cx: &mut Context<Self>) {
         self.theme = theme;
         self.search_input
@@ -618,21 +677,27 @@ impl Render for PackageWorkstationView {
             cx.notify();
         }
 
-        let sidebar_collapsed = self.session.read(cx).sidebar_collapsed;
-        let sidebar_width = if sidebar_collapsed {
-            UiMetrics::SIDEBAR_COLLAPSED
-        } else {
-            UiMetrics::SIDEBAR_EXPANDED
-        };
+        // La colonne de navigation : la largeur que l'utilisateur lui a
+        // donnée, ou celle que la place lui laisse.
+        let user_collapsed = self.session.read(cx).sidebar_collapsed;
+        let sidebar_width = effective_sidebar_width(user_collapsed, window.viewport_size().width / px(1.0));
         let window_width = window.viewport_size().width / px(1.0);
         let content_width = content_width(window_width, sidebar_width);
-        let window_height = window.viewport_size().height / px(1.0);
+        // The height the owner gave us. The station composes in its band, not
+        // in the window: the difference is the drawer, and it is decided
+        // before we are drawn.
+        let window_height = if self.assigned_height > 0.0 {
+            self.assigned_height
+        } else {
+            // A station drawn outside an owner — the bench. There, the window
+            // *is* its space.
+            window.viewport_size().height / px(1.0)
+        };
 
         // The plate is read from the top down: the band of the header, the
-        // bank, the readout, the nameplate. The content's height is what the
-        // nameplate is bounded against.
-        let content_height = (window_height - UiMetrics::NAMEPLATE_MIN_HEIGHT).max(0.0);
-        let effective_nameplate_height = nameplate_height(content_height, self.nameplate_height);
+        // bank, the readout, the nameplate. The band we were given is what
+        // the nameplate is bounded against — not the window.
+        let effective_nameplate_height = nameplate_height(window_height, self.nameplate_height);
         self.nameplate_height = effective_nameplate_height;
 
         let active_list_width = content_width;
@@ -1674,6 +1739,78 @@ mod tests {
         assert_eq!(scroll_pending_after(10.0, 5.0), 15.0);
     }
 
+    /// L'échelle horizontale : la colonne se replie quand le catalogue n'a
+    /// plus la place, et elle reprend sa forme quand la fenêtre la rend.
+    ///
+    /// C'est la règle de l'échelle du contrat spatial, en exécutable : la
+    /// colonne de navigation est la première surface qui peut rétrécir, et
+    /// elle ne disparaît jamais.
+    #[test]
+    fn the_spine_folds_when_the_catalogue_needs_the_room() {
+        // Une fenêtre large : la colonne garde la forme de l'utilisateur.
+        assert!(!spine_is_forced_collapsed(1440.0));
+        assert_eq!(effective_sidebar_width(false, 1440.0), UiMetrics::SIDEBAR_EXPANDED);
+
+        // Au plancher de la fenêtre, la colonne se replie : le catalogue
+        // garde sa place.
+        assert!(
+            spine_is_forced_collapsed(720.0),
+            "à 720 px, la colonne dépliée ne laisserait que {} px au catalogue",
+            content_width(720.0, UiMetrics::SIDEBAR_EXPANDED)
+        );
+        assert_eq!(effective_sidebar_width(false, 720.0), UiMetrics::SIDEBAR_COLLAPSED);
+
+        // La colonne repliée laisse au catalogue son plancher.
+        assert!(
+            content_width(720.0, UiMetrics::SIDEBAR_COLLAPSED) >= UiMetrics::CATALOGUE_MIN_WIDTH,
+            "le catalogue garde {} px",
+            content_width(720.0, UiMetrics::SIDEBAR_COLLAPSED)
+        );
+
+        // La forme que l'utilisateur a donnée reste la sienne : la règle
+        // ne fait que la plier.
+        assert_eq!(effective_sidebar_width(true, 1440.0), UiMetrics::SIDEBAR_COLLAPSED);
+
+        // Le cas qui échoue, et il est gardé : un compositeur qui accorde
+        // moins que le plancher. À 600 px, la colonne repliée laisse 544 px
+        // au catalogue — 16 px de moins que son plancher qualifié. La
+        // composition ne peut pas tenir sa promesse là, et le banc le dit
+        // au lieu de le cacher.
+        let constrained = 600.0;
+        assert!(spine_is_forced_collapsed(constrained));
+        let content = content_width(constrained, UiMetrics::SIDEBAR_COLLAPSED);
+        assert_eq!(content, 544.0);
+        assert!(
+            content < UiMetrics::CATALOGUE_MIN_WIDTH,
+            "sous le plancher du compositeur, le catalogue est sous son minimum : {content} contre {}",
+            UiMetrics::CATALOGUE_MIN_WIDTH
+        );
+    }
+
+    /// Le plancher de la fenêtre est dérivé, pas choisi.
+    ///
+    /// Le catalogue garde 560 px, la colonne repliée 56 : le plancher est
+    /// leur somme. Une fenêtre plus étroite ne tiendrait pas la composition,
+    /// et le compositeur peut toujours en accorder une plus étroite — la
+    /// composition, elle, doit savoir tenir.
+    #[test]
+    fn the_window_floor_is_derived_from_the_catalogue_and_the_spine() {
+        let floor = UiMetrics::CATALOGUE_MIN_WIDTH + UiMetrics::SIDEBAR_COLLAPSED;
+        assert!(
+            crate::config::MIN_WINDOW_WIDTH >= floor,
+            "le plancher ({}) doit porter le catalogue et la colonne repliée ({})",
+            crate::config::MIN_WINDOW_WIDTH,
+            floor
+        );
+        // Et il ne sert à rien d'être plus large que ce que la composition
+        // demande : la colonne repliée, c'est déjà la règle.
+        assert!(
+            crate::config::MIN_WINDOW_WIDTH <= UiMetrics::CATALOGUE_MIN_WIDTH
+                + UiMetrics::SIDEBAR_EXPANDED,
+            "au-delà, la colonne n'a plus besoin de se replier : le plancher serait du comfort"
+        );
+    }
+
     #[test]
     fn the_content_width_follows_the_mapped_window() {
         // La largeur mappée moins le rail : c'est elle qui décide du partage
@@ -1739,14 +1876,45 @@ mod tests {
 
     #[test]
     fn the_nameplate_is_bounded_in_a_short_window() {
-        // Une fenêtre basse : la part est calculée sur le contenu, pas sur la
-        // fenêtre entière, et le plancher tient toujours.
-        let content = 200.0;
-        let nameplate = nameplate_height(content, 1000.0);
-        assert_eq!(nameplate, UiMetrics::NAMEPLATE_MIN_HEIGHT);
-        let (min, max) = nameplate_bounds(content);
+        // Une bande basse : il n'y a pas de place pour que la plaque grandisse
+        // — elle reste à son plancher, et le catalogue garde ce qui reste.
+        let band = 200.0;
+        let (min, max) = nameplate_bounds(band);
         assert_eq!(min, UiMetrics::NAMEPLATE_MIN_HEIGHT);
         assert_eq!(max, UiMetrics::NAMEPLATE_MIN_HEIGHT);
+        assert_eq!(
+            nameplate_height(band, 1000.0),
+            min,
+            "la plaque ne grandit pas dans une bande trop basse"
+        );
+
+        // Une bande large : la plaque s'arrête à sa part, même tirée sans
+        // fin, et le catalogue garde ses lignes.
+        let band = 600.0;
+        let (min, max) = nameplate_bounds(band);
+        assert!(
+            max > min,
+            "dans une bande large, la plaque a de la place : {max}"
+        );
+        assert!(
+            max <= band * UiMetrics::NAMEPLATE_MAX_RATIO + 0.01,
+            "sans jamais prendre plus que sa part de la bande : {max}"
+        );
+        assert_eq!(
+            nameplate_height(band, 1000.0),
+            max,
+            "la plaque s'arrête à sa part, même tirée sans fin"
+        );
+        // Et le catalogue garde le minimum, même quand la plaque prend le
+        // reste.
+        let catalogue = band
+            - UiMetrics::BANK_HEIGHT
+            - UiMetrics::SPLITTER_THICKNESS
+            - nameplate_height(band, 1000.0);
+        assert!(
+            catalogue >= UiMetrics::CATALOGUE_MIN_HEIGHT - 0.01,
+            "le catalogue garde ses lignes : {catalogue}"
+        );
     }
 
     #[test]
@@ -1784,11 +1952,12 @@ mod tests {
     /// une fenêtre réelle, et on lit les hauteurs que la fenêtre a
     /// dessinées.
     ///
-    /// Le second dessin est le cas qui compte : la station est dans une
-    /// bande plus courte que la fenêtre — ce que fait le tiroir de journal,
-    /// qui prend sa part en bas — et la station continue de mesurer la
-    /// fenêtre. C'est le fait que l'audit constate, et il est mesuré, pas
-    /// supposé.
+    /// La station ne mesure plus la fenêtre : le propriétaire de la mise en
+    /// page lui attribue sa bande, et c'est **cette** bande qui décide de la
+    /// part de la plaque. Le second dessin est ce cas : la station reçoit
+    /// 372 px — ce que le tiroir de journal lui laisse — et la plaque se
+    /// règle sur cette mesure. Avant, elle se réglait sur la fenêtre, et le
+    /// catalogue tombait à 6,5 px pendant que sa légende gardait 260.
     #[gpui::test]
     fn the_composition_is_measured_in_a_real_window(cx: &mut gpui::TestAppContext) {
         use gpui::prelude::*;
@@ -1848,6 +2017,11 @@ mod tests {
             band: None,
         });
 
+        // The owner attributes the height: the station composes in it.
+        station.update(cx, |station, cx| {
+            station.set_assigned_height(680.0, cx);
+        });
+
         let draw = |cx: &mut gpui::VisualTestContext| {
             cx.draw(
                 point(px(0.0), px(0.0)),
@@ -1882,10 +2056,12 @@ mod tests {
             readout.size.height
         );
 
-        // ── The same window, with a band shorter than the window: what the
-        //    log drawer does when it opens.
+        // ── The station in the band the log drawer leaves it.
         let band_height = 372.0;
         fixture.update(cx, |fixture, _cx| fixture.band = Some(band_height));
+        station.update(cx, |station, cx| {
+            station.set_assigned_height(band_height, cx);
+        });
         draw(cx);
         let squeezed_readout = cx
             .debug_bounds("workstation_readout")
@@ -1894,19 +2070,22 @@ mod tests {
             .debug_bounds("workstation_nameplate")
             .expect("the nameplate is drawn");
 
-        // The nameplate keeps its share — it does not shrink — and the
-        // catalogue is what disappears.
-        assert!(
-            squeezed_nameplate.size.height >= nameplate.size.height - px(0.5),
-            "the nameplate does not give its share back: {} then {}",
-            nameplate.size.height,
-            squeezed_nameplate.size.height
+        // The plate stays at its floor: it grows when the user pulls it, and
+        // it never takes the catalogue's rows to do it.
+        assert_eq!(
+            squeezed_nameplate.size.height, nameplate.size.height,
+            "la plaque garde son plancher, quelle que soit la bande"
         );
         assert!(
-            squeezed_readout.size.height < readout.size.height,
-            "the catalogue is what shrinks: {} then {}",
-            readout.size.height,
+            squeezed_readout.size.height > px(0.0),
+            "et le catalogue garde de la place : {}",
             squeezed_readout.size.height
+        );
+        assert!(
+            squeezed_readout.size.height > squeezed_nameplate.size.height,
+            "le catalogue reste la surface dominante : {} contre {} pour sa légende",
+            squeezed_readout.size.height,
+            squeezed_nameplate.size.height
         );
     }
 }

@@ -17,6 +17,10 @@ pub struct SidebarView {
     pub session: Entity<AppSession>,
     pub store: Entity<PackageStore>,
     pub width_scalar: AnimatedScalar,
+    /// La place manque : la colonne se replie, quelle que soit la forme que
+    /// l'utilisateur lui a donnée. C'est la règle de l'échelle, et elle se
+    /// défait quand la fenêtre reprend de la place.
+    pub forced_collapsed: bool,
     /// Le trait de la sélection : la rangée qu'il marque, celle qu'il quitte.
     pub rail_marker: Option<SelectionMarker>,
     pub theme: Theme,
@@ -63,11 +67,21 @@ impl SidebarView {
             session,
             store,
             width_scalar,
+            forced_collapsed: false,
             rail_marker: None,
             theme,
             visual_style,
             reduce_motion,
             _session_sub: session_sub,
+        }
+    }
+
+    /// La place manque : la colonne se replie. Le propriétaire de la mise en
+    /// page le décide, à partir de la largeur qu'il a.
+    pub fn set_forced_collapsed(&mut self, forced: bool, cx: &mut Context<Self>) {
+        if self.forced_collapsed != forced {
+            self.forced_collapsed = forced;
+            cx.notify();
         }
     }
 
@@ -101,10 +115,27 @@ impl Render for SidebarView {
         }
 
         let current_width = self.width_scalar.current;
-        let (place, scope, is_collapsed) = {
+        let (place, scope, user_collapsed) = {
             let s = self.session.read(cx);
             (s.place, s.scope, s.sidebar_collapsed)
         };
+        // La forme de la colonne : celle de l'utilisateur, ou celle que la
+        // place impose. Elle s'animationne comme un voyage : la colonne se
+        // replie, elle ne saute pas.
+        let is_collapsed = user_collapsed || self.forced_collapsed;
+        let target_width = if is_collapsed {
+            UiMetrics::SIDEBAR_COLLAPSED
+        } else {
+            UiMetrics::SIDEBAR_EXPANDED
+        };
+        if (self.width_scalar.target_value - target_width).abs() > 0.5 {
+            self.width_scalar.retarget(
+                target_width,
+                MotionDurations::STANDARD,
+                Instant::now(),
+                self.reduce_motion,
+            );
+        }
         let updates_count = self.store.read(cx).updates_count;
 
         // La sélection du rail est un objet qui voyage : quand le périmètre

@@ -86,8 +86,20 @@ pub struct GpuiUiConfig {
     pub brand_color: Brand,
 }
 
-pub const MIN_WINDOW_WIDTH: f32 = 1024.0;
-pub const MIN_WINDOW_HEIGHT: f32 = 680.0;
+/// Le plancher de la fenêtre, en pixels logiques.
+///
+/// C'est une *cible de qualification*, pas un chiffre arbitraire : la
+/// composition doit y tenir — la colonne de navigation, le catalogue, les
+/// commandes essentielles — et le catalogue garde 560 px (son plancher
+/// qualifié), la colonne repliée 56. Le plancher est donc la somme des
+/// deux, arrondie : la colonne de navigation se replie d'elle-même quand la
+/// place manque (l'échelle du contrat spatial).
+///
+/// Un plancher est une *demande* : un compositeur à tuiles peut accorder
+/// moins. La composition doit donc tenir aussi en dessous, et c'est ce que
+/// le banc mesure.
+pub const MIN_WINDOW_WIDTH: f32 = 720.0;
+pub const MIN_WINDOW_HEIGHT: f32 = 480.0;
 
 fn default_dark_theme() -> bool {
     true
@@ -693,7 +705,7 @@ mod tests {
     #[test]
     fn test_sanitize_window_size_enforces_minimums() {
         // Below minimum falls back to default
-        let (w, h) = ConfigManager::sanitize_window_size(800.0, 500.0);
+        let (w, h) = ConfigManager::sanitize_window_size(400.0, 300.0);
         assert_eq!(w, 1280.0);
         assert_eq!(h, 840.0);
 
@@ -710,8 +722,8 @@ mod tests {
         // Boundary test at exact minimums
         let (w_min, h_min) =
             ConfigManager::sanitize_window_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT);
-        assert_eq!(w_min, 1024.0);
-        assert_eq!(h_min, 680.0);
+        assert_eq!(w_min, 720.0);
+        assert_eq!(h_min, 480.0);
     }
 
     #[test]

@@ -386,6 +386,9 @@ impl LogDrawer {
             .justify_between()
             .px_4()
             .py_1p5()
+            // Le bandeau du tiroir est une bande permanente : le budget
+            // vertical le compte quand il répartit la fenêtre.
+            .h(px(crate::ui_metrics::UiMetrics::DRAWER_HEADER_HEIGHT))
             .bg(theme.bg_surface)
             .border_t_1()
             .border_color(theme.border)

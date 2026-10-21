@@ -17,6 +17,7 @@ use crate::state::{
     ToastAction, ToastCenter, ToastKind,
 };
 use crate::theme::Theme;
+use crate::ui_metrics::UiMetrics;
 use crate::views::news::{NewsView, NewsViewProps};
 use crate::views::operation_console::OperationConsoleView;
 use crate::views::package_workstation::{PackageWorkstationConfig, PackageWorkstationView};
@@ -32,6 +33,88 @@ enum MutationAction {
     Install { is_aur: bool, is_flatpak: bool },
     Remove { is_flatpak: bool },
     UpgradeSystem,
+}
+
+/// Le budget vertical : la répartition de la hauteur, décidée une fois.
+///
+/// Le propriétaire de la mise en page calcule l'espace disponible **une
+/// fois**, à partir de l'allocation réelle et de la hauteur des bandes
+/// qui l'occupent, puis il attribue une hauteur explicite à la station et à
+/// chaque surface secondaire.
+///
+/// La règle qui rend cela vrai : *aucune surface ne calcule sa hauteur
+/// utile à partir de la fenêtre entière quand elle n'en occupe qu'une
+/// partie*. Avant, la station mesurait la fenêtre — et le tiroir, en
+/// prenant sa part en bas, lui volait l'espace qu'elle croyait avoir. Le
+/// catalogue tombait à 6,5 px pendant que sa légende gardait 260.
+///
+/// `A` est la hauteur disponible après les bandes permanentes ; `P` le
+/// plafond du tiroir ; `W_min` l'espace que la station garde toujours.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct VerticalBudget {
+    /// La hauteur disponible, après les bandes permanentes.
+    pub available: f32,
+    /// La hauteur attribuée à la station (le poste de travail).
+    pub workspace: f32,
+    /// La hauteur attribuée au corps du tiroir : zéro quand il est fermé.
+    pub drawer_body: f32,
+    /// Le plafond du corps du tiroir : ce qu'il pourrait prendre s'il était
+    /// ouvert, en plus de son bandeau.
+    pub drawer_max: f32,
+    /// Le tiroir ne peut pas être un tiroir : il passe par-dessus.
+    pub drawer_overlays: bool,
+}
+
+/// Le plafond du tiroir : une part de l'espace disponible, et jamais ce que
+/// la station garde.
+///
+/// `P = max(0, min(0.40 × A, A − W_min))` : la part d'abord, la protection
+/// du catalogue ensuite. Les deux sont nécessaires : la part seule laisserait
+/// le tiroir prendre toute la fenêtre, la protection seule le laisserait
+/// prendre trop de place pour un journal.
+///
+/// `P` est la hauteur *totale* de la bande du tiroir — son bandeau compris.
+pub fn drawer_max_height(available: f32) -> f32 {
+    (0.40 * available)
+        .min(available - UiMetrics::WORKSPACE_MIN_HEIGHT)
+        .max(0.0)
+}
+
+/// Le budget vertical, pour une fenêtre et la hauteur *actuelle* du tiroir.
+///
+/// Le tiroir occupe la place qu'il occupe *maintenant* : son corps, tel
+/// qu'il est ouvert ou fermé, et son bandeau, qui est toujours là. La
+/// demande de l'utilisateur (220 px par défaut) est le but du tiroir quand
+/// il s'ouvre — elle ne réserve pas de place en permanence, sinon la
+/// fenêtre garderait un vide sous le catalogue.
+///
+/// Le plafond, lui, est permanent : c'est lui qui garantit que le tiroir ne
+/// prendra jamais plus que sa part.
+pub fn vertical_budget(window_height: f32, drawer_body: f32) -> VerticalBudget {
+    // L'espace sous l'en-tête : la fenêtre moins sa bande.
+    let available = (window_height - UiMetrics::CONTEXT_HEADER_HEIGHT).max(0.0);
+    let max_total = drawer_max_height(available);
+    let max_body = (max_total - UiMetrics::DRAWER_HEADER_HEIGHT).max(0.0);
+    if max_body < UiMetrics::DRAWER_MIN_HEIGHT {
+        // Un tiroir trop bas pour être un tiroir ne prend aucune place : il
+        // se pose par-dessus du catalogue, et la station garde tout — bandeau
+        // compris.
+        return VerticalBudget {
+            available,
+            workspace: available,
+            drawer_body: 0.0,
+            drawer_max: max_body,
+            drawer_overlays: true,
+        };
+    }
+    let drawer_body = drawer_body.clamp(0.0, max_body);
+    VerticalBudget {
+        available,
+        workspace: (available - UiMetrics::DRAWER_HEADER_HEIGHT - drawer_body).max(0.0),
+        drawer_body,
+        drawer_max: max_body,
+        drawer_overlays: false,
+    }
 }
 
 pub struct WorkspaceView {
@@ -2166,7 +2249,7 @@ impl WorkspaceView {
     }
 }
 impl Render for WorkspaceView {
-    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let theme = self.theme;
         let entity = cx.entity().clone();
 
@@ -2589,12 +2672,62 @@ impl Render for WorkspaceView {
         // ── 4. Assemblage final du shell ─────────────────────────────────────
         let entity_key = entity.clone();
 
+        // ── Le budget vertical : décidé ici, une fois ──────────────────────
+        //
+        // La fenêtre est la seule chose qui sait combien de place il y a.
+        // Le propriétaire en déduit la part de chaque bande — la station, le
+        // tiroir — et le dit à ses enfants. Aucun enfant ne remesure la
+        // fenêtre : c'est ainsi que le tiroir et la station se sont
+        // disputé la même place, et que le catalogue a disparu.
+        // La colonne de navigation se replie quand le catalogue n'a plus la
+        // place qu'il doit garder. C'est une règle de l'échelle, pas un
+        // choix : quand la fenêtre reprend de la place, la colonne reprend
+        // sa forme.
+        self.sidebar.update(cx, |sb, cx| {
+            sb.set_forced_collapsed(
+                crate::views::package_workstation::spine_is_forced_collapsed(
+                    window.viewport_size().width / px(1.0),
+                ),
+                cx,
+            );
+        });
+
+        let window_height = window.viewport_size().height / px(1.0);
+        // La place que le tiroir occupe *maintenant* : son corps tel qu'il
+        // est, et son bandeau, qui est toujours là.
+        let drawer_body = self.console_view.read(cx).height_scalar.current;
+        let budget = vertical_budget(window_height, drawer_body);
+        self.workstation.update(cx, |ws, cx| {
+            ws.set_assigned_height(budget.workspace, cx);
+        });
+        self.console_view.update(cx, |cv, cx| {
+            cv.set_budget(budget.drawer_max, budget.drawer_overlays, cx);
+        });
+
         // The shortcut sheet, above the frame: it appears when the user holds
         // the modifier alone, and it never sits on the surface.
         let cheatsheet = if self.cheatsheet_visible {
             Some(Cheatsheet::render(CheatsheetProps { theme: &theme }))
         } else {
             None
+        };
+
+        // The drawer: in the flow, or over the catalogue.
+        //
+        // When the budget cannot give it a usable split, it lies over the
+        // catalogue instead of squeezing it — the catalogue is the surface
+        // that keeps its place, and the drawer is the one that moves.
+        let drawer_element: AnyElement = if budget.drawer_overlays {
+            div()
+                .id("console_overlay")
+                .absolute()
+                .bottom(px(0.0))
+                .left(px(0.0))
+                .right(px(0.0))
+                .child(self.console_view.clone())
+                .into_any_element()
+        } else {
+            self.console_view.clone().into_any_element()
         };
 
         div()
@@ -2627,7 +2760,7 @@ impl Render for WorkspaceView {
                             .overflow_hidden()
                             .child(destination_element),
                     )
-                    .child(self.console_view.clone()),
+                    .child(drawer_element),
             )
             .child(toast_overlay)
             .children(cheatsheet)
@@ -2653,5 +2786,124 @@ fn merged_installed(
                 &crate::backend::calix_snapshot::Snapshot::default(),
             )
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{drawer_max_height, vertical_budget};
+    use crate::ui_metrics::UiMetrics;
+    use core::prelude::v1::test;
+
+    /// Le tiroir ne prend jamais la place que la station garde.
+    ///
+    /// C'est l'inversion de priorité, en executable : le catalogue est la
+    /// surface qui garde sa place, le journal celle qui s'efface. Avant,
+    /// la station mesurait la fenêtre et le tiroir prenait le bas — le
+    /// catalogue tombait à 6,5 px pendant que sa légende gardait 260.
+    #[test]
+    fn the_drawer_never_takes_the_workspace_floor() {
+        for window_height in [480.0_f32, 560.0, 680.0, 900.0, 1440.0, 2160.0] {
+            for drawer_body in [0.0_f32, 120.0, 220.0, 400.0, 600.0] {
+                let budget = vertical_budget(window_height, drawer_body);
+                assert!(
+                    budget.workspace >= UiMetrics::WORKSPACE_MIN_HEIGHT - 0.01,
+                    "la station garde {} px pour une fenêtre de {} et un tiroir de {} : elle en garde {}",
+                    UiMetrics::WORKSPACE_MIN_HEIGHT,
+                    window_height,
+                    drawer_body,
+                    budget.workspace
+                );
+            }
+        }
+    }
+
+    /// Le plafond du tiroir est une part de l'espace, et jamais ce que la
+    /// station garde.
+    #[test]
+    fn the_drawer_ceiling_is_a_share_and_a_floor() {
+        // À mi-chemin entre le plancher de la fenêtre et le haut : la part.
+        let available = 800.0;
+        let max = drawer_max_height(available);
+        assert!(
+            max <= 0.40 * available + 0.01,
+            "le tiroir ne prend pas plus de 40 % de l'espace : {max}"
+        );
+        assert!(
+            max <= available - UiMetrics::WORKSPACE_MIN_HEIGHT + 0.01,
+            "et jamais la place que la station garde : {max}"
+        );
+        // L'espace est trop court pour la part : c'est la protection qui
+        // tranche.
+        let tight = UiMetrics::WORKSPACE_MIN_HEIGHT + 10.0;
+        assert_eq!(
+            drawer_max_height(tight),
+            10.0,
+            "quand l'espace manque, c'est le catalogue qui gagne"
+        );
+        // Il n'y a rien à prendre.
+        assert_eq!(drawer_max_height(100.0), 0.0);
+    }
+
+    /// Un tiroir trop bas pour être un tiroir passe par-dessus du catalogue.
+    ///
+    /// Il ne le pousse pas : il se pose dessus, et la station garde sa
+    /// place.
+    #[test]
+    fn a_shallow_drawer_overlays_instead_of_squeezing() {
+        let budget = vertical_budget(480.0, 220.0);
+        assert!(
+            budget.drawer_overlays,
+            "à 480 px de haut, le tiroir n'a pas la place d'être un tiroir"
+        );
+        assert_eq!(
+            budget.drawer_body, 0.0,
+            "il ne prend aucune place dans le flux"
+        );
+        assert_eq!(
+            budget.workspace, budget.available,
+            "la station garde tout l'espace sous l'en-tête"
+        );
+    }
+
+    /// Le budget est une fonction de la fenêtre : pas de mémoire, pas
+    /// d'oscillation.
+    ///
+    /// La même fenêtre et le même tiroir donnent toujours le même budget, et
+    /// le tiroir ne peut pas faire bounce : ce qu'il prend, il le prend une
+    /// fois.
+    #[test]
+    fn the_budget_is_a_function_and_it_does_not_oscillate() {
+        let first = vertical_budget(900.0, 220.0);
+        let second = vertical_budget(900.0, 220.0);
+        assert_eq!(first, second, "le même budget deux fois");
+
+        // Un tiroir plus grand est ramené au plafond — et le catalogue garde
+        // sa place malgré tout.
+        let bigger = vertical_budget(900.0, 600.0);
+        assert!(
+            bigger.drawer_body <= bigger.drawer_max + 0.01,
+            "la taille est ramenée au plafond : {} pour un plafond de {}",
+            bigger.drawer_body,
+            bigger.drawer_max
+        );
+        assert!(
+            bigger.workspace >= UiMetrics::WORKSPACE_MIN_HEIGHT - 0.01,
+            "et la station garde sa place : {}",
+            bigger.workspace
+        );
+        assert!(
+            bigger.workspace < first.workspace,
+            "un tiroir plus grand prend sa part à la station, mais pas au-delà du plancher"
+        );
+
+        // Le tiroir fermé laisse la place à la station : c'est le tiroir qui
+        // change, jamais la règle.
+        let closed = vertical_budget(900.0, 0.0);
+        assert!(
+            closed.workspace > first.workspace,
+            "un tiroir fermé rend sa place à la station"
+        );
+        assert_eq!(closed.drawer_body, 0.0, "un tiroir fermé ne prend rien");
     }
 }
