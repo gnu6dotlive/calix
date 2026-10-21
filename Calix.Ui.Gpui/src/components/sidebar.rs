@@ -248,18 +248,19 @@ impl Sidebar {
                         .border_color(theme.border)
                         .child(
                             // The shell mark, painted by the accent: the mark
-                            // and the interface speak the same colour.
+                            // and the interface speak the same colour. It is
+                            // the product's voice, not an icon in a corner.
                             svg()
                                 .path(AppIcon::Calix.path())
-                                .size_6()
+                                .size_8()
                                 .text_color(theme.accent),
                         )
                         .child(if !is_collapsed {
                             div()
-                                .text_xs()
+                                .text_lg()
                                 .font_weight(FontWeight::BOLD)
                                 .text_color(theme.text_primary)
-                                .child("CALIX GPUI")
+                                .child("CALIX")
                         } else {
                             div()
                         }),
