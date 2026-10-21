@@ -114,6 +114,14 @@ scroll as it is.
 - The synthetic keyboard of this machine never reaches the client, so A7's
   three-second gesture is still unproven by hand. The keys that were checked
   were checked with the pointer.
+- **The clicks are proved now** — and they were never the harness's
+  limitation. The synthetic *pointer* (an OS-level device) fought the
+  compositor; the *harness* dispatches the event straight into the window,
+  with a real hit test and a real handler. Four gates stand: the view
+  commutateur, the five rail entries, the seven bank apertures, and a
+  catalogue row (addressed by name). The protocol: a click is a sequence of
+  events separated by frames — the frame between them is what the focus
+  needs to be redrawn. See the audit, §6.
 - The measurement's scale is logarithmic, and the header says so. A linear
   scale would bury every small package under a sliver, and the sizes span
   orders of magnitude.

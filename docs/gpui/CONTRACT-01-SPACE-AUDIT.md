@@ -529,11 +529,40 @@ What is left to decide, after the measurements:
 | the plate leaves the flow before the catalogue is reduced | `the_plate_leaves_the_flow_before_the_catalogue_is_reduced`, `the_composition_is_measured_in_a_real_window` | **done** |
 | the catalogue's minimum is the measured one, and the budget adds up | `the_window_floor_budget_adds_up` | **done** |
 | the catalogue's rows are drawn by the list, at every width | `the_catalogue_list_draws_its_rows_at_every_width` | **done** |
+| a click on the view commutateur changes the view | `a_click_on_the_switcher_changes_the_view` | **done** |
+| a click on a rail entry changes the place or the scope | `a_click_on_a_rail_entry_changes_the_place_or_the_scope` | **done** |
+| a click on a bank aperture toggles that source | `a_click_on_an_aperture_toggles_that_source` | **done** |
+| a click on a catalogue row selects that package | `a_click_on_a_row_selects_that_package` | **done** |
 | the composition at 150 % keeps the catalogue's floor | — | **open**: the same instrument, at another scale |
 
-The harness makes the last two cheap once the list can be seen:
-`VisualTestContext::simulate_resize` resizes the window, and the bands are
-re-measured. What is missing is not the instrument — it is the list.
+The harness makes the last one cheap: `VisualTestContext::simulate_resize`
+resizes the window, and the bands are re-measured.
+
+### The interaction layer, and the protocol of a click
+
+Since v0.2.5 the release notes said the *clicks* were not proved — the
+synthetic pointer never reached the Wayland client on the machine where the
+evidence was taken. It stole the focus, and it landed nowhere.
+
+The gap was never in the capability. The **harness** dispatches the event
+straight into the window: a real hit test, a real propagation, a real
+handler — with no compositor, no pointer, and no stolen focus. Four gates
+stand, on the real components: the view commutateur, the five entries of
+the rail, the seven openings of the bank, and a row of the catalogue. The
+rows are addressable *by name* (`package_row-<name>`), so a click lands on
+the package the test means and not on the first row of the list.
+
+**The protocol**, which belongs to the bench and not to the application: *a
+click is a sequence of events separated by frames*, exactly as it is for a
+user. The first click moves the focus, the focus changes the style, the
+window repaints, and the next click is dispatched against the hitboxes of
+that repaint. Without the frame between them, the second click lands
+nowhere.
+
+Two false diagnoses came out of that discovery, and the data corrected
+both: the travelling mark does *not* steal the click, and a percentage
+height did *not* fail to resolve. The list was simply not in the tree,
+because the session's default scope is the *results* — which were empty.
 
 ## 7. What was not done, and why
 
