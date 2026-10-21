@@ -333,6 +333,9 @@ impl SourceBank {
 
         div()
             .id("source_bank")
+            // The handle the audit measures: the harness reads the bounds of
+            // the band under this name. A noop outside the tests.
+            .debug_selector(|| "source_bank".to_string())
             .flex()
             .flex_row()
             .gap(px(6.0))

@@ -1,0 +1,71 @@
+{
+  "run_id": "contract-01-space-audit-20261021",
+  "kind": "audit",
+  "status": "ok",
+  "objective": "Write Calix's spatial contract down, then confront it with the repository — with measurements, not with beliefs. No new primitive was invented before the audit; the audit's job was to say what already exists, what the contract asks for, and where the two disagree.",
+  "the_contract": {
+    "document": "docs/gpui/CONTRACT-01-SPACE.md",
+    "version": "1.0",
+    "the_principle": "The layout protects the essential functions before it preserves the secondary ones.",
+    "the_layers": [
+      "1 — the spine: the destinations, the search, the primary actions. It may narrow; it never disappears because the window did.",
+      "2 — the body: the catalogue, the results, their primary actions. It never falls below the width at which it is still a catalogue.",
+      "3 — the context surfaces: the plate, the log, the metadata. They give way first, and in a stated order."
+    ],
+    "the_primitives": [
+      "window policy — the floors and what happens when the system refuses them",
+      "adaptive layout — the division of the space, and the choice of composition",
+      "the spine — the identity of and the access to the destinations",
+      "the body — the central surface, which keeps the context and the usable space",
+      "the context surfaces — the secondaries, which must not compete with the body",
+      "presentation policy — the transitions, the reduced motion, the zoom, the accessible re-organisation"
+    ],
+    "the_ladder": "The decorative spaces give way, then the context surfaces shrink towards their floors, then a context surface overlays or closes, then the spine narrows to its floor. The body keeps its floor: always.",
+    "the_rule_of_the_clause": "Every clause is testable or it is not in the document."
+  },
+  "the_audit": {
+    "document": "docs/gpui/CONTRACT-01-SPACE-AUDIT.md",
+    "the_instrument": "The harness draws the application's own views and reads the bounds the window actually drew: the composition is measured, not described. `the_composition_is_measured_in_a_real_window` draws the real station in a real window and reads the three bands.",
+    "the_measurements_at_the_windows_floor": {
+      "window": "1024 × 680 (config::MIN_WINDOW_WIDTH × MIN_WINDOW_HEIGHT)",
+      "the_bank": "100.5 px",
+      "the_readout": "314.5 px",
+      "the_splitter": "5 px",
+      "the_nameplate": "260 px",
+      "the_content_width": "834 px with the spine expanded, 968 px collapsed"
+    },
+    "the_findings": {
+      "the_vertical_budget_has_no_owner": "The station measures the WINDOW (package_workstation.rs:627-634), not the band it occupies. With the log drawer open (220 px) and the header's band (≈ 88 px, content-driven), the station is left with 372 px, and the measured result is: the readout 6.5 px, the nameplate 260 px. The catalogue — priority 2 — is reduced to a sliver while the nameplate — priority 3, the caption of that catalogue — keeps 70 % of the band. The nameplate cannot shrink (flex_shrink_0); the readout can shrink to nothing (flex_1, min_h(0)). The ladder of the contract is inverted.",
+      "the_drawers_ceiling_is_not_related_to_the_windows_floor": "The config allows a drawer of 600 px (config.rs:464-478) and the window's floor is 680 px: 600 + 90 is already more than the window, so the destination band goes to zero and the header is clipped.",
+      "the_windows_floor_is_a_number_not_a_derivation": "MIN_WINDOW_WIDTH = 1024 is a chosen number; the body's floor is written down nowhere. The consequence: the content is never below 834 px, and the toolbar's breakpoint rule (Wide ≥ 640, Medium 460-640, Narrow < 460) has two branches that can never be reached — the `Narrow` sort label is code that cannot run.",
+      "the_spine_is_protected_by_the_floor_not_by_a_rule": "The spine is 190 px (56 collapsed) and is never squeezed, but nothing narrows it automatically; the user collapses it by hand. The invariant holds by accident, and it would stop holding the moment the floor came down.",
+      "the_zoom_holds_by_construction": "The layout is in logical pixels (the viewport is divided by px(1.0)) and the window's floor is a floor in logical pixels, so at 150 % the physical window grows and the logical composition keeps its room. The caveat: a floor is a request — a tiling compositor, or a screen smaller than the floor, may grant a window that is narrower than the floor. That is why the two levels must be tested separately.",
+      "the_context_surfaces_are_bands_already": "The plate, the log and the spine are bands; the detail is not a card in a column. What is missing is not the shape but the order: nothing makes them give way first."
+    },
+    "the_inventory": "What already exists and is re-used rather than reinvented: the window policy (config.rs, enforced twice — the sanitiser and the compositor), the geometry tokens (ui_metrics.rs), the horizontal division of the space (content_width, one place, tested), the vertical division of the space (nameplate_bounds/nameplate_height, one place, tested), the presentation policy (state/motion.rs — the curves as tokens, the reduced motion, the porteur shared by three surfaces), the keyboard registry (state/keys.rs, the single source of the bindings), and the surfaces themselves (the spine, the body, the plate, the log, the render lab — a surface, not a place)."
+  },
+  "the_decisions_left_to_the_product": [
+    "The window's floor: 1024 stays and the two unreachable branches are deleted, or the floor comes down and the narrow layout is authored.",
+    "The body's floor: the narrowest width at which the catalogue is still a catalogue — the number the window's floor must be derived from.",
+    "The vertical budget's owner: the workspace, as the contract says, or somewhere else.",
+    "The drawer's ceiling: a share of the budget, or a constant."
+  ],
+  "the_artefacts": [
+    {"path": "docs/gpui/CONTRACT-01-SPACE.md", "what": "the contract: the philosophy, the invariants, the primitives, the policies, the ladder, and how a change is judged"},
+    {"path": "docs/gpui/CONTRACT-01-SPACE-AUDIT.md", "what": "the audit: the verdicts, the measurements, the inventory, the findings, the decisions left, and the test plan"},
+    {"path": "Calix.Ui.Gpui/src/views/package_workstation.rs", "what": "the measurement of the composition, and the handles the harness reads the bands through"},
+    {"path": "Calix.Ui.Gpui/src/components/source_bank.rs", "what": "the handle the harness reads the bank's bounds through"},
+    {"path": "README.md", "what": "the two documents in the documentation index"},
+    {"path": "docs/calix-architecture.md", "what": "the pointer: the contract is normative for the composition"}
+  ],
+  "the_gates": {
+    "local": "scripts/verify — PASSED on the dirty tree, run local-verify-20261021T153143Z: 1386 package-manager tests, 392 CLI tests, 245 UI tests",
+    "ci_replay": "scripts/ci-replay --worktree — PASSED inside archlinux:latest on a clean worktree, run local-verify-20261021T153412Z: 1388 package-manager tests, 392 CLI tests, 245 UI tests"
+  },
+  "the_gaps": [
+    "The body's floor is not written down, so the window's floor cannot be derived from it. The audit states the decision; it does not take it.",
+    "The vertical budget has no owner, so the catalogue can be reduced to 6.5 px while the nameplate keeps 260 px. The measurement is in the suite; the fix is a decision, and the fix's shape (the workspace computes the bands, the header's height becomes a token, the station takes its height as an input) is written down but not built.",
+    "The two unreachable branches of the breakpoint rule are still in the code, and the `Narrow` sort label is still code that cannot run.",
+    "The harness cannot lay out the catalogue's `uniform_list`, so the body's own contents are not measured — only the bands around them."
+  ]
+}

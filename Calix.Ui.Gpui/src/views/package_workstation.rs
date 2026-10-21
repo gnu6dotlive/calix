@@ -1247,6 +1247,10 @@ impl Render for PackageWorkstationView {
 
         // The readout: the band where the work happens, in full width.
         let readout = div()
+            .id("workstation_readout")
+            // The handle the audit measures: the harness reads the bounds of
+            // the band under this name. A noop outside the tests.
+            .debug_selector(|| "workstation_readout".to_string())
             .flex()
             .flex_col()
             .w_full()
@@ -1473,6 +1477,10 @@ impl Render for PackageWorkstationView {
 
         // The nameplate: the caption of the readout, in full width, under it.
         let nameplate = div()
+            .id("workstation_nameplate")
+            // The handle the audit measures: the harness reads the bounds of
+            // the band under this name. A noop outside the tests.
+            .debug_selector(|| "workstation_nameplate".to_string())
             .w_full()
             .h(px(effective_nameplate_height))
             .flex_shrink_0()
@@ -1766,5 +1774,139 @@ mod tests {
         // voisins ne coupent pas du même côté quand on inverse le sens.
         assert!(scope_order(NavScope::Results) < scope_order(NavScope::Installed));
         assert!(scope_order(NavScope::Installed) < scope_order(NavScope::Updates));
+    }
+
+    /// La composition, mesurée : ce que la fenêtre donne, ce que les bandes
+    /// prennent, et ce qui reste au catalogue.
+    ///
+    /// C'est l'audit du contrat spatial (CONTRACT-01) rendu exécutable : on
+    /// dessine la vraie station — la banque, la lecture, la plaque — dans
+    /// une fenêtre réelle, et on lit les hauteurs que la fenêtre a
+    /// dessinées.
+    ///
+    /// Le second dessin est le cas qui compte : la station est dans une
+    /// bande plus courte que la fenêtre — ce que fait le tiroir de journal,
+    /// qui prend sa part en bas — et la station continue de mesurer la
+    /// fenêtre. C'est le fait que l'audit constate, et il est mesuré, pas
+    /// supposé.
+    #[gpui::test]
+    fn the_composition_is_measured_in_a_real_window(cx: &mut gpui::TestAppContext) {
+        use gpui::prelude::*;
+        use gpui::{div, point, px, size, Context, Render, Window};
+
+        struct Fixture {
+            station: Entity<PackageWorkstationView>,
+            band: Option<f32>,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let station = self.station.clone();
+                let content = div().size_full().child(station).into_any_element();
+                match self.band {
+                    Some(height) => div()
+                        .w_full()
+                        .h(px(height))
+                        .overflow_hidden()
+                        .child(content)
+                        .into_any_element(),
+                    None => content,
+                }
+            }
+        }
+
+        let session = cx.new(|_| AppSession::new());
+        let store = cx.new(|_| {
+            PackageStore::new(crate::backend::client::CalixClient::default())
+        });
+        let console = cx.new(|_| ConsoleModel::new());
+        let toast_center = cx.new(|_| ToastCenter::new());
+        let station = cx.new(|cx| {
+            PackageWorkstationView::new(
+                session,
+                store,
+                console,
+                toast_center,
+                PackageWorkstationConfig {
+                    theme: Theme::dark(),
+                    reduce_motion: false,
+                    compact: false,
+                    visual_style: VisualStyleId::default(),
+                },
+                cx,
+            )
+        });
+
+        let window = (px(1024.0), px(680.0));
+        let cx = cx.add_empty_window();
+        let fixture = cx.new(|_| Fixture {
+            station: station.clone(),
+            band: None,
+        });
+
+        let draw = |cx: &mut gpui::VisualTestContext| {
+            cx.draw(
+                point(px(0.0), px(0.0)),
+                size(window.0, window.1),
+                |_window, _cx| fixture.clone(),
+            );
+        };
+
+        // ── The whole window: the composition at the window's floor.
+        draw(cx);
+        let bank = cx.debug_bounds("source_bank").expect("the bank is drawn");
+        let readout = cx
+            .debug_bounds("workstation_readout")
+            .expect("the readout is drawn");
+        let nameplate = cx
+            .debug_bounds("workstation_nameplate")
+            .expect("the nameplate is drawn");
+
+        // The three bands fill the window: nothing is lost between them.
+        assert!(
+            (bank.size.height + readout.size.height + nameplate.size.height).floor()
+                <= window.1.floor(),
+            "the bands fit in the window: {} + {} + {} <= {}",
+            bank.size.height,
+            readout.size.height,
+            nameplate.size.height,
+            window.1
+        );
+        assert!(
+            readout.size.height > px(0.0),
+            "the catalogue has room when the window is whole: {}",
+            readout.size.height
+        );
+
+        // ── The same window, with a band shorter than the window: what the
+        //    log drawer does when it opens.
+        let band_height = 372.0;
+        fixture.update(cx, |fixture, _cx| fixture.band = Some(band_height));
+        draw(cx);
+        let squeezed_readout = cx
+            .debug_bounds("workstation_readout")
+            .expect("the readout is drawn");
+        let squeezed_nameplate = cx
+            .debug_bounds("workstation_nameplate")
+            .expect("the nameplate is drawn");
+
+        // The nameplate keeps its share — it does not shrink — and the
+        // catalogue is what disappears.
+        assert!(
+            squeezed_nameplate.size.height >= nameplate.size.height - px(0.5),
+            "the nameplate does not give its share back: {} then {}",
+            nameplate.size.height,
+            squeezed_nameplate.size.height
+        );
+        assert!(
+            squeezed_readout.size.height < readout.size.height,
+            "the catalogue is what shrinks: {} then {}",
+            readout.size.height,
+            squeezed_readout.size.height
+        );
     }
 }

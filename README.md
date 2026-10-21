@@ -590,6 +590,8 @@ recorded only in [`docs/legacy-references.md`](docs/legacy-references.md).
 | [`docs/isolated-builds.md`](docs/isolated-builds.md) | Isolated AUR builds through `systemd-nspawn` |
 | [`docs/flatpak-backend-abi.md`](docs/flatpak-backend-abi.md) | The optional Flatpak backend ABI |
 | [`docs/brand.md`](docs/brand.md) | The mark, the two colourways, and the user's choice |
+| [`docs/gpui/CONTRACT-01-SPACE.md`](docs/gpui/CONTRACT-01-SPACE.md) | The spatial contract: the layers, the invariants, the re-organisation ladder |
+| [`docs/gpui/CONTRACT-01-SPACE-AUDIT.md`](docs/gpui/CONTRACT-01-SPACE-AUDIT.md) | The audit of that contract against the repository, with the measurements |
 | [`docs/gpui/`](docs/gpui/) | The front-end slice kits: the work contracts, the render lab, the UX workbench, and the Slice-07 information architecture and navigation plan |
 | [`docs/legacy-references.md`](docs/legacy-references.md) | The historical name boundary and the rename map |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Architecture overview and how to propose a change |
