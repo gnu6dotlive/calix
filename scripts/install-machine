@@ -107,8 +107,10 @@ step "The verification"
 if [[ $DRY_RUN -eq 1 ]]; then
     echo "  would verify the package, the binaries, the daemon and the services"
 else
-    # The package's own files: none altered, none missing.
-    ALTERED=$(pacman -Qkk calix-gpui-git 2>&1 | grep -c "altered" || true)
+    # The package's own files: none altered, none missing. The lines that
+    # name a file are the ones that matter — the summary line ends with "0
+    # altered files" and would match a naive grep on the word.
+    ALTERED=$(pacman -Qkk calix-gpui-git 2>&1 | grep -cE "^calix-gpui-git: /" || true)
     [[ "$ALTERED" -eq 0 ]] || fail "${ALTERED} files of the package differ from the package's"
     echo "  the package's files are the new ones"
 
