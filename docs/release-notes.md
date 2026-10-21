@@ -1,3 +1,109 @@
+# Calix v0.3.0
+
+Calix v0.3.0 is the **spatial** release. The application now has a written
+contract for where things are, what gives way when the space runs short, and
+what never disappears — and, for the first time, the claims are *measured* on
+the real views rather than asserted.
+
+The contract is published in
+[`docs/gpui/CONTRACT-01-SPACE.md`](docs/gpui/CONTRACT-01-SPACE.md), and the
+audit that confronts it with the repository — with the numbers, and with the
+cases that fail — in
+[`docs/gpui/CONTRACT-01-SPACE-AUDIT.md`](docs/gpui/CONTRACT-01-SPACE-AUDIT.md).
+
+## The priority, stated and enforced
+
+> The layout protects the essential functions before it preserves the secondary
+> ones.
+
+Three layers, in that order of priority: the **spine** (the destinations, the
+search, the primary actions), the **body** (the catalogue), and the
+**context surfaces** (the plate, the log, the metadata).
+
+Before this release, that priority was *inverted*, and the inversion was
+measurable: with the log drawer open, the catalogue fell to **6.5 pixels**
+while its own caption kept 260. The workspace now owns the vertical budget —
+it computes the space once, from the real allocation and the height of the
+chrome, and attributes an explicit height to the station and to the drawer.
+No surface computes its usable height from the whole window when it occupies
+a part of it. In the same 372-pixel band, the catalogue now has **170.5**.
+
+## The window's floor, derived instead of chosen
+
+The minimum was 1024 × 680 — a number nobody had justified. It is now
+**720 × 480**, and it adds up:
+
+```
+495  the row's five fixed columns and its padding
++ 22 the identity glyph, its gap
++ 143 the name, for 90 % of the real packages of a real machine
++ 56  the navigation spine, folded
+= 716 → 720
+```
+
+The catalogue's own minimum is **660 pixels**, and it is measured on the real
+row and on the real package names — the p90 of 1884 installed packages is 143
+pixels of text. The 560 that was tried first does not hold: at 560 the name
+showed six characters. The failing case is kept in the test, not hidden.
+
+## The narrow window, authored
+
+The toolbar's three forms are now three *different* layouts, each measured:
+the wide one says what the commands do (*Sort: Relevance*), the middle one
+says what they are (*Sort: Rel*), and the narrow one their word alone (*Rel*).
+The spine folds itself when the catalogue would lose its room, and takes back
+the user's shape when the window gives it back. There is no maximum: the
+compositor and the work area decide.
+
+## The row's ladder
+
+The row's five fixed columns cost 495 pixels, and the name is what is left.
+The row now gives way in a stated order, expressed in the flex factors so
+that the numbers *are* the order: the source gives way four times as fast as
+the version, the instrument's reading twice, and the size and the state never
+shrink. The name never shrinks, and has a floor of 165 pixels of cell. At 660
+and above the row is exactly the row it was; below, it degrades instead of
+breaking, and nothing is dropped.
+
+## The plate, when the band is too short
+
+Six rows are a catalogue; two are a strip. The catalogue's vertical floor is
+written down, and when the band cannot hold the catalogue *and* the plate's
+chrome, the plate leaves the flow and comes **over** the catalogue, summoned
+by the same edge that used to resize it. The catalogue takes the band whole.
+
+## The movement, and how it is measured
+
+The application moves by one law: a **travel** takes the aller-retour curve,
+an **entry** takes the out curve, and a mark that travels is one *porteur*
+shared by three surfaces — the list's bar, the rail's mark, and the
+commutateur's mark.
+
+The entries ignite on the **distance** they have covered, not on the time
+they have spent. The out curve is front-loaded — at 35 % of the time it has
+already covered 86 % of the path — so an ignition measured in time swallowed
+the gesture before anyone could see it. That was why the plate's tab switch
+looked like a fade and was not one.
+
+Every entry is now measured on the bounds the window actually drew: the
+bank's arrival, the menu's drop, the toast's rise, the plate's cut, and the
+commutateur's mark — each one broken on purpose to prove that the
+measurement can fail.
+
+## What is not proved
+
+- **A 150 % interface scale** is reasoned, not measured: the layout is in
+  logical pixels and the scale factor does not leak into the geometry — which
+  *is* measured — but the test platform's scale factor is fixed at 2.0 and
+  cannot be set to 1.5.
+- **The plate's sheet** is measured in its composition, not in its feel: the
+  bench has no pointer.
+- **The window's floor is a request.** A compositor that grants 600 × 480
+  leaves 544 pixels — under the qualified minimum. The row degrades there
+  now; the catalogue's minimum is still 660.
+
+## What v0.2.5 brought, and what v0.2.4 and v0.2.3 fixed
+
 # Calix v0.2.5
 
 Calix v0.2.5 is the navigation release. The application says where it is: a
@@ -198,122 +304,3 @@ Two things it deliberately does not do:
   or `XDG_RUNTIME_DIR` when that is absolute, and exits otherwise. A machine with no
   desktop session must not grow a bus because a package was installed.
 - **It never fails a package operation.** A missing notification daemon means the
-  notification is dropped, not that the install is rolled back. Only a dropped bus
-  stops the service, and systemd restarts it.
-
-## Migration from Shelly
-
-Calix v0.2.0 was a hard cut from the Shelly name. There is no runtime
-compatibility layer, and Calix does not read the old Shelly paths, environment
-variables or Flatpak ABI names. If you are coming from Shelly, the migration
-below still applies unchanged.
-
-### 1. Remove the old package
-
-Find the package that owns the old executable. If it is not installed, skip this step:
-
-```bash
-pacman -Qo /usr/bin/shelly
-```
-
-Remove that package and its unneeded dependencies through polkit:
-
-```bash
-pkexec pacman -Rns <package-name>
-```
-
-Do this before installing `calix-gpui-git` so the two packages do not compete for the
-same paths.
-
-### 2. Move the user state
-
-Calix uses new paths. Move the old state once; there is no fallback reader. Skip any
-path that does not exist:
-
-```bash
-mv ~/.config/shelly ~/.config/calix
-mv ~/.cache/Shelly ~/.cache/calix
-```
-
-The AppImage metadata database lives inside that config directory, so it moves with it;
-there is no separate copy step. The system cache is moved through polkit, not `sudo`:
-
-```bash
-pkexec mv /var/cache/shelly /var/cache/calix
-```
-
-### 3. Install Calix
-
-From a source checkout:
-
-```bash
-make package
-pkexec pacman -U --noconfirm /tmp/calix-gpui-pkg/*.pkg.tar.zst
-```
-
-The package installs both user services but does not enable them. Enabling a user unit
-is a per-account decision:
-
-```bash
-systemctl --user enable --now calix-daemon.service
-systemctl --user status calix-daemon.service
-```
-
-### 4. Replace the old environment variables
-
-`SHELLY_BIN`, `SHELLY_ELEVATOR`, `SHELLY_CONFIG_DIR` and `SHELLY_APPIMAGE_DB` are now
-`CALIX_BIN`, `CALIX_ELEVATOR`, `CALIX_CONFIG_DIR` and `CALIX_APPIMAGE_DB`. The old names
-are not read.
-
-### 5. Rebuild Flatpak integration
-
-The optional Flatpak backend ABI changed with no aliases:
-
-- `libshelly-flatpak-backend.so.1` is now `libcalix-flatpak-backend.so.1`;
-- `shelly_flatpak_backend_get_api` is now `calix_flatpak_backend_get_api`.
-
-Any external consumer must be rebuilt against the new library.
-
-## Release artifact
-
-The GitHub release contains `calix-gpui-linux-x86_64.tar.gz`, its
-`.sha256` checksum, and a `usr/` tree with:
-
-- `usr/lib/calix/calix`
-- `usr/lib/calix/calix-daemon`
-- `usr/lib/calix/calix-notify`
-- `usr/lib/calix/libcalix-flatpak-backend.so.1`
-- `usr/lib/calix/calix-gpui`
-- `usr/bin/calix`, `usr/bin/calix-daemon` and `usr/bin/calix-notify` symlinks
-- `usr/bin/calix-gpui` wrapper
-- the desktop entry and the polkit policy
-- `usr/share/icons/hicolor/scalable/apps/live.gnu6.calix.svg`, its single-colour
-  variant, and the raster sizes from 16 to 512
-- `usr/lib/systemd/user/calix-daemon.service`
-- `usr/lib/systemd/user/calix-notify.service`
-
-It is not an installer. Use the package recipe or copy the tree deliberately.
-
-## Known limitations
-
-- `calix-daemon` serves inventory and release state on demand; it has no scheduler yet.
-- The tracked-release observation file is still written by the frozen Python bridge.
-- UI mutations cover ALPM, AUR and Flatpak.
-- The navigation is being requalified: the contract is published, the
-  implementation is not. The rail still mixes a scope switch with page
-  navigation, and the current scope is still not named on screen.
-- The list pane's width is clamped to the window it is drawn in, and the
-  clamped value is kept: narrowing the window and widening it back does not
-  restore the width the user had chosen.
-- `calix-notify` is desktop-only: it needs a session bus and a notification daemon.
-  Neither is required for the package manager itself.
-- The bridge was validated against a private D-Bus and then against a live session
-  bus; the rendered toast was not asserted programmatically.
-- Calix is pre-1.0; the backend reports the inherited `3.1.9-dev` string, not the
-  product version.
-
-## Verification
-
-The release commit passed `scripts/verify` and `scripts/ci-replay` locally before the
-tag was pushed, and the published tarball was unpacked and run on the machine that
-found the defects. The same gate runs in `ci.yml`.

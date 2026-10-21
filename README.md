@@ -73,7 +73,7 @@ Five decisions follow from that:
 Every release publishes a tarball and its checksum:
 
 ```bash
-gh release download v0.2.5 --repo gnu6dotlive/calix \
+gh release download v0.3.0 --repo gnu6dotlive/calix \
   --pattern 'calix-gpui-linux-x86_64.tar.gz*'
 sha256sum -c calix-gpui-linux-x86_64.tar.gz.sha256
 mkdir -p /tmp/calix && tar -xzf calix-gpui-linux-x86_64.tar.gz -C /tmp/calix
@@ -520,7 +520,7 @@ more optimistic document elsewhere in the tree, this table is the one to trust.
 | Naming | Complete: code, paths, binaries and packaging use `calix` and `live.gnu6.calix` |
 | Platform | Arch Linux, `x86_64` |
 
-The frontend crate is version `0.2.5`. The Zig backend reports `3.1.9-dev`, a version
+The frontend crate is version `0.2.4`; the release is `v0.3.0`. The Zig backend reports `3.1.9-dev`, a version
 string inherited from the tree it descends from; it is not the Calix product version.
 
 ---
@@ -545,7 +545,10 @@ In rough order of value:
 5. **Cut the frozen Python engine.** Once the watcher is native, `scripts/calix_*.py`
    and the legacy `packaging/systemd/calix-sync.*` units can go.
 
-Just before this list: `v0.2.5` requalified the navigation — a context header
+Just before this list: `v0.3.0` is the spatial release — a written contract
+for the composition, a single owner of the vertical budget, a window's floor
+derived from the measured catalogue, and a narrow layout that is authored
+rather than unreachable. `v0.2.5` requalified the navigation — a context header
 that names the scope, the filters in every scope, and a search box that narrows
 what you are looking at. `v0.2.4` brought the new mark — a chalice whose cup is
 a scallop shell — and the user's choice of colour, which follows the accent of
