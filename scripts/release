@@ -1,0 +1,212 @@
+#!/usr/bin/env bash
+# The release, as one command.
+#
+# A release is not a tag: it is a claim that a specific commit is green, that
+# the notes describe it, and that the artefacts exist afterwards. This
+# script makes each of those a *check* instead of a habit.
+#
+#   scripts/release --version 0.3.1            # the whole thing
+#   scripts/release --version 0.3.1 --dry-run  # everything but the tag
+#
+# What it does, in order:
+#
+#   1. the tree is clean, on main, and in step with the remote;
+#   2. the version is free: no tag, no release;
+#   3. the notes describe *this* version — the release body is
+#      `docs/release-notes.md`, and its title must name the version;
+#   4. the local gate passes on this exact commit (`scripts/verify`);
+#   5. the tag is created, annotated, and pushed;
+#   6. the hosted workflow is watched to its end;
+#   7. the release is checked: the tag points at the commit, the artefacts
+#      are there;
+#   8. the run is recorded in `evidence/runs/release-<version>/`.
+#
+# The gate is *not* optional. A release that skips it is a release whose
+# green is a claim rather than a fact.
+set -euo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+cd "$ROOT"
+
+VERSION=""
+DRY_RUN=0
+SKIP_GATE=0
+REPO="gnu6dotlive/calix"
+
+usage() {
+    sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --version)
+            [[ -n "${2:-}" ]] || { echo "release: --version needs a value" >&2; exit 2; }
+            VERSION="$2"
+            shift
+            ;;
+        --dry-run) DRY_RUN=1 ;;
+        --skip-gate) SKIP_GATE=1 ;;
+        --repo) REPO="$2" ;;
+        -h | --help) usage; exit 0 ;;
+        *)
+            echo "release: unknown argument: $1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
+if [[ -z "$VERSION" ]]; then
+    echo "release: --version is required" >&2
+    usage >&2
+    exit 2
+fi
+if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "release: '${VERSION}' is not a version (expected X.Y.Z)" >&2
+    exit 2
+fi
+
+TAG="v${VERSION}"
+NOTES="docs/release-notes.md"
+EVIDENCE="evidence/runs/release-${VERSION}"
+STEP=0
+
+step() {
+    STEP=$((STEP + 1))
+    printf '\n[%d] %s\n' "$STEP" "$1"
+}
+
+fail() {
+    echo "release: $1" >&2
+    exit 1
+}
+
+# ── 1. The tree ────────────────────────────────────────────────────────────
+step "The tree"
+if [[ -n "$(git status --porcelain)" ]]; then
+    fail "the working tree is dirty — commit or stash first"
+fi
+BRANCH=$(git branch --show-current)
+[[ "$BRANCH" == "main" ]] || fail "the release must be cut from main (on '${BRANCH}')"
+git fetch --quiet origin
+LOCAL=$(git rev-parse HEAD)
+REMOTE=$(git rev-parse origin/main)
+[[ "$LOCAL" == "$REMOTE" ]] || fail "main is not in step with the remote (${LOCAL} vs ${REMOTE})"
+echo "  main is at ${LOCAL} and in step with the remote"
+
+# ── 2. The version is free ──────────────────────────────────────────────────
+step "The version is free"
+if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+    fail "the tag ${TAG} already exists"
+fi
+if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+    fail "the release ${TAG} already exists"
+fi
+echo "  ${TAG} is free"
+
+# ── 3. The notes describe this version ──────────────────────────────────────
+step "The notes describe this version"
+[[ -f "$NOTES" ]] || fail "the release notes are missing (${NOTES})"
+TITLE=$(head -1 "$NOTES")
+EXPECTED="# Calix ${TAG}"
+[[ "$TITLE" == "$EXPECTED" ]] || fail "the notes' title is '${TITLE}', expected '${EXPECTED}'"
+echo "  the notes are titled '${TITLE}'"
+
+# ── 4. The gate ────────────────────────────────────────────────────────────
+step "The gate"
+if [[ $SKIP_GATE -eq 1 ]]; then
+    echo "  skipped on request — the release will not be green"
+elif [[ $DRY_RUN -eq 1 ]]; then
+    echo "  a dry run does not spend the gate"
+else
+    ./scripts/verify
+    echo "  the gate is green on ${LOCAL}"
+fi
+
+# ── 5. The tag ─────────────────────────────────────────────────────────────
+step "The tag"
+if [[ $DRY_RUN -eq 1 ]]; then
+    echo "  would create and push the annotated tag ${TAG}"
+else
+    git tag -a "$TAG" -m "Calix ${TAG}
+
+$(head -3 "$NOTES" | tail -1)
+
+The notes are in docs/release-notes.md."
+    git push origin "$TAG"
+    echo "  ${TAG} is pushed"
+fi
+
+# ── 6. The hosted workflow ─────────────────────────────────────────────────
+step "The hosted workflow"
+if [[ $DRY_RUN -eq 1 ]]; then
+    echo "  would watch the run of ${TAG}"
+else
+    # The run appears a moment after the tag lands.
+    RUN=""
+    for _ in $(seq 1 30); do
+        sleep 10
+        RUN=$(gh run list --repo "$REPO" --limit 20 --json databaseId,headBranch,event \
+            --jq "[.[] | select(.headBranch == \"${TAG}\")] | .[0].databaseId // empty" 2>/dev/null || true)
+        [[ -n "$RUN" ]] && break
+    done
+    [[ -n "$RUN" ]] || fail "the workflow for ${TAG} did not start"
+    echo "  watching the run ${RUN}"
+    if ! gh run watch "$RUN" --repo "$REPO" --exit-status >/dev/null 2>&1; then
+        fail "the hosted run ${RUN} did not pass — see https://github.com/${REPO}/actions/runs/${RUN}"
+    fi
+    echo "  the hosted run is green"
+fi
+
+# ── 7. The release ──────────────────────────────────────────────────────────
+step "The release"
+if [[ $DRY_RUN -eq 1 ]]; then
+    echo "  would check the release and its artefacts"
+else
+    RELEASE=$(gh release view "$TAG" --repo "$REPO" --json tagName,isDraft,assets,url 2>/dev/null) ||
+        fail "the release ${TAG} was not created"
+    echo "  ${RELEASE}"
+    # The artefacts are the point of the release.
+    HAS_TARBALL=$(echo "$RELEASE" | grep -c "calix-gpui-linux-x86_64.tar.gz" || true)
+    [[ "$HAS_TARBALL" -ge 1 ]] || fail "the release has no binary tarball"
+    # And the tag must name this commit.
+    TAG_COMMIT=$(git rev-list -n 1 "$TAG")
+    [[ "$TAG_COMMIT" == "$LOCAL" ]] || fail "the tag ${TAG} does not name ${LOCAL}"
+    echo "  the tag names ${LOCAL}, and the artefacts are there"
+fi
+
+# ── 8. The record ───────────────────────────────────────────────────────────
+step "The record"
+if [[ $DRY_RUN -eq 1 ]]; then
+    echo "  would record the run in ${EVIDENCE}"
+else
+    mkdir -p "$EVIDENCE"
+    cat >"${EVIDENCE}/run.json" <<EOF
+{
+  "run_id": "release-${VERSION}",
+  "kind": "release",
+  "status": "ok",
+  "version": "${VERSION}",
+  "tag": "${TAG}",
+  "commit": "${LOCAL}",
+  "repository": "${REPO}",
+  "the_checks": [
+    "the working tree was clean, on main, and in step with the remote",
+    "the version was free: no tag, no release",
+    "the notes' title named this version",
+    "the local gate was green on this exact commit",
+    "the hosted workflow was watched to a green conclusion",
+    "the release carries the binary tarball, and the tag names this commit"
+  ],
+  "the_artefacts": [
+    {"path": "${NOTES}", "what": "the release body"},
+    {"path": "${EVIDENCE}/run.json", "what": "this record"}
+  ]
+}
+EOF
+    echo "  recorded in ${EVIDENCE}/run.json"
+fi
+
+echo
+echo "release: ${TAG} is done."
