@@ -222,6 +222,9 @@ impl PackageTable {
         };
         div()
             .id("package_row")
+            // The handle the bench measures: the harness reads the bounds of
+            // the row under this name. A noop outside the tests.
+            .debug_selector(|| "package_row".to_string())
             .h(px(row_height))
             .child(Self::render_row(pkg, is_selected, theme, compact, scale_max))
             .on_mouse_down(MouseButton::Left, move |_e, w, cx| on_select(w, cx))
@@ -710,6 +713,139 @@ mod tests {
             name_at_560_without_the_bar >= p90,
             "sans la barre de mesure, le nom du p90 tiendrait à 560 px : {name_at_560_without_the_bar} pour {p90}"
         );
+    }
+
+    /// Le catalogue, qualification : la liste paints ses lignes, et ce
+    /// qu'elles contiennent à chaque largeur.
+    ///
+    /// La qualification de la ligne (§ plus haut) portait sur la ligne
+    /// *seule*. Celle-ci porte sur la **liste** : le vrai `uniform_list`, la
+    /// vraie ligne, et les bornes que la fenêtre a dessinées.
+    ///
+    /// Une leçon du banc, gardée ici : une `uniform_list` dont la hauteur
+    /// n'est pas donnée est posée à **zéro** par le chemin de la mise en
+    /// page mesurée, et ne dessine alors aucune ligne. La liste du
+    /// catalogue reçoit sa hauteur du flex (`flex_1`), que le banc ne
+    /// résout pas ; le banc lui donne donc une hauteur certaine. Ce n'est
+    /// pas une correction du produit : c'est la condition de lecture du
+    /// banc.
+    #[gpui::test]
+    fn the_catalogue_list_draws_its_rows_at_every_width(cx: &mut gpui::TestAppContext) {
+        struct Fixture {
+            theme: Theme,
+            packages: Vec<UnifiedPackage>,
+            width: f32,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let theme = self.theme.clone();
+                let packages = self.packages.clone();
+                let width = self.width;
+                div()
+                    .size_full()
+                    .child(
+                        div()
+                            .w(px(width))
+                            .h(px(300.0))
+                            .child(
+                                uniform_list("catalogue-list", packages.len(), move |range, _w, _cx| {
+                                    range
+                                        .map(|idx| {
+                                            let pkg = &packages[idx];
+                                            PackageTable::render_selectable_row(
+                                                pkg,
+                                                false,
+                                                &theme,
+                                                false,
+                                                u64::MAX,
+                                                std::rc::Rc::new(|_w, _cx| {}),
+                                            )
+                                            .into_any_element()
+                                        })
+                                        .collect::<Vec<_>>()
+                                })
+                                .h(px(300.0)),
+                            ),
+                    )
+                    .into_any_element()
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let theme = Theme::dark();
+        let make = |name: &str| UnifiedPackage {
+            name: name.into(),
+            version: "14.1.0-1".into(),
+            description: "a package".into(),
+            source_type: "ALPM".into(),
+            repository_or_remote: "extra".into(),
+            is_installed: true,
+            has_update: false,
+            new_version: None,
+            inner: UnifiedPackageSource::Standard(AlpmPackage::default()),
+        };
+        let packages = vec![
+            make("7zip"),
+            make("browsers-neo-bin"),
+            make("ruby-power_assert"),
+        ];
+
+        let mut drawn: Vec<(f32, f32, f32)> = Vec::new();
+        for width in [400.0_f32, 480.0, 495.0, 520.0, 560.0, 660.0, 720.0, 800.0] {
+            let fixture = cx.new(|_| Fixture {
+                theme: theme.clone(),
+                packages: packages.clone(),
+                width,
+            });
+            cx.draw(
+                point(px(0.0), px(0.0)),
+                size(px(width.max(200.0)), px(400.0)),
+                |_window, _cx| fixture.clone(),
+            );
+
+            // The row the list drew: its own bounds.
+            let row = cx
+                .debug_bounds("package_row")
+                .expect("the list draws its rows");
+            let row_width: f32 = row.size.width.into();
+            let row_height: f32 = row.size.height.into();
+
+            // The name's cell, in the row the list drew.
+            let cell: f32 = cx
+                .debug_bounds("package_row_name_cell")
+                .map(|bounds| bounds.size.width.into())
+                .unwrap_or(0.0);
+
+            eprintln!("PROBE list at {width}: row {row_width}x{row_height}, name cell {cell}");
+            drawn.push((width, row_width, cell));
+
+            // The row is the real row: its height is the catalogue's.
+            assert_eq!(
+                row_height,
+                crate::ui_metrics::UiMetrics::ROW_HEIGHT_NORMAL,
+                "the list draws the real row, at its real height"
+            );
+        }
+
+        // The row takes the list's width, and the name's cell is what the
+        // fixed columns leave — the same rule as the row alone, now proved
+        // *in the list*.
+        for (width, row_width, cell) in &drawn {
+            assert_eq!(
+                *row_width, *width,
+                "the row takes the list's width: {row_width} in {width}"
+            );
+            let expected = (*width - 495.0).max(0.0);
+            assert!(
+                (cell - expected).abs() < 1.0,
+                "at {width} px, the name's cell is {cell} and the fixed columns leave {expected}"
+            );
+        }
     }
 
     #[test]
