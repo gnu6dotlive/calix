@@ -12,6 +12,7 @@
   "the_measurements": {
     "how": "The test harness draws the real views and reads the bounds the window actually drew, on the first frame of the animation — the animation's state is created at the first placement, so the first measured offset is zero — and again after the travel. Each measurement was broken on purpose to prove it can fail.",
     "the_menu": "the_menu_drops_by_four_pixels_and_lands — 4 px, the surface falls into its anchor and lands. Broken: the displacement removed → 0 px → the test fails.",
+    "the_bank": "the_bank_comes_in_from_below_and_lands — 14 px, the anchor comes in from below and rises into the band; the seven apertures arrive as a wave. Broken: the travel set to zero → 0 px → the test fails.",
     "the_toast": "the_toast_rises_by_eight_pixels_and_lands — 8 px, it rises and lights up. Broken: the displacement removed → 0 px → the test fails.",
     "the_tab_body": "the_tab_body_lands_displaced_and_comes_to_its_place — 32 px, the panel lands off its seat on the side the tab went and closes the distance. Broken: the travel set to zero → 0 px → the test fails.",
     "the_view_mark": "the_fill_travels_from_the_cell_it_left_to_the_cell_it_chose — 28 px, the mark leaves the cell it marked and lands on the cell chosen. Broken: the travel removed → the first frame is already at the destination → the test fails."
@@ -31,6 +32,7 @@
     {"path": "Calix.Ui.Gpui/src/state/motion.rs", "what": "cut_entry now ignites on the distance covered, not on the time spent; the layout probe that measures what an inset does to a flow child, and what it leaves alone; the doc of the law"},
     {"path": "Calix.Ui.Gpui/src/components/view_mode_switcher.rs", "what": "the travelling mark of the view commutateur, its geometry (26/2/28), and the two rules and one measurement"},
     {"path": "Calix.Ui.Gpui/src/components/toast_overlay.rs", "what": "the arrival eased once, and its measurement"},
+    {"path": "Calix.Ui.Gpui/src/components/source_bank.rs", "what": "the wave's arrival, and its measurement"},
     {"path": "Calix.Ui.Gpui/src/components/menu.rs", "what": "the menu's drop, and its measurement"},
     {"path": "Calix.Ui.Gpui/src/views/inspector/mod.rs", "what": "the cut without a fade, the direction of the tab, and the measurement"},
     {"path": "Calix.Ui.Gpui/src/views/package_workstation.rs", "what": "the third porteur: the view mark, and the direction of the cut"},
@@ -38,8 +40,8 @@
     {"path": "docs/gpui/slice-09/05-ACCEPTANCE-MATRIX.md", "what": "A20 corrected, A22 to A24 added, the motion table and the gaps rewritten"}
   ],
   "the_gates": {
-    "local": "scripts/verify — PASSED on the dirty tree, run local-verify-20261021T131848Z: 1386 package-manager tests, 392 CLI tests, 243 UI tests",
-    "ci_replay": "scripts/ci-replay --worktree — PASSED inside archlinux:latest on a clean worktree, run local-verify-20261021T132122Z: 1388 package-manager tests, 392 CLI tests, 243 UI tests"
+    "local": "scripts/verify — PASSED on the dirty tree, run local-verify-20261021T133158Z: 1386 package-manager tests, 392 CLI tests, 244 UI tests",
+    "ci_replay": "scripts/ci-replay --worktree — PASSED inside archlinux:latest on a clean worktree, run local-verify-20261021T133420Z: 1388 package-manager tests, 392 CLI tests, 244 UI tests"
   },
   "the_gaps": [
     "The carrier's geometry inside the virtualised list is still proved by the rule (`carrier_top`) and by the frames: a `uniform_list` does not resolve its layout in the test harness, so it cannot be measured the way the four entries above were.",

@@ -45,6 +45,19 @@ fn aperture_id(kind: PackageSourceKind) -> &'static str {
     }
 }
 
+/// The name the proof measures the aperture under, one per source.
+fn aperture_selector(kind: PackageSourceKind) -> &'static str {
+    match kind {
+        PackageSourceKind::Alpm => "aperture-alpm",
+        PackageSourceKind::Aur => "aperture-aur",
+        PackageSourceKind::Flatpak => "aperture-flatpak",
+        PackageSourceKind::AppImage => "aperture-appimage",
+        PackageSourceKind::Cargo => "aperture-cargo",
+        PackageSourceKind::Npm => "aperture-npm",
+        PackageSourceKind::Release => "aperture-release",
+    }
+}
+
 /// The id of the count, one per source.
 fn count_id(kind: PackageSourceKind) -> &'static str {
     match kind {
@@ -121,6 +134,9 @@ impl SourceBank {
 
         let aperture = div()
             .id(aperture_id(kind))
+            // The handle the proof measures: the harness reads the bounds of
+            // the aperture under this name. A noop outside the tests.
+            .debug_selector(move || aperture_selector(kind).to_string())
             .flex()
             .flex_col()
             .gap(px(2.0))
@@ -327,5 +343,92 @@ impl SourceBank {
             .border_color(theme.border)
             .bg(theme.bg_app)
             .children(apertures)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{aperture_selector, SourceBank, SourceBankProps};
+    use crate::state::package_store::SourceHealthMap;
+    use crate::state::query::SourceScope;
+    use crate::state::sources::{source_axis, SourceAxisEntry};
+    use crate::state::{NavScope, PackageSourceKind};
+    use crate::theme::Theme;
+    use gpui::prelude::*;
+    use gpui::{div, point, px, size, Context, Render, Window};
+    use std::rc::Rc;
+
+    /// L'arrivée de la banque, mesurée sur l'image : les sept ouvertures
+    /// viennent par en dessous, et l'ancre voyage plus loin que les autres.
+    ///
+    /// La première image est prise dans l'image même où l'animation naît —
+    /// l'état de l'animation est créé au premier placement, donc le premier
+    /// écart vaut zéro — et la seconde après la vague.
+    #[gpui::test]
+    fn the_bank_comes_in_from_below_and_lands(cx: &mut gpui::TestAppContext) {
+        struct Fixture {
+            theme: Theme,
+            axis: Vec<SourceAxisEntry>,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let theme = self.theme.clone();
+                let health = SourceHealthMap::default();
+                div().size_full().child(SourceBank::render(SourceBankProps {
+                    axis: &self.axis,
+                    source_health: &health,
+                    theme: &theme,
+                    epoch: 4,
+                    reduce_motion: false,
+                    on_toggle: Rc::new(|_, _, _| {}),
+                    on_retry: Rc::new(|_, _, _| {}),
+                }))
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        // An axis with rows: the first source is the anchor, the others are
+        // lighter, and the empty ones are the lightest of all.
+        let axis = source_axis(NavScope::Installed, &[], &SourceScope::all());
+        let anchor = crate::state::anchor_index(&axis);
+        let selector = aperture_selector(PackageSourceKind::ALL[anchor]);
+        let fixture = cx.new(|_| Fixture {
+            theme: Theme::dark(),
+            axis,
+        });
+
+        let draw = |cx: &mut gpui::VisualTestContext| {
+            cx.draw(
+                point(px(0.0), px(0.0)),
+                size(px(1080.0), px(200.0)),
+                |_window, _cx| fixture.clone(),
+            );
+        };
+
+        draw(cx);
+        let departure = cx
+            .debug_bounds(selector)
+            .expect("la banque est dessinée");
+
+        // La vague dure un peu plus de 400 ms ; on attend plus, et on dessine
+        // encore.
+        std::thread::sleep(std::time::Duration::from_millis(700));
+        draw(cx);
+        let arrival = cx
+            .debug_bounds(selector)
+            .expect("la banque est dessinée");
+
+        // L'ancre est venue de plus bas que les autres : elle porte le
+        // plus de lignes, et son voyage est le plus long.
+        assert_eq!(
+            departure.origin.y - arrival.origin.y,
+            px(14.0),
+            "l'ancre est arrivée quatorze pixels plus bas, et elle est montée à sa place"
+        );
     }
 }
