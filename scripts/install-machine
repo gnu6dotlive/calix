@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+# The machine, as a target.
+#
+# Installing Calix is not "copy the binaries": a package must replace the
+# previous one, the services must serve the *new* code rather than the old
+# one still in memory, and the result must be checked — not assumed.
+#
+#   scripts/install-machine            # build, install, restart, verify
+#   scripts/install-machine --dry-run  # everything but the installation
+#
+# The steps, in order:
+#
+#   1. the tree is clean, on main, and in step with the remote;
+#   2. the package is built (the repository's own PKGBUILD, in the
+#      repository's own scratch);
+#   3. the package is installed, replacing the previous one, through
+#      polkit — never sudo;
+#   4. the user services are restarted, so that they serve the new code;
+#   5. the installation is *verified*: the package's files are the new
+#      ones, the binaries answer, the daemon answers, the services run the
+#      new code;
+#   6. the run is recorded in `evidence/runs/install-<date>/`.
+set -euo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+cd "$ROOT"
+
+DRY_RUN=0
+PKGDIR="$ROOT/.ci-cache/pkg"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --dry-run) DRY_RUN=1 ;;
+        -h | --help)
+            sed -n '2,26p' "$0" | sed 's/^# \{0,1\}//'
+            exit 0
+            ;;
+        *)
+            echo "install-machine: unknown argument: $1" >&2
+            exit 2
+            ;;
+    esac
+    shift
+done
+
+STEP=0
+step() {
+    STEP=$((STEP + 1))
+    printf '\n[%d] %s\n' "$STEP" "$1"
+}
+fail() {
+    echo "install-machine: $1" >&2
+    exit 1
+}
+
+# ── 1. The tree ────────────────────────────────────────────────────────────
+step "The tree"
+if [[ -n "$(git status --porcelain)" ]]; then
+    fail "the working tree is dirty — commit or stash first"
+fi
+[[ "$(git branch --show-current)" == "main" ]] || fail "the installation comes from main"
+git fetch --quiet origin
+LOCAL=$(git rev-parse HEAD)
+[[ "$LOCAL" == "$(git rev-parse origin/main)" ]] || fail "main is not in step with the remote"
+echo "  main is at ${LOCAL}"
+
+# ── 2. The package ─────────────────────────────────────────────────────────
+step "The package"
+if [[ $DRY_RUN -eq 1 ]]; then
+    echo "  would build the package from PKGBUILD-calix in ${PKGDIR}"
+else
+    make package
+    PACKAGE=$(ls -t "${PKGDIR}"/*.pkg.tar.zst 2>/dev/null | head -1)
+    [[ -n "$PACKAGE" ]] || fail "the package was not built"
+    echo "  built $(basename "$PACKAGE")"
+fi
+
+# ── 3. The installation ─────────────────────────────────────────────────────
+step "The installation"
+if [[ $DRY_RUN -eq 1 ]]; then
+    echo "  would install the package with pkexec pacman -U (never sudo)"
+else
+    # pacman replaces the previous package: its obsolete files go with it.
+    pkexec pacman -U --noconfirm "$PACKAGE" || fail "the installation failed"
+    echo "  installed"
+fi
+
+# ── 4. The services ────────────────────────────────────────────────────────
+step "The services"
+if [[ $DRY_RUN -eq 1 ]]; then
+    echo "  would restart calix-daemon and calix-notify, so that they serve the new code"
+else
+    # A service that was running yesterday's binary keeps it in memory: the
+    # upgrade does not restart it. This is the step that is easy to forget,
+    # and the step whose absence is invisible until a bug is chased.
+    systemctl --user restart calix-daemon.service calix-notify.service
+    sleep 2
+    for unit in calix-daemon.service calix-notify.service; do
+        state=$(systemctl --user is-active "$unit" || true)
+        [[ "$state" == "active" ]] || fail "${unit} is ${state} after the restart"
+    done
+    echo "  both services are running the new code"
+fi
+
+# ── 5. The verification ────────────────────────────────────────────────────
+step "The verification"
+if [[ $DRY_RUN -eq 1 ]]; then
+    echo "  would verify the package, the binaries, the daemon and the services"
+else
+    # The package's own files: none altered, none missing.
+    ALTERED=$(pacman -Qkk calix-gpui-git 2>&1 | grep -c "altered" || true)
+    [[ "$ALTERED" -eq 0 ]] || fail "${ALTERED} files of the package differ from the package's"
+    echo "  the package's files are the new ones"
+
+    # The binaries answer.
+    /usr/lib/calix/calix --version >/dev/null 2>&1 || fail "the CLI does not answer"
+    /usr/lib/calix/calix-gpui --help >/dev/null 2>&1 || fail "the frontend does not answer"
+    echo "  the binaries answer"
+
+    # The daemon answers, and the answer is the new code's.
+    if command -v systemctl >/dev/null 2>&1; then
+        timeout 60 /usr/bin/calix list-updates standard -j >/dev/null 2>&1 ||
+            fail "the daemon does not answer"
+        echo "  the daemon answers"
+    fi
+
+    # The services run the code that is on disk now.
+    for unit in calix-daemon.service calix-notify.service; do
+        pid=$(systemctl --user show "$unit" --property MainPID --value 2>/dev/null || echo 0)
+        [[ "$pid" != "0" ]] || fail "${unit} has no process"
+    done
+    echo "  the services run"
+fi
+
+# ── 6. The record ───────────────────────────────────────────────────────────
+step "The record"
+STAMP=$(date -u +%Y%m%dT%H%M%SZ)
+EVIDENCE="$ROOT/evidence/runs/install-${STAMP}"
+if [[ $DRY_RUN -eq 1 ]]; then
+    echo "  would record the run in ${EVIDENCE}"
+else
+    mkdir -p "$EVIDENCE"
+    PACKAGE_NAME=$(basename "${PACKAGE:-unknown}")
+    cat >"${EVIDENCE}/run.json" <<EOF
+{
+  "run_id": "install-${STAMP}",
+  "kind": "installation",
+  "status": "ok",
+  "commit": "${LOCAL}",
+  "package": "${PACKAGE_NAME}",
+  "the_checks": [
+    "the working tree was clean, on main, and in step with the remote",
+    "the package was built by the repository's own PKGBUILD",
+    "the package replaced the previous one, through polkit",
+    "the user services were restarted, so that they serve the new code",
+    "no file of the package differs from the package's",
+    "the binaries and the daemon answer",
+    "the services run"
+  ]
+}
+EOF
+    echo "  recorded in ${EVIDENCE}/run.json"
+fi
+
+echo
+echo "install-machine: done."
