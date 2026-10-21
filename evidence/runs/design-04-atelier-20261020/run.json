@@ -1,0 +1,68 @@
+{
+  "run_id": "design-04-atelier-20261020",
+  "kind": "design",
+  "status": "ok",
+  "started_at": "2026-10-20T20:05:00Z",
+  "finished_at": "2026-10-20T20:40:00Z",
+  "objective": "Design proposal 04 of 4: L'Atelier, a package manager for Arch as a workbench. One 1600x1000 dark desktop screen, the FigCraft source, and the rationale.",
+  "inputs": {
+    "brief": "evidence/design-proposals/00-BRIEFS.md, brief 4",
+    "tokens": "the design-system tokens taken as they are: anthracite #111418, shell white #F7F3ED, muted #A1A6AD, slate #667085, signal orange 100 #FFE5D2 / 300 #FF8E40 / base #FF6A00 / 700 #C95400, royal blue 300 #87A0F4 / base #4169E1",
+    "derivation_rule": "every intermediate tone is mix(anthracite, shell-white) or mix(slate, ...) at a stated ratio; no hue outside the tokens was invented"
+  },
+  "the_decision": {
+    "the_two_axes": "sources are trays in a permanent left column; the operations are tools in a rail across the top of the work surface",
+    "the_third_operation": "remove is a verb on a selected package, so it lives on the inspection card, not on the rail",
+    "the_mark": "a scallop shell of nine ribs in a metal cup on a brushed aluminium stem, 70px tall in the header",
+    "the_empty_bench": "the seventh tray is an empty dashed slot that suggests a search, and the mat carries a second EMPTY SLOT card naming the kind of package that would fit there"
+  },
+  "what_was_built": {
+    "generator": "build.py (emits build.jsonl; every layer is a figcraft command)",
+    "commands": 363,
+    "layers": 363
+  },
+  "how": [
+    "python3 build.py",
+    "figcraft-cli run build.jsonl --out 04-atelier.figcraft",
+    "figcraft-cli export 04-atelier.figcraft -o 04-atelier.png --scale 1",
+    "the PNG was read back and corrected six times: the mark (three passes on the shell geometry), the noise effect painting over a rotated frame's children, the fade over the settling scroll, the header breadcrumb, the keyboard legend, the density switch"
+  ],
+  "artefacts": [
+    {
+      "path": "evidence/design-proposals/04-atelier.png",
+      "sha256": "938fc3ccdadfa4ead60a7f03b8918bd63677086c779d904e2f0b2c3a5c2e93a5",
+      "size": "1600x1000"
+    },
+    {
+      "path": "evidence/design-proposals/04-atelier.figcraft",
+      "sha256": "d2f6bc02255cbd5812115dc3ccef1ce5b0a55d5c7a7b65e4c8483fef6561e87f"
+    },
+    {
+      "path": "evidence/design-proposals/04-atelier.md",
+      "note": "the rationale: navigation, material, motion, and the second pass"
+    },
+    {
+      "path": "evidence/design-proposals/notes/04-atelier.md",
+      "note": "one question for the other three authors"
+    },
+    {
+      "path": "evidence/runs/design-04-atelier-20261020/build.jsonl",
+      "sha256": "040532796b47db769123dc6916152455376f5cd761f9da410fe10d205930dc1d",
+      "note": "the figcraft command log the .figcraft was built from"
+    },
+    {
+      "path": "evidence/runs/design-04-atelier-20261020/build.py",
+      "sha256": "9111dfdb296b2199da85d9db6ac87a4637e6545063125cde5ed067d4dc946fdc",
+      "note": "the generator"
+    }
+  ],
+  "rules_kept": [
+    "the Calix application code was not opened, the running application was not started, and no screenshot of it was looked for: the proposal comes from the brief alone",
+    "no GitHub Actions were used",
+    "no privileged commands were used"
+  ],
+  "known_gaps": [
+    "the fonts are system fonts (IBM Plex Sans, IBM Plex Sans Condensed, IBM Plex Mono); a render on a machine without them falls back",
+    "the cutting-mat green of the brief was not used: a green is not in the token set, so the mat carries the grid and a slate tint instead"
+  ]
+}

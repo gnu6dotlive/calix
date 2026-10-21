@@ -1,0 +1,419 @@
+{"command": "frame.create", "params": {"x": 0, "y": 0, "width": 1600, "height": 1000, "name": "CALIX \u2014 L'Atelier", "props": {"fill": "#111418"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 0, "width": 1600, "height": 92, "parent": {"$step": 0}, "props": {"fill": "#191C1F"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 1}], "props": {"fills": [{"type": "linearGradient", "stops": ["#232629", "#16181C"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 1}], "effect": {"type": "noise", "opacity": 0.05}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 1}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.55, "offset": [0, 10], "radius": 22, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 90, "width": 1600, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708573"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 91, "width": 1600, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#F7F3ED0F"}}}
+{"command": "vector.create", "params": {"path": "M 30.40 23.60 C 42.50 30.20 75.50 30.20 87.60 23.60 L 87.60 30.20 C 75.50 37.90 42.50 37.90 30.40 30.20 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#4B5362"}}}
+{"command": "vector.create", "params": {"path": "M 59.00 45.60 Q 55.70 39.00 28.66 21.90 C 31.34 18.42 33.31 20.35 32.52 19.58 C 33.31 20.35 31.34 18.42 34.77 15.68 C 38.17 12.90 39.64 15.22 39.05 14.29 C 39.64 15.22 38.17 12.90 42.12 11.00 C 46.06 9.05 46.97 11.64 46.61 10.60 C 46.97 11.64 46.06 9.05 50.34 8.09 C 54.61 7.07 54.92 9.81 54.80 8.71 C 54.92 9.81 54.61 7.07 59.00 7.10 C 63.39 7.07 63.08 9.81 63.20 8.71 C 63.08 9.81 63.39 7.07 67.66 8.09 C 71.94 9.05 71.03 11.64 71.39 10.60 C 71.03 11.64 71.94 9.05 75.88 11.00 C 79.83 12.90 78.36 15.22 78.95 14.29 C 78.36 15.22 79.83 12.90 83.23 15.68 C 86.66 18.42 84.69 20.35 85.48 19.58 C 84.69 20.35 86.66 18.42 89.34 21.90 Q 62.30 39.00 89.34 21.90 Q 61.20 47.25 59.00 45.60 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FF6A00"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 8}], "props": {"fills": [{"type": "linearGradient", "stops": ["#FF8E40", "#FF6A00", "#C95400"], "from": [0.05, 0], "to": [0.95, 1]}]}}}
+{"command": "vector.create", "params": {"path": "M 28.66 21.90 C 31.34 18.42 33.31 20.35 32.52 19.58 C 33.31 20.35 31.34 18.42 34.77 15.68 C 38.17 12.90 39.64 15.22 39.05 14.29 C 39.64 15.22 38.17 12.90 42.12 11.00 C 46.06 9.05 46.97 11.64 46.61 10.60 C 46.97 11.64 46.06 9.05 50.34 8.09 C 54.61 7.07 54.92 9.81 54.80 8.71 C 54.92 9.81 54.61 7.07 59.00 7.10 C 63.39 7.07 63.08 9.81 63.20 8.71 C 63.08 9.81 63.39 7.07 67.66 8.09 C 71.94 9.05 71.03 11.64 71.39 10.60 C 71.03 11.64 71.94 9.05 75.88 11.00 C 79.83 12.90 78.36 15.22 78.95 14.29 C 78.36 15.22 79.83 12.90 83.23 15.68 C 86.66 18.42 84.69 20.35 85.48 19.58 C 84.69 20.35 86.66 18.42 89.34 21.90", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#FFE5D2", "strokeWeight": 0.77, "opacity": 0.38}}}
+{"command": "vector.create", "params": {"path": "M 59.00 45.60 L 29.74 24.11 L 31.07 22.41 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 59.00 45.60 L 35.33 18.08 L 37.00 16.72 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 59.00 45.60 L 42.13 13.46 L 44.06 12.52 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 59.00 45.60 L 49.79 10.49 L 51.89 10.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 59.00 45.60 L 57.92 9.32 L 60.08 9.32 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 59.00 45.60 L 66.11 10.00 L 68.21 10.49 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 59.00 45.60 L 73.94 12.52 L 75.87 13.46 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 59.00 45.60 L 81.00 16.72 L 82.67 18.08 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 59.00 45.60 L 86.93 22.41 L 88.26 24.11 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 56.25 42.90 L 33.31 20.35", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.7150000000000001, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 56.93 42.35 L 39.64 15.22", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.7150000000000001, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 57.71 41.97 L 46.97 11.64", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.7150000000000001, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 58.56 41.77 L 54.92 9.81", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.7150000000000001, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 59.44 41.77 L 63.08 9.81", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.7150000000000001, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 60.29 41.97 L 71.03 11.64", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.7150000000000001, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 61.07 42.35 L 78.36 15.22", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.7150000000000001, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 61.75 42.90 L 84.69 20.35", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.7150000000000001, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 30.40 30.20 C 42.50 37.90 75.50 37.90 87.60 30.20 C 86.50 48.90 76.60 56.05 65.60 56.60 L 52.40 56.60 C 41.40 56.05 31.50 48.90 30.40 30.20 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#667085"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 28}], "props": {"fills": [{"type": "linearGradient", "stops": ["#B6B8BE", "#667085", "#404754"], "from": [0.05, 0], "to": [0.25, 1]}]}}}
+{"command": "vector.create", "params": {"path": "M 30.40 30.20 C 42.50 37.90 75.50 37.90 87.60 30.20", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#B6B8BE", "strokeWeight": 1.54, "opacity": 0.9}}}
+{"command": "shape.rectangle", "params": {"x": 56.25, "y": 56.050000000000004, "width": 5.5, "height": 14.850000000000001, "parent": {"$step": 0}, "props": {"fill": "#667085", "cornerRadius": 1.1}}}
+{"command": "node.set", "params": {"ids": [{"$step": 31}], "props": {"fills": [{"type": "linearGradient", "stops": ["#B6B8BE", "#404754", "#B6B8BE"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "vector.create", "params": {"path": "M 56.25 70.35 L 61.75 70.35 L 66.70 73.65 L 51.30 73.65 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#667085"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 33}], "props": {"fills": [{"type": "linearGradient", "stops": ["#B6B8BE", "#404754"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "shape.ellipse", "params": {"x": 46.900000000000006, "y": 72.0, "width": 24.200000000000003, "height": 5.5, "parent": {"$step": 0}, "props": {"fill": "#667085"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 35}], "props": {"fills": [{"type": "linearGradient", "stops": ["#B6B8BE", "#404754"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "text.create", "params": {"text": "CALIX", "x": 112, "y": 19.11, "parent": {"$step": 0}, "props": {"fontSize": 33, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3ED", "letterSpacing": "0.16"}}}
+{"command": "shape.rectangle", "params": {"x": 113, "y": 62, "width": 46, "height": 3, "parent": {"$step": 0}, "props": {"fill": "#FF6A00", "cornerRadius": 1.5}}}
+{"command": "shape.rectangle", "params": {"x": 266, "y": 22, "width": 1, "height": 48, "parent": {"$step": 0}, "props": {"fill": "#66708580"}}}
+{"command": "text.create", "params": {"text": "TRAY", "x": 296, "y": 32.035, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD", "letterSpacing": "0.14"}}}
+{"command": "shape.rectangle", "params": {"x": 332, "y": 31, "width": 8, "height": 8, "parent": {"$step": 0}, "props": {"fill": "#FF6A00"}}}
+{"command": "text.create", "params": {"text": "ALPM", "x": 348, "y": 21.07, "parent": {"$step": 0}, "props": {"fontSize": 21, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3ED", "letterSpacing": "0.04"}}}
+{"command": "text.create", "params": {"text": "\u203a", "x": 406, "y": 21.73, "parent": {"$step": 0}, "props": {"fontSize": 19, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADB2"}}}
+{"command": "text.create", "params": {"text": "TOOL", "x": 430, "y": 32.035, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD", "letterSpacing": "0.14"}}}
+{"command": "text.create", "params": {"text": "FIND", "x": 464, "y": 21.07, "parent": {"$step": 0}, "props": {"fontSize": 21, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#FF6A00", "letterSpacing": "0.04"}}}
+{"command": "text.create", "params": {"text": "\u203a", "x": 520, "y": 21.73, "parent": {"$step": 0}, "props": {"fontSize": 19, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADB2"}}}
+{"command": "text.create", "params": {"text": "FILTER", "x": 544, "y": 32.035, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD", "letterSpacing": "0.14"}}}
+{"command": "text.create", "params": {"text": "name ~ z", "x": 596, "y": 24.72, "parent": {"$step": 0}, "props": {"fontSize": 16, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED"}}}
+{"command": "text.create", "params": {"text": "INDEX FRESHNESS", "x": 1290, "y": 22.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD", "letterSpacing": "0.14"}}}
+{"command": "shape.ellipse", "params": {"x": 1290, "y": 40, "width": 8, "height": 8, "parent": {"$step": 0}, "props": {"fill": "#FF8E40"}}}
+{"command": "text.create", "params": {"text": "4 MIN OLD", "x": 1306, "y": 37.05, "parent": {"$step": 0}, "props": {"fontSize": 15, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3ED", "letterSpacing": "0.04"}}}
+{"command": "text.create", "params": {"text": "\u00b7  20:14:09", "x": 1404, "y": 37.71, "parent": {"$step": 0}, "props": {"fontSize": 13, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 92, "width": 292, "height": 764, "parent": {"$step": 0}, "props": {"fill": "#15181C"}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 53}], "effect": {"type": "noise", "opacity": 0.06}}}
+{"command": "shape.rectangle", "params": {"x": 291, "y": 92, "width": 1, "height": 764, "parent": {"$step": 0}, "props": {"fill": "#66708547"}}}
+{"command": "text.create", "params": {"text": "TRAYS", "x": 24, "y": 117.38, "parent": {"$step": 0}, "props": {"fontSize": 14, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3ED", "letterSpacing": "0.18"}}}
+{"command": "text.create", "params": {"text": "7 SOURCES", "x": 148, "y": 117.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD", "letterSpacing": "0.12", "width": 120, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 132, "width": 244, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#6670852E"}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 148, "width": 244, "height": 62, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 6, "stroke": "#FF6A0080", "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 59}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.55, "offset": [6, 8], "radius": 16, "spread": 0}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 59}], "effect": {"type": "noise", "opacity": 0.05}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 156, "width": 3, "height": 46, "parent": {"$step": 0}, "props": {"fill": "#FF6A00", "cornerRadius": 1.5}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 62}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.6, "offset": [0, 0], "radius": 6, "spread": 0}}}
+{"command": "text.create", "params": {"text": "ALPM", "x": 40, "y": 167.38, "parent": {"$step": 0}, "props": {"fontSize": 14, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3ED", "letterSpacing": "0.14"}}}
+{"command": "text.create", "params": {"text": "1,284", "x": 212, "y": 168.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF6A00", "width": 56, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "core \u00b7 extra \u00b7 multilib", "x": 40, "y": 190.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADC7"}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 220, "width": 244, "height": 62, "parent": {"$step": 0}, "props": {"fill": "#191C1F", "cornerRadius": 6, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 67}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.4, "offset": [0, 3], "radius": 8, "spread": 0}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 67}], "effect": {"type": "noise", "opacity": 0.05}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 228, "width": 3, "height": 46, "parent": {"$step": 0}, "props": {"fill": "#66708599", "cornerRadius": 1.5}}}
+{"command": "text.create", "params": {"text": "AUR", "x": 40, "y": 239.38, "parent": {"$step": 0}, "props": {"fontSize": 14, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#AEB2B7", "letterSpacing": "0.14"}}}
+{"command": "text.create", "params": {"text": "8,431", "x": 212, "y": 240.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD", "width": 56, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "recipes, not binaries", "x": 40, "y": 262.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADC7"}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 292, "width": 244, "height": 62, "parent": {"$step": 0}, "props": {"fill": "#191C1F", "cornerRadius": 6, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 74}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.4, "offset": [0, 3], "radius": 8, "spread": 0}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 74}], "effect": {"type": "noise", "opacity": 0.05}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 300, "width": 3, "height": 46, "parent": {"$step": 0}, "props": {"fill": "#66708599", "cornerRadius": 1.5}}}
+{"command": "text.create", "params": {"text": "FLATPAK", "x": 40, "y": 311.38, "parent": {"$step": 0}, "props": {"fontSize": 14, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#AEB2B7", "letterSpacing": "0.14"}}}
+{"command": "text.create", "params": {"text": "96", "x": 212, "y": 312.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD", "width": 56, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "sandboxed applications", "x": 40, "y": 334.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADC7"}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 364, "width": 244, "height": 62, "parent": {"$step": 0}, "props": {"fill": "#191C1F", "cornerRadius": 6, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 81}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.4, "offset": [0, 3], "radius": 8, "spread": 0}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 81}], "effect": {"type": "noise", "opacity": 0.05}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 372, "width": 3, "height": 46, "parent": {"$step": 0}, "props": {"fill": "#66708599", "cornerRadius": 1.5}}}
+{"command": "text.create", "params": {"text": "APPIMAGE", "x": 40, "y": 383.38, "parent": {"$step": 0}, "props": {"fontSize": 14, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#AEB2B7", "letterSpacing": "0.14"}}}
+{"command": "text.create", "params": {"text": "41", "x": 212, "y": 384.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD", "width": 56, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "self-contained binaries", "x": 40, "y": 406.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADC7"}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 436, "width": 244, "height": 62, "parent": {"$step": 0}, "props": {"fill": "#191C1F", "cornerRadius": 6, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 88}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.4, "offset": [0, 3], "radius": 8, "spread": 0}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 88}], "effect": {"type": "noise", "opacity": 0.05}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 444, "width": 3, "height": 46, "parent": {"$step": 0}, "props": {"fill": "#66708599", "cornerRadius": 1.5}}}
+{"command": "text.create", "params": {"text": "CARGO", "x": 40, "y": 455.38, "parent": {"$step": 0}, "props": {"fontSize": 14, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#AEB2B7", "letterSpacing": "0.14"}}}
+{"command": "text.create", "params": {"text": "612", "x": 212, "y": 456.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD", "width": 56, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "crates.io \u00b7 rust", "x": 40, "y": 478.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADC7"}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 508, "width": 244, "height": 62, "parent": {"$step": 0}, "props": {"fill": "#191C1F", "cornerRadius": 6, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 95}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.4, "offset": [0, 3], "radius": 8, "spread": 0}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 95}], "effect": {"type": "noise", "opacity": 0.05}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 516, "width": 3, "height": 46, "parent": {"$step": 0}, "props": {"fill": "#66708599", "cornerRadius": 1.5}}}
+{"command": "text.create", "params": {"text": "NPM", "x": 40, "y": 527.38, "parent": {"$step": 0}, "props": {"fontSize": 14, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#AEB2B7", "letterSpacing": "0.14"}}}
+{"command": "text.create", "params": {"text": "1,308", "x": 212, "y": 528.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD", "width": 56, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "global node packages", "x": 40, "y": 550.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADC7"}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 580, "width": 244, "height": 62, "parent": {"$step": 0}, "props": {"fill": "#14171B", "cornerRadius": 6, "stroke": "#6670856B", "strokeWeight": 1, "dashes": [5, 4]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 102}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.5, "offset": [0, 3], "radius": 7}}}
+{"command": "text.create", "params": {"text": "TRACKED RELEASES", "x": 40, "y": 599.875, "parent": {"$step": 0}, "props": {"fontSize": 12.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADD9", "letterSpacing": "0.14"}}}
+{"command": "text.create", "params": {"text": "\u2318F TO FOLLOW A RELEASE", "x": 40, "y": 622.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF6A00BF", "letterSpacing": "0.08"}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 660, "width": 244, "height": 88, "parent": {"$step": 0}, "props": {"fill": "#16191D", "cornerRadius": 6, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "THE RULE OF THE BENCH", "x": 40, "y": 676.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADE6", "letterSpacing": "0.16"}}}
+{"command": "text.create", "params": {"text": "A TRAY HOLDS ONLY ITS OWN KIND.", "x": 40, "y": 696.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADD9"}}}
+{"command": "text.create", "params": {"text": "A FLATPAK IS NEVER UPDATED", "x": 40, "y": 714.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADD9"}}}
+{"command": "text.create", "params": {"text": "FROM A CARGO TRAY.", "x": 40, "y": 732.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADD9"}}}
+{"command": "text.create", "params": {"text": "\u2325\u2190  \u2325\u2192   MOVE BETWEEN TRAYS", "x": 24, "y": 768.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085F2"}}}
+{"command": "text.create", "params": {"text": "\u23181 \u23182 \u23183   PICK A TOOL", "x": 24, "y": 788.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085F2"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 104, "width": 900, "height": 80, "parent": {"$step": 0}, "props": {"fill": "#1C1F23", "cornerRadius": 8, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "node.set", "params": {"ids": [{"$step": 113}], "props": {"fills": [{"type": "linearGradient", "stops": ["#282A2D", "#181B1E"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 113}], "effect": {"type": "noise", "opacity": 0.07}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 113}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.45, "offset": [0, 3], "radius": 10}}}
+{"command": "shape.rectangle", "params": {"x": 317, "y": 105, "width": 898, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#F7F3ED14"}}}
+{"command": "shape.rectangle", "params": {"x": 332, "y": 112, "width": 158, "height": 56, "parent": {"$step": 0}, "props": {"fill": "#2A2D2F", "cornerRadius": 8, "stroke": "#FF6A008C", "strokeWeight": 1, "rotation": -2.2}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 118}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.65, "offset": [8, 20], "radius": 24, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 339, "y": 110.5, "width": 142, "height": 3, "parent": {"$step": 0}, "props": {"fill": "#FF6A00", "cornerRadius": 1.5, "rotation": -2.2}}}
+{"command": "text.create", "params": {"text": "FIND", "x": 348, "y": 134.885, "parent": {"$step": 0}, "props": {"fontSize": 15.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3ED", "letterSpacing": "0.14"}}}
+{"command": "text.create", "params": {"text": "\u23181", "x": 446, "y": 136.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF6A00E6", "width": 30, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "1,284", "x": 446, "y": 152.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF6A00BF", "width": 30, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 500, "y": 116, "width": 158, "height": 56, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 8, "stroke": "#66708557", "strokeWeight": 1, "rotation": 0}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 124}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.45, "offset": [0, 5], "radius": 10, "spread": 0}}}
+{"command": "text.create", "params": {"text": "INVENTORY", "x": 516, "y": 134.885, "parent": {"$step": 0}, "props": {"fontSize": 15.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADEB", "letterSpacing": "0.14"}}}
+{"command": "text.create", "params": {"text": "\u23182", "x": 614, "y": 136.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC", "width": 30, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "612", "x": 614, "y": 152.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085FF", "width": 30, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 668, "y": 116, "width": 158, "height": 56, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 8, "stroke": "#66708557", "strokeWeight": 1, "rotation": 0}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 129}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.45, "offset": [0, 5], "radius": 10, "spread": 0}}}
+{"command": "text.create", "params": {"text": "DELTA", "x": 684, "y": 134.885, "parent": {"$step": 0}, "props": {"fontSize": 15.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADEB", "letterSpacing": "0.14"}}}
+{"command": "text.create", "params": {"text": "\u23183", "x": 782, "y": 136.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC", "width": 30, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "18", "x": 782, "y": 152.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085FF", "width": 30, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 852, "y": 116, "width": 348, "height": 56, "parent": {"$step": 0}, "props": {"fill": "#16181C", "cornerRadius": 8, "stroke": "#66708557", "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 134}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.75, "offset": [0, 4], "radius": 10}}}
+{"command": "shape.ellipse", "params": {"x": 868, "y": 134, "width": 14, "height": 14, "parent": {"$step": 0}, "props": {"fill": "#00000000", "stroke": "#A1A6ADD9", "strokeWeight": 1.7}}}
+{"command": "shape.rectangle", "params": {"x": 879, "y": 148, "width": 8, "height": 1.8, "parent": {"$step": 0}, "props": {"fill": "#A1A6ADD9", "rotation": 45}}}
+{"command": "text.create", "params": {"text": "z", "x": 900, "y": 126.73, "parent": {"$step": 0}, "props": {"fontSize": 19, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED"}}}
+{"command": "shape.rectangle", "params": {"x": 913, "y": 129, "width": 2, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#FF6A00"}}}
+{"command": "text.create", "params": {"text": "SEARCH ALPM", "x": 900, "y": 158.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC", "letterSpacing": "0.12"}}}
+{"command": "text.create", "params": {"text": "\u2318F", "x": 1160, "y": 134.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADD9", "width": 36, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 200, "width": 900, "height": 656, "parent": {"$step": 0}, "props": {"fill": "#1B1E22", "cornerRadius": 10}}}
+{"command": "node.set", "params": {"ids": [{"$step": 142}], "props": {"fills": [{"type": "linearGradient", "stops": ["#1E2024", "#181B1E"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 142}], "effect": {"type": "noise", "opacity": 0.07}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 142}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.5, "offset": [0, 14], "radius": 26, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 317, "y": 201, "width": 898, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#F7F3ED12"}}}
+{"command": "shape.rectangle", "params": {"x": 376, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 436, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 496, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 556, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 616, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 676, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 736, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 796, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 856, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 916, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 976, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 1036, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 1096, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 1156, "y": 252, "width": 1, "height": 604, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 262, "width": 900, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 314, "width": 900, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 366, "width": 900, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 418, "width": 900, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 470, "width": 900, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 522, "width": 900, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 574, "width": 900, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 626, "width": 900, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 678, "width": 900, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 730, "width": 900, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 782, "width": 900, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 834, "width": 900, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708521"}}}
+{"command": "shape.rectangle", "params": {"x": 352, "y": 826, "width": 1, "height": 10, "parent": {"$step": 0}, "props": {"fill": "#66708580"}}}
+{"command": "shape.rectangle", "params": {"x": 372, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 392, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 412, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 432, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 452, "y": 826, "width": 1, "height": 10, "parent": {"$step": 0}, "props": {"fill": "#66708580"}}}
+{"command": "shape.rectangle", "params": {"x": 472, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 492, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 512, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 532, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 552, "y": 826, "width": 1, "height": 10, "parent": {"$step": 0}, "props": {"fill": "#66708580"}}}
+{"command": "shape.rectangle", "params": {"x": 572, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 592, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 612, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 632, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 652, "y": 826, "width": 1, "height": 10, "parent": {"$step": 0}, "props": {"fill": "#66708580"}}}
+{"command": "shape.rectangle", "params": {"x": 672, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 692, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 712, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 732, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 752, "y": 826, "width": 1, "height": 10, "parent": {"$step": 0}, "props": {"fill": "#66708580"}}}
+{"command": "shape.rectangle", "params": {"x": 772, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 792, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 812, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 832, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 852, "y": 826, "width": 1, "height": 10, "parent": {"$step": 0}, "props": {"fill": "#66708580"}}}
+{"command": "shape.rectangle", "params": {"x": 872, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 892, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 912, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 932, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 952, "y": 826, "width": 1, "height": 10, "parent": {"$step": 0}, "props": {"fill": "#66708580"}}}
+{"command": "shape.rectangle", "params": {"x": 972, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 992, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 1012, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 1032, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 1052, "y": 826, "width": 1, "height": 10, "parent": {"$step": 0}, "props": {"fill": "#66708580"}}}
+{"command": "shape.rectangle", "params": {"x": 1072, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 1092, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 1112, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 1132, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 1152, "y": 826, "width": 1, "height": 10, "parent": {"$step": 0}, "props": {"fill": "#66708580"}}}
+{"command": "shape.rectangle", "params": {"x": 1172, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "shape.rectangle", "params": {"x": 1192, "y": 830, "width": 1, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#66708552"}}}
+{"command": "text.create", "params": {"text": "6 SHOWN", "x": 336, "y": 218.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED"}}}
+{"command": "text.create", "params": {"text": "\u00b7  1,284 IN ALPM  \u00b7  FILTER name~z  \u00b7  SORT NAME \u2191", "x": 392, "y": 218.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "shape.rectangle", "params": {"x": 1030, "y": 206, "width": 82, "height": 24, "parent": {"$step": 0}, "props": {"fill": "#2A2D2F", "cornerRadius": 5, "stroke": "#FF6A0080", "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 218}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.5, "offset": [0, 4], "radius": 8, "spread": 0}}}
+{"command": "text.create", "params": {"text": "DETAILED", "x": 1030, "y": 219.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED", "letterSpacing": "0.06", "width": 82, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 1114, "y": 206, "width": 82, "height": 24, "parent": {"$step": 0}, "props": {"fill": "#14171B", "cornerRadius": 5, "stroke": "#6670852E", "strokeWeight": 1, "dashes": [4, 3]}}}
+{"command": "text.create", "params": {"text": "COMPACT", "x": 1114, "y": 219.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADD9", "letterSpacing": "0.06", "width": 82, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "PACKAGE", "x": 352, "y": 244.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADBF", "letterSpacing": "0.16"}}}
+{"command": "text.create", "params": {"text": "PROVENANCE", "x": 680, "y": 244.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADBF", "letterSpacing": "0.16"}}}
+{"command": "text.create", "params": {"text": "VERSION", "x": 776, "y": 244.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADBF", "letterSpacing": "0.16"}}}
+{"command": "text.create", "params": {"text": "SIZE", "x": 868, "y": 244.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADBF", "letterSpacing": "0.16"}}}
+{"command": "text.create", "params": {"text": "STATE", "x": 952, "y": 244.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADBF", "letterSpacing": "0.16"}}}
+{"command": "shape.rectangle", "params": {"x": 336, "y": 258, "width": 860, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#6670852E"}}}
+{"command": "frame.create", "params": {"x": 316, "y": 258, "width": 900, "height": 402, "parent": {"$step": 0}, "name": "list viewport", "props": {"clip": true, "fill": "#00000000"}}}
+{"command": "text.create", "params": {"text": "zbar", "x": 36, "y": 16.884999999999998, "parent": {"$step": 229}, "props": {"fontSize": 15.5, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#DBD8D3"}}}
+{"command": "text.create", "params": {"text": "reads barcodes from images and video streams", "x": 36, "y": 40.04, "parent": {"$step": 229}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "extra", "x": 364, "y": 22.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "0.23-1", "x": 460, "y": 22.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "384 KB", "x": 552, "y": 22.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "shape.rectangle", "params": {"x": 636, "y": 12, "width": 92, "height": 23, "parent": {"$step": 229}, "props": {"fill": "#13161A", "cornerRadius": 4, "stroke": "#6670854C", "strokeWeight": 1, "dashes": [4, 3]}}}
+{"command": "text.create", "params": {"text": "AVAILABLE", "x": 636, "y": 22.865, "parent": {"$step": 229}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADD9", "letterSpacing": "0.10", "width": 92, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 20, "y": 73, "width": 860, "height": 1, "parent": {"$step": 229}, "props": {"fill": "#6670851F"}}}
+{"command": "text.create", "params": {"text": "zenity", "x": 36, "y": 90.885, "parent": {"$step": 229}, "props": {"fontSize": 15.5, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#DBD8D3"}}}
+{"command": "text.create", "params": {"text": "graphical dialog boxes for shell scripts", "x": 36, "y": 114.04, "parent": {"$step": 229}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "extra", "x": 364, "y": 96.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "3.0.0-2", "x": 460, "y": 96.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "1.1 MB", "x": 552, "y": 96.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "shape.rectangle", "params": {"x": 636, "y": 86, "width": 92, "height": 23, "parent": {"$step": 229}, "props": {"fill": "#FF6A00", "cornerRadius": 4}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 243}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.4, "offset": [0, 3], "radius": 6, "spread": 0}}}
+{"command": "text.create", "params": {"text": "UPDATE", "x": 636, "y": 96.865, "parent": {"$step": 229}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED", "letterSpacing": "0.10", "width": 92, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "3.0.0-3", "x": 736, "y": 96.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40"}}}
+{"command": "shape.rectangle", "params": {"x": 20, "y": 147, "width": 860, "height": 1, "parent": {"$step": 229}, "props": {"fill": "#6670851F"}}}
+{"command": "text.create", "params": {"text": "zeromq", "x": 36, "y": 164.885, "parent": {"$step": 229}, "props": {"fontSize": 15.5, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#DBD8D3"}}}
+{"command": "text.create", "params": {"text": "high-performance messaging library", "x": 36, "y": 188.04, "parent": {"$step": 229}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "extra", "x": 364, "y": 170.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "4.3.5-1", "x": 460, "y": 170.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "2.4 MB", "x": 552, "y": 170.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "shape.rectangle", "params": {"x": 636, "y": 160, "width": 92, "height": 23, "parent": {"$step": 229}, "props": {"fill": "#13161A", "cornerRadius": 4, "stroke": "#6670854C", "strokeWeight": 1, "dashes": [4, 3]}}}
+{"command": "text.create", "params": {"text": "AVAILABLE", "x": 636, "y": 170.865, "parent": {"$step": 229}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADD9", "letterSpacing": "0.10", "width": 92, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 20, "y": 221, "width": 860, "height": 1, "parent": {"$step": 229}, "props": {"fill": "#6670851F"}}}
+{"command": "text.create", "params": {"text": "zram-generator", "x": 36, "y": 238.885, "parent": {"$step": 229}, "props": {"fontSize": 15.5, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#DBD8D3"}}}
+{"command": "text.create", "params": {"text": "compressed swap devices backed by zstd", "x": 36, "y": 262.04, "parent": {"$step": 229}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "extra", "x": 364, "y": 244.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "1.5.1-2", "x": 460, "y": 244.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "24 KB", "x": 552, "y": 244.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "shape.rectangle", "params": {"x": 636, "y": 234, "width": 92, "height": 23, "parent": {"$step": 229}, "props": {"fill": "#1F2125", "cornerRadius": 4, "stroke": "#66708559", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "INSTALLED", "x": 636, "y": 244.865, "parent": {"$step": 229}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2", "letterSpacing": "0.10", "width": 92, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 20, "y": 295, "width": 860, "height": 1, "parent": {"$step": 229}, "props": {"fill": "#6670851F"}}}
+{"command": "frame.create", "params": {"x": 20, "y": 299, "width": 860, "height": 66, "parent": {"$step": 229}, "name": "row zsh (picked up)", "props": {"cornerRadius": 8, "rotation": -0.55, "fills": [{"type": "linearGradient", "stops": ["#2A2D2F", "#222528"], "from": [0, 0], "to": [0, 1]}], "strokes": ["#FF6A0080"], "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 264}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.68, "offset": [5, 16], "radius": 22, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 8, "y": 1, "width": 844, "height": 1, "parent": {"$step": 264}, "props": {"fill": "#F7F3ED14"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 8, "width": 3.5, "height": 50, "parent": {"$step": 264}, "props": {"fill": "#FF6A00", "cornerRadius": 1.8}}}
+{"command": "text.create", "params": {"text": "zsh", "x": 20, "y": 16.884999999999998, "parent": {"$step": 264}, "props": {"fontSize": 15.5, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#F7F3ED"}}}
+{"command": "text.create", "params": {"text": "powerful shell with scriptable completion", "x": 20, "y": 40.04, "parent": {"$step": 264}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADEB"}}}
+{"command": "text.create", "params": {"text": "extra", "x": 344, "y": 22.37, "parent": {"$step": 264}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "text.create", "params": {"text": "5.9-3", "x": 440, "y": 22.37, "parent": {"$step": 264}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "text.create", "params": {"text": "\u2192 5.9-4", "x": 483.11, "y": 22.37, "parent": {"$step": 264}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40"}}}
+{"command": "text.create", "params": {"text": "5.8 MB", "x": 566, "y": 22.37, "parent": {"$step": 264}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "shape.rectangle", "params": {"x": 646, "y": 12, "width": 92, "height": 23, "parent": {"$step": 264}, "props": {"fill": "#FF6A00", "cornerRadius": 4}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 274}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.45, "offset": [0, 3], "radius": 6, "spread": 0}}}
+{"command": "text.create", "params": {"text": "UPDATE", "x": 646, "y": 22.865, "parent": {"$step": 264}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED", "letterSpacing": "0.10", "width": 92, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "zstd", "x": 36, "y": 386.885, "parent": {"$step": 229}, "props": {"fontSize": 15.5, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#DBD8D3"}}}
+{"command": "text.create", "params": {"text": "zstandard compression library", "x": 36, "y": 410.04, "parent": {"$step": 229}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "core", "x": 364, "y": 392.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "1.5.6-1", "x": 460, "y": 392.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "712 KB", "x": 552, "y": 392.37, "parent": {"$step": 229}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "shape.rectangle", "params": {"x": 636, "y": 382, "width": 92, "height": 23, "parent": {"$step": 229}, "props": {"fill": "#1F2125", "cornerRadius": 4, "stroke": "#66708559", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "INSTALLED", "x": 636, "y": 392.865, "parent": {"$step": 229}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2", "letterSpacing": "0.10", "width": 92, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 316, "y": 588, "width": 900, "height": 72, "parent": {"$step": 0}, "props": {"fill": "#1A1D21"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 284}], "props": {"fills": [{"type": "linearGradient", "stops": ["#1A1D2100", "#1A1D21FF"], "from": [0, 0], "to": [0.62, 1]}]}}}
+{"command": "shape.rectangle", "params": {"x": 1206, "y": 300, "width": 3, "height": 180, "parent": {"$step": 0}, "props": {"fill": "#66708580", "cornerRadius": 1.5}}}
+{"command": "shape.rectangle", "params": {"x": 352, "y": 726, "width": 500, "height": 80, "parent": {"$step": 0}, "props": {"fill": "#14171B", "cornerRadius": 8, "stroke": "#66708573", "strokeWeight": 1, "dashes": [6, 5]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 287}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.55, "offset": [0, 4], "radius": 9}}}
+{"command": "text.create", "params": {"text": "EMPTY SLOT", "x": 372, "y": 752.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#FF6A00D9", "letterSpacing": "0.18"}}}
+{"command": "text.create", "params": {"text": "AN OFFICIAL-REPOSITORY PACKAGE WOULD SIT HERE.", "x": 372, "y": 776.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "text.create", "params": {"text": "\u2318F TO PLACE ONE", "x": 700, "y": 776.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "shape.rectangle", "params": {"x": 1240, "y": 104, "width": 336, "height": 752, "parent": {"$step": 0}, "props": {"fill": "#191C1F", "cornerRadius": 12}}}
+{"command": "node.set", "params": {"ids": [{"$step": 292}], "props": {"fills": [{"type": "linearGradient", "stops": ["#212427", "#191C1F"], "from": [0, 0], "to": [0.3, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 292}], "effect": {"type": "noise", "opacity": 0.06}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 292}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.6, "offset": [0, 20], "radius": 34, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 1241, "y": 105, "width": 334, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#F7F3ED17"}}}
+{"command": "text.create", "params": {"text": "INSPECTION CARD", "x": 1264, "y": 132.205, "parent": {"$step": 0}, "props": {"fontSize": 11.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#FF6A00", "letterSpacing": "0.18"}}}
+{"command": "text.create", "params": {"text": "LIFTED FROM THE BENCH", "x": 1264, "y": 153.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085FF", "letterSpacing": "0.10"}}}
+{"command": "text.create", "params": {"text": "\u23184", "x": 1512, "y": 131.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC", "width": 40, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "zsh", "x": 1264, "y": 173.46, "parent": {"$step": 0}, "props": {"fontSize": 38, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3ED", "letterSpacing": "0.02"}}}
+{"command": "text.create", "params": {"text": "5.9-3", "x": 1472, "y": 181.05, "parent": {"$step": 0}, "props": {"fontSize": 15, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD", "width": 80, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 1264, "y": 204, "width": 288, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#6670852E"}}}
+{"command": "text.create", "params": {"text": "PROVENANCE", "x": 1264, "y": 232.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADF2", "letterSpacing": "0.18"}}}
+{"command": "shape.rectangle", "params": {"x": 1264, "y": 246, "width": 288, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708538"}}}
+{"command": "text.create", "params": {"text": "extra \u2014 official repository", "x": 1264, "y": 257.215, "parent": {"$step": 0}, "props": {"fontSize": 14.5, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#F7F3ED"}}}
+{"command": "text.create", "params": {"text": "SIGNED BY THE PACKAGERS. NO BUILD RECIPE \u2014", "x": 1264, "y": 280.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "text.create", "params": {"text": "OFFICIAL PACKAGES ARE ALREADY BUILT.", "x": 1264, "y": 296.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "text.create", "params": {"text": "STATE", "x": 1264, "y": 332.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADF2", "letterSpacing": "0.18"}}}
+{"command": "shape.rectangle", "params": {"x": 1264, "y": 346, "width": 288, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708538"}}}
+{"command": "text.create", "params": {"text": "INSTALLED", "x": 1264, "y": 356.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2", "letterSpacing": "0.12"}}}
+{"command": "text.create", "params": {"text": "5.9-3", "x": 1350, "y": 356.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED"}}}
+{"command": "shape.rectangle", "params": {"x": 1414, "y": 345, "width": 138, "height": 22, "parent": {"$step": 0}, "props": {"fill": "#FF6A00", "cornerRadius": 4}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 312}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.45, "offset": [0, 3], "radius": 7, "spread": 0}}}
+{"command": "text.create", "params": {"text": "UPDATE 5.9-4", "x": 1414, "y": 356.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED", "letterSpacing": "0.08", "width": 138, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "5.8 MB DOWNLOAD  \u00b7  18.4 MB INSTALLED", "x": 1264, "y": 378.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "text.create", "params": {"text": "DEPENDENCIES", "x": 1264, "y": 412.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADF2", "letterSpacing": "0.18"}}}
+{"command": "shape.rectangle", "params": {"x": 1264, "y": 426, "width": 288, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708538"}}}
+{"command": "text.create", "params": {"text": "libreadline 8.2", "x": 1264, "y": 438.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "text.create", "params": {"text": "\u25cf", "x": 1528, "y": 438.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40CC", "width": 12, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "ncurses 6.4", "x": 1264, "y": 458.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "text.create", "params": {"text": "\u25cf", "x": 1528, "y": 458.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40CC", "width": 12, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "pcre2 10.42", "x": 1264, "y": 478.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "text.create", "params": {"text": "\u25cf", "x": 1528, "y": 478.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40CC", "width": 12, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "zlib 1.3", "x": 1264, "y": 498.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "text.create", "params": {"text": "\u25cf", "x": 1528, "y": 498.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40CC", "width": 12, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "gmp 6.2", "x": 1264, "y": 518.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "text.create", "params": {"text": "\u25cf", "x": 1528, "y": 518.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40CC", "width": 12, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "FILES", "x": 1264, "y": 552.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADF2", "letterSpacing": "0.18"}}}
+{"command": "shape.rectangle", "params": {"x": 1264, "y": 566, "width": 288, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708538"}}}
+{"command": "text.create", "params": {"text": "/bin/zsh", "x": 1264, "y": 578.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "text.create", "params": {"text": "/usr/bin/zsh", "x": 1264, "y": 598.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "text.create", "params": {"text": "/usr/share/man/man1/zsh.1.gz", "x": 1264, "y": 618.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "text.create", "params": {"text": "/usr/share/zsh/functions/\u2026", "x": 1264, "y": 638.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "text.create", "params": {"text": "THE COMMAND", "x": 1264, "y": 672.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADF2", "letterSpacing": "0.18"}}}
+{"command": "shape.rectangle", "params": {"x": 1264, "y": 686, "width": 288, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708538"}}}
+{"command": "shape.rectangle", "params": {"x": 1264, "y": 692, "width": 288, "height": 42, "parent": {"$step": 0}, "props": {"fill": "#14171B", "cornerRadius": 6, "stroke": "#66708557", "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 336}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.75, "offset": [0, 4], "radius": 9}}}
+{"command": "text.create", "params": {"text": "pacman -S zsh", "x": 1280, "y": 714.38, "parent": {"$step": 0}, "props": {"fontSize": 14, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40"}}}
+{"command": "text.create", "params": {"text": "\u2318\u2325C", "x": 1516, "y": 714.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADD9", "width": 36, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 1264, "y": 752, "width": 150, "height": 40, "parent": {"$step": 0}, "props": {"fill": "#FF6A00", "cornerRadius": 6}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 340}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.5, "offset": [0, 6], "radius": 12, "spread": 0}}}
+{"command": "text.create", "params": {"text": "INSTALL 5.9-4", "x": 1264, "y": 773.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED", "letterSpacing": "0.10", "width": 150, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 1424, "y": 752, "width": 62, "height": 40, "parent": {"$step": 0}, "props": {"fill": "#16181C", "cornerRadius": 6, "stroke": "#66708557", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "REMOVE", "x": 1424, "y": 773.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2", "letterSpacing": "0.10", "width": 62, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 1496, "y": 752, "width": 56, "height": 40, "parent": {"$step": 0}, "props": {"fill": "#16181C", "cornerRadius": 6, "stroke": "#66708557", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "FILES", "x": 1496, "y": 773.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2", "letterSpacing": "0.10", "width": 56, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "THESE ACTIONS BELONG TO THE ALPM TRAY:", "x": 1264, "y": 814.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085FF"}}}
+{"command": "text.create", "params": {"text": "NO BUILD, NO RECIPE.", "x": 1264, "y": 830.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085FF"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 856, "width": 1600, "height": 144, "parent": {"$step": 0}, "props": {"fill": "#191C1F"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 349}], "props": {"fills": [{"type": "linearGradient", "stops": ["#1F2125", "#14171B"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 349}], "effect": {"type": "noise", "opacity": 0.06}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 349}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.5, "offset": [0, -8], "radius": 18, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 856, "width": 1600, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#6670856B"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 857, "width": 1600, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#F7F3ED0D"}}}
+{"command": "text.create", "params": {"text": "OPERATIONS IN FLIGHT", "x": 24, "y": 876.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADF2", "letterSpacing": "0.18"}}}
+{"command": "shape.ellipse", "params": {"x": 26, "y": 896, "width": 9, "height": 9, "parent": {"$step": 0}, "props": {"fill": "#FF6A00"}}}
+{"command": "text.create", "params": {"text": "SYNCING ALPM INDEX", "x": 44, "y": 900.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED"}}}
+{"command": "text.create", "params": {"text": "68%", "x": 476, "y": 900.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF6A00", "width": 40, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 918, "width": 656, "height": 7, "parent": {"$step": 0}, "props": {"fill": "#14171B", "cornerRadius": 3.5}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 359}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.8, "offset": [0, 2], "radius": 5}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 918, "width": 446, "height": 7, "parent": {"$step": 0}, "props": {"fill": "#FF6A00", "cornerRadius": 3.5}}}
+{"command": "node.set", "params": {"ids": [{"$step": 361}], "props": {"fills": [{"type": "linearGradient", "stops": ["#C95400", "#FF6A00", "#FFE5D2"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 466, "y": 916, "width": 3, "height": 11, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "cornerRadius": 1.5}}}
+{"command": "shape.ellipse", "params": {"x": 26, "y": 940, "width": 9, "height": 9, "parent": {"$step": 0}, "props": {"fill": "#667085E6"}}}
+{"command": "text.create", "params": {"text": "DOWNLOADING ZSH-5.9-4-X86_64.PKG.TAR.ZST", "x": 44, "y": 944.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2"}}}
+{"command": "text.create", "params": {"text": "2.4 MB", "x": 600, "y": 944.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6", "width": 40, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 962, "width": 656, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#14171B", "cornerRadius": 2.5}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 367}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.8, "offset": [0, 2], "radius": 4}}}
+{"command": "shape.rectangle", "params": {"x": 24, "y": 962, "width": 128, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#667085D9", "cornerRadius": 2.5}}}
+{"command": "text.create", "params": {"text": "PACMAN -S --NEEDED ZSH", "x": 24, "y": 982.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085FF"}}}
+{"command": "shape.rectangle", "params": {"x": 716, "y": 872, "width": 1, "height": 112, "parent": {"$step": 0}, "props": {"fill": "#6670854C"}}}
+{"command": "text.create", "params": {"text": "LOG", "x": 740, "y": 876.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADF2", "letterSpacing": "0.18"}}}
+{"command": "text.create", "params": {"text": "20:14:02", "x": 740, "y": 902.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085FF"}}}
+{"command": "text.create", "params": {"text": "RESOLVED 1284 PACKAGES IN 41 MS", "x": 812, "y": 902.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD"}}}
+{"command": "text.create", "params": {"text": "20:14:05", "x": 740, "y": 922.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085FF"}}}
+{"command": "text.create", "params": {"text": "ZSH 5.9-3 \u2192 5.9-4", "x": 812, "y": 922.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40"}}}
+{"command": "text.create", "params": {"text": "20:14:09", "x": 740, "y": 942.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085FF"}}}
+{"command": "text.create", "params": {"text": "DOWNLOADING ZSH-5.9-4 (2.4 MB)", "x": 812, "y": 942.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD"}}}
+{"command": "text.create", "params": {"text": "20:14:11", "x": 740, "y": 962.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085FF"}}}
+{"command": "text.create", "params": {"text": "WAITING FOR PACKAGER SIGNATURE", "x": 812, "y": 962.37, "parent": {"$step": 0}, "props": {"fontSize": 11, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "shape.rectangle", "params": {"x": 1156, "y": 872, "width": 1, "height": 112, "parent": {"$step": 0}, "props": {"fill": "#6670854C"}}}
+{"command": "text.create", "params": {"text": "KEYBOARD", "x": 1180, "y": 876.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADF2", "letterSpacing": "0.18"}}}
+{"command": "shape.rectangle", "params": {"x": 1180, "y": 902, "width": 32, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 4, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "\u23181", "x": 1180, "y": 912.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40", "width": 32, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "FIND", "x": 1218, "y": 912.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "shape.rectangle", "params": {"x": 1280, "y": 902, "width": 32, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 4, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "\u23182", "x": 1280, "y": 912.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40", "width": 32, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "INVENTORY", "x": 1318, "y": 912.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "shape.rectangle", "params": {"x": 1380, "y": 902, "width": 32, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 4, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "\u23183", "x": 1380, "y": 912.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40", "width": 32, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "DELTA", "x": 1418, "y": 912.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "shape.rectangle", "params": {"x": 1480, "y": 902, "width": 32, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 4, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "\u23184", "x": 1480, "y": 912.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40", "width": 32, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "CARD", "x": 1518, "y": 912.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "shape.rectangle", "params": {"x": 1180, "y": 932, "width": 32, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 4, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "\u23185", "x": 1180, "y": 942.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40", "width": 32, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "CONSOLE", "x": 1218, "y": 942.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "shape.rectangle", "params": {"x": 1280, "y": 932, "width": 32, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 4, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "\u2325\u2190\u2192", "x": 1280, "y": 942.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40", "width": 32, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "TRAY", "x": 1318, "y": 942.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "shape.rectangle", "params": {"x": 1380, "y": 932, "width": 32, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 4, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "\u2318F", "x": 1380, "y": 942.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40", "width": 32, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "SEARCH", "x": 1418, "y": 942.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "shape.rectangle", "params": {"x": 1480, "y": 932, "width": 32, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 4, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "\u2318L", "x": 1480, "y": 942.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40", "width": 32, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "LIST", "x": 1518, "y": 942.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "shape.rectangle", "params": {"x": 1180, "y": 962, "width": 32, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 4, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "\u2318\u2325C", "x": 1180, "y": 972.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40", "width": 32, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "COPY CMD", "x": 1218, "y": 972.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "shape.rectangle", "params": {"x": 1280, "y": 962, "width": 32, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 4, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "ESC", "x": 1280, "y": 972.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40", "width": 32, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "CLEAR", "x": 1318, "y": 972.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "shape.rectangle", "params": {"x": 1380, "y": 962, "width": 32, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 4, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "\u2318\u21e7D", "x": 1380, "y": 972.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40", "width": 32, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "DENSITY", "x": 1418, "y": 972.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}
+{"command": "shape.rectangle", "params": {"x": 1480, "y": 962, "width": 32, "height": 20, "parent": {"$step": 0}, "props": {"fill": "#202226", "cornerRadius": 4, "stroke": "#6670852E", "strokeWeight": 1}}}
+{"command": "text.create", "params": {"text": "\u23ce", "x": 1480, "y": 972.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40", "width": 32, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "INSTALL", "x": 1518, "y": 972.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADE6"}}}

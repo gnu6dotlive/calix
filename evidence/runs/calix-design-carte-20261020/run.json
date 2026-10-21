@@ -1,0 +1,82 @@
+{
+  "run_id": "calix-design-carte-20261020",
+  "kind": "design-proposal",
+  "status": "ok",
+  "started_at": "2026-10-20T20:05:00Z",
+  "finished_at": "2026-10-21T00:32:18Z",
+  "commit": "3e4a4a2b",
+  "objective": "Blind design proposal 03 - 'La Carte': Calix as a nautical chart, from the brief alone.",
+  "rules_observed": {
+    "did_not_open_application_code": true,
+    "did_not_run_application": true,
+    "did_not_view_existing_screenshots": true,
+    "worked_alone": true,
+    "one_figcraft_process_per_file": true
+  },
+  "toolchain": {
+    "builder": "figcraft-cli",
+    "generator": "evidence/design-proposals/build/03-carte.build.py",
+    "command_script": "evidence/design-proposals/build/03-carte.build.jsonl",
+    "steps": 1060,
+    "run": "figcraft-cli run build/03-carte.build.jsonl --out 03-carte.figcraft",
+    "export": "figcraft-cli export 03-carte.figcraft -o 03-carte.png --scale 2"
+  },
+  "artefacts": {
+    "evidence/design-proposals/03-carte.png": {
+      "sha256": "ddd0be9bca558855ef58a0cdcb1830bf5b31caf0b179e5da189df6852d364fda",
+      "bytes": 1314731
+    },
+    "evidence/design-proposals/03-carte.figcraft": {
+      "sha256": "78def078f5ef59ee809175fa3c4213a9c7f8fdd0cfb7d5110ceb9258e1f9b76a",
+      "bytes": 130365
+    },
+    "evidence/design-proposals/03-carte.md": {
+      "sha256": "c19491d67a2281a45a0ae9761a30b23794ef5cfcb05611468e1221ea6296aa3f",
+      "bytes": 9947
+    },
+    "evidence/design-proposals/notes/03-carte.md": {
+      "sha256": "5a81bf62ac80013c6ff9697d0e0307507113bd4262e658764d414ef302807501",
+      "bytes": 544
+    },
+    "evidence/design-proposals/build/03-carte.build.py": {
+      "sha256": "53f3618d4db7beba23ca58fb5cdf70df5a1c1caaf32ccf465e7f90ac655d46ea",
+      "bytes": 42716
+    },
+    "evidence/design-proposals/build/03-carte.build.jsonl": {
+      "sha256": "8acccc7147171641c59ecb2fef6526c877b9f9262db211feea94c56348b92b8b",
+      "bytes": 175882
+    }
+  },
+  "checks": [
+    {
+      "check": "export size is 1600x1000 at 2x",
+      "result": "pass",
+      "detail": "3200x2000 px PNG"
+    },
+    {
+      "check": "one top-level frame in the document",
+      "result": "pass",
+      "detail": "figcraft-cli info: 1 top-level, FRAME 'Calix - La Carte' 1600x1000"
+    },
+    {
+      "check": "image was looked at and iterated",
+      "result": "pass",
+      "detail": "9 build->export->read cycles; corrections to unpainted frames, the noise effect, the pattern weave, the shell geometry and the compass rose"
+    },
+    {
+      "check": "tokens only",
+      "result": "pass",
+      "detail": "all fills are design-system tokens with alpha; no new hue"
+    },
+    {
+      "check": "keyboard coverage",
+      "result": "pass",
+      "detail": "cmd1-5, alt-left/right, cmd-F, cmd-L, cmd-opt-C, Escape all in the helm"
+    }
+  ],
+  "known_gaps": [
+    "The coverage strip cannot show 1,204 of 9,812 with precision; a log scale is the second-pass fix.",
+    "Find is both a bearing on the rose and a field in the strip; that duplication is unresolved.",
+    "The soundings and contours are atmosphere, not data; their removal should be tested."
+  ]
+}
