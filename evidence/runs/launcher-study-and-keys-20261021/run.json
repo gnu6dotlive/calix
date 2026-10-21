@@ -1,0 +1,40 @@
+{
+  "run_id": "launcher-study-and-keys-20261021",
+  "kind": "implementation",
+  "status": "ok",
+  "objective": "Study a reference application for its motion, its components and its performance discipline, and take from it what Calix needs. Then make the keyboard leave the surface for real.",
+  "the_reference": {
+    "what": "the Artcraft launcher — a Tauri desktop application with a React front end and forty-six component libraries",
+    "where": "the artcraft-main archive, unpacked under .ci-cache/references/ (the repository's ignored work directory, not /tmp)",
+    "the_study": "evidence/references/artcraft-launcher-20261020.md"
+  },
+  "what_was_taken": {
+    "the_curves_became_tokens": "three named Bézier curves — out, in-out, spring — evaluated by Newton-Raphson, the way a browser evaluates them. The application invents no others.",
+    "a_confusion_the_study_uncovered": "Calix had two easings called ease_out_quint: its own polynomial, and gpui's, used by five call sites against seven. The same name, two curves. Every easing in the application is now one of the three tokens, and gpui's polynomials are gone.",
+    "the_keyboard_left_the_surface": "state/keys.rs is the registry: every action has an id, a group and a binding, and it is the single source of truth — the handler asks it what a key press means, and the shortcut sheet is derived from it. The two cannot disagree, because there is only one list.",
+    "the_sheet": "a translucent overlay, grouped, with keycaps, not blocking the surface. Opened by the ? disc in the header, or by holding the modifier alone for three seconds — any other key cancels the gesture, so a real Ctrl+C never trips it.",
+    "the_toast": "it rises and lights up on the out curve, and goes back down on the same one."
+  },
+  "what_was_not_taken": {
+    "the_physical_key_codes": "Calix reads gpui's keystroke.key, which is the produced character, so the registry is not yet layout-independent — the launcher's reason for storing the physical code has not been met.",
+    "the_presets": "the launcher has named binding presets; Calix has one set.",
+    "the_availability_gates": "the launcher's actions carry a `when`; Calix's do not, so the list's navigation is listed unconditionally.",
+    "the_remapping": "the launcher lets the user rebind; Calix does not."
+  },
+  "the_proof": {
+    "tests": "226 passed (the floor is 195): the curve tokens, the overshoot, the cut's entry, the cascade, the registry, the sheet's rendering, the smooth scroll, the nameplate's bounds.",
+    "by_hand": "the ? disc and the sheet's layout were seen — the sheet was forced open by an environment variable in a throwaway build, and the switch was removed before the commit. The tightening that followed that sighting was not seen.",
+    "not_verified": "the three-second hold: the synthetic keyboard events of this machine never reach the Wayland client. ydotool was tried; the injected keys did not arrive. The gesture is verified by its code and by nothing else."
+  },
+  "the_gates": {
+    "local": "scripts/verify — PASSED at fbcca9fd (226 UI tests, 392 CLI, 1388 package manager)",
+    "container": "scripts/ci-replay — PASSED at the final tree (226 UI tests in the container)",
+    "a_first_failure": "an earlier container replay failed in the flatpak backend's Zig build: a missing intermediate object in the container's cache. It was not the code — the same tree passed on the re-run, and the container's work directory was cleared in between. Recorded because a failure that is not understood is not a failure that is passed."
+  },
+  "the_artefacts": [
+    {"path": "Calix.Ui.Gpui/src/state/keys.rs", "what": "the keyboard's registry"},
+    {"path": "Calix.Ui.Gpui/src/components/cheatsheet.rs", "what": "the shortcut sheet, derived from the registry"},
+    {"path": "Calix.Ui.Gpui/src/state/motion.rs", "what": "the curve tokens and the motion vocabulary"},
+    {"path": "evidence/references/artcraft-launcher-20261020.md", "what": "the study, with what was taken and what was not"}
+  ]
+}
