@@ -44,9 +44,9 @@ catalogue itself (its measured layout never resolves there). Every band
 | Window: the floors are coherent with what the application can compose | **held** | the floor (720 × 480) is derived and the budget adds up: the row's floor (495) + the name's share (165) + the folded spine (56) = 716 → 720. Tested: `the_window_floor_is_derived_from_the_catalogue_and_the_spine`, `the_window_floor_budget_adds_up` |
 | Spine: a stable presence, it narrows but never vanishes | **held by a rule** | the spine folds itself when the catalogue would lose its room, and takes back the user's shape when the window gives it room. Tested: `the_spine_folds_when_the_catalogue_needs_the_room` |
 | Body: the catalogue keeps a usable width and stays dominant | **held, and qualified against the row and the list** | the catalogue's minimum is 660 px, measured on the real row and the real names (§4.7), and the list that holds the rows draws them at every width (§4.8); at the window's floor the catalogue has 664 px; the three toolbar forms are measured |
-| Context surfaces: opening one never reduces the body below its floor | **held** | the drawer cannot take the workspace's 320 px whatever the request, and below 120 px it overlays instead of squeezing. The plate yields first: the catalogue goes from 6.5 px to 170.5 px in a 372 px band. Tested: `the_drawer_never_takes_the_workspace_floor`, `the_composition_is_measured_in_a_real_window` |
+| Context surfaces: opening one never reduces the body below its floor | **held** | the drawer cannot take the workspace's 320 px whatever the request, and below 120 px it overlays instead of squeezing. The plate yields first — and when the band cannot hold the catalogue's six rows *and* the plate's chrome, it leaves the flow entirely and comes over the catalogue, summoned by the same edge (§4.10). Tested: `the_drawer_never_takes_the_workspace_floor`, `the_plate_leaves_the_flow_before_the_catalogue_is_reduced`, `the_composition_is_measured_in_a_real_window` |
 | Portrait and landscape: the composition adapts to the space, not to a declared orientation | **held, by not answering it** | no code reads the orientation; the composition is expressed in logical pixels and adapts by growing or shrinking the bands |
-| Zoom: at every scale the content stays accessible | **held by construction, with one caveat** | the layout is in logical pixels (the viewport is divided by `px(1.0)`) and the window's floor is a floor in logical pixels, so the physical window grows with the scale. The caveat is in §4.5 |
+| Zoom: at every scale the content stays accessible | **held, and qualified as far as the harness allows** | the layout is in logical pixels and the scale factor does not leak into the geometry — measured at the bench's fixed 2.0 factor (§4.5). A real 150 % window is not measured: the harness cannot be set to it |
 | Transitions: a change of width preserves the continuity | **held** | the vertical budget has one owner, so a change of height is a re-budget, not a re-landing; the spine's fold is animated like a travel, not a jump |
 | Extensibility: a new surface uses the same primitives | **held** | the plate, the drawer and the sidebar are all bands; the render lab is a surface, not a place (`the_render_lab_is_not_a_place`) |
 
@@ -238,21 +238,35 @@ preserved, the catalogue keeps its place, and the drawer is reversible.
 (`the_spine_folds_when_the_catalogue_needs_the_room`), and the failing case
 is kept in the same test.
 
-### 4.5 The zoom holds by construction, with one caveat
+### 4.5 The zoom — qualified as far as the harness allows, and no further
 
-The layout is in logical pixels: the viewport is divided by `px(1.0)`
-(`package_workstation.rs:627,629`), and gpui's `viewport_size()` is already in
-logical pixels on both backends (X11 divides by the scale factor; Wayland's
-bounds are logical). The window's floor is a floor in logical pixels, so at
-150 % the physical window grows and the logical composition keeps its room.
-Nothing in the layout needs to change for the zoom.
+**What the harness can do, and cannot.** The test platform's window has a
+**fixed scale factor of 2.0** — it is hard-coded in gpui's test platform
+(`platform/test/window.rs:136`). The bench therefore cannot be set to 1.5,
+and no amount of cleverness in the bench will change that.
 
-The caveat: a floor is a *request*. A tiling compositor, or a screen smaller
-than the floor, may grant a window that is narrower than the floor — the
-window's floor and the composition's floor are two different things, and only
-the first is enforced by the system. This is precisely why the contract
-(§4.1) asks for the two levels to be tested separately, and why the
-composition's own floors have to exist as numbers.
+**What that does *not* change: the composition.** The layout is computed in
+logical pixels — the viewport is divided by `px(1.0)`, gpui's `viewport_size()`
+is logical on both backends (X11 divides by the scale factor; Wayland's bounds
+are logical), and the text metrics are logical too. The scale factor only
+multiplies the *physical* size. So the composition at 150 % is the composition
+at 100 %, in a physically larger window.
+
+**And that is now measured** (`the_composition_is_in_logical_pixels`): at the
+bench's 2.0 factor, the row is 600 × 36 — the logical numbers, exactly. The
+scale factor does not leak into the geometry, and the contract's floors are
+logical (660, 720, 480) in the same way.
+
+So the zoom is qualified *as far as the instrument allows*: the layout is
+scale-independent, and the floors are logical. What is **not** measured is a
+window at 1.5 on a real screen — the harness cannot be set to it, and the
+machine's compositor is not the bench.
+
+**The caveat that remains**: a floor is a *request*. A tiling compositor, or
+a screen smaller than the floor, may grant a window that is narrower or
+shorter than the floor — the window's floor and the composition's floor are
+two different things, and only the first is enforced by the system. This is
+why the contract (§4.1) asks for the two levels to be tested separately.
 
 ### 4.6 The case that fails, kept
 
@@ -336,14 +350,6 @@ that was tried first **does not hold**: at 560 the name shows 43 px of text
 failing case is kept in the test
 (`the_row_is_measured_at_and_around_the_catalogue_minimum`), not hidden.
 
-**The concession that would make 560 hold** — measured, offered, not imposed:
-the measurement bar is 96 px, and it is the *reading* of the size, whose
-exact figure has a column of its own ("the bar is the reading, the figure is
-the truth"). Without it, the row's floor falls to 399 px and the name has
-**161 px** at 560 — the p90 name fits whole. Whether the instrument's
-reading is worth 96 px of the name is a product decision, and it is not
-taken here.
-
 ### 4.8 The catalogue's list, qualified — and the bench's blind spot, named
 
 **The list is qualified now.** The `uniform_list` — the real one, with the
@@ -395,13 +401,86 @@ list that is not drawn.*
 | **the list drawing the real row, at the real height, at every width** | the real `uniform_list`, measured in the bench |
 | the catalogue's viewport, and the three toolbar forms | the bench, on the real views |
 | the list's own measurement of its rows (36 px, the content size) | `UniformListScrollState::last_item_size` |
-| the list's *virtualisation* — that it recycles rows when scrolled, and that its own scrolling is smooth | **not proved**: the bench has no wheel over a list, and the list's scrolling is the application code, not the list's |
+| the list's *virtualisation* — that it recycles rows when scrolled | **proved**: `the_list_draws_only_the_rows_it_shows` — a hundred rows, a window that shows a dozen: the hundredth is not drawn, and after a scroll of fifty rows the list draws the fiftieth at the top and has *recycled* the first |
+| the list's own scrolling, and the application handing the wheel back in steps | **proved by the application**: `the_wheel_moves_the_list_by_steps` (the bench has no wheel over a list; the application's own scrolling is proved on the structure the list uses) |
 
 So the qualification of the catalogue is now real: the row, and the list that
 holds it. What remains unproved is the list's behaviour *under* a scroll —
 which is the application code, and is proved by the application's own
 scrolling test (`the_wheel_moves_the_list_by_steps`, on the same structure
 the list uses).
+
+### 4.9 The row's ladder — the concession, done better than a concession
+
+The concession that would have made 560 hold was to *drop* the measurement
+bar (96 px): the size has its own column, so the bar is the row's most
+droppable part. Dropping it is a loss, and a loss is a poor answer.
+
+The row now has a **ladder**, and the ladder is expressed in the flex
+factors — the flexbox distributes a deficit in proportion to them, so the
+numbers *are* the order:
+
+| the cell | gives way | why |
+|---|---|---|
+| the source | 4 | the most droppable: the name almost always says it, and the inspector gives it in full |
+| the measurement | 2 | the instrument's reading — the size's exact figure has its own column |
+| the version | 1 | the last of the secondary columns |
+| the size, the state | 0 | the figure, and the state of the package: they never shrink |
+| **the name** | — | the key: it never shrinks, and it has a floor of 165 px of cell (the p90 of the real names, 143 px of text, plus the identity glyph and its gap) |
+
+Measured, in the list, at every width:
+
+| the content | the name | the version | the source | the bar | the size | the state |
+|---|---|---|---|---|---|---|
+| 400 px | **165** | 60 | 0 | 0 | 80 | 85 |
+| 480 px | **165** | 77 | 0 | 49 | 80 | 85 |
+| 520 px | **165** | 84 | 21 | 61 | 80 | 85 |
+| 560 px | **165** | 90 | 45 | 71 | 80 | 85 |
+| **660 px** | 165 | 105 | 105 | 96 | 80 | 85 |
+| 720 px | 225 | 105 | 105 | 96 | 80 | 85 |
+
+At and above the catalogue's qualified minimum, the row is **exactly the row
+it was**: nothing changes at 660 px and above. Below it, the row degrades
+instead of breaking: the name keeps its floor, the state and the size keep
+their room, and the source — the column that says *where* — is the one that
+shortens. The row's own floor falls from 495 to **383 px**, so a row that
+used to be cut on the right now fits.
+
+Nothing is dropped: at 400 px every cell is still there, and the source and
+the bar are the ones that shorten.
+
+### 4.10 The plate, the catalogue, and the band that is too short
+
+**The catalogue's vertical floor was missing.** The audit noted it as an open
+item: the body had a *width* floor (660) but no *height* floor, and the
+height it had (72 px) was two rows — a strip, not a catalogue. Six rows
+(216 px) is a catalogue you can scan.
+
+With that floor, the arithmetic changes shape: the band that holds the bank
+(100.5), the edge (5), the catalogue (216) and the plate's chrome (96) is
+**417.5 px** — and the workspace's minimum band is 320. The plate and the
+catalogue cannot both stay in the flow.
+
+**So the plate leaves the flow.** It comes *over* the catalogue, summoned by
+the same edge that resized it — the same gesture, but it lifts the sheet
+instead of resizing it, and pulls it back down to dismiss it. The catalogue
+takes the band whole.
+
+| the window | the band | the plate | the catalogue |
+|---|---|---|---|
+| 480 (the minimum) | 356 | **over the catalogue**, summoned | 250.5 px — 6 rows |
+| 560 | 436 | in the flow, at its chrome | 234.5 px — 6 rows |
+| 680 | 556 | in the flow | 359.5 px — 9 rows |
+
+This is the contract's ladder, applied to the band: the context surface
+yields *entirely* before the body is reduced — and the body's floor is now
+written down.
+
+**The risk, stated.** The gesture is the existing one (the edge drag), and
+the layout is measured; but the *feel* of a sheet that comes from the bottom
+cannot be verified by the bench, which has no pointer. The measurement proves
+the composition, not the motion's quality.
+
 
 ## 5. What the audit leaves to the product
 
@@ -444,6 +523,10 @@ What is left to decide, after the measurements:
 | the spine folds itself, and the failing case is kept | `the_spine_folds_when_the_catalogue_needs_the_room` | **done** |
 | the three forms of the toolbar are reachable and distinct | `the_three_forms_of_the_toolbar_are_measured` | **done** |
 | the row's geometry, and the name's share at every width | `the_row_is_measured_at_and_around_the_catalogue_minimum` | **done** |
+| the row's ladder: the name is never cut, the state and the size never shrink | `the_catalogue_list_draws_its_rows_at_every_width` | **done** |
+| the list draws only the rows it shows, and recycles them | `the_list_draws_only_the_rows_it_shows` | **done** |
+| the composition is in logical pixels, whatever the scale | `the_composition_is_in_logical_pixels` | **done** (the harness's scale factor is fixed at 2.0) |
+| the plate leaves the flow before the catalogue is reduced | `the_plate_leaves_the_flow_before_the_catalogue_is_reduced`, `the_composition_is_measured_in_a_real_window` | **done** |
 | the catalogue's minimum is the measured one, and the budget adds up | `the_window_floor_budget_adds_up` | **done** |
 | the catalogue's rows are drawn by the list, at every width | `the_catalogue_list_draws_its_rows_at_every_width` | **done** |
 | the composition at 150 % keeps the catalogue's floor | — | **open**: the same instrument, at another scale |
@@ -459,11 +542,15 @@ re-measured. What is missing is not the instrument — it is the list.
   divisions of the space (`content_width`, `nameplate_height`), the
   presentation policy (`state/motion.rs`). What was missing was an *owner*
   for the vertical budget — a responsibility, not a component.
-- **The list's virtualisation is not qualified.** The list draws the real
-  rows, at the real height, at every width (§4.8); what is not proved is its
-  behaviour *under* a scroll — that it recycles its rows, and that the
-  application hands the wheel back in steps. That second part is proved by
-  the application's own scrolling test, on the structure the list uses.
+- **The list's virtualisation is now qualified** (§4.8): it draws only the
+  rows it shows, and it recycles them on a scroll.
+- **The 150 % scale is qualified as far as the harness allows** (§4.5): the
+  layout is scale-independent and the floors are logical, but the harness's
+  scale factor is fixed at 2.0 and a real 150 % window is not measured.
+- **The plate's sheet cannot be felt by the bench.** The composition when it
+  overlays is measured (§4.10); the *gesture* — the edge lifting it, and
+  pulling it back down — is the existing drag, but the bench has no pointer
+  and the motion's quality is not verified.
 - **The zoom was not measured at 150 %.** The layout is in logical pixels
   and the floor is too, so the reasoning holds; but the *measurement* of a
   150 % window is not in the bench yet, for the same reason as the rows.

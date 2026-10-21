@@ -277,6 +277,68 @@ impl PackageTable {
             source_label.to_string()
         };
 
+        // L'échelle de la ligne : ce qui cède, et dans quel ordre.
+        //
+        // Le flexbox répartit le manque au prorata des facteurs de
+        // rétrécissement : ces trois nombres *sont* l'ordre. La source cède
+        // d'abord — c'est la plus jetable, le nom la dit presque toujours et
+        // l'inspecteur la donne en entier. La lecture de l'instrument
+        // ensuite — la figure exacte a sa propre colonne. La version en
+        // dernier des secondaires.
+        //
+        // La taille et l'état ne cèdent jamais : l'un est la figure, l'autre
+        // l'état du paquet. Et le nom ne cède jamais : c'est la clé.
+        let mut version_cell = div()
+            .id("package_row_version")
+            // The handle the bench measures.
+            .debug_selector(|| "package_row_version".to_string())
+            .w(px(105.0))
+            .min_w(px(crate::ui_metrics::UiMetrics::ROW_VERSION_MIN_WIDTH))
+            .overflow_hidden()
+            .text_ellipsis()
+            .text_xs()
+            .font_family("monospace")
+            .font_weight(FontWeight::MEDIUM)
+            .text_color(theme.text_muted)
+            .child(if pkg.has_update {
+                format!("→ {}", pkg.new_version.as_deref().unwrap_or(&pkg.version))
+            } else {
+                pkg.version.clone()
+            });
+        version_cell.style().flex_shrink = Some(crate::ui_metrics::UiMetrics::ROW_SHRINK_VERSION);
+
+        let mut source_cell = div()
+            .id("package_row_source")
+            // The handle the bench measures.
+            .debug_selector(|| "package_row_source".to_string())
+            .w(px(105.0))
+            .min_w(px(0.0))
+            .overflow_hidden()
+            .text_ellipsis()
+            .text_xs()
+            .font_weight(FontWeight::NORMAL)
+            .text_color(theme.text_secondary)
+            .child(source_display);
+        source_cell.style().flex_shrink = Some(crate::ui_metrics::UiMetrics::ROW_SHRINK_SOURCE);
+
+        let mut measurement_cell = div()
+            .id("package_row_measurement")
+            // The handle the bench measures.
+            .debug_selector(|| "package_row_measurement".to_string())
+            .w(px(MEASURE_WIDTH))
+            .min_w(px(0.0))
+            .flex()
+            .justify_end()
+            .pr_2()
+            .overflow_hidden()
+            .child(Self::render_measurement(
+                Self::size_bytes(pkg),
+                scale_max,
+                theme,
+            ));
+        measurement_cell.style().flex_shrink =
+            Some(crate::ui_metrics::UiMetrics::ROW_SHRINK_MEASUREMENT);
+
         div()
             .h(px(row_height))
             .w_full()
@@ -299,7 +361,8 @@ impl PackageTable {
                     // The handle the bench measures.
                     .debug_selector(|| "package_row_name_cell".to_string())
                     .flex_1()
-                    .min_w_0()
+                    // The name's floor: it is the last thing the row cuts.
+                    .min_w(px(crate::ui_metrics::UiMetrics::ROW_NAME_MIN_WIDTH))
                     .flex()
                     .items_center()
                     .gap_2()
@@ -325,55 +388,11 @@ impl PackageTable {
                     ),
             )
             // Column 2: Version en police monospace
-            .child(
-                div()
-                    .id("package_row_version")
-                    // The handle the bench measures.
-                    .debug_selector(|| "package_row_version".to_string())
-                    .w(px(105.0))
-                    .overflow_hidden()
-                    .text_ellipsis()
-                    .text_xs()
-                    .font_family("monospace")
-                    .font_weight(FontWeight::MEDIUM)
-                    .text_color(theme.text_muted)
-                    .child(if pkg.has_update {
-                        format!("→ {}", pkg.new_version.as_deref().unwrap_or(&pkg.version))
-                    } else {
-                        pkg.version.clone()
-                    }),
-            )
+            .child(version_cell)
             // Column 3: Source textuelle propre ("Arch / extra", sans badge chip)
-            .child(
-                div()
-                    .id("package_row_source")
-                    // The handle the bench measures.
-                    .debug_selector(|| "package_row_source".to_string())
-                    .w(px(105.0))
-                    .overflow_hidden()
-                    .text_ellipsis()
-                    .text_xs()
-                    .font_weight(FontWeight::NORMAL)
-                    .text_color(theme.text_secondary)
-                    .child(source_display),
-            )
+            .child(source_cell)
             // Column 4: the measurement — the value against the shared scale
-            .child(
-                div()
-                    .id("package_row_measurement")
-                    // The handle the bench measures.
-                    .debug_selector(|| "package_row_measurement".to_string())
-                    .w(px(MEASURE_WIDTH))
-                    .flex()
-                    .justify_end()
-                    .pr_2()
-                    .overflow_hidden()
-                    .child(Self::render_measurement(
-                        Self::size_bytes(pkg),
-                        scale_max,
-                        theme,
-                    )),
-            )
+            .child(measurement_cell)
             // Column 5: Size en police monospace aligné à droite avec padding
             .child(
                 div()
@@ -381,6 +400,8 @@ impl PackageTable {
                     // The handle the bench measures.
                     .debug_selector(|| "package_row_size".to_string())
                     .w(px(80.0))
+                    .min_w(px(crate::ui_metrics::UiMetrics::ROW_SIZE_MIN_WIDTH))
+                    .flex_shrink_0()
                     .flex()
                     .justify_end()
                     .pr_3()
@@ -398,6 +419,8 @@ impl PackageTable {
                     // The handle the bench measures.
                     .debug_selector(|| "package_row_status".to_string())
                     .w(px(85.0))
+                    .min_w(px(crate::ui_metrics::UiMetrics::ROW_STATUS_MIN_WIDTH))
+                    .flex_shrink_0()
                     .flex()
                     .items_center()
                     .child(if pkg.has_update {
@@ -636,22 +659,17 @@ mod tests {
                 .size
                 .width
                 .into();
-            if width >= row_floor {
-                // The name takes what the fixed columns leave.
-                assert!(
-                    (cell - (width - row_floor)).abs() < 1.0,
-                    "at {width} px, the name's cell is {cell} and the row leaves {}",
-                    width - row_floor
-                );
-                assert!(
-                    name <= cell + 0.5,
-                    "at {width} px, the name is cut to its cell: {name} in {cell}"
-                );
-            } else {
-                // Below the floor, the name is gone and the row's right end
-                // is cut: the row overflows.
-                assert_eq!(cell, 0.0, "at {width} px the name has no place");
-            }
+            // The name takes what the fixed columns leave — and never less
+            // than its floor: the ladder gives way before it does.
+            let expected = (width - row_floor).max(crate::ui_metrics::UiMetrics::ROW_NAME_MIN_WIDTH);
+            assert!(
+                (cell - expected).abs() < 1.0,
+                "at {width} px, the name's cell is {cell} and the row leaves {expected}"
+            );
+            assert!(
+                name <= cell + 0.5,
+                "at {width} px, the name is cut to its cell: {name} in {cell}"
+            );
             eprintln!("PROBE at {width}: cell={cell} name={name}");
             shares.push((width, cell));
         }
@@ -683,35 +701,45 @@ mod tests {
         // The catalogue's qualified minimum: the width at which the name is
         // whole for 90 % of the real names.
         let qualified = whole(p90);
+        assert_eq!(
+            qualified, 660.0,
+            "the catalogue's qualified minimum, measured"
+        );
         assert!(
             qualified > 560.0,
             "560 px ne suffit pas : le nom du p90 ({p90} px) y est coupé, il lui faut {qualified}"
         );
 
-        // What 560 px buys, measured: the name is cut to a few characters.
-        let at_minimum = shares
+        // What 560 px buys now: the name keeps its floor instead of being
+        // cut to nothing, and the columns that say *where* give way. The
+        // ladder is what makes it possible — the row is not a list of
+        // truncated names any more, it is a row with a short source.
+        let at_560 = shares
             .iter()
             .find(|(width, _)| *width == 560.0)
             .expect("measured at 560");
-        assert_eq!(at_minimum.1, 65.0, "at 560 px the name's cell is 65 px");
+        assert_eq!(
+            at_560.1,
+            crate::ui_metrics::UiMetrics::ROW_NAME_MIN_WIDTH,
+            "at 560 px, the name keeps its floor: {} px of cell",
+            at_560.1
+        );
         assert!(
-            at_minimum.1 - glyph_and_gap < 60.0,
-            "at 560 px, the name shows {} px of text — six characters",
-            at_minimum.1 - glyph_and_gap
+            at_560.1 - glyph_and_gap >= p90,
+            "at 560 px, the name shows {} px of text — the p90 ({p90}) is whole",
+            at_560.1 - glyph_and_gap
         );
 
-        // The concession that would make 560 hold: the measurement bar is
-        // the *reading* of the size, and the size has its own column — the
-        // bar is what the row can do without. Its width is measured, so
-        // what it frees is known, not guessed.
-        let without_the_bar = row_floor - MEASURE_WIDTH;
-        let name_at_560_without_the_bar = 560.0 - 24.0 - (fixed - MEASURE_WIDTH);
-        eprintln!(
-            "PROBE concession: without the bar the row's floor is {without_the_bar}              and the name at 560 has {name_at_560_without_the_bar} px"
-        );
+        // And the row's own floor: below it, the row is cut on the right.
+        let row_floor = 24.0
+            + crate::ui_metrics::UiMetrics::ROW_NAME_MIN_WIDTH
+            + crate::ui_metrics::UiMetrics::ROW_VERSION_MIN_WIDTH
+            + crate::ui_metrics::UiMetrics::ROW_SIZE_MIN_WIDTH
+            + crate::ui_metrics::UiMetrics::ROW_STATUS_MIN_WIDTH;
+        assert_eq!(row_floor, 383.0, "the row's floor, with the ladder");
         assert!(
-            name_at_560_without_the_bar >= p90,
-            "sans la barre de mesure, le nom du p90 tiendrait à 560 px : {name_at_560_without_the_bar} pour {p90}"
+            row_floor < 495.0,
+            "the ladder lets the row fit where it used to overflow: {row_floor} against 495"
         );
     }
 
@@ -820,8 +848,30 @@ mod tests {
                 .debug_bounds("package_row_name_cell")
                 .map(|bounds| bounds.size.width.into())
                 .unwrap_or(0.0);
+            let version: f32 = cx
+                .debug_bounds("package_row_version")
+                .map(|bounds| bounds.size.width.into())
+                .unwrap_or(0.0);
+            let source: f32 = cx
+                .debug_bounds("package_row_source")
+                .map(|bounds| bounds.size.width.into())
+                .unwrap_or(0.0);
+            let measure: f32 = cx
+                .debug_bounds("package_row_measurement")
+                .map(|bounds| bounds.size.width.into())
+                .unwrap_or(0.0);
+            let size: f32 = cx
+                .debug_bounds("package_row_size")
+                .map(|bounds| bounds.size.width.into())
+                .unwrap_or(0.0);
+            let status: f32 = cx
+                .debug_bounds("package_row_status")
+                .map(|bounds| bounds.size.width.into())
+                .unwrap_or(0.0);
 
-            eprintln!("PROBE list at {width}: row {row_width}x{row_height}, name cell {cell}");
+            eprintln!(
+                "PROBE list at {width}: row {row_width}x{row_height}, name {cell}, version {version}, source {source}, measure {measure}, size {size}, status {status}"
+            );
             drawn.push((width, row_width, cell));
 
             // The row is the real row: its height is the catalogue's.
@@ -840,12 +890,218 @@ mod tests {
                 *row_width, *width,
                 "the row takes the list's width: {row_width} in {width}"
             );
-            let expected = (*width - 495.0).max(0.0);
-            assert!(
-                (cell - expected).abs() < 1.0,
-                "at {width} px, the name's cell is {cell} and the fixed columns leave {expected}"
-            );
+            if *width >= 660.0 {
+                // At the catalogue's qualified minimum and above, the row is
+                // the row it has always been: the fixed columns keep their
+                // width and the name takes what is left.
+                let expected = *width - 495.0;
+                assert!(
+                    (cell - expected).abs() < 1.0,
+                    "at {width} px, the name's cell is {cell} and the fixed columns leave {expected}"
+                );
+            } else {
+                // Below it, the ladder: the name keeps its floor — the p90 of
+                // the real names, whole — and the columns that say *where*
+                // give way. The row still fits.
+                assert!(
+                    *cell >= crate::ui_metrics::UiMetrics::ROW_NAME_MIN_WIDTH,
+                    "at {width} px, the name keeps its floor: {cell}"
+                );
+            }
         }
+    }
+
+    /// L'échelle : la composition est la même à toute échelle.
+    ///
+    /// Le banc tourne sur une fenêtre de plateforme dont le facteur
+    /// d'échelle est **2.0** (il est figé dans la plateforme de test de
+    /// gpui) : la mise en page y est calculée en pixels logiques, et les
+    /// bornes mesurées sont les bornes logiques — 600 × 36 pour une ligne,
+    /// quelle que soit l'échelle physique.
+    ///
+    /// Ce test ne peut donc pas régler 1,5 : il mesure ce qui est
+    /// mesurable — que le facteur d'échelle ne **fuit pas** dans la géométrie
+    /// logique, et que les planchers du contrat sont posés en pixels
+    /// logiques.
+    #[gpui::test]
+    fn the_composition_is_in_logical_pixels(cx: &mut gpui::TestAppContext) {
+        struct Fixture {
+            theme: Theme,
+            pkg: UnifiedPackage,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let theme = self.theme.clone();
+                div()
+                    .w(px(600.0))
+                    .child(PackageTable::render_selectable_row(
+                        &self.pkg,
+                        false,
+                        &theme,
+                        false,
+                        u64::MAX,
+                        std::rc::Rc::new(|_w, _cx| {}),
+                    ))
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let fixture = cx.new(|_| Fixture {
+            theme: Theme::dark(),
+            pkg: UnifiedPackage {
+                name: "7zip".into(),
+                version: "14.1.0-1".into(),
+                description: "a package".into(),
+                source_type: "ALPM".into(),
+                repository_or_remote: "extra".into(),
+                is_installed: true,
+                has_update: false,
+                new_version: None,
+                inner: UnifiedPackageSource::Standard(AlpmPackage::default()),
+            },
+        });
+
+        cx.draw(
+            point(px(0.0), px(0.0)),
+            size(px(600.0), px(200.0)),
+            |_window, _cx| fixture.clone(),
+        );
+
+        let row = cx.debug_bounds("package_row").expect("the row is drawn");
+        assert_eq!(
+            row.size.width,
+            px(600.0),
+            "the row's width is logical: the scale factor does not leak into it"
+        );
+        assert_eq!(
+            row.size.height,
+            px(crate::ui_metrics::UiMetrics::ROW_HEIGHT_NORMAL),
+            "and so is its height"
+        );
+
+        // The contract's floors are logical too: the same numbers, whether
+        // the window is 600 logical pixels wide or 600 physical ones.
+        assert_eq!(
+            crate::ui_metrics::UiMetrics::CATALOGUE_MIN_WIDTH,
+            660.0,
+            "the catalogue's floor is in logical pixels"
+        );
+        assert_eq!(
+            crate::config::MIN_WINDOW_WIDTH,
+            720.0,
+            "and so is the window's"
+        );
+    }
+
+    /// La virtualisation de la liste : elle ne dessine que les lignes
+    /// visibles, et elle les recycle.
+    ///
+    /// La liste est le catalogue : cent lignes, et la fenêtre n'en montre
+    /// qu'une dizaine. Ce qui est mesuré, c'est que la liste **ne dessine
+    /// que ce qu'elle montre** — et qu'après un défilement, elle dessine la
+    /// fenêtre nouvelle, pas toutes les lignes du catalogue.
+    #[gpui::test]
+    fn the_list_draws_only_the_rows_it_shows(cx: &mut gpui::TestAppContext) {
+        use gpui::prelude::*;
+        use gpui::{div, point, px, size, uniform_list, Context, Render, Window};
+
+        struct Fixture {
+            handle: gpui::UniformListScrollHandle,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                div().size_full().child(
+                    div()
+                        .h(px(300.0))
+                        .w_full()
+                        .child(
+                            uniform_list("virtual-list", 100, |range, _w, _cx| {
+                                range
+                                    .map(|idx| {
+                                        div()
+                                            .debug_selector(move || format!("vrow-{idx}"))
+                                            .h(px(36.0))
+                                            .w_full()
+                                            .into_any_element()
+                                    })
+                                    .collect::<Vec<_>>()
+                            })
+                            .track_scroll(self.handle.clone())
+                            .h(px(300.0)),
+                        ),
+                )
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let handle = gpui::UniformListScrollHandle::default();
+        let fixture = cx.new(|_| Fixture {
+            handle: handle.clone(),
+        });
+        let draw = |cx: &mut gpui::VisualTestContext| {
+            cx.draw(
+                point(px(0.0), px(0.0)),
+                size(px(600.0), px(400.0)),
+                |_window, _cx| fixture.clone(),
+            );
+        };
+
+        draw(cx);
+
+        // The first rows are there...
+        let first = cx.debug_bounds("vrow-0").expect("the first row is drawn");
+        assert_eq!(first.origin.y, px(0.0), "the first row is at the top");
+
+        // ...and the last of the hundred is not: the list does not draw the
+        // catalogue, it draws the window.
+        assert!(
+            cx.debug_bounds("vrow-99").is_none(),
+            "la liste ne dessine pas les lignes qu'elle ne montre pas"
+        );
+
+        // The list measured its rows: 36 px each, and the content is the
+        // hundred of them.
+        let state = handle.0.borrow();
+        let size = state.last_item_size.expect("the list measured its rows");
+        assert_eq!(
+            size.contents.height,
+            px(36.0 * 100.0),
+            "the list knows the height of its whole content"
+        );
+        drop(state);
+
+        // The scroll: the list now shows another window of the catalogue.
+        let mut offset = handle.0.borrow().base_handle.offset();
+        offset.y = px(-36.0 * 50.0);
+        handle.0.borrow().base_handle.set_offset(offset);
+        draw(cx);
+
+        let scrolled = cx
+            .debug_bounds("vrow-50")
+            .expect("the list draws the row it scrolled to");
+        assert_eq!(
+            scrolled.origin.y,
+            px(0.0),
+            "la ligne 50 est en haut de la fenêtre"
+        );
+        assert!(
+            cx.debug_bounds("vrow-0").is_none(),
+            "et la ligne 0 n'est plus dessinée : elle est recyclée"
+        );
+        assert!(
+            cx.debug_bounds("vrow-99").is_none(),
+            "et la liste ne dessine toujours pas tout le catalogue"
+        );
     }
 
     #[test]

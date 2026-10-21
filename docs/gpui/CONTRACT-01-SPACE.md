@@ -114,6 +114,12 @@ body's rest is **what is actually left**, not what the window was before the
 other bands took their share. A component that measures the window when it
 occupies a band is measuring a space it does not have.
 
+The body has a floor in **both** axes: a width (the catalogue's qualified
+minimum, §4.2) and a height (six rows — a strip is not a catalogue). When the
+band cannot hold the body and a context surface, the context surface leaves
+the flow and comes over the body, summoned by the edge that used to resize
+it. The body's floor is never the thing that gives way.
+
 ### 4.4 The re-organisation ladder
 
 When the space runs short, the composition re-organises by a **deterministic
@@ -127,6 +133,12 @@ ladder**, in this order:
 
 The spine and the body's floor are **not** on the ladder: they are what the
 ladder protects.
+
+The ladder applies to the body's *own* content as well. A row that does not
+fit gives way in a stated order too — the source, then the instrument's
+reading, then the version — and the name, the state and the size never
+shrink. A row that is too narrow is a row with a short source, not a row with
+a truncated name.
 
 ### 4.5 Portrait, landscape, zoom
 

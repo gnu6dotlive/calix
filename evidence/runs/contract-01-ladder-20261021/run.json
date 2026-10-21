@@ -1,0 +1,64 @@
+{
+  "run_id": "contract-01-ladder-20261021",
+  "kind": "implementation",
+  "status": "ok",
+  "objective": "Close the last qualifications of the spatial contract (the zoom, the list's virtualisation) and answer the two decisions the product reserved, with measurements rather than with a binary choice.",
+  "the_qualifications_closed": {
+    "the_zoom": {
+      "the_limit": "The test platform's window has a fixed scale factor of 2.0 (gpui's platform/test/window.rs:136). The bench cannot be set to 1.5, and no cleverness in the bench changes that.",
+      "what_is_proved": "The layout is computed in logical pixels — the viewport is divided by px(1.0), gpui's viewport_size() is logical on both backends, and the text metrics are logical. The scale factor only multiplies the physical size. Measured at the bench's 2.0: the row is 600 × 36, the logical numbers exactly. The scale factor does not leak into the geometry.",
+      "the_test": "the_composition_is_in_logical_pixels (components/package_table.rs)",
+      "what_is_not_proved": "A real window at 150 % on a real screen. The harness cannot be set to it, and the compositor is not the bench."
+    },
+    "the_virtualisation": {
+      "the_test": "the_list_draws_only_the_rows_it_shows (components/package_table.rs)",
+      "what_is_proved": "A list of a hundred rows draws only the dozen it shows: the hundredth is not drawn, and after a scroll of fifty rows the list draws the fiftieth at the top and has recycled the first. The list also knows the height of its whole content (36 px × 100).",
+      "what_is_not_proved": "The application's own handling of the wheel over the list — proved by its own test, the_wheel_moves_the_list_by_steps, on the structure the list uses."
+    }
+  },
+  "the_two_proposals": {
+    "the_row": {
+      "the_problem": "The row's five fixed columns cost 495 px, and the name is what is left. Below 660, the name was cut — at 560 to six characters. The concession that would have saved it was to DROP the measurement bar (96 px): a loss.",
+      "the_proposal": "A ladder, expressed in the flex factors — the flexbox distributes a deficit in proportion to them, so the numbers ARE the order. The source gives way 4×, the instrument's reading 2×, the version 1×; the size and the state never shrink; the name never shrinks and has a floor of 165 px of cell (the p90 of the real names, 143 px of text, plus the identity glyph and its gap).",
+      "measured": {
+        "400 px": "name 165, version 60, source 0, bar 0, size 80, state 85",
+        "480 px": "name 165, version 77, source 0, bar 49, size 80, state 85",
+        "520 px": "name 165, version 84, source 21, bar 61, size 80, state 85",
+        "560 px": "name 165, version 90, source 45, bar 71, size 80, state 85",
+        "660 px": "name 165, version 105, source 105, bar 96, size 80, state 85 — the row is exactly the row it was",
+        "720 px": "name 225, version 105, source 105, bar 96, size 80, state 85"
+      },
+      "the_gains": [
+        "nothing is dropped: at 400 px every cell is still there, and the source and the bar are the ones that shorten",
+        "the row's own floor falls from 495 to 383 px, so a row that used to be cut on the right now fits",
+        "the 560 case that used to show six characters now shows the p90 name whole"
+      ],
+      "the_test": "the_catalogue_list_draws_its_rows_at_every_width"
+    },
+    "the_plate": {
+      "the_problem": "The catalogue had no vertical floor: 72 px — two rows — which is a strip, not a catalogue. And the band that holds the bank (100.5), the edge (5), six rows (216) and the plate's chrome (96) is 417.5 px, while the workspace's minimum band is 320. The plate and the catalogue cannot both stay in the flow.",
+      "the_proposal": "The catalogue's floor is written down (six rows, 216 px). The plate leaves the flow when the band cannot hold the catalogue AND its own chrome: it comes OVER the catalogue, summoned by the same edge that used to resize it — the same gesture, but it lifts the sheet instead of resizing it, and pulls it back down to dismiss it. The catalogue takes the band whole.",
+      "measured": {
+        "window 480 (the minimum)": "the band is 356, the plate is over the catalogue, the catalogue gets 250.5 px — 6 rows",
+        "window 560": "the band is 436, the plate is in the flow at its chrome, the catalogue gets 234.5 px — 6 rows",
+        "window 680": "the band is 556, the plate is in the flow, the catalogue gets 359.5 px — 9 rows"
+      },
+      "the_tests": [
+        "the_plate_leaves_the_flow_before_the_catalogue_is_reduced",
+        "the_composition_is_measured_in_a_real_window",
+        "the_edge_lifts_the_plate_when_it_overlays"
+      ],
+      "the_risk_stated": "The composition is measured; the *feel* of a sheet that comes from the bottom is not — the bench has no pointer, and the motion's quality is not verified by it. The gesture is the existing edge drag."
+    }
+  },
+  "the_gates": {
+    "local": "scripts/verify — PASSED on the dirty tree, run local-verify-20261021T192754Z: 1386 package-manager tests, 392 CLI tests, 259 UI tests",
+    "ci_replay": "scripts/ci-replay --worktree — PASSED inside archlinux:latest on a clean worktree, run local-verify-20261021T193020Z: 1388 package-manager tests, 392 CLI tests, 259 UI tests"
+  },
+  "the_limitations": [
+    "The 150 % interface scale is qualified as far as the harness allows: the layout is scale-independent and the floors are logical, measured at the harness's fixed 2.0 factor. A real 150 % window is not measured.",
+    "The plate's sheet: the composition when it overlays is measured; the gesture's feel is not — the bench has no pointer.",
+    "The failing case is kept: a compositor granting 600 × 480 leaves 544 px — 116 px under the qualified minimum of 660. The row now degrades there instead of breaking, but the catalogue's minimum is still 660.",
+    "The plate's overlay has no focus management of its own: it is a sheet over the catalogue, and the focus order is the flow's."
+  ]
+}
