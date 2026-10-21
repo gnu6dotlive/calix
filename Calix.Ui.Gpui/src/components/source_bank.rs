@@ -1,6 +1,6 @@
 use crate::components::query_workbench::{SourceRetryHandler, SourceToggleHandler};
 use crate::state::package_store::{SourceHealthMap, SourceHealthStatus};
-use crate::state::sources::{SourceAxisEntry, SourceFamily};
+use crate::state::sources::SourceAxisEntry;
 use crate::state::PackageSourceKind;
 use crate::theme::Theme;
 use gpui::prelude::FluentBuilder;
@@ -170,28 +170,18 @@ impl SourceBank {
                         .child("listed, not queried"),
                 )
             })
-            .when(
-                entry.family == SourceFamily::Method,
-                |element| {
-                    element.child(
-                        div()
-                            .text_xs()
-                            .text_color(theme.text_muted)
-                            .child("a single file, not a store"),
-                    )
-                },
-            )
             .into_any_element()
     }
 
     pub fn render(props: SourceBankProps) -> impl IntoElement {
         let theme = props.theme;
         let health_of = |kind| {
-            props.source_health.get(&kind).map(|health| match health.status {
-                SourceHealthStatus::Failed => ("Failed", true),
-                SourceHealthStatus::Disabled => ("Disabled", false),
-                SourceHealthStatus::Loading => ("Loading...", false),
-                SourceHealthStatus::Ready => ("Ready", false),
+            props.source_health.get(&kind).and_then(|health| match health.status {
+                SourceHealthStatus::Failed => Some(("Failed", true)),
+                SourceHealthStatus::Disabled => Some(("Disabled", false)),
+                SourceHealthStatus::Loading => Some(("Loading...", false)),
+                // A source that answered says nothing.
+                SourceHealthStatus::Ready => None,
             })
         };
 
