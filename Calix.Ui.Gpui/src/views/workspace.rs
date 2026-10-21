@@ -112,9 +112,6 @@ impl WorkspaceView {
                     theme,
                     reduce_motion,
                     compact,
-                    aur_enabled,
-                    flatpak_enabled,
-                    appimage_enabled,
                     visual_style: gpui_config.visual_style,
                 },
                 cx,
@@ -1036,12 +1033,6 @@ impl WorkspaceView {
             ws.set_visual_style(gpui.visual_style, cx);
             ws.set_reduce_motion(reduce, cx);
             ws.set_compact(gpui.compact_view, cx);
-            ws.set_sources_enabled(
-                calix.aur_enabled,
-                calix.flat_pack_enabled,
-                calix.app_image_enabled,
-                cx,
-            );
         });
 
         self.sidebar.update(cx, |sb, cx| {
@@ -1862,7 +1853,6 @@ impl WorkspaceView {
                     ws.set_visual_style(self.gpui_config.visual_style, cx);
                     ws.set_reduce_motion(reduce, cx);
                     ws.set_compact(self.gpui_config.compact_view, cx);
-                    ws.set_sources_enabled(draft_aur, draft_flatpak, draft_appimage, cx);
                 });
 
                 if sources_changed {

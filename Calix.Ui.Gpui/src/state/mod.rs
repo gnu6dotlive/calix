@@ -21,6 +21,5 @@ pub use session::{
 };
 pub use sources::{
     also_in, anchor_index, kind_of_source_type, limits_of, scope_kinds, source_axis, AlsoIn,
-    SourceAxisEntry,
 };
 pub use toast::{Toast, ToastAction, ToastCenter, ToastKind, ToastLifecycle};

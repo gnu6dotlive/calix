@@ -1,0 +1,53 @@
+{
+  "run_id": "slice-09-a8-20261021",
+  "kind": "implementation",
+  "status": "ok",
+  "objective": "Two axes, two controls: the sources leave the filters menu, and the menu leaves with them.",
+  "what_was_deleted": {
+    "the_menu": "the Filters popover, its items, its button, its trigger, its badge, and the WorkbenchMenu::Filters variant",
+    "the_items": "MenuCheckItem and MenuCheckItemProps — a checkable item with a health badge and its own retry, built for the sources alone — and MenuDivider, which only that menu used",
+    "the_settings": "the three source flags the menu read (aur_enabled, flatpak_enabled, appimage_enabled): the view's fields, the config's fields, set_sources_enabled, and the workspace's two calls",
+    "the_duplicates": "SourceRetryHandler was defined three times and SourceToggleHandler once, all in the workbench. Both now live in components/source_bank.rs, the component that owns the axis."
+  },
+  "the_discovery": {
+    "the_menu_could_never_open": "the window cannot be narrower than 1024 px (config::MIN_WINDOW_WIDTH) and the sidebar is 190 px expanded, so the content is never under 834 px. WorkbenchBreakpoint::Wide begins at 640: Medium and Narrow are unreachable, and the Filters button — which existed only where the state button was hidden — had no width in which to appear. The sources went, the state has its own button, and the menu had nothing left to hold.",
+    "the_choice": "delete it. A fallback that cannot fall is not a fallback, and a menu that cannot open is not a control. The narrow layout is recorded as unauthored rather than left as a branch nobody can run.",
+    "the_width_floor_is_the_older_decision": "MIN_WINDOW_WIDTH arrives with the rename and the breakpoints with UX-02P, and the floor has never been lowered. The pass that decides whether Calix runs narrower than 1024 px will have to author the narrow layout and lower the floor together.",
+    "the_measurement": "a resize to 640 px was refused by the compositor at 1024 px, which is how the contradiction was found: the screenshot of the 'narrow' window showed the wide toolbar."
+  },
+  "the_keyboard": {
+    "the_bug": "menu_item_count and activate_menu_item believed the state menu held four states while the menu drew PackageStateFilter::options_for(scope) — two in Installed, one in Updates. Pressing Down in the Installed scope walked to options that were not on screen, and Enter on the third item set a state the menu never offered.",
+    "the_fix": "both ask options_for(scope): the list drawn and the list walked are the same list.",
+    "the_proof": "by the rule; the synthetic keyboard of this machine never reaches the client, so no keypress proves it."
+  },
+  "the_trap": {
+    "what_happened": "a #[cfg(test)] mod tests with `use super::*` appended to a file that does `use gpui::*` makes the bare #[test] resolve to gpui's attribute macro instead of the built-in one. The macro expands to a #[test] of its own in the same scope, where it resolves to itself: infinite expansion, and rustc dies with SIGSEGV inside libgpui_macros after a stack overflow.",
+    "the_symptom": "cargo build passed; only cargo test --release crashed, because the module was behind #[cfg(test)].",
+    "the_rule": "in a test module under a gpui file, import what it tests by name, or write `use core::prelude::v1::test;` the way components/menu.rs does. Never glob a module that globs gpui while a #[test] is in scope.",
+    "the_bisect": "reverting the file to HEAD made the crash a plain compile error; a minimal module without the glob built; the glob alone was enough to crash."
+  },
+  "what_was_seen": {
+    "the_wide_toolbar": "Search, State: All States, Sort: Relevance, the view switcher — no Filters, at 1080 × 935",
+    "the_state_menu": "it opens with 'Filter by State' and the two states of the Installed scope (All States, Updates Available); choosing Updates Available turns the label accent-coloured",
+    "the_bank": "unchanged, and now the only source control: its apertures toggle and take the accent focus"
+  },
+  "the_artefacts": [
+    {"path": "Calix.Ui.Gpui/src/components/query_workbench.rs", "what": "the menu, its items, its badge and its variant are gone; the state button is the state control at every width"},
+    {"path": "Calix.Ui.Gpui/src/components/menu.rs", "what": "MenuCheckItem, MenuCheckItemProps and MenuDivider deleted"},
+    {"path": "Calix.Ui.Gpui/src/components/source_bank.rs", "what": "owns SourceToggleHandler and SourceRetryHandler"},
+    {"path": "Calix.Ui.Gpui/src/components/context_header.rs", "what": "one definition of the retry handler, imported"},
+    {"path": "Calix.Ui.Gpui/src/views/package_workstation.rs", "what": "the Filters keyboard arms gone; menu_item_count and activate_menu_item follow options_for(scope); the three settings fields and set_sources_enabled gone"},
+    {"path": "Calix.Ui.Gpui/src/views/workspace.rs", "what": "the two set_sources_enabled calls and the three config fields gone"},
+    {"path": "Calix.Ui.Gpui/src/state/mod.rs", "what": "the SourceAxisEntry re-export had no reader left"},
+    {"path": "docs/gpui/slice-09/05-ACCEPTANCE-MATRIX.md", "what": "A8 proved; the unreachable breakpoints and the keyboard's wrong count recorded as gaps"}
+  ],
+  "the_gates": {
+    "local": "scripts/verify — PASSED on a dirty tree, run local-verify-20261021T065136Z, 1386 package-manager tests, 235 UI tests",
+    "ci_replay": "scripts/ci-replay --worktree — PASSED inside archlinux:latest on a clean checkout, run local-verify-20261021T065405Z, 1388 package-manager tests, 235 UI tests"
+  },
+  "the_gaps": [
+    "the narrow layout (Medium, Narrow) is unreachable and therefore unproven: the window floor is 1024 px; Narrow still shortens the sort label",
+    "the state menu's keyboard navigation is proved by the rule, not by a keypress",
+    "the inspector's tab body still animates its opacity only; its `left` offset falls on a flow child and moves nothing"
+  ]
+}

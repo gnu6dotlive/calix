@@ -1,3 +1,4 @@
+use crate::components::source_bank::SourceRetryHandler;
 use crate::state::package_store::{SourceHealthMap, SourceHealthStatus};
 use crate::state::query::{PackageStateFilter, SourceScope};
 use crate::state::{NavScope, PackageSourceKind, Place};
@@ -7,7 +8,6 @@ use gpui::*;
 use std::rc::Rc;
 
 pub type WindowActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
-pub type SourceRetryHandler = Rc<dyn Fn(PackageSourceKind, &mut Window, &mut App) + 'static>;
 
 pub struct ContextHeaderProps<'a> {
     /// Le lieu : la surface des paquets, Actualités ou Réglages.

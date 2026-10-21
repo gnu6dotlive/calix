@@ -7,13 +7,13 @@ use crate::components::query_workbench::{
 };
 use crate::components::scope_dial::ScopeDialView;
 use crate::components::search_input::SearchInputView;
-use crate::components::source_bank::{SourceBank, SourceBankProps};
+use crate::components::source_bank::{SourceBank, SourceBankProps, SourceRetryHandler};
 use crate::components::unified_search::UnifiedSearch;
 use crate::state::console::{ConsoleEvent, ConsoleModel};
-use crate::state::query::{PackageStateFilter, SortMode, SourceScope, WorkbenchBreakpoint};
+use crate::state::query::{PackageStateFilter, SortMode, SourceScope};
 use crate::state::{
     also_in, canonical_install_command, source_axis, AlsoIn, AppSession, NavScope, PackageKey,
-    PackageSourceKind, PackageStore, PackageViewMode, SessionEvent, ToastCenter, ToastKind,
+    PackageStore, PackageViewMode, SessionEvent, ToastCenter, ToastKind,
 };
 use crate::theme::Theme;
 use crate::ui_metrics::UiMetrics;
@@ -28,7 +28,6 @@ use std::time::Duration;
 pub type PackageMutationHandler =
     Rc<dyn Fn(&UnifiedPackage, bool /* is_install */, &mut Window, &mut App) + 'static>;
 pub type SystemUpgradeHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
-pub type SourceRetryHandler = Rc<dyn Fn(PackageSourceKind, &mut Window, &mut App) + 'static>;
 pub type ActionReloadHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 pub type DetailsRetryHandler = Rc<dyn Fn(&PackageKey, &mut Window, &mut App) + 'static>;
 
@@ -227,9 +226,6 @@ pub struct PackageWorkstationView {
     pub theme: Theme,
     pub visual_style: VisualStyleId,
     pub compact: bool,
-    pub aur_enabled: bool,
-    pub flatpak_enabled: bool,
-    pub appimage_enabled: bool,
     pub search_input: Entity<SearchInputView>,
     /// The dial of the scope: one object with three positions.
     pub scope_dial: Entity<ScopeDialView>,
@@ -237,7 +233,6 @@ pub struct PackageWorkstationView {
     _scope_dial_sub: Subscription,
     pub active_menu: Option<ActiveMenuState>,
     pub menu_epoch: usize,
-    pub filters_btn_focus: FocusHandle,
     pub state_btn_focus: FocusHandle,
     pub sort_btn_focus: FocusHandle,
     pub menu_surface_focus: FocusHandle,
@@ -248,9 +243,6 @@ pub struct PackageWorkstationConfig {
     pub theme: Theme,
     pub reduce_motion: bool,
     pub compact: bool,
-    pub aur_enabled: bool,
-    pub flatpak_enabled: bool,
-    pub appimage_enabled: bool,
     pub visual_style: VisualStyleId,
 }
 
@@ -341,9 +333,6 @@ impl PackageWorkstationView {
             theme: config.theme,
             visual_style: config.visual_style,
             compact: config.compact,
-            aur_enabled: config.aur_enabled,
-            flatpak_enabled: config.flatpak_enabled,
-            appimage_enabled: config.appimage_enabled,
             search_input,
             marker: None,
             selection_epoch: 0,
@@ -354,7 +343,6 @@ impl PackageWorkstationView {
             _scope_dial_sub: dial_subscription,
             active_menu: None,
             menu_epoch: 0,
-            filters_btn_focus: cx.focus_handle(),
             state_btn_focus: cx.focus_handle(),
             sort_btn_focus: cx.focus_handle(),
             menu_surface_focus: cx.focus_handle(),
@@ -435,7 +423,6 @@ impl PackageWorkstationView {
         }
 
         match current.menu {
-            WorkbenchMenu::Filters => window.focus(&self.filters_btn_focus),
             WorkbenchMenu::State => window.focus(&self.state_btn_focus),
             WorkbenchMenu::Sort => window.focus(&self.sort_btn_focus),
         }
@@ -472,25 +459,11 @@ impl PackageWorkstationView {
         }
     }
 
-    pub fn menu_item_count(&self, menu: WorkbenchMenu, breakpoint: WorkbenchBreakpoint) -> usize {
+    pub fn menu_item_count(&self, menu: WorkbenchMenu, scope: NavScope) -> usize {
         match menu {
-            WorkbenchMenu::Filters => {
-                let mut count = 1; // ALPM
-                if self.aur_enabled {
-                    count += 1;
-                }
-                if self.flatpak_enabled {
-                    count += 1;
-                }
-                if self.appimage_enabled {
-                    count += 1;
-                }
-                if breakpoint == WorkbenchBreakpoint::Narrow {
-                    count += 4; // All, Installed, NotInstalled, UpdatesAvailable
-                }
-                count
-            }
-            WorkbenchMenu::State => 4,
+            // Les états sont ceux du périmètre : le menu montre exactement la
+            // liste que le clavier parcourt.
+            WorkbenchMenu::State => PackageStateFilter::options_for(scope).len(),
             WorkbenchMenu::Sort => 6,
         }
     }
@@ -498,7 +471,6 @@ impl PackageWorkstationView {
     pub fn navigate_menu(
         &mut self,
         key: &str,
-        breakpoint: WorkbenchBreakpoint,
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
@@ -506,7 +478,7 @@ impl PackageWorkstationView {
             return;
         };
 
-        let total = self.menu_item_count(current.menu, breakpoint);
+        let total = self.menu_item_count(current.menu, self.session.read(cx).scope);
         if total == 0 {
             return;
         }
@@ -546,7 +518,6 @@ impl PackageWorkstationView {
                 self.activate_menu_item(
                     current.menu,
                     current.highlighted_index,
-                    breakpoint,
                     window,
                     cx,
                 );
@@ -559,52 +530,15 @@ impl PackageWorkstationView {
         &mut self,
         menu: WorkbenchMenu,
         index: usize,
-        breakpoint: WorkbenchBreakpoint,
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
         match menu {
-            WorkbenchMenu::Filters => {
-                let mut sources = vec![PackageSourceKind::Alpm];
-                if self.aur_enabled {
-                    sources.push(PackageSourceKind::Aur);
-                }
-                if self.flatpak_enabled {
-                    sources.push(PackageSourceKind::Flatpak);
-                }
-                if self.appimage_enabled {
-                    sources.push(PackageSourceKind::AppImage);
-                }
-
-                if index < sources.len() {
-                    let source = sources[index];
-                    self.session.update(cx, |s, cx| {
-                        s.toggle_source(source, cx);
-                    });
-                } else if breakpoint == WorkbenchBreakpoint::Narrow {
-                    let state_idx = index - sources.len();
-                    let states = [
-                        PackageStateFilter::All,
-                        PackageStateFilter::Installed,
-                        PackageStateFilter::NotInstalled,
-                        PackageStateFilter::UpdatesAvailable,
-                    ];
-                    if let Some(&state) = states.get(state_idx) {
-                        self.session.update(cx, |s, cx| {
-                            s.set_state_filter(state, cx);
-                        });
-                        self.close_menu(window, cx);
-                    }
-                }
-            }
             WorkbenchMenu::State => {
-                let states = [
-                    PackageStateFilter::All,
-                    PackageStateFilter::Installed,
-                    PackageStateFilter::NotInstalled,
-                    PackageStateFilter::UpdatesAvailable,
-                ];
-                if let Some(&state) = states.get(index) {
+                // Les états sont ceux du périmètre, dans l'ordre où le menu
+                // les montre : les deux listes sont la même.
+                let scope = self.session.read(cx).scope;
+                if let Some(&state) = PackageStateFilter::options_for(scope).get(index) {
                     self.session.update(cx, |s, cx| {
                         s.set_state_filter(state, cx);
                     });
@@ -628,19 +562,6 @@ impl PackageWorkstationView {
                 }
             }
         }
-    }
-
-    pub fn set_sources_enabled(
-        &mut self,
-        aur: bool,
-        flatpak: bool,
-        appimage: bool,
-        cx: &mut Context<Self>,
-    ) {
-        self.aur_enabled = aur;
-        self.flatpak_enabled = flatpak;
-        self.appimage_enabled = appimage;
-        cx.notify();
     }
 
     pub fn set_on_mutation(&mut self, handler: PackageMutationHandler) {
@@ -855,10 +776,6 @@ impl Render for PackageWorkstationView {
         let on_menu = entity.clone();
         let on_nav_menu = entity.clone();
         let on_retry = entity.clone();
-        let aur_enabled = self.aur_enabled;
-        let flatpak_enabled = self.flatpak_enabled;
-        let appimage_enabled = self.appimage_enabled;
-        let breakpoint = WorkbenchBreakpoint::from_width(active_list_width);
         let store = self.store.read(cx);
 
         // L'axe des sources : ce que chaque source tient, et combien de
@@ -898,30 +815,16 @@ impl Render for PackageWorkstationView {
             search_input: self.search_input.clone(),
             list_pane_width: active_list_width,
             scope,
-            source_scope,
             state_filter,
             sort_mode,
             view_mode,
             active_menu_state: self.active_menu,
             reduce_motion: self.reduce_motion,
-            aur_enabled,
-            flatpak_enabled,
-            appimage_enabled,
-            source_health: &store.source_health,
-            source_axis: &source_axis,
             theme: &theme,
             visual_style: self.visual_style,
-            filters_btn_focus: self.filters_btn_focus.clone(),
             state_btn_focus: self.state_btn_focus.clone(),
             sort_btn_focus: self.sort_btn_focus.clone(),
             menu_surface_focus: self.menu_surface_focus.clone(),
-            on_toggle_source: Rc::new(move |kind, _w, cx| {
-                on_toggle_source.update(cx, |view, cx| {
-                    view.session.update(cx, |s, cx| {
-                        s.toggle_source(kind, cx);
-                    });
-                });
-            }),
             on_select_state: Rc::new(move |state, _w, cx| {
                 on_state.update(cx, |view, cx| {
                     view.session.update(cx, |s, cx| {
@@ -950,14 +853,8 @@ impl Render for PackageWorkstationView {
             }),
             on_navigate_menu: Rc::new(move |key, window, cx| {
                 on_nav_menu.update(cx, |view, cx| {
-                    view.navigate_menu(key, breakpoint, window, cx);
+                    view.navigate_menu(key, window, cx);
                 });
-            }),
-            on_retry_source: Rc::new(move |kind, w, cx| {
-                let cb = on_retry.read(cx).on_retry_source.clone();
-                if let Some(cb) = cb {
-                    cb(kind, w, cx);
-                }
             }),
             scope_action: match scope {
                 NavScope::Updates => self.on_upgrade_all.clone().map(|handler| ScopeAction {

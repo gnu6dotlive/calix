@@ -1,4 +1,3 @@
-use crate::components::query_workbench::{SourceRetryHandler, SourceToggleHandler};
 use crate::state::motion::{waterfall_duration, waterfall_entry, Weight, WaterfallStep};
 use crate::state::package_store::{SourceHealthMap, SourceHealthStatus};
 use crate::state::sources::SourceAxisEntry;
@@ -6,7 +5,13 @@ use crate::state::PackageSourceKind;
 use crate::theme::Theme;
 use gpui::prelude::FluentBuilder;
 use gpui::*;
+use std::rc::Rc;
 use std::time::Duration;
+
+/// Ce que fait une ouverture de la banque : elle bascule une source du
+/// périmètre, ou relance une source en échec.
+pub type SourceToggleHandler = Rc<dyn Fn(PackageSourceKind, &mut Window, &mut App) + 'static>;
+pub type SourceRetryHandler = Rc<dyn Fn(PackageSourceKind, &mut Window, &mut App) + 'static>;
 
 /// The source bank: seven apertures, one per source.
 ///

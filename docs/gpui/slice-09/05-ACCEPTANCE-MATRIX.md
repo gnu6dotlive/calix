@@ -13,7 +13,7 @@ only until the next change.
 | A5 | The card says where else the name is found, with the versions | `the_card_says_where_else_the_name_is_found`; the overview's *ALSO IN* band | proved by the test; the rendering is seen by the eye |
 | A6 | The bank is always present, and it is reachable by the keyboard | the apertures are focusable, tab stops, and answer Enter and Space; the bank is in the plate at every width | proved by the eye |
 | A7 | The keyboard leaves the surface | the key map is a translucent overlay, **derived from the registry**; the surface carries no key glyph; the overlay is opened by the `?` disc in the header, or by holding the modifier alone for three seconds | **done**: `state/keys.rs` is the single source of truth ✗ — the handler asks it what a key means ✗, and the sheet is derived from it ✗; `the_registry_is_the_source_of_the_bindings` ✗, `the_sheet_draws_without_panicking` ✗. The gesture is not verified by hand ✗ (the synthetic keys of this machine never reach the client ✗) |
-| A8 | The sources leave the filters menu | the menu still offers them, bound to the same selection | **not done**: the menu keeps the sources as the narrow fallback |
+| A8 | The sources leave the filters menu | the menu is gone. The sources are the bank's, and the menu's only other content was the state — which has its own button at every reachable width. `menu_item_count` and `activate_menu_item` count the states the scope offers, the same list the menu draws | **done**: the menu, its items (`MenuCheckItem`, `MenuDivider`) and the three settings it existed to read are deleted; the wide toolbar carries Search, State, Sort, View — seen at 1080 × 935 |
 | A9 | The detail is a nameplate, a full-width band under the readout | the plate: bank → readout → edge → nameplate; the vertical splitter and the right-hand column are gone | **done**; the nameplate's bounds are proved by `the_nameplate_stays_inside_its_bounds_at_the_heights_a_tiling_compositor_uses` and `the_nameplate_never_swallows_the_readout` |
 | A10 | The log is a tape: the product's own command, then what the backend actually ran | the operation log is a band at the bottom of the frame; it now carries the product's command (`$ calix install standard ripgrep`) above the backend's output | **done**; the product's command is the console model's `product_command`, set when the operation starts |
 | A11 | The scope is a dial, one object with three positions, and it does not look like the bank | `components/scope_dial.rs`: a machined disc, three detents on the arc, a needle thrown at the detent; the header's segmented switcher is gone | **done**; the needle's throw is `ease_out_back` (`the_overshoot_passes_the_target_and_comes_back`), the positions are `the_three_positions_are_on_the_upper_arc` |
@@ -58,9 +58,21 @@ the bank's arrival, and leaves the scroll as it is.
 
 ## The gaps of this run
 
-- A8 is open: the filters menu still offers the sources, bound to the same
-  selection. The bank is meant to be the only source control, and until the
-  menu gives them up the two axes share one.
+- The two narrow breakpoints cannot be reached. The window's minimum width is
+  1024 px (`config::MIN_WINDOW_WIDTH`) and the sidebar is 190 px expanded, so
+  the content is never under 834 px: the workbench is always Wide. That is why
+  the filters menu could never open: it existed only to hold the state where
+  the state button was hidden, and that place does not exist. The menu is
+  deleted rather than left as a fallback that cannot fall. If the application
+  is ever to run under 1024 px, the narrow layout has to be authored — and the
+  minimum lowered with it — not resurrected from a branch that never ran.
+  `Narrow` still shortens the sort label; that branch is unreachable too, and
+  it is left for the pass that decides the window's floor.
+- The keyboard's state menu had never matched the drawn one: it believed four
+  states while the menu drew `PackageStateFilter::options_for(scope)` — two in
+  Installed, one in Updates. It now counts and activates the same list. The
+  synthetic keyboard of this machine never reaches the client, so it is proved
+  by the rule, not by a keypress.
 - The inspector's tab body still animates its opacity only. Its `left` offset
   falls on a flow child, where this version of gpui ignores it, so the fade
   carries the change alone.

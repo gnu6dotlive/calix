@@ -1,14 +1,11 @@
 use crate::components::menu::{
-    MenuActionHandler, MenuCheckItem, MenuCheckItemProps, MenuCheckmarkItem, MenuDivider,
-    MenuKeyHandler, MenuLifecycle, MenuSection, MenuSurface, MenuSurfaceProps,
+    MenuCheckmarkItem, MenuKeyHandler, MenuLifecycle, MenuSection, MenuSurface, MenuSurfaceProps,
 };
 use crate::components::search_input::SearchInputView;
 use crate::components::view_mode_switcher::{ViewModeSwitcher, ViewModeSwitcherProps};
-use crate::state::package_store::{SourceHealthMap, SourceHealthStatus};
-use crate::state::query::{PackageStateFilter, SortMode, SourceScope, WorkbenchBreakpoint};
-use crate::state::SourceAxisEntry;
+use crate::state::query::{PackageStateFilter, SortMode, WorkbenchBreakpoint};
 use crate::state::session::NavScope;
-use crate::state::{PackageSourceKind, PackageViewMode};
+use crate::state::PackageViewMode;
 use crate::theme::Theme;
 use crate::visual_style::paint::apply_surface_projection;
 use crate::visual_style::roles::SurfaceRole;
@@ -18,7 +15,6 @@ use std::rc::Rc;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WorkbenchMenu {
-    Filters,
     State,
     Sort,
 }
@@ -31,46 +27,34 @@ pub struct ActiveMenuState {
     pub highlighted_index: usize,
 }
 
-pub type SourceToggleHandler = Rc<dyn Fn(PackageSourceKind, &mut Window, &mut App) + 'static>;
 pub type StateSelectHandler = Rc<dyn Fn(PackageStateFilter, &mut Window, &mut App) + 'static>;
 pub type SortSelectHandler = Rc<dyn Fn(SortMode, &mut Window, &mut App) + 'static>;
 pub type ViewModeHandler = Rc<dyn Fn(PackageViewMode, &mut Window, &mut App) + 'static>;
 pub type MenuToggleHandler = Rc<dyn Fn(Option<WorkbenchMenu>, &mut Window, &mut App) + 'static>;
-pub type SourceRetryHandler = Rc<dyn Fn(PackageSourceKind, &mut Window, &mut App) + 'static>;
 pub type ActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 
 pub struct QueryWorkbenchProps<'a> {
     pub search_input: Entity<SearchInputView>,
     /// The dial of the scope: one object with three positions.
     pub list_pane_width: f32,
-    /// Le périmètre : il décide de ce que le contrôle des sources et de l'état
+    /// Le périmètre : il décide de ce que la banque et le filtre d'état
     /// proposent.
     pub scope: NavScope,
-    pub source_scope: SourceScope,
     pub state_filter: PackageStateFilter,
     pub sort_mode: SortMode,
     pub view_mode: PackageViewMode,
     pub active_menu_state: Option<ActiveMenuState>,
     pub reduce_motion: bool,
-    pub aur_enabled: bool,
-    pub flatpak_enabled: bool,
-    pub appimage_enabled: bool,
-    pub source_health: &'a SourceHealthMap,
-    /// L'axe des sources : ce que chaque source tient, et combien de lignes.
-    pub source_axis: &'a [SourceAxisEntry],
     pub theme: &'a Theme,
     pub visual_style: VisualStyleId,
-    pub filters_btn_focus: FocusHandle,
     pub state_btn_focus: FocusHandle,
     pub sort_btn_focus: FocusHandle,
     pub menu_surface_focus: FocusHandle,
-    pub on_toggle_source: SourceToggleHandler,
     pub on_select_state: StateSelectHandler,
     pub on_select_sort: SortSelectHandler,
     pub on_select_view_mode: ViewModeHandler,
     pub on_toggle_menu: MenuToggleHandler,
     pub on_navigate_menu: MenuKeyHandler,
-    pub on_retry_source: SourceRetryHandler,
     /// L'action propre au périmètre, quand il en a une.
     pub scope_action: Option<ScopeAction>,
 }
@@ -82,27 +66,7 @@ pub struct ScopeAction {
     pub handler: ActionHandler,
 }
 
-/// Computes the active filter badge count (non-default sources or state).
-pub fn compute_filter_badge_count(
-    source_scope: &SourceScope,
-    state_filter: PackageStateFilter,
-    aur_enabled: bool,
-    flatpak_enabled: bool,
-    appimage_enabled: bool,
-) -> usize {
-    let mut count = 0;
-    if !source_scope.is_all_enabled(aur_enabled, flatpak_enabled, appimage_enabled) {
-        count += 1;
-    }
-    if state_filter != PackageStateFilter::All {
-        count += 1;
-    }
-    count
-}
-
-
-/// Arguments pour le calcul de la ligne de statut permanente.
-
+/// La barre de requête : la recherche, l'état, le tri et la vue.
 pub struct QueryWorkbench;
 
 impl QueryWorkbench {
@@ -117,249 +81,13 @@ impl QueryWorkbench {
             .h(px(40.0))
             .child(props.search_input.clone());
 
-        // ── 2. Filters Popover Setup ──────────────────────────────────────────
+        // ── 2. The menus' shared state ────────────────────────────────────────
         let on_toggle_menu = props.on_toggle_menu.clone();
         let active_state = props.active_menu_state;
-        let is_filters_open = active_state.is_some_and(|s| {
-            s.menu == WorkbenchMenu::Filters && s.lifecycle != MenuLifecycle::Closed
-        });
-        let filters_lifecycle = active_state
-            .and_then(|s| (s.menu == WorkbenchMenu::Filters).then_some(s.lifecycle))
-            .unwrap_or(MenuLifecycle::Closed);
-        let filters_epoch = active_state
-            .and_then(|s| (s.menu == WorkbenchMenu::Filters).then_some(s.anim_epoch))
-            .unwrap_or(0);
-        let filters_highlighted = active_state
-            .and_then(|s| (s.menu == WorkbenchMenu::Filters).then_some(s.highlighted_index))
-            .unwrap_or(0);
-
-        let on_close_filters = {
-            let cb = on_toggle_menu.clone();
-            Rc::new(move |window: &mut Window, cx: &mut App| {
-                cb(None, window, cx);
-            })
-        };
-
-        let filter_badge_count = compute_filter_badge_count(
-            &props.source_scope,
-            props.state_filter,
-            props.aur_enabled,
-            props.flatpak_enabled,
-            props.appimage_enabled,
-        );
-
-        let filters_btn_text = if filter_badge_count > 0 {
-            format!("Filters  {filter_badge_count}")
-        } else {
-            "Filters ▾".to_string()
-        };
-
+        // L'anneau de focus des deux menus qui restent.
         let focus_border = theme.border_focus;
-        let on_toggle_filters_btn = on_toggle_menu.clone();
-        let on_toggle_filters_key = on_toggle_menu.clone();
 
-        // Build items for Filters popover
-        let mut filter_menu_items = Vec::new();
-        filter_menu_items.push(MenuSection::render("Sources", theme).into_any_element());
-
-        let build_health_badge = |kind: PackageSourceKind| -> (Option<&'static str>, bool) {
-            if let Some(h) = props.source_health.get(&kind) {
-                match h.status {
-                    SourceHealthStatus::Failed => (Some("Failed"), true),
-                    SourceHealthStatus::Disabled => (Some("Disabled"), false),
-                    SourceHealthStatus::Loading => (Some("Loading..."), false),
-                    SourceHealthStatus::Ready => (None, false),
-                }
-            } else {
-                (None, false)
-            }
-        };
-
-        let mut item_index = 0;
-
-        // Les sources du périmètre : celles qu'il contient, et pas d'autres.
-        for entry in props.source_axis.iter() {
-            let is_enabled = match entry.kind {
-                PackageSourceKind::Alpm => true,
-                PackageSourceKind::Aur => props.aur_enabled,
-                PackageSourceKind::Flatpak => props.flatpak_enabled,
-                PackageSourceKind::AppImage => props.appimage_enabled,
-                // Les écosystèmes d'inventaire n'ont pas de dépôt à interroger :
-                // ils ne se conjuguent pas.
-                PackageSourceKind::Cargo | PackageSourceKind::Npm | PackageSourceKind::Release => {
-                    true
-                }
-            };
-            if !is_enabled {
-                continue;
-            }
-            let (health_lbl, is_failed) = if entry.inventory_only {
-                (None, false)
-            } else {
-                build_health_badge(entry.kind)
-            };
-            let on_retry = if is_failed {
-                let cb = props.on_retry_source.clone();
-                let kind = entry.kind;
-                Some(Rc::new(move |w: &mut Window, a: &mut App| {
-                    cb(kind, w, a);
-                }) as MenuActionHandler)
-            } else {
-                None
-            };
-            let on_toggle = props.on_toggle_source.clone();
-            let kind = entry.kind;
-            let id: &'static str = Box::leak(
-                format!("menu_source_{}", kind.as_str()).into_boxed_str(),
-            );
-            let retry_id: &'static str = Box::leak(
-                format!("menu_retry_{}", kind.as_str()).into_boxed_str(),
-            );
-            filter_menu_items.push(
-                MenuCheckItem::render(MenuCheckItemProps {
-                    id: id.into(),
-                    retry_id: retry_id.into(),
-                    label: entry.label.into(),
-                    note: Some(entry.holds),
-                    count: Some(entry.count),
-                    is_checked: props.source_scope.is_selected(kind),
-                    is_highlighted: is_filters_open && filters_highlighted == item_index,
-                    health_label: health_lbl,
-                    is_failed,
-                    theme,
-                    on_toggle: Rc::new(move |w, a| on_toggle(kind, w, a)),
-                    on_retry,
-                })
-                .into_any_element(),
-            );
-            item_index += 1;
-        }
-
-
-
-
-        // In Narrow mode ONLY: dynamically include Package State in Filters menu
-        if breakpoint == WorkbenchBreakpoint::Narrow {
-            filter_menu_items.push(MenuDivider::render(theme).into_any_element());
-            filter_menu_items.push(MenuSection::render("Package State", theme).into_any_element());
-            for state in PackageStateFilter::options_for(props.scope) {
-                let state = *state;
-                let on_select = props.on_select_state.clone();
-                let close_cb = on_close_filters.clone();
-                let state_val = state;
-                let id_str = match state {
-                    PackageStateFilter::All => "menu_state_all",
-                    PackageStateFilter::Installed => "menu_state_installed",
-                    PackageStateFilter::NotInstalled => "menu_state_not_installed",
-                    PackageStateFilter::UpdatesAvailable => "menu_state_updates",
-                };
-                filter_menu_items.push(
-                    MenuCheckmarkItem::render(
-                        id_str.into(),
-                        state.label(),
-                        props.state_filter == state,
-                        is_filters_open && filters_highlighted == item_index,
-                        theme,
-                        Rc::new(move |w, a| {
-                            on_select(state_val, w, a);
-                            close_cb(w, a);
-                        }),
-                    )
-                    .into_any_element(),
-                );
-                item_index += 1;
-            }
-        }
-
-        let on_nav_filters = props.on_navigate_menu.clone();
-
-        let filters_dropdown = if is_filters_open {
-            Some(
-                deferred(
-                    anchored()
-                        .anchor(Corner::TopLeft)
-                        .offset(point(px(0.0), px(30.0)))
-                        .snap_to_window()
-                        .child(MenuSurface::render(MenuSurfaceProps {
-                            id: "filters_menu_surface".into(),
-                            theme,
-                            min_width: px(240.0),
-                            reduce_motion: props.reduce_motion,
-                            lifecycle: filters_lifecycle,
-                            anim_epoch: filters_epoch,
-                            focus_handle: Some(props.menu_surface_focus.clone()),
-                            visual_style: props.visual_style,
-                            on_close: on_close_filters,
-                            on_key_navigate: Some(on_nav_filters),
-                            children: filter_menu_items,
-                        })),
-                )
-                .into_any_element(),
-            )
-        } else {
-            None
-        };
-
-        // Unboxed command trigger for Filters
-        let filters_trigger = div()
-            .id("workbench_filters_btn")
-            .relative()
-            .track_focus(&props.filters_btn_focus)
-            .tab_stop(true)
-            .focus(move |s| s.border_1().border_color(focus_border))
-            .on_key_down(move |event, window, cx| {
-                let key = event.keystroke.key.as_str();
-                if key == "enter" || key == "space" {
-                    let next = if is_filters_open {
-                        None
-                    } else {
-                        Some(WorkbenchMenu::Filters)
-                    };
-                    on_toggle_filters_key(next, window, cx);
-                }
-            })
-            .flex()
-            .items_center()
-            .h(px(28.0))
-            .gap(px(5.0))
-            .px(px(8.0))
-            .rounded_md()
-            .bg(if is_filters_open {
-                theme.bg_surface_active
-            } else {
-                gpui::rgba(0x00000000)
-            })
-            .border_1()
-            .border_color(if is_filters_open {
-                theme.border
-            } else {
-                gpui::rgba(0x00000000)
-            })
-            .text_xs()
-            .font_weight(if filter_badge_count > 0 {
-                FontWeight::BOLD
-            } else {
-                FontWeight::NORMAL
-            })
-            .text_color(if filter_badge_count > 0 || is_filters_open {
-                theme.accent
-            } else {
-                theme.text_secondary
-            })
-            .cursor_pointer()
-            .hover(|s| s.bg(theme.bg_surface_hover).text_color(theme.text_primary))
-            .child(filters_btn_text)
-            .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
-                let next = if is_filters_open {
-                    None
-                } else {
-                    Some(WorkbenchMenu::Filters)
-                };
-                on_toggle_filters_btn(next, window, cx);
-            })
-            .children(filters_dropdown);
-
-        // ── 3. State Dropdown (Wide and Medium Breakpoints ONLY) ───────────────
+        // ── 3. State Dropdown ─────────────────────────────────────────────────
         let is_state_open = active_state.is_some_and(|s| {
             s.menu == WorkbenchMenu::State && s.lifecycle != MenuLifecycle::Closed
         });
@@ -380,7 +108,9 @@ impl QueryWorkbench {
             })
         };
 
-        let state_btn = if breakpoint != WorkbenchBreakpoint::Narrow {
+        // Le bouton d'état est là à toute largeur : c'est le seul contrôle
+        // de cet axe, et une fenêtre ne descend pas sous 1024 px.
+        let state_btn = {
             let mut state_items = Vec::new();
             state_items.push(MenuSection::render("Filter by State", theme).into_any_element());
 
@@ -503,8 +233,6 @@ impl QueryWorkbench {
                     })
                     .children(state_dropdown),
             )
-        } else {
-            None
         };
 
         // ── 4. Sort Dropdown ──────────────────────────────────────────────────
@@ -718,7 +446,6 @@ impl QueryWorkbench {
                     .flex()
                     .items_center()
                     .gap(px(10.0))
-                    .child(filters_trigger)
                     .children(state_btn)
                     .child(sort_btn),
             )
