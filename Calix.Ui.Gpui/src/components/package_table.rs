@@ -5,9 +5,65 @@ use crate::ui_metrics::UiMetrics;
 use gpui::prelude::FluentBuilder;
 use gpui::*;
 
+/// The width of the measurement: the bar and its scale.
+pub const MEASURE_WIDTH: f32 = 96.0;
+
 pub struct PackageTable;
 
 impl PackageTable {
+    /// A measurement: the value drawn against a shared scale.
+    ///
+    /// The scale is the same for every row of the scope — the largest size
+    /// in view — so the bars can be read against each other. The exact figure
+    /// stays in its own column: the bar is the reading, the figure is the
+    /// truth.
+    pub fn render_measurement(
+        bytes: Option<u64>,
+        scale_max: u64,
+        theme: &Theme,
+    ) -> impl IntoElement {
+        // The scale is logarithmic: the sizes span orders of magnitude, and a
+        // linear scale would bury every small package under a sliver. The
+        // header says so — a bar whose length is not a proportion must not
+        // pretend to be one.
+        let ratio = match (bytes, scale_max) {
+            (Some(size), max) if max > 0 => {
+                (1.0 + size as f32).ln() / (1.0 + max as f32).ln()
+            }
+            _ => 0.0,
+        };
+        let bar = theme.accent;
+        div()
+            .w(px(MEASURE_WIDTH))
+            .h(px(6.0))
+            .rounded_xs()
+            .bg(theme.border)
+            .relative()
+            .child(
+                div()
+                    .absolute()
+                    .left(px(0.0))
+                    .top(px(0.0))
+                    .h(px(6.0))
+                    .w(px(MEASURE_WIDTH * ratio))
+                    .rounded_xs()
+                    .bg(Rgba {
+                        a: 0.55,
+                        ..bar
+                    }),
+            )
+            .child(
+                // The end-marker: where the reading stops.
+                div()
+                    .absolute()
+                    .left(px((MEASURE_WIDTH * ratio - 1.0).max(0.0)))
+                    .top(px(-3.0))
+                    .w(px(2.0))
+                    .h(px(12.0))
+                    .bg(if bytes.is_some() { bar } else { theme.border }),
+            )
+    }
+
     pub fn format_bytes(bytes: u64) -> String {
         const KIB: u64 = 1024;
         const MIB: u64 = 1024 * 1024;
@@ -22,6 +78,32 @@ impl PackageTable {
         } else {
             format!("{} B", bytes)
         }
+    }
+
+    /// The size of a package, in bytes — the value the measurement is drawn
+    /// from.
+    pub fn size_bytes(pkg: &UnifiedPackage) -> Option<u64> {
+        let opt_size = match &pkg.inner {
+            UnifiedPackageSource::Standard(alpm) => {
+                alpm.installed_size.or(alpm.download_size).or(alpm.size)
+            }
+            UnifiedPackageSource::Flatpak(fp) => fp.installed_size.or(fp.download_size),
+            UnifiedPackageSource::AppImage(ai) => ai.size_on_disk,
+            UnifiedPackageSource::Aur(_) => None,
+            UnifiedPackageSource::Cargo(_)
+            | UnifiedPackageSource::Npm(_)
+            | UnifiedPackageSource::Release(_) => None,
+        };
+        opt_size.filter(|size| *size > 0)
+    }
+
+    /// The largest size of a set: the top of the shared scale.
+    pub fn scale_max(packages: &[UnifiedPackage]) -> u64 {
+        packages
+            .iter()
+            .filter_map(Self::size_bytes)
+            .max()
+            .unwrap_or(0)
     }
 
     pub fn display_size(pkg: &UnifiedPackage) -> String {
@@ -44,7 +126,9 @@ impl PackageTable {
         }
     }
 
-    pub fn render_header(theme: &Theme) -> impl IntoElement {
+    /// The header of the readout. The measurement's column names the top of
+    /// the scale: the bars are read against it.
+    pub fn render_header(theme: &Theme, scale_max: u64) -> impl IntoElement {
         div()
             .h(px(UiMetrics::ROW_HEIGHT_HEADER))
             .w_full()
@@ -81,6 +165,24 @@ impl PackageTable {
             )
             .child(
                 div()
+                    .w(px(MEASURE_WIDTH))
+                    .flex()
+                    .justify_end()
+                    .pr_2()
+                    .overflow_hidden()
+                    .text_ellipsis()
+                    .text_xs()
+                    .font_family("monospace")
+                    .font_weight(FontWeight::NORMAL)
+                    .text_color(theme.text_muted)
+                    .child(if scale_max > 0 {
+                        format!("log 0 — {}", Self::format_bytes(scale_max))
+                    } else {
+                        "—".to_string()
+                    }),
+            )
+            .child(
+                div()
                     .w(px(80.0))
                     .flex()
                     .justify_end()
@@ -103,6 +205,7 @@ impl PackageTable {
         is_selected: bool,
         theme: &Theme,
         compact: bool,
+        scale_max: u64,
     ) -> impl IntoElement {
         let bg_color = if is_selected {
             theme.bg_surface_active
@@ -211,7 +314,21 @@ impl PackageTable {
                     .text_color(theme.text_secondary)
                     .child(source_display),
             )
-            // Column 4: Size en police monospace aligné à droite avec padding
+            // Column 4: the measurement — the value against the shared scale
+            .child(
+                div()
+                    .w(px(MEASURE_WIDTH))
+                    .flex()
+                    .justify_end()
+                    .pr_2()
+                    .overflow_hidden()
+                    .child(Self::render_measurement(
+                        Self::size_bytes(pkg),
+                        scale_max,
+                        theme,
+                    )),
+            )
+            // Column 5: Size en police monospace aligné à droite avec padding
             .child(
                 div()
                     .w(px(80.0))

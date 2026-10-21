@@ -992,12 +992,18 @@ impl Render for PackageWorkstationView {
                     .flex()
                     .flex_col()
                     .size_full()
-                    .child(PackageTable::render_header(&theme))
+                    .child(PackageTable::render_header(
+                        &theme,
+                        PackageTable::scale_max(&packages),
+                    ))
                     .child(
                         div().flex_1().h_full().overflow_hidden().child(
                             uniform_list("package-list-table", package_count, {
                                 let packages = packages.clone();
                                 let selected_name = selected_name.clone();
+                                // The scale is shared: the bars of the readout
+                                // are read against each other.
+                                let scale_max = PackageTable::scale_max(&packages);
                                 let is_compact = self.compact;
 
                                 move |range, _window, _cx| {
@@ -1018,6 +1024,7 @@ impl Render for PackageWorkstationView {
                                                     is_selected,
                                                     &list_theme,
                                                     is_compact,
+                                                    scale_max,
                                                 ))
                                                 .on_mouse_down(
                                                     MouseButton::Left,

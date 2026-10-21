@@ -336,7 +336,17 @@ impl WorkspaceView {
                 let key = pkg.key();
                 let is_aur = pkg.source_type == "AUR";
                 let is_flatpak = pkg.source_type == "Flatpak";
+                // The product's own command: the one it shows, above the log
+                // that shows what the backend actually ran.
+                let product_command = if is_install {
+                    crate::state::canonical_install_command(pkg)
+                } else {
+                    crate::state::canonical_remove_command(pkg)
+                };
                 entity_mut.update(cx, |view, cx| {
+                    view.console.update(cx, |c, cx| {
+                        c.set_product_command(product_command.clone(), cx);
+                    });
                     if is_install {
                         view.run_package_mutation(
                             &format!("Installation of {}", pkg_clone.name),

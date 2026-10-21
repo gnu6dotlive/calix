@@ -152,6 +152,7 @@ impl Render for OperationConsoleView {
         let console_read = self.console.read(cx);
 
         LogDrawer::render(LogDrawerProps {
+            product_command: console_read.product_command.as_deref(),
             logs: &console_read.logs,
             backend_phases: &console_read.backend_phases,
             status: &console_read.status,

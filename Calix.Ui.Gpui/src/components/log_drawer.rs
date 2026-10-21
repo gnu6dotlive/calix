@@ -46,6 +46,9 @@ impl LogEntry {
 pub type LogActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 
 pub struct LogDrawerProps<'a> {
+    /// The product's own command, the one it shows. The log underneath shows
+    /// what the backend actually ran.
+    pub product_command: Option<&'a str>,
     pub logs: &'a [LogEntry],
     pub backend_phases: &'a [BackendPhase],
     pub status: &'a OperationStatus,
@@ -398,6 +401,16 @@ impl LogDrawer {
                             .text_color(theme.text_primary)
                             .child("CALIX OPERATION LOG"),
                     )
+                    // La commande du produit, puis ce que le moteur a
+                    // réellement lancé. Les deux ne sont jamais la même
+                    // chaîne : le produit demande, le moteur obéit.
+                    .children(props.product_command.map(|command| {
+                        div()
+                            .text_xs()
+                            .font_family("monospace")
+                            .text_color(theme.accent)
+                            .child(format!("$ {}", command))
+                    }))
                     .child(status_badge),
             )
             .child(

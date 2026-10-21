@@ -1,0 +1,39 @@
+{
+  "run_id": "slice-09-plate-20261021",
+  "kind": "implementation",
+  "status": "ok",
+  "objective": "Build the Instrument's plate: the bands read from the top down, the dial for the scope, and the movement that goes with them.",
+  "the_bands": {
+    "the_header": "the identity, the scope's name, the coverage, the count — unchanged",
+    "the_bank": "the seven sources, each stating what it holds and how many rows it carries",
+    "the_control_strip": "the query, the filters, and the dial",
+    "the_readout": "the list, with the sizes measured against a shared logarithmic scale",
+    "the_nameplate": "the detail, in full width, under the readout",
+    "the_tape": "the operation log, carrying the product's own command above the backend's output"
+  },
+  "the_arrangement_changes": {
+    "the_right_hand_column_is_gone": "the detail was a column beside the list; it is now a full-width band under it, separated by a draggable edge. The vertical splitter, the layout mode and the six metrics that governed them are gone.",
+    "the_scope_switcher_is_gone": "the header's segmented switcher became a dial: a machined disc, three detents on the arc, a needle thrown at the detent. The two axes now look like different kinds of things."
+  },
+  "the_motion": {
+    "the_bank_arrives_in_a_wave": "the waterfall entry: the apertures overlap, the gaps shrink by 0.84 per element, the anchors travel further and longer",
+    "the_needle_is_thrown": "the overshoot: the needle passes its detent and comes back — an instrument overshoots, a switch does not",
+    "the_panel_switch_is_a_cut": "the cut on the curve: the outgoing panel accelerates, the cut lands mid-motion, the incoming panel continues in the same direction and decelerates, igniting at 35 % instead of fading in",
+    "a_count_flashes_once": "a value that changes re-reads and flashes; it does not glide into place",
+    "the_scroll_is_eased": "a wheel notch is a movement, not a jump",
+    "the_user_can_ask_for_less": "reduce_motion snaps the needle, skips the bank's arrival, and leaves the scroll as it is"
+  },
+  "the_artefacts": [
+    {"path": "Calix.Ui.Gpui/src/state/motion.rs", "what": "the motion vocabulary: the weights, the waterfall, the cut's entry, the overshoot"},
+    {"path": "Calix.Ui.Gpui/src/components/scope_dial.rs", "what": "the dial"},
+    {"path": "Calix.Ui.Gpui/src/components/source_bank.rs", "what": "the bank, with its arrival"},
+    {"path": "Calix.Ui.Gpui/src/components/package_table.rs", "what": "the measurement and its scale"},
+    {"path": "Calix.Ui.Gpui/src/views/package_workstation.rs", "what": "the plate: the bands, the nameplate's edge, the smooth scroll"},
+    {"path": "docs/gpui/slice-09/", "what": "the slice: the arrangement, the ten rules, the acceptance matrix"}
+  ],
+  "the_gaps": [
+    "the readout is measured but not recessed: the sunken plate and the ruled grid are not there",
+    "the nameplate's empty state is centred in a wide band, where the Instrument's names the channel",
+    "the log drawer is still the drawer: the tape's perforation, and the record's own header, are not there"
+  ]
+}

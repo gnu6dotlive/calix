@@ -18,6 +18,9 @@ pub enum ConsoleEvent {
 /// Modèle d'état découplé de la console d'opérations avec contrôle de défilement,
 /// décodage du protocole structuré UI et suivi chronologique des backends.
 pub struct ConsoleModel {
+    /// The product's own command, the one it shows. The log underneath shows
+    /// what the backend actually ran: the two are never the same string.
+    pub product_command: Option<String>,
     pub logs: Vec<LogEntry>,
     pub status: OperationStatus,
     pub is_open: bool,
@@ -33,6 +36,7 @@ impl EventEmitter<ConsoleEvent> for ConsoleModel {}
 impl ConsoleModel {
     pub fn new() -> Self {
         Self {
+            product_command: None,
             logs: Vec::new(),
             status: OperationStatus::Idle,
             is_open: true,
@@ -331,6 +335,13 @@ impl ConsoleModel {
     /// Efface l'historique des lignes de log affichées sans altérer le statut du cycle de vie
     pub fn clear_history(&mut self) {
         self.logs.clear();
+        self.product_command = None;
+    }
+
+    /// The product's own command, the one it shows.
+    pub fn set_product_command(&mut self, command: Option<String>, cx: &mut Context<Self>) {
+        self.product_command = command;
+        cx.notify();
     }
 
     pub fn clear_logs(&mut self, cx: &mut Context<Self>) {

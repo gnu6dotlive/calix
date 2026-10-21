@@ -15,9 +15,10 @@ only until the next change.
 | A7 | The keyboard leaves the surface | no key glyph on any band; the key map is the help overlay | inherited from Slice 07 |
 | A8 | The sources leave the filters menu | the menu still offers them, bound to the same selection | **not done**: the menu keeps the sources as the narrow fallback |
 | A9 | The detail is a nameplate, a full-width band under the readout | the plate: bank → readout → edge → nameplate; the vertical splitter and the right-hand column are gone | **done**; the nameplate's bounds are proved by `the_nameplate_stays_inside_its_bounds_at_the_heights_a_tiling_compositor_uses` and `the_nameplate_never_swallows_the_readout` |
-| A10 | The log is a tape | the operation log is already a band at the bottom of the frame | **done**, but it is the drawer as it was — it is not yet the perforated tape: the product's command and the backend's own run on two lines |
+| A10 | The log is a tape: the product's own command, then what the backend actually ran | the operation log is a band at the bottom of the frame; it now carries the product's command (`$ calix install standard ripgrep`) above the backend's output | **done**; the product's command is the console model's `product_command`, set when the operation starts |
 | A11 | The scope is a dial, one object with three positions, and it does not look like the bank | `components/scope_dial.rs`: a machined disc, three detents on the arc, a needle thrown at the detent; the header's segmented switcher is gone | **done**; the needle's throw is `ease_out_back` (`the_overshoot_passes_the_target_and_comes_back`), the positions are `the_three_positions_are_on_the_upper_arc` |
-| A12 | One region may be empty on purpose, and it reads as glass rather than as a missing panel | — | **not done**: it comes with the readout's requalification |
+| A12 | The readout is a recess cut into the plate, and the values are measured against a shared scale | the measurement column: a bar with an end-marker, drawn against the scope's shared scale, with the exact figure in its own column; the scale is logarithmic and the header says so | **done**, the scale's part; the *recess* — the sunken plate, the ruled grid — is not done |
+| A13 | The value that changes re-reads and flashes once | the count in the bank flashes once when it changes | **done**, by the eye |
 
 ## The motion
 
@@ -46,6 +47,9 @@ the bank's arrival, and leaves the scroll as it is.
 - The tape is the drawer as it was. It shows the backend's output; it does
   not yet put the product's own command on the line above the backend's
   actual run.
-- The readout is still the list as it was. The Instrument's readout is a
-  recess cut into the plate, ruled, with the delta measured as bars on a
-  calibrated scale.
+- The readout is the list, measured but not yet recessed: the Instrument's
+  readout is a recess cut into the plate, ruled, with the grid visible. The
+  measurement is there, the recess is not.
+- The measurement's scale is logarithmic, and the header says so. A linear
+  scale would bury every small package under a sliver, and the sizes span
+  orders of magnitude.

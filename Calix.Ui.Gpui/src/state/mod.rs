@@ -11,7 +11,8 @@ pub use console::{ConsoleEvent, ConsoleModel, OperationStatus};
 pub use motion::{AnimatedScalar, MotionDurations};
 pub use package_store::{PackageStore, PackageStoreEvent};
 pub use semantic::{
-    canonical_install_command, DependencyKind, DependencyRef, PackageCapabilities, SemanticTarget,
+    canonical_install_command, canonical_remove_command, DependencyKind, DependencyRef,
+    PackageCapabilities, SemanticTarget,
 };
 pub use session::{
     AppSession, InspectorTab, NavScope, PackageKey, PackageSourceKind, PackageViewMode, Place,

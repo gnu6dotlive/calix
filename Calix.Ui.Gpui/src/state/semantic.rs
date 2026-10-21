@@ -181,6 +181,22 @@ pub fn canonical_install_command(pkg: &UnifiedPackage) -> Option<String> {
     }
 }
 
+/// The canonical Calix removal command, by source.
+///
+/// The product's own command is the one it shows; the log underneath shows
+/// what the backend actually ran. The two are never the same string, and the
+/// difference is the point: the product asks, the backend obeys.
+pub fn canonical_remove_command(pkg: &UnifiedPackage) -> Option<String> {
+    match pkg.source_type.as_str() {
+        "AUR" => Some(format!("calix remove aur {}", pkg.name)),
+        "Flatpak" => Some(format!("calix remove flatpak {}", pkg.name)),
+        "ALPM" => Some(format!("calix remove standard {}", pkg.name)),
+        "AppImage" => None,
+        "Cargo" | "NPM" | "Release" => None,
+        _ => Some(format!("calix remove standard {}", pkg.name)),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
