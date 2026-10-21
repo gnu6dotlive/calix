@@ -135,7 +135,7 @@ impl PackageTable {
             .flex()
             .items_center()
             .px_3()
-            .bg(theme.bg_surface)
+            .bg(gpui::rgba(0x00000000))
             .border_b_1()
             .border_color(theme.border)
             .text_xs()
@@ -207,10 +207,13 @@ impl PackageTable {
         compact: bool,
         scale_max: u64,
     ) -> impl IntoElement {
+        // The rows are engraved into the recess: the ground is the recess's
+        // own, and the rules are what separate them. Only the selected row
+        // is lifted off it.
         let bg_color = if is_selected {
             theme.bg_surface_active
         } else {
-            theme.bg_surface
+            gpui::rgba(0x00000000)
         };
 
         let border_color = if is_selected {

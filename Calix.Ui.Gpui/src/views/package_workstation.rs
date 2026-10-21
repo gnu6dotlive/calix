@@ -19,6 +19,7 @@ use crate::theme::Theme;
 use crate::ui_metrics::UiMetrics;
 use crate::views::inspector::{PackageInspectorProps, PackageInspectorView};
 use crate::visual_style::VisualStyleId;
+use gpui::prelude::FluentBuilder;
 use gpui::*;
 use gpui::{uniform_list, UniformListScrollHandle};
 use std::rc::Rc;
@@ -992,10 +993,6 @@ impl Render for PackageWorkstationView {
                     .flex()
                     .flex_col()
                     .size_full()
-                    .child(PackageTable::render_header(
-                        &theme,
-                        PackageTable::scale_max(&packages),
-                    ))
                     .child(
                         div().flex_1().h_full().overflow_hidden().child(
                             uniform_list("package-list-table", package_count, {
@@ -1126,6 +1123,47 @@ impl Render for PackageWorkstationView {
                 .child(list_body)
         };
 
+        // The readout: a recess cut into the plate.
+        //
+        // The frame stays when the readout is empty. The glass is calibrated —
+        // the column names, the rules, the scale — and a calibrated glass that
+        // waits reads as glass, not as a panel that failed to draw.
+        // The ruler — the column names and the scale — is part of the recess.
+        // It stays when the table is empty: a calibrated glass that waits
+        // reads as glass, not as a panel that failed to draw. It does not stay
+        // when there is no table yet: the discovery screen is a screen, not an
+        // empty table.
+        let shows_a_table = view_mode == PackageViewMode::Table && !is_browse_empty;
+        let readout_recess = if view_mode == PackageViewMode::Table {
+            div()
+                .flex()
+                .flex_col()
+                .size_full()
+                .flex_1()
+                .overflow_hidden()
+                .border_1()
+                .border_color(theme.border)
+                .bg(theme.bg_sidebar)
+                .when(shows_a_table, |element| {
+                    element.child(PackageTable::render_header(
+                        &theme,
+                        PackageTable::scale_max(&packages),
+                    ))
+                })
+                .child(list_body)
+        } else {
+            div()
+                .flex()
+                .flex_col()
+                .size_full()
+                .flex_1()
+                .overflow_hidden()
+                .border_1()
+                .border_color(theme.border)
+                .bg(theme.bg_sidebar)
+                .child(list_body)
+        };
+
         // The readout: the band where the work happens, in full width.
         let readout = div()
             .flex()
@@ -1134,7 +1172,7 @@ impl Render for PackageWorkstationView {
             .flex_1()
             .overflow_hidden()
             .child(top_bar)
-            .child(list_body);
+            .child(readout_recess);
 
         // ── 3. The nameplate's edge, drawn between the bands ────────────────
         let is_resizing = self.nameplate_drag.is_some();
