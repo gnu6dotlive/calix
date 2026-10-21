@@ -1,13 +1,15 @@
 # CONTRACT 01 — The audit of the spatial contract
 
-**Audit 1.2 — 2026-10-21 — against `feat/contract-01-space` at `a5f81dbe`
-(merged into `main` as `071a8927`)**
+**Audit 1.3 — 2026-10-21 — against `feat/contract-01-row-qualification`
+(merged into `main` as `c2b8d6b7`)**
 
 *Version 1.0 was the audit of the state before the decisions. Version 1.1
 records the implementation of the four decisions. Version 1.2 adds the
 qualification of the catalogue's row: the measurement that corrected the
 minimum from 560 to 660, and the reconciliation of the window's floor that
-the operator asked for.*
+the operator asked for. Version 1.3 adds the qualification of the **list**
+that holds the rows — and the bench's blind spot, named: a list whose height
+is not given is laid out at zero, and draws nothing.*
 
 This audit confronts [`CONTRACT-01-SPACE.md`](CONTRACT-01-SPACE.md) with the
 repository as it stands. It does not propose new primitives: it inventories
@@ -41,7 +43,7 @@ catalogue itself (its measured layout never resolves there). Every band
 |---|---|---|
 | Window: the floors are coherent with what the application can compose | **held** | the floor (720 × 480) is derived and the budget adds up: the row's floor (495) + the name's share (165) + the folded spine (56) = 716 → 720. Tested: `the_window_floor_is_derived_from_the_catalogue_and_the_spine`, `the_window_floor_budget_adds_up` |
 | Spine: a stable presence, it narrows but never vanishes | **held by a rule** | the spine folds itself when the catalogue would lose its room, and takes back the user's shape when the window gives it room. Tested: `the_spine_folds_when_the_catalogue_needs_the_room` |
-| Body: the catalogue keeps a usable width and stays dominant | **held, and now qualified against the row** | the catalogue's minimum is 660 px, measured on the real row and the real names (§4.7); at the window's floor the catalogue has 664 px; the three toolbar forms are measured. **The list that holds the rows is not yet qualified** (§4.8) |
+| Body: the catalogue keeps a usable width and stays dominant | **held, and qualified against the row and the list** | the catalogue's minimum is 660 px, measured on the real row and the real names (§4.7), and the list that holds the rows draws them at every width (§4.8); at the window's floor the catalogue has 664 px; the three toolbar forms are measured |
 | Context surfaces: opening one never reduces the body below its floor | **held** | the drawer cannot take the workspace's 320 px whatever the request, and below 120 px it overlays instead of squeezing. The plate yields first: the catalogue goes from 6.5 px to 170.5 px in a 372 px band. Tested: `the_drawer_never_takes_the_workspace_floor`, `the_composition_is_measured_in_a_real_window` |
 | Portrait and landscape: the composition adapts to the space, not to a declared orientation | **held, by not answering it** | no code reads the orientation; the composition is expressed in logical pixels and adapts by growing or shrinking the bands |
 | Zoom: at every scale the content stays accessible | **held by construction, with one caveat** | the layout is in logical pixels (the viewport is divided by `px(1.0)`) and the window's floor is a floor in logical pixels, so the physical window grows with the scale. The caveat is in §4.5 |
@@ -342,29 +344,64 @@ the truth"). Without it, the row's floor falls to 399 px and the name has
 reading is worth 96 px of the name is a product decision, and it is not
 taken here.
 
-### 4.8 What the bench still cannot see
+### 4.8 The catalogue's list, qualified — and the bench's blind spot, named
 
-The harness draws the application's own views and reads the bounds the window
-actually drew. It reads the bands, the buttons, the search field, the mark
-that travels, the toast, the menu, and now the catalogue's **row**.
+**The list is qualified now.** The `uniform_list` — the real one, with the
+real row — draws its rows in the bench, and the bench reads their bounds
+(`the_catalogue_list_draws_its_rows_at_every_width`):
 
-It does **not** read the catalogue's *rows as the list draws them*: the
-`uniform_list` that holds them resolves its **viewport** in the bench
-(600 × 400 in a probe) but never paints its items, and the probe found no
-configuration of the harness in which they appear — the item measurement
-inside the list's measured layout is what fails.
+| the content | the row the list drew | the name's cell |
+|---|---|---|
+| 400 px | 400 × 36 | 0 px |
+| 480 px | 480 × 36 | 0 px |
+| 495 px | 495 × 36 | 0 px |
+| 520 px | 520 × 36 | 25 px |
+| 560 px | 560 × 36 | 65 px |
+| **660 px** | **660 × 36** | **165 px** |
+| 720 px | 720 × 36 | 225 px |
+| 800 px | 800 × 36 | 305 px |
 
-The distinction is kept, as the operator required:
+The row is the catalogue's real row, at the catalogue's real height (36 px),
+taking the list's width, and the name's cell is exactly what the fixed
+columns leave — the same rule as the row alone, now proved *in the list*.
+
+**What the earlier probe missed, and why.** The first probe found a list
+whose viewport resolved (600 × 400) but whose items never appeared. The
+cause was found by reading the list's *own* measurement of its items
+(`UniformListScrollState::last_item_size`):
+
+```
+item:     600 × 0     ← the viewport's height: zero
+contents: 600 × 180   ← 36 px × 5 items: the list measured the row
+```
+
+**A `uniform_list` whose height is not given is laid out at zero by the
+measured-layout path, and then draws no row at all.** The bench's earlier
+fixture gave the list its height through `flex_1`, which the measured path
+does not resolve; the bench now gives it a definite height, which is the
+condition of reading it — not a change to the product. The application's own
+list gets its height from the flex layout of the readout, and the row it
+measures is the same row (36 px).
+
+The lesson is kept in the test's own comment, because it is the kind of thing
+that would be rediscovered as a mystery: *a list that is not measured is a
+list that is not drawn.*
+
+**What is proved, and what is not:**
 
 | What is proved | By |
 |---|---|
 | the row's geometry, and what the name keeps at each width | the extracted row, drawn directly, measured |
+| **the list drawing the real row, at the real height, at every width** | the real `uniform_list`, measured in the bench |
 | the catalogue's viewport, and the three toolbar forms | the bench, on the real views |
-| **the `uniform_list` painting its items in every configuration** | **nothing yet** — open |
+| the list's own measurement of its rows (36 px, the content size) | `UniformListScrollState::last_item_size` |
+| the list's *virtualisation* — that it recycles rows when scrolled, and that its own scrolling is smooth | **not proved**: the bench has no wheel over a list, and the list's scrolling is the application code, not the list's |
 
-So the qualification of the *row* is a component proof. The qualification of
-the *catalogue* — the list, its virtualisation, its own scrolling, the row's
-placement in it — remains open, and the audit says so.
+So the qualification of the catalogue is now real: the row, and the list that
+holds it. What remains unproved is the list's behaviour *under* a scroll —
+which is the application code, and is proved by the application's own
+scrolling test (`the_wheel_moves_the_list_by_steps`, on the same structure
+the list uses).
 
 ## 5. What the audit leaves to the product
 
@@ -408,7 +445,7 @@ What is left to decide, after the measurements:
 | the three forms of the toolbar are reachable and distinct | `the_three_forms_of_the_toolbar_are_measured` | **done** |
 | the row's geometry, and the name's share at every width | `the_row_is_measured_at_and_around_the_catalogue_minimum` | **done** |
 | the catalogue's minimum is the measured one, and the budget adds up | `the_window_floor_budget_adds_up` | **done** |
-| the catalogue's *rows* are drawn by the list in every configuration | — | **open**: the `uniform_list` does not paint its items in the bench (§4.8) |
+| the catalogue's rows are drawn by the list, at every width | `the_catalogue_list_draws_its_rows_at_every_width` | **done** |
 | the composition at 150 % keeps the catalogue's floor | — | **open**: the same instrument, at another scale |
 
 The harness makes the last two cheap once the list can be seen:
@@ -422,10 +459,11 @@ re-measured. What is missing is not the instrument — it is the list.
   divisions of the space (`content_width`, `nameplate_height`), the
   presentation policy (`state/motion.rs`). What was missing was an *owner*
   for the vertical budget — a responsibility, not a component.
-- **The list is not qualified.** The row is (§4.7); the `uniform_list` that
-  holds the rows resolves its viewport in the bench but never paints its
-  items (§4.8). The list's own qualification — its virtualisation, its
-  scrolling, the row's placement in it — stays open.
+- **The list's virtualisation is not qualified.** The list draws the real
+  rows, at the real height, at every width (§4.8); what is not proved is its
+  behaviour *under* a scroll — that it recycles its rows, and that the
+  application hands the wheel back in steps. That second part is proved by
+  the application's own scrolling test, on the structure the list uses.
 - **The zoom was not measured at 150 %.** The layout is in logical pixels
   and the floor is too, so the reasoning holds; but the *measurement* of a
   150 % window is not in the bench yet, for the same reason as the rows.
