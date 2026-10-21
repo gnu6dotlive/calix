@@ -1,0 +1,92 @@
+{
+  "run_id": "contract-01-row-qualification-20261021",
+  "kind": "qualification",
+  "status": "ok",
+  "objective": "Qualify the catalogue's minimum against the *real* row: extract the row into a production component, measure it in the bench at and around 560 px, and report what the width actually guarantees.",
+  "the_extraction": {
+    "what": "PackageTable::render_selectable_row — the catalogue's row, as a production component: the same markup, the same styles, the same hover, the same selection, the same gesture. The station now renders it (views/package_workstation.rs), so the bench measures the component the application draws, not an approximation.",
+    "the_handles": ["package_row", "package_row_name_cell", "package_row_name", "package_row_version", "package_row_source", "package_row_measurement", "package_row_size", "package_row_status"],
+    "what_was_not_touched": "the row's geometry, its styles, its columns, its actions, its accessibility structure. The extraction added ids (invisible) and one wrapper that carries the row's height and the mouse-down gesture — the gesture the station had already written.",
+    "the_test": "the_row_is_measured_at_and_around_the_catalogue_minimum (components/package_table.rs)"
+  },
+  "the_measurements": {
+    "the_row_costs_before_the_name": {
+      "version": "105 px",
+      "source": "105 px",
+      "measurement_the_bar": "96 px",
+      "size": "80 px",
+      "status": "85 px",
+      "the_rows_padding": "24 px",
+      "the_rows_floor": "495 px"
+    },
+    "the_names_share": {
+      "495 px": "cell 0 px — the row is at its floor; the name is gone and the row's right end is cut",
+      "520 px": "cell 25 px, text 3 px",
+      "560 px": "cell 65 px, text 43 px — six characters",
+      "600 px": "cell 105 px, text 83 px",
+      "640 px": "cell 145 px, text 123 px",
+      "720 px": "cell 225 px, text 203 px",
+      "800 px": "cell 305 px, text 283 px"
+    },
+    "the_real_names": {
+      "source": "the inventory of the machine the measurement was taken on: 1884 installed packages, sampled across the distribution (median 10 characters, p80 15, p90 18, max 44) and its extreme",
+      "bc": "17 px",
+      "7zip": "34 px",
+      "zotero": "51 px",
+      "alsa-utils_the_median": "85 px",
+      "intel-ucode": "93 px",
+      "libxkbcommon": "101 px",
+      "aws-sdk-cpp-s3_the_p80": "118 px",
+      "vlc-plugin-alsa": "127 px",
+      "ruby-power_assert_the_p90": "143 px",
+      "python-jaraco.classes": "177 px",
+      "networkmanager-vpn-plugin-openvpn": "278 px",
+      "intel-oneapi-compiler-dpcpp-cpp-runtime-libs_the_longest": "370 px"
+    },
+    "the_thresholds": {
+      "the_name_is_whole_when": "495 + 22 (the identity glyph and its gap) + the name's width",
+      "for_the_p80": "644 px",
+      "for_the_p90": "660 px",
+      "for_the_longest": "887 px"
+    }
+  },
+  "the_results": {
+    "the_560_target_does_not_hold": "At 560 px the name shows 43 px of text — six characters. The row becomes a list of truncated names. The failing case is kept in the test, not hidden.",
+    "the_qualified_minimum": "660 px — measured from the real row and the real names, and now the value in the code (UiMetrics::CATALOGUE_MIN_WIDTH).",
+    "the_concession_that_would_make_560_hold": "The measurement bar is 96 px, and it is the *reading* of the size, whose exact figure has a column of its own. Without it the row's floor falls to 399 px and the name has 161 px at 560 — the p90 name fits whole. Offered, not imposed: whether the instrument's reading is worth 96 px of the name is the product's decision.",
+    "the_reconciliation_of_the_window_floor": "The earlier derivation (720 = 560 + 56) did not add up (616 ≠ 720) and the 104 px it left over had no name. The corrected budget: 495 (the row's floor) + 22 (the glyph and its gap) + 143 (the p90 name) + 56 (the folded spine) = 716 → 720. The 104 px were the name. Tested: the_window_floor_budget_adds_up."
+  },
+  "the_scope_of_the_proof": {
+    "proved": "the row's geometry, and what the name keeps at every width — on the real component the catalogue renders.",
+    "not_proved": "that the uniform_list paints its items in every configuration. The list resolves its viewport in the bench (600 × 400 in a probe) but never paints its items, and no harness configuration was found in which it does. The list's own qualification — its virtualisation, its scrolling, the row's placement in it — stays open, and the audit says so (audit §4.8).",
+    "the_target_stays_provisional": "660 px is qualified against the row. It is not qualified against the list."
+  },
+  "the_migration_check": {
+    "the_transfer": "tension-atoi/calix → gnu6dotlive/calix, done by the operator on 2026-10-21.",
+    "what_followed": "the history, the labels, the published releases and their artefacts, the topics, the description, the default branch and the wiki.",
+    "what_did_not_break": "the old address answers 301: the badges, `gh release --repo tension-atoi/calix` and `git clone` all still work (verified). No secret, variable, environment, webhook or branch protection existed to lose, and the workflow references none.",
+    "what_was_corrected": "the live references were put back in the canonical form: PKGBUILD-calix, README (CI badge, release badge, the release download, the clone), CONTRIBUTING, SECURITY, the two systemd units, the issue template, the six slice contracts, and the Zig builder's PKGBUILD fixture. The dated records — the signed acceptance reports, the raw captures, the architecture's own renaming entry — keep the old address: they are dated, and the redirect makes them true.",
+    "the_cancelled_run": "the pull request's hosted run was cancelled by GitHub itself, with the annotation 'repository transferred' (job 119355471053). The merged main therefore has no green hosted run. The local gates are green on that exact commit: local-verify-20261021T163722Z (the pre-push hook) and local-verify-20261021T175407Z (the CI replay, inside archlinux:latest, on the clean tree of main).",
+    "the_badge": "the CI badge was already red before the transfer — the latest run on main was a cancelled manual dispatch from 2026-10-20. Not a casualty of the migration."
+  },
+  "the_artefacts": [
+    {"path": "Calix.Ui.Gpui/src/components/package_table.rs", "what": "the row extracted as a production component (render_selectable_row), the cells' handles, and the bench that measures it at and around the minimum"},
+    {"path": "Calix.Ui.Gpui/src/views/package_workstation.rs", "what": "the station renders the extracted row; the window floor's budget test"},
+    {"path": "Calix.Ui.Gpui/src/ui_metrics.rs", "what": "the catalogue's minimum, corrected from 560 to 660, with the measurement that justifies it"},
+    {"path": "Calix.Ui.Gpui/src/config.rs", "what": "the window floor's derivation, written out so that it adds up"},
+    {"path": "docs/gpui/CONTRACT-01-SPACE.md", "what": "the contract, revised to 1.2"},
+    {"path": "docs/gpui/CONTRACT-01-SPACE-AUDIT.md", "what": "the audit, revised to 1.2: §4.7 the row's qualification, §4.8 what the bench still cannot see, the floor's reconciliation"},
+    {"path": "PKGBUILD-calix, README.md, CONTRIBUTING.md, SECURITY.md, packaging/systemd/, .github/ISSUE_TEMPLATE/, docs/gpui/slice-*/", "what": "the live references, in the canonical form of the new organisation"}
+  ],
+  "the_gates": {
+    "local": "scripts/verify — PASSED on the dirty tree, run local-verify-20261021T180735Z: 1386 package-manager tests, 392 CLI tests, 254 UI tests",
+    "ci_replay": "scripts/ci-replay --worktree — PASSED inside archlinux:latest on a clean worktree, run local-verify-20261021T181200Z: 1388 package-manager tests, 392 CLI tests, 254 UI tests"
+  },
+  "the_limitations": [
+    "The list that holds the rows is not qualified: the uniform_list resolves its viewport in the bench but never paints its items.",
+    "The 150 % interface scale is still reasoned, not measured, for the same reason.",
+    "The failing case kept: a compositor granting 600 × 480 leaves 544 px — 116 px under the qualified minimum of 660, and the row's own floor of 495 is barely met.",
+    "No screenshot was taken; the desktop was not touched.",
+    "The plate's overlay alternative and the drawer's own focus management are untouched, and are not presented as solved."
+  ]
+}

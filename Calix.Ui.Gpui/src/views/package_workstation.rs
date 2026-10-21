@@ -1032,11 +1032,6 @@ impl Render for PackageWorkstationView {
             let list_theme = theme;
 
             if view_mode == PackageViewMode::Table {
-                let row_h = if self.compact {
-                    UiMetrics::ROW_HEIGHT_COMPACT
-                } else {
-                    UiMetrics::ROW_HEIGHT_NORMAL
-                };
                 div()
                     .flex()
                     .flex_col()
@@ -1062,26 +1057,24 @@ impl Render for PackageWorkstationView {
                                             let pkg_key = pkg.key();
                                             let on_select = entity_select.clone();
 
-                                            div()
-                                                .h(px(row_h))
-                                                .child(PackageTable::render_row(
-                                                    pkg,
-                                                    is_selected,
-                                                    &list_theme,
-                                                    is_compact,
-                                                    scale_max,
-                                                ))
-                                                .on_mouse_down(
-                                                    MouseButton::Left,
-                                                    move |_e, _w, cx| {
-                                                        let key = pkg_key.clone();
-                                                        on_select.update(cx, |view, cx| {
-                                                            view.session.update(cx, |s, cx| {
-                                                                s.select_package(Some(key), cx);
-                                                            });
+                                            // The row, as the catalogue renders
+                                            // it: the same component, the same
+                                            // gesture.
+                                            PackageTable::render_selectable_row(
+                                                pkg,
+                                                is_selected,
+                                                &list_theme,
+                                                is_compact,
+                                                scale_max,
+                                                Rc::new(move |_w, cx| {
+                                                    let key = pkg_key.clone();
+                                                    on_select.update(cx, |view, cx| {
+                                                        view.session.update(cx, |s, cx| {
+                                                            s.select_package(Some(key), cx);
                                                         });
-                                                    },
-                                                )
+                                                    });
+                                                }),
+                                            )
                                         })
                                         .collect()
                                 }
@@ -1773,9 +1766,9 @@ mod tests {
 
         // Le cas qui échoue, et il est gardé : un compositeur qui accorde
         // moins que le plancher. À 600 px, la colonne repliée laisse 544 px
-        // au catalogue — 16 px de moins que son plancher qualifié. La
-        // composition ne peut pas tenir sa promesse là, et le banc le dit
-        // au lieu de le cacher.
+        // au catalogue — 116 px de moins que son plancher qualifié (660,
+        // mesuré). La composition ne peut pas tenir sa promesse là, et le
+        // banc le dit au lieu de le cacher.
         let constrained = 600.0;
         assert!(spine_is_forced_collapsed(constrained));
         let content = content_width(constrained, UiMetrics::SIDEBAR_COLLAPSED);
@@ -1783,6 +1776,48 @@ mod tests {
         assert!(
             content < UiMetrics::CATALOGUE_MIN_WIDTH,
             "sous le plancher du compositeur, le catalogue est sous son minimum : {content} contre {}",
+            UiMetrics::CATALOGUE_MIN_WIDTH
+        );
+    }
+
+    /// Le plancher de la fenêtre, recompté : il ne reste rien.
+    ///
+    /// Le budget du plancher est une somme, et la somme s'additionne : la
+    /// ligne du catalogue (495), le nom qu'elle porte (22 + 143), et la
+    /// colonne repliée (56). C'est 716, et la fenêtre en demande 720.
+    /// L'écart de 104 px que l'ancienne justification ne savait pas
+    /// expliquer est donc le nom du paquet : la place que la ligne ne
+    /// Donnerait pas au texte, et que le texte prend.
+    #[test]
+    fn the_window_floor_budget_adds_up() {
+        let row = 495.0_f32; // the row's fixed columns and its padding
+        let name = 22.0 + 143.0; // the glyph, its gap, and the p90 name
+        let catalogue = row + name;
+        let spine = UiMetrics::SIDEBAR_COLLAPSED;
+
+        assert_eq!(catalogue, 660.0, "the catalogue's qualified minimum");
+        assert_eq!(
+            catalogue + spine,
+            716.0,
+            "the budget of the floor, before the rounding"
+        );
+        assert_eq!(
+            crate::config::MIN_WINDOW_WIDTH,
+            720.0,
+            "and the window asks for 720 — the budget, rounded up"
+        );
+        assert!(
+            crate::config::MIN_WINDOW_WIDTH >= catalogue + spine,
+            "the floor carries the whole budget"
+        );
+        // And at the floor, the catalogue keeps its minimum.
+        let content = content_width(
+            crate::config::MIN_WINDOW_WIDTH,
+            UiMetrics::SIDEBAR_COLLAPSED,
+        );
+        assert!(
+            content >= UiMetrics::CATALOGUE_MIN_WIDTH,
+            "au plancher, le catalogue garde {content} px pour un minimum de {}",
             UiMetrics::CATALOGUE_MIN_WIDTH
         );
     }

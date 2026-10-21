@@ -61,7 +61,7 @@ This slice builds upon the Slice-04 interaction and motion layer, executing a co
 
 Repository:
 
-    tension-atoi/calix
+    gnu6dotlive/calix
 
 Canonical branch:
 

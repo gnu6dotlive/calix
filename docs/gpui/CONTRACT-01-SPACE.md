@@ -1,6 +1,6 @@
 # CONTRACT 01 — The spatial contract of Calix
 
-**Version 1.1 — 2026-10-21 — status: ratified (decisions 1–4), in implementation**
+**Version 1.2 — 2026-10-21 — status: ratified (decisions 1–4), the catalogue's minimum qualified**
 
 Calix is a product. It is not a GPUI experiment that happens to have a
 package manager in it. The rules that decide where things are, what gives way
@@ -21,6 +21,12 @@ the catalogue's minimum, the single owner of the vertical budget, and the
 journal drawer's ceiling. The numbers they name are *qualification targets*:
 they are measured in the audit, and where the measurement disagrees with a
 target, the audit says so and the evidence is kept.
+
+**Version 1.2** records the result of the qualification: the catalogue's
+minimum was tried at 560 px and **does not hold** — the row's fixed columns
+cost 495 px, and at 560 the name shows six characters. The qualified
+minimum is **660 px**, measured from the real row and the real names, and
+the window's floor is re-derived from it so that the budget adds up.
 
 The companion audit confronts this contract with the repository as it stands.
 Where the repository disagrees with this document, the audit says so, with the
@@ -94,6 +100,11 @@ window's floor and each component's floor.
 One place divides the width. The spine takes its width; the body takes the
 rest. The body never falls below its floor: below it, the layout changes
 shape (§4.4) rather than squeezing the catalogue.
+
+The body's floor is **measured on the row itself**, not estimated: the row's
+fixed columns, the row's padding, and the name the real packages carry.
+See the audit, §4.7 — the number is 660 px, and it is qualified by a test
+that reads the bounds the window drew.
 
 ### 4.3 The vertical budget
 
