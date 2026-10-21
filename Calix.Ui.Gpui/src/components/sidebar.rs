@@ -82,6 +82,10 @@ impl Sidebar {
 
         let base = div()
             .id(element_id)
+            // The handle the interaction gate clicks: the harness reads the
+            // bounds of a rail entry under this name. A noop outside the
+            // tests.
+            .debug_selector(|| element_id.to_string())
             .focusable()
             .tab_stop(true)
             .focus(move |s| s.border_1().border_color(focus_border))
@@ -325,8 +329,12 @@ impl Sidebar {
 
 #[cfg(test)]
 mod tests {
-    use super::rail_mark_top;
+    use super::{rail_mark_top, Sidebar, SidebarProps};
+    use crate::state::session::RailEntry;
+    use crate::state::{NavScope, Place};
+    use crate::theme::Theme;
     use crate::ui_metrics::UiMetrics;
+    use crate::visual_style::VisualStyleId;
     use core::prelude::v1::test;
 
     #[test]
@@ -342,5 +350,101 @@ mod tests {
         // La rangée suivante commence sous celle-ci : le trait ne chevauche
         // jamais la mise en page.
         assert!(rail_mark_top(1.0) > rail_mark_top(0.0) + UiMetrics::RAIL_ROW_HEIGHT);
+    }
+
+    /// La porte de l'interaction : un clic sur une entrée du rail change le
+    /// lieu ou le périmètre.
+    ///
+    /// C'est la première porte de la série, et elle porte la navigation
+    /// elle-même : le rail est la surface de priorité 1, et un clic qui ne
+    /// change rien est un rail mort.
+    ///
+    /// Le protocole du banc : un clic est une suite d'événements séparés par
+    /// des images — comme pour un utilisateur. Le premier clic déplace le
+    /// focus, le focus change le style, la fenêtre se redessine, et le clic
+    /// suivant est dispatché contre les hitboxes de ce redessin. Sans
+    /// l'image entre les deux, le second clic ne trouve rien.
+    #[gpui::test]
+    fn a_click_on_a_rail_entry_changes_the_place_or_the_scope(
+        cx: &mut gpui::TestAppContext,
+    ) {
+        use gpui::prelude::*;
+        use gpui::{div, point, px, size, Context, Render, Window};
+        use std::cell::RefCell;
+        use std::rc::Rc;
+
+        struct Fixture {
+            theme: Theme,
+            chosen: Rc<RefCell<Option<RailEntry>>>,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let theme = self.theme.clone();
+                let chosen = self.chosen.clone();
+                div().size_full().child(Sidebar::render(SidebarProps {
+                    active_place: Place::Packages,
+                    active_scope: NavScope::Installed,
+                    updates_count: 14,
+                    is_collapsed: false,
+                    current_width: UiMetrics::SIDEBAR_EXPANDED,
+                    theme: &theme,
+                    visual_style: VisualStyleId::default(),
+                    on_select: Rc::new(move |entry, _w, _cx| {
+                        *chosen.borrow_mut() = Some(entry);
+                    }),
+                    on_toggle_collapse: Rc::new(|_w, _cx| {}),
+                    marker: None,
+                    reduce_motion: false,
+                }))
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let chosen = Rc::new(RefCell::new(None));
+        let fixture = cx.new(|_| Fixture {
+            theme: Theme::dark(),
+            chosen: chosen.clone(),
+        });
+
+        let frame = |cx: &mut gpui::VisualTestContext| {
+            cx.draw(
+                point(px(0.0), px(0.0)),
+                size(px(240.0), px(400.0)),
+                |_window, _cx| fixture.clone(),
+            );
+        };
+        // The frame comes *before* the lookup: the bounds are the ones the
+        // last frame drew. Then the click is dispatched against them.
+        let click = |cx: &mut gpui::VisualTestContext, selector: &'static str| {
+            frame(cx);
+            let bounds = cx
+                .debug_bounds(selector)
+                .unwrap_or_else(|| panic!("{selector} is drawn"));
+            cx.simulate_click(
+                point(
+                    bounds.origin.x + bounds.size.width / 2.0,
+                    bounds.origin.y + bounds.size.height / 2.0,
+                ),
+                gpui::Modifiers::default(),
+            );
+        };
+
+        // The three scopes, the two places: every entry answers.
+        for entry in RailEntry::ALL {
+            *chosen.borrow_mut() = None;
+            click(cx, entry.id);
+            assert_eq!(
+                *chosen.borrow(),
+                Some(*entry),
+                "le clic sur {} ({} l'a choisie",
+                entry.label,
+                entry.id
+            );
+        }
     }
 }

@@ -1088,6 +1088,7 @@ impl Render for PackageWorkstationView {
 
             if view_mode == PackageViewMode::Table {
                 div()
+                    .debug_selector(|| "catalogue_table".to_string())
                     .flex()
                     .flex_col()
                     .size_full()
@@ -1135,6 +1136,10 @@ impl Render for PackageWorkstationView {
                                 }
                             })
                             .h_full()
+                            // The handle the bench measures: the harness reads
+                            // the bounds of the list under this name. A noop
+                            // outside the tests.
+                            .debug_selector(|| "package_list".to_string())
                             .track_scroll(self.scroll_handle.clone()),
                         ),
                     )
@@ -2262,6 +2267,123 @@ mod tests {
         // And it never grows past the band.
         let too_far = drag.start_height + (drag.start_pointer_y - (drag.start_pointer_y - 900.0));
         assert_eq!(too_far.clamp(0.0, band), band, "et jamais plus que la bande");
+    }
+
+    /// La porte de l'interaction : un clic sur une ligne du catalogue
+    /// sélectionne ce paquet.
+    ///
+    /// C'est le corps — la surface de priorité 2. Un clic qui ne sélectionne
+    /// rien est un catalogue mort, et la porte le dit.
+    ///
+    /// Ici, la ligne est dans la **vraie** liste, avec la vraie station
+    /// autour d'elle : le clic passe par le composant, la sélection va à la
+    /// session, et la session est ce que l'on vérifie.
+    #[gpui::test]
+    fn a_click_on_a_row_selects_that_package(cx: &mut gpui::TestAppContext) {
+        use crate::backend::models::{AlpmPackage, UnifiedPackageSource};
+        use gpui::prelude::*;
+        use gpui::{point, px, size, Context, Render, Window};
+
+        struct Fixture {
+            station: Entity<PackageWorkstationView>,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let station = self.station.clone();
+                // A *definite* height, not a percentage: the bench's measured
+                // layout path does not resolve a percentage against a
+                // percentage.
+                div().h(px(700.0)).w(px(1080.0)).child(station)
+            }
+        }
+
+        let session = cx.new(|_| AppSession::new());
+        let store = cx.new(|_| {
+            PackageStore::new(crate::backend::client::CalixClient::default())
+        });
+        let console = cx.new(|_| ConsoleModel::new());
+        let toast_center = cx.new(|_| ToastCenter::new());
+
+        // Two rows, so the click has to pick *one* and not merely find one.
+        let packages: Vec<UnifiedPackage> = ["ripgrep", "7zip"]
+            .iter()
+            .map(|name| UnifiedPackage {
+                name: (*name).to_string(),
+                version: "14.1.0-1".to_string(),
+                description: "a package".to_string(),
+                source_type: "ALPM".to_string(),
+                repository_or_remote: "extra".to_string(),
+                is_installed: true,
+                has_update: false,
+                new_version: None,
+                inner: UnifiedPackageSource::Standard(AlpmPackage::default()),
+            })
+            .collect();
+        store.update(cx, |store, _cx| {
+            store.installed_packages = std::sync::Arc::from(packages);
+        });
+        // The installed scope — the default is the results, which are empty
+        // here — and the table, not the cards: the catalogue's list is what
+        // carries the rows.
+        session.update(cx, |session, cx| {
+            session.set_scope(NavScope::Installed, cx);
+            session.set_view_mode(PackageViewMode::Table, cx);
+        });
+
+        let station = cx.new(|cx| {
+            PackageWorkstationView::new(
+                session.clone(),
+                store.clone(),
+                console.clone(),
+                toast_center.clone(),
+                PackageWorkstationConfig {
+                    theme: Theme::dark(),
+                    reduce_motion: false,
+                    compact: false,
+                    visual_style: VisualStyleId::default(),
+                },
+                cx,
+            )
+        });
+
+        let cx = cx.add_empty_window();
+        let fixture = cx.new(|_| Fixture {
+            station: station.clone(),
+        });
+
+        // The row the list drew — *named*, so that the click lands on the
+        // package the test means and not on the first one of the list.
+        cx.draw(
+            point(px(0.0), px(0.0)),
+            size(px(1080.0), px(700.0)),
+            |_window, _cx| fixture.clone(),
+        );
+        let row = cx
+            .debug_bounds("package_row-ripgrep")
+            .expect("the list draws its rows");
+        assert!(row.size.height > px(0.0), "the row has a height");
+
+        // The click.
+        cx.simulate_click(
+            point(
+                row.origin.x + row.size.width / 2.0,
+                row.origin.y + row.size.height / 2.0,
+            ),
+            gpui::Modifiers::default(),
+        );
+
+        // And the selection.
+        let selected = cx.read(|app| session.read(app).selected_package_key.clone());
+        assert_eq!(
+            selected.map(|key| key.name),
+            Some("ripgrep".to_string()),
+            "le clic sur la ligne a sélectionné ce paquet"
+        );
     }
 
     /// L'échelle de la plaque : elle reste dans le flux tant que la bande

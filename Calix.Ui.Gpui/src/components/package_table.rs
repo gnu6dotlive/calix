@@ -223,8 +223,10 @@ impl PackageTable {
         div()
             .id("package_row")
             // The handle the bench measures: the harness reads the bounds of
-            // the row under this name. A noop outside the tests.
-            .debug_selector(|| "package_row".to_string())
+            // the row under this name — *named*, so that a test can click
+            // *this* row and not merely the first one. A noop outside the
+            // tests.
+            .debug_selector(move || format!("package_row-{}", pkg.name))
             .h(px(row_height))
             .child(Self::render_row(pkg, is_selected, theme, compact, scale_max))
             .on_mouse_down(MouseButton::Left, move |_e, w, cx| on_select(w, cx))
@@ -838,7 +840,7 @@ mod tests {
 
             // The row the list drew: its own bounds.
             let row = cx
-                .debug_bounds("package_row")
+                .debug_bounds("package_row-browsers-neo-bin")
                 .expect("the list draws its rows");
             let row_width: f32 = row.size.width.into();
             let row_height: f32 = row.size.height.into();
@@ -972,7 +974,9 @@ mod tests {
             |_window, _cx| fixture.clone(),
         );
 
-        let row = cx.debug_bounds("package_row").expect("the row is drawn");
+        let row = cx
+            .debug_bounds("package_row-7zip")
+            .expect("the row is drawn");
         assert_eq!(
             row.size.width,
             px(600.0),
@@ -1037,7 +1041,7 @@ mod tests {
                                     .collect::<Vec<_>>()
                             })
                             .track_scroll(self.handle.clone())
-                            .h(px(300.0)),
+                            .h_full(),
                         ),
                 )
             }

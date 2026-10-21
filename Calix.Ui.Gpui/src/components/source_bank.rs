@@ -434,4 +434,84 @@ mod tests {
             "l'ancre est arrivée quatorze pixels plus bas, et elle est montée à sa place"
         );
     }
+
+    /// La porte de l'interaction : un clic sur une ouverture de la banque
+    /// bascule cette source.
+    ///
+    /// La banque est l'axe des sources : c'est par elle que l'on change ce
+    /// que l'on cherche. Un clic qui ne bascule rien est une banque morte —
+    /// et la porte le dit.
+    #[gpui::test]
+    fn a_click_on_an_aperture_toggles_that_source(cx: &mut gpui::TestAppContext) {
+        use gpui::prelude::*;
+        use gpui::{div, point, px, size, Context, Render, Window};
+        use std::cell::RefCell;
+        use std::rc::Rc;
+
+        struct Fixture {
+            theme: Theme,
+            axis: Vec<SourceAxisEntry>,
+            toggled: Rc<RefCell<Vec<PackageSourceKind>>>,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let theme = self.theme.clone();
+                let toggled = self.toggled.clone();
+                div().size_full().child(SourceBank::render(SourceBankProps {
+                    axis: &self.axis,
+                    source_health: &crate::state::package_store::SourceHealthMap::default(),
+                    theme: &theme,
+                    epoch: 1,
+                    reduce_motion: true,
+                    on_toggle: Rc::new(move |kind, _w, _cx| {
+                        toggled.borrow_mut().push(kind);
+                    }),
+                    on_retry: Rc::new(|_, _, _| {}),
+                }))
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let toggled = Rc::new(RefCell::new(Vec::new()));
+        let axis = crate::state::sources::source_axis(
+            crate::state::NavScope::Installed,
+            &[],
+            &crate::state::query::SourceScope::all(),
+        );
+        let fixture = cx.new(|_| Fixture {
+            theme: Theme::dark(),
+            axis: axis.clone(),
+            toggled: toggled.clone(),
+        });
+
+        for entry in &axis {
+            toggled.borrow_mut().clear();
+            cx.draw(
+                point(px(0.0), px(0.0)),
+                size(px(1080.0), px(200.0)),
+                |_window, _cx| fixture.clone(),
+            );
+            let bounds = cx
+                .debug_bounds(aperture_selector(entry.kind))
+                .unwrap_or_else(|| panic!("the aperture is drawn"));
+            cx.simulate_click(
+                point(
+                    bounds.origin.x + bounds.size.width / 2.0,
+                    bounds.origin.y + bounds.size.height / 2.0,
+                ),
+                gpui::Modifiers::default(),
+            );
+            assert_eq!(
+                *toggled.borrow(),
+                vec![entry.kind],
+                "le clic sur l'ouverture de {:?} l'a basculée",
+                entry.kind
+            );
+        }
+    }
 }
