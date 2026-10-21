@@ -69,7 +69,18 @@ impl UiMetrics {
     //
     /// The width the catalogue keeps: below it, the catalogue is not a
     /// catalogue any more.
-    pub const CATALOGUE_MIN_WIDTH: f32 = 560.0;
+    ///
+    /// It is **measured**, not chosen. A row of the table spends 495 px
+    /// before the name (the five fixed columns and the row's padding), and
+    /// the name needs its glyph, its gap, and — for 90 % of the real
+    /// packages of this machine — 143 px of text. The minimum is the sum:
+    /// 495 + 22 + 143 = 660 px.
+    ///
+    /// The proof is `the_row_is_measured_at_and_around_the_catalogue_minimum`
+    /// (components/package_table.rs), and the 560 px that was tried first is
+    /// kept in the record as the case that failed: at 560, the name shows
+    /// 43 px of text — six characters.
+    pub const CATALOGUE_MIN_WIDTH: f32 = 660.0;
 
     // ── The vertical budget, inside the station ─────────────────────────────
     //

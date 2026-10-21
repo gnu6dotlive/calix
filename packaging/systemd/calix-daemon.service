@@ -1,6 +1,6 @@
 [Unit]
 Description=Calix package inventory service
-Documentation=https://github.com/tension-atoi/calix
+Documentation=https://github.com/gnu6dotlive/calix
 StartLimitBurst=3
 StartLimitIntervalSec=30s
 

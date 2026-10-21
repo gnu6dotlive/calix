@@ -60,7 +60,7 @@ code paths that invoke those tools.
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/tension-atoi/calix.git
+   git clone https://github.com/gnu6dotlive/calix.git
    cd calix
    ```
 

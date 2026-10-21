@@ -1,6 +1,6 @@
 [Unit]
 Description=Calix desktop notification bridge
-Documentation=https://github.com/tension-atoi/calix
+Documentation=https://github.com/gnu6dotlive/calix
 PartOf=graphical-session.target
 After=graphical-session.target
 StartLimitBurst=3
