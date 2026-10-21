@@ -1,0 +1,612 @@
+{"command": "frame.create", "params": {"x": 0, "y": 0, "width": 1600, "height": 1000, "name": "Le Comptoir \u2014 loaded", "props": {"fill": "#111418", "clip": true}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 0, "width": 1600, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#1A1717"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 1}], "props": {"fills": [{"type": "linearGradient", "stops": ["#171617", "#1A1717", "#211916"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 1}], "effect": {"type": "noise", "opacity": 0.07}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 1, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 128, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 129, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 256, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 257, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 384, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 385, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 512, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 513, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 640, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 641, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 768, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 769, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 896, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 897, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 1024, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 1025, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 1152, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 1153, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 1280, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 1281, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 1408, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 1409, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 1536, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 1537, "y": 0, "width": 1, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 250, "width": 1600, "height": 3, "parent": {"$step": 0}, "props": {"fill": "#FFE5D221"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 253, "width": 1600, "height": 2, "parent": {"$step": 0}, "props": {"fill": "#11141880"}}}
+{"command": "shape.ellipse", "params": {"x": 240, "y": 120, "width": 1200, "height": 300, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 32}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D21F", "#FFE5D200"]}]}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 0, "width": 4, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141859"}}}
+{"command": "shape.rectangle", "params": {"x": 256, "y": 0, "width": 4, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141859"}}}
+{"command": "shape.rectangle", "params": {"x": 512, "y": 0, "width": 4, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141859"}}}
+{"command": "shape.rectangle", "params": {"x": 768, "y": 0, "width": 4, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141859"}}}
+{"command": "shape.rectangle", "params": {"x": 1024, "y": 0, "width": 4, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141859"}}}
+{"command": "shape.rectangle", "params": {"x": 1280, "y": 0, "width": 4, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141859"}}}
+{"command": "shape.rectangle", "params": {"x": 1536, "y": 0, "width": 4, "height": 556, "parent": {"$step": 0}, "props": {"fill": "#11141859"}}}
+{"command": "shape.ellipse", "params": {"x": 90, "y": 30, "width": 460, "height": 400, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 41}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D226", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": -60, "y": 40, "width": 420, "height": 480, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 43}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D21A", "#FFE5D200"]}]}}}
+{"command": "shape.rectangle", "params": {"x": 262, "y": 26, "width": 1300, "height": 168, "parent": {"$step": 0}, "props": {"fill": "#20252C", "cornerRadius": 4}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 45}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.6, "offset": [0, 12], "radius": 26, "spread": 0}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 45}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.5, "offset": [0, 3], "radius": 10}}}
+{"command": "shape.rectangle", "params": {"x": 262, "y": 26, "width": 1300, "height": 2, "parent": {"$step": 0}, "props": {"fill": "#A3A7B173"}}}
+{"command": "shape.rectangle", "params": {"x": 262, "y": 26, "width": 1300, "height": 30, "parent": {"$step": 0}, "props": {"fill": "#292E37"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 49}], "props": {"fills": [{"type": "linearGradient", "stops": ["#424957", "#292E37"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "shape.rectangle", "params": {"x": 262, "y": 55, "width": 1300, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#11141899"}}}
+{"command": "text.create", "params": {"text": "THE SEVEN COUNTERS", "x": 282, "y": 43.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADCC", "letterSpacing": "0.22"}}}
+{"command": "shape.ellipse", "params": {"x": 1338, "y": 36, "width": 8, "height": 8, "parent": {"$step": 0}, "props": {"fill": "#FF8E40"}}}
+{"command": "text.create", "params": {"text": "ALPM INDEX \u00b7 4 MIN OLD", "x": 1352, "y": 41.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2", "letterSpacing": "0.04", "width": 190, "textAlign": "right"}}}
+{"command": "shape.ellipse", "params": {"x": 288.0, "y": 70, "width": 133.71428571428572, "height": 108, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 55}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D233", "#FFE5D200"]}]}}}
+{"command": "vector.create", "params": {"path": "M 341.86 90.00 L 367.86 90.00 L 361.86 72.00 L 347.86 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 57}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 353.3571428571429, "y": 60, "width": 3, "height": 12, "parent": {"$step": 0}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 348.8571428571429, "y": 84, "width": 12, "height": 10, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2"}}}
+{"command": "shape.ellipse", "params": {"x": 334.8571428571429, "y": 76, "width": 40, "height": 36, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 61}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D273", "#FFE5D200"]}]}}}
+{"command": "text.create", "params": {"text": "ALPM", "x": 262.0, "y": 128.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3ED", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "OFFICIAL REPOS", "x": 262.0, "y": 149.195, "parent": {"$step": 0}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "1,284", "x": 262.0, "y": 172.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF6A00", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 447.7142857142857, "y": 60, "width": 1, "height": 130, "parent": {"$step": 0}, "props": {"fill": "#66708533"}}}
+{"command": "vector.create", "params": {"path": "M 527.57 90.00 L 553.57 90.00 L 547.57 72.00 L 533.57 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 67}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 539.0714285714286, "y": 60, "width": 3, "height": 12, "parent": {"$step": 0}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 536.5714285714286, "y": 86, "width": 8, "height": 7, "parent": {"$step": 0}, "props": {"fill": "#667085B2"}}}
+{"command": "text.create", "params": {"text": "AUR", "x": 447.7142857142857, "y": 128.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADA8", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "BUILD RECIPES", "x": 447.7142857142857, "y": 149.195, "parent": {"$step": 0}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "8,431", "x": 447.7142857142857, "y": 172.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085D9", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 633.4285714285714, "y": 60, "width": 1, "height": 130, "parent": {"$step": 0}, "props": {"fill": "#66708533"}}}
+{"command": "vector.create", "params": {"path": "M 713.29 90.00 L 739.29 90.00 L 733.29 72.00 L 719.29 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 75}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 724.7857142857143, "y": 60, "width": 3, "height": 12, "parent": {"$step": 0}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 722.2857142857143, "y": 86, "width": 8, "height": 7, "parent": {"$step": 0}, "props": {"fill": "#667085B2"}}}
+{"command": "text.create", "params": {"text": "FLATPAK", "x": 633.4285714285714, "y": 128.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADA8", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "SANDBOXES", "x": 633.4285714285714, "y": 149.195, "parent": {"$step": 0}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "96", "x": 633.4285714285714, "y": 172.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085D9", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 819.1428571428571, "y": 60, "width": 1, "height": 130, "parent": {"$step": 0}, "props": {"fill": "#66708533"}}}
+{"command": "vector.create", "params": {"path": "M 899.00 90.00 L 925.00 90.00 L 919.00 72.00 L 905.00 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 83}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 910.5, "y": 60, "width": 3, "height": 12, "parent": {"$step": 0}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 908.0, "y": 86, "width": 8, "height": 7, "parent": {"$step": 0}, "props": {"fill": "#667085B2"}}}
+{"command": "text.create", "params": {"text": "APPIMAGE", "x": 819.1428571428571, "y": 128.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADA8", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "SINGLE BINARIES", "x": 819.1428571428571, "y": 149.195, "parent": {"$step": 0}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "41", "x": 819.1428571428571, "y": 172.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085D9", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 1004.8571428571429, "y": 60, "width": 1, "height": 130, "parent": {"$step": 0}, "props": {"fill": "#66708533"}}}
+{"command": "vector.create", "params": {"path": "M 1084.71 90.00 L 1110.71 90.00 L 1104.71 72.00 L 1090.71 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 91}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 1096.2142857142858, "y": 60, "width": 3, "height": 12, "parent": {"$step": 0}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 1093.7142857142858, "y": 86, "width": 8, "height": 7, "parent": {"$step": 0}, "props": {"fill": "#667085B2"}}}
+{"command": "text.create", "params": {"text": "CARGO", "x": 1004.8571428571429, "y": 128.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADA8", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "RUST CRATES", "x": 1004.8571428571429, "y": 149.195, "parent": {"$step": 0}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "612", "x": 1004.8571428571429, "y": 172.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085D9", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 1190.5714285714287, "y": 60, "width": 1, "height": 130, "parent": {"$step": 0}, "props": {"fill": "#66708533"}}}
+{"command": "vector.create", "params": {"path": "M 1270.43 90.00 L 1296.43 90.00 L 1290.43 72.00 L 1276.43 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 99}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 1281.9285714285716, "y": 60, "width": 3, "height": 12, "parent": {"$step": 0}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 1279.4285714285716, "y": 86, "width": 8, "height": 7, "parent": {"$step": 0}, "props": {"fill": "#667085B2"}}}
+{"command": "text.create", "params": {"text": "NPM", "x": 1190.5714285714287, "y": 128.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADA8", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "NODE PACKAGES", "x": 1190.5714285714287, "y": 149.195, "parent": {"$step": 0}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "1,308", "x": 1190.5714285714287, "y": 172.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085D9", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 1376.2857142857142, "y": 60, "width": 1, "height": 130, "parent": {"$step": 0}, "props": {"fill": "#66708533"}}}
+{"command": "vector.create", "params": {"path": "M 1456.14 90.00 L 1482.14 90.00 L 1476.14 72.00 L 1462.14 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 107}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 1467.642857142857, "y": 60, "width": 3, "height": 12, "parent": {"$step": 0}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 1465.142857142857, "y": 86, "width": 8, "height": 7, "parent": {"$step": 0}, "props": {"fill": "#667085B2"}}}
+{"command": "text.create", "params": {"text": "TRACKED RELEASES", "x": 1376.2857142857142, "y": 128.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADA8", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "FOLLOWED BINARIES", "x": 1376.2857142857142, "y": 149.195, "parent": {"$step": 0}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "0", "x": 1376.2857142857142, "y": 172.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085D9", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "NOTHING IN STOCK", "x": 1376.2857142857142, "y": 187.36, "parent": {"$step": 0}, "props": {"fontSize": 8, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085E6", "letterSpacing": "0.02", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 800, "y": 188, "width": 2, "height": 44, "parent": {"$step": 0}, "props": {"fill": "#667085B2"}}}
+{"command": "vector.create", "params": {"path": "M 760.00 232.00 L 840.00 232.00 L 822.00 264.00 L 778.00 264.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 116}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 768, "y": 228, "width": 64, "height": 4, "parent": {"$step": 0}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 788, "y": 256, "width": 26, "height": 22, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2"}}}
+{"command": "shape.ellipse", "params": {"x": 756, "y": 242, "width": 88, "height": 76, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 120}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D273", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": 600, "y": 290, "width": 560, "height": 320, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 122}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D233", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": 180, "y": 210, "width": 1240, "height": 300, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 124}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D230", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": 420, "y": 300, "width": 900, "height": 220, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 126}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D21A", "#FFE5D200"]}]}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 452, "width": 1600, "height": 40, "parent": {"$step": 0}, "props": {"fill": "#221A16"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 128}], "props": {"fills": [{"type": "linearGradient", "stops": ["#291C15", "#362113"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 128}], "effect": {"type": "noise", "opacity": 0.09}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 492, "width": 1600, "height": 64, "parent": {"$step": 0}, "props": {"fill": "#221A16"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 131}], "props": {"fills": [{"type": "linearGradient", "stops": ["#362113", "#1F1916"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 131}], "effect": {"type": "noise", "opacity": 0.09}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 492, "width": 1600, "height": 2, "parent": {"$step": 0}, "props": {"fill": "#FFE5D261"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 494, "width": 1600, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#11141880"}}}
+{"command": "shape.rectangle", "params": {"x": 294, "y": 444, "width": 184, "height": 14, "parent": {"$step": 0}, "props": {"fill": "#111418CC", "cornerRadius": 7}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 136}], "effect": {"type": "layerBlur", "radius": 6}}}
+{"command": "frame.create", "params": {"x": 286, "y": 282, "width": 200, "height": 170, "parent": {"$step": 0}, "name": "good rindexer", "props": {"cornerRadius": 3, "rotation": 0, "fills": [{"type": "linearGradient", "stops": ["#565758", "#444547"], "from": [0, 0], "to": [0.2, 1]}], "strokes": ["#111418BF"], "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 138}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.5, "offset": [5, 9], "radius": 12, "spread": 0}}}
+{"command": "vector.create", "params": {"path": "M 0.00 0.00 L 200.00 0.00 L 218.00 -14.00 L 18.00 -14.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 138}, "props": {"fill": "#646465"}}}
+{"command": "vector.create", "params": {"path": "M 200.00 0.00 L 218.00 -14.00 L 218.00 156.00 L 200.00 170.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 138}, "props": {"fill": "#313336"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 0, "width": 200, "height": 1.5, "parent": {"$step": 138}, "props": {"fill": "#F7F3ED2E"}}}
+{"command": "shape.rectangle", "params": {"x": 20, "y": 20, "width": 81.2, "height": 30, "parent": {"$step": 138}, "props": {"fill": "#7F7F7E", "cornerRadius": 2}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 143}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.3, "offset": [0, 2], "radius": 4}}}
+{"command": "shape.ellipse", "params": {"x": 26, "y": 22, "width": 7, "height": 7, "parent": {"$step": 138}, "props": {"fill": "#A3A7B1"}}}
+{"command": "text.create", "params": {"text": "rindexer", "x": 29, "y": 35.875, "parent": {"$step": 138}, "props": {"fontSize": 12.5, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#111418EB"}}}
+{"command": "text.create", "params": {"text": "0.15.1-1 \u00b7 extra", "x": 20, "y": 74.865, "parent": {"$step": 138}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADD9"}}}
+{"command": "text.create", "params": {"text": "indexes directories with ripgrep,", "x": 20, "y": 102.865, "parent": {"$step": 138}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADA8"}}}
+{"command": "text.create", "params": {"text": "for search engines", "x": 20, "y": 118.865, "parent": {"$step": 138}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADA8"}}}
+{"command": "shape.rectangle", "params": {"x": 315, "y": 486, "width": 2, "height": 12, "parent": {"$step": 0}, "props": {"fill": "#FFE5D24C"}}}
+{"command": "shape.rectangle", "params": {"x": 300, "y": 498, "width": 150, "height": 25, "parent": {"$step": 0}, "props": {"fill": "#8D8C8B", "cornerRadius": 2}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 151}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.45, "offset": [0, 4], "radius": 8, "spread": 0}}}
+{"command": "shape.ellipse", "params": {"x": 310, "y": 507, "width": 5, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#1114188C"}}}
+{"command": "text.create", "params": {"text": "INSTALLED", "x": 322, "y": 511.525, "parent": {"$step": 0}, "props": {"fontSize": 7.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#111418D1", "letterSpacing": "0.12"}}}
+{"command": "text.create", "params": {"text": "2.3 MB", "x": 386, "y": 511.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#111418E6", "width": 58, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 540, "y": 444, "width": 184, "height": 14, "parent": {"$step": 0}, "props": {"fill": "#111418CC", "cornerRadius": 7}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 156}], "effect": {"type": "layerBlur", "radius": 6}}}
+{"command": "shape.rectangle", "params": {"x": 544, "y": 450, "width": 176, "height": 32, "parent": {"$step": 0}, "props": {"fill": "#36211380", "cornerRadius": 4}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 158}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.35, "offset": [0, 2], "radius": 5}}}
+{"command": "frame.create", "params": {"x": 520, "y": 254, "width": 200, "height": 170, "parent": {"$step": 0}, "name": "good ripgrep (lifted)", "props": {"cornerRadius": 3, "rotation": -2.6, "fills": [{"type": "linearGradient", "stops": ["#565758", "#444547"], "from": [0, 0], "to": [0.2, 1]}], "strokes": ["#111418BF"], "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 160}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.72, "offset": [18, 32], "radius": 28, "spread": 0}}}
+{"command": "vector.create", "params": {"path": "M 0.00 0.00 L 200.00 0.00 L 218.00 -14.00 L 18.00 -14.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 160}, "props": {"fill": "#646465"}}}
+{"command": "vector.create", "params": {"path": "M 200.00 0.00 L 218.00 -14.00 L 218.00 156.00 L 200.00 170.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 160}, "props": {"fill": "#313336"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 0, "width": 200, "height": 1.5, "parent": {"$step": 160}, "props": {"fill": "#F7F3ED2E"}}}
+{"command": "shape.rectangle", "params": {"x": 20, "y": 20, "width": 73.80000000000001, "height": 30, "parent": {"$step": 160}, "props": {"fill": "#7F7F7E", "cornerRadius": 2}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 165}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.3, "offset": [0, 2], "radius": 4}}}
+{"command": "shape.ellipse", "params": {"x": 26, "y": 22, "width": 7, "height": 7, "parent": {"$step": 160}, "props": {"fill": "#A3A7B1"}}}
+{"command": "text.create", "params": {"text": "ripgrep", "x": 29, "y": 35.875, "parent": {"$step": 160}, "props": {"fontSize": 12.5, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#111418EB"}}}
+{"command": "text.create", "params": {"text": "14.1.0-1 \u2192 14.1.1 \u00b7 extra", "x": 20, "y": 74.865, "parent": {"$step": 160}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40F2"}}}
+{"command": "text.create", "params": {"text": "recursively search directories", "x": 20, "y": 102.865, "parent": {"$step": 160}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADA8"}}}
+{"command": "text.create", "params": {"text": "for a regex pattern", "x": 20, "y": 118.865, "parent": {"$step": 160}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADA8"}}}
+{"command": "shape.rectangle", "params": {"x": 561, "y": 486, "width": 2, "height": 12, "parent": {"$step": 0}, "props": {"fill": "#FFE5D24C"}}}
+{"command": "shape.rectangle", "params": {"x": 546, "y": 498, "width": 150, "height": 25, "parent": {"$step": 0}, "props": {"fill": "#FF6A00", "cornerRadius": 2}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 173}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.45, "offset": [0, 4], "radius": 8, "spread": 0}}}
+{"command": "shape.ellipse", "params": {"x": 556, "y": 507, "width": 5, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#C954008C"}}}
+{"command": "text.create", "params": {"text": "UPDATE", "x": 568, "y": 511.525, "parent": {"$step": 0}, "props": {"fontSize": 7.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3ED", "letterSpacing": "0.12"}}}
+{"command": "text.create", "params": {"text": "5.1 MB", "x": 632, "y": 511.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED", "width": 58, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 786, "y": 444, "width": 184, "height": 14, "parent": {"$step": 0}, "props": {"fill": "#111418CC", "cornerRadius": 7}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 178}], "effect": {"type": "layerBlur", "radius": 6}}}
+{"command": "frame.create", "params": {"x": 778, "y": 282, "width": 200, "height": 170, "parent": {"$step": 0}, "name": "good ripgrep-all", "props": {"cornerRadius": 3, "rotation": 0, "fills": [{"type": "linearGradient", "stops": ["#565758", "#444547"], "from": [0, 0], "to": [0.2, 1]}], "strokes": ["#111418BF"], "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 180}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.5, "offset": [5, 9], "radius": 12, "spread": 0}}}
+{"command": "vector.create", "params": {"path": "M 0.00 0.00 L 200.00 0.00 L 218.00 -14.00 L 18.00 -14.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 180}, "props": {"fill": "#646465"}}}
+{"command": "vector.create", "params": {"path": "M 200.00 0.00 L 218.00 -14.00 L 218.00 156.00 L 200.00 170.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 180}, "props": {"fill": "#313336"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 0, "width": 200, "height": 1.5, "parent": {"$step": 180}, "props": {"fill": "#F7F3ED2E"}}}
+{"command": "shape.rectangle", "params": {"x": 20, "y": 20, "width": 103.4, "height": 30, "parent": {"$step": 180}, "props": {"fill": "#7F7F7E", "cornerRadius": 2}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 185}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.3, "offset": [0, 2], "radius": 4}}}
+{"command": "shape.ellipse", "params": {"x": 26, "y": 22, "width": 7, "height": 7, "parent": {"$step": 180}, "props": {"fill": "#A3A7B1"}}}
+{"command": "text.create", "params": {"text": "ripgrep-all", "x": 29, "y": 35.875, "parent": {"$step": 180}, "props": {"fontSize": 12.5, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#111418EB"}}}
+{"command": "text.create", "params": {"text": "0.10.9-1 \u00b7 extra", "x": 20, "y": 74.865, "parent": {"$step": 180}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADD9"}}}
+{"command": "text.create", "params": {"text": "every ripgrep feature in one", "x": 20, "y": 102.865, "parent": {"$step": 180}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADA8"}}}
+{"command": "text.create", "params": {"text": "binary, no optional features", "x": 20, "y": 118.865, "parent": {"$step": 180}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADA8"}}}
+{"command": "shape.rectangle", "params": {"x": 807, "y": 486, "width": 2, "height": 12, "parent": {"$step": 0}, "props": {"fill": "#FFE5D24C"}}}
+{"command": "shape.rectangle", "params": {"x": 792, "y": 498, "width": 150, "height": 25, "parent": {"$step": 0}, "props": {"fill": "#8D8C8B", "cornerRadius": 2}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 193}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.45, "offset": [0, 4], "radius": 8, "spread": 0}}}
+{"command": "shape.ellipse", "params": {"x": 802, "y": 507, "width": 5, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#1114188C"}}}
+{"command": "text.create", "params": {"text": "AVAILABLE", "x": 814, "y": 511.525, "parent": {"$step": 0}, "props": {"fontSize": 7.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#111418D1", "letterSpacing": "0.12"}}}
+{"command": "text.create", "params": {"text": "1.2 MB", "x": 878, "y": 511.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#111418E6", "width": 58, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 1032, "y": 444, "width": 184, "height": 14, "parent": {"$step": 0}, "props": {"fill": "#111418CC", "cornerRadius": 7}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 198}], "effect": {"type": "layerBlur", "radius": 6}}}
+{"command": "frame.create", "params": {"x": 1024, "y": 282, "width": 200, "height": 170, "parent": {"$step": 0}, "name": "good ripgrep-git", "props": {"cornerRadius": 3, "rotation": 0, "fills": [{"type": "linearGradient", "stops": ["#565758", "#444547"], "from": [0, 0], "to": [0.2, 1]}], "strokes": ["#111418BF"], "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 200}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.5, "offset": [5, 9], "radius": 12, "spread": 0}}}
+{"command": "vector.create", "params": {"path": "M 0.00 0.00 L 200.00 0.00 L 218.00 -14.00 L 18.00 -14.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 200}, "props": {"fill": "#646465"}}}
+{"command": "vector.create", "params": {"path": "M 200.00 0.00 L 218.00 -14.00 L 218.00 156.00 L 200.00 170.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 200}, "props": {"fill": "#313336"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 0, "width": 200, "height": 1.5, "parent": {"$step": 200}, "props": {"fill": "#F7F3ED2E"}}}
+{"command": "shape.rectangle", "params": {"x": 20, "y": 20, "width": 103.4, "height": 30, "parent": {"$step": 200}, "props": {"fill": "#7F7F7E", "cornerRadius": 2}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 205}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.3, "offset": [0, 2], "radius": 4}}}
+{"command": "shape.ellipse", "params": {"x": 26, "y": 22, "width": 7, "height": 7, "parent": {"$step": 200}, "props": {"fill": "#A3A7B1"}}}
+{"command": "text.create", "params": {"text": "ripgrep-git", "x": 29, "y": 35.875, "parent": {"$step": 200}, "props": {"fontSize": 12.5, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#111418EB"}}}
+{"command": "text.create", "params": {"text": "14.1.0.r6-1 \u00b7 extra", "x": 20, "y": 74.865, "parent": {"$step": 200}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADD9"}}}
+{"command": "text.create", "params": {"text": "the git master, built from", "x": 20, "y": 102.865, "parent": {"$step": 200}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADA8"}}}
+{"command": "text.create", "params": {"text": "source every time", "x": 20, "y": 118.865, "parent": {"$step": 200}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADA8"}}}
+{"command": "shape.rectangle", "params": {"x": 1053, "y": 486, "width": 2, "height": 12, "parent": {"$step": 0}, "props": {"fill": "#FFE5D24C"}}}
+{"command": "shape.rectangle", "params": {"x": 1038, "y": 498, "width": 150, "height": 25, "parent": {"$step": 0}, "props": {"fill": "#8D8C8B", "cornerRadius": 2}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 213}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.45, "offset": [0, 4], "radius": 8, "spread": 0}}}
+{"command": "shape.ellipse", "params": {"x": 1048, "y": 507, "width": 5, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#1114188C"}}}
+{"command": "text.create", "params": {"text": "AVAILABLE", "x": 1060, "y": 511.525, "parent": {"$step": 0}, "props": {"fontSize": 7.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#111418D1", "letterSpacing": "0.12"}}}
+{"command": "text.create", "params": {"text": "4.8 MB", "x": 1124, "y": 511.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#111418E6", "width": 58, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 1278, "y": 444, "width": 184, "height": 14, "parent": {"$step": 0}, "props": {"fill": "#111418CC", "cornerRadius": 7}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 218}], "effect": {"type": "layerBlur", "radius": 6}}}
+{"command": "frame.create", "params": {"x": 1270, "y": 282, "width": 200, "height": 170, "parent": {"$step": 0}, "name": "good rizin", "props": {"cornerRadius": 3, "rotation": 0, "fills": [{"type": "linearGradient", "stops": ["#565758", "#444547"], "from": [0, 0], "to": [0.2, 1]}], "strokes": ["#111418BF"], "strokeWeight": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 220}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.5, "offset": [5, 9], "radius": 12, "spread": 0}}}
+{"command": "vector.create", "params": {"path": "M 0.00 0.00 L 200.00 0.00 L 218.00 -14.00 L 18.00 -14.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 220}, "props": {"fill": "#646465"}}}
+{"command": "vector.create", "params": {"path": "M 200.00 0.00 L 218.00 -14.00 L 218.00 156.00 L 200.00 170.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 220}, "props": {"fill": "#313336"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 0, "width": 200, "height": 1.5, "parent": {"$step": 220}, "props": {"fill": "#F7F3ED2E"}}}
+{"command": "shape.rectangle", "params": {"x": 20, "y": 20, "width": 72, "height": 30, "parent": {"$step": 220}, "props": {"fill": "#7F7F7E", "cornerRadius": 2}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 225}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.3, "offset": [0, 2], "radius": 4}}}
+{"command": "shape.ellipse", "params": {"x": 26, "y": 22, "width": 7, "height": 7, "parent": {"$step": 220}, "props": {"fill": "#A3A7B1"}}}
+{"command": "text.create", "params": {"text": "rizin", "x": 29, "y": 35.875, "parent": {"$step": 220}, "props": {"fontSize": 12.5, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#111418EB"}}}
+{"command": "text.create", "params": {"text": "0.6.0-1 \u00b7 extra", "x": 20, "y": 74.865, "parent": {"$step": 220}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADD9"}}}
+{"command": "text.create", "params": {"text": "reverse engineering framework", "x": 20, "y": 102.865, "parent": {"$step": 220}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADA8"}}}
+{"command": "text.create", "params": {"text": "and binary editor", "x": 20, "y": 118.865, "parent": {"$step": 220}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans", "fontWeight": 400, "fill": "#A1A6ADA8"}}}
+{"command": "shape.rectangle", "params": {"x": 1299, "y": 486, "width": 2, "height": 12, "parent": {"$step": 0}, "props": {"fill": "#FFE5D24C"}}}
+{"command": "shape.rectangle", "params": {"x": 1284, "y": 498, "width": 150, "height": 25, "parent": {"$step": 0}, "props": {"fill": "#8D8C8B", "cornerRadius": 2}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 233}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.45, "offset": [0, 4], "radius": 8, "spread": 0}}}
+{"command": "shape.ellipse", "params": {"x": 1294, "y": 507, "width": 5, "height": 5, "parent": {"$step": 0}, "props": {"fill": "#1114188C"}}}
+{"command": "text.create", "params": {"text": "AVAILABLE", "x": 1306, "y": 511.525, "parent": {"$step": 0}, "props": {"fontSize": 7.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#111418D1", "letterSpacing": "0.12"}}}
+{"command": "text.create", "params": {"text": "38.2 MB", "x": 1370, "y": 511.7, "parent": {"$step": 0}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#111418E6", "width": 58, "textAlign": "right"}}}
+{"command": "text.create", "params": {"text": "5 ON THE SHELF \u00b7 1,284 AT THE ALPM COUNTER", "x": 44, "y": 509.195, "parent": {"$step": 0}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FFE5D266"}}}
+{"command": "text.create", "params": {"text": "SORTED BY NAME \u2191", "x": 44, "y": 522.195, "parent": {"$step": 0}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FFE5D242"}}}
+{"command": "shape.rectangle", "params": {"x": 1470, "y": 496, "width": 92, "height": 36, "parent": {"$step": 0}, "props": {"fill": "#292E37", "cornerRadius": 3}}}
+{"command": "node.set", "params": {"ids": [{"$step": 240}], "props": {"fills": [{"type": "linearGradient", "stops": ["#424957", "#292E37"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "text.create", "params": {"text": "DETAILED", "x": 1478, "y": 508.525, "parent": {"$step": 0}, "props": {"fontSize": 7.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FFE5D280"}}}
+{"command": "text.create", "params": {"text": "COMPACT", "x": 1478, "y": 521.525, "parent": {"$step": 0}, "props": {"fontSize": 7.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FFE5D238"}}}
+{"command": "shape.rectangle", "params": {"x": 1470, "y": 496, "width": 40, "height": 2, "parent": {"$step": 0}, "props": {"fill": "#FF6A00"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 556, "width": 1600, "height": 444, "parent": {"$step": 0}, "props": {"fill": "#2D1E14"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 245}], "props": {"fills": [{"type": "linearGradient", "stops": ["#231A16", "#1F1916", "#191717"], "from": [0, 0], "to": [0.8, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 245}], "effect": {"type": "noise", "opacity": 0.085}}}
+{"command": "shape.ellipse", "params": {"x": 200, "y": 540, "width": 1250, "height": 500, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 248}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D21C", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": 1180, "y": 700, "width": 620, "height": 420, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 250}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D20D", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": -30, "y": 600, "width": 420, "height": 320, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 252}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D213", "#FFE5D200"]}]}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 992, "width": 1600, "height": 2, "parent": {"$step": 0}, "props": {"fill": "#FFE5D229"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 990, "width": 1600, "height": 2, "parent": {"$step": 0}, "props": {"fill": "#11141880"}}}
+{"command": "shape.rectangle", "params": {"x": 40, "y": 636, "width": 292, "height": 176, "parent": {"$step": 0}, "props": {"fill": "#292E37", "cornerRadius": 10}}}
+{"command": "node.set", "params": {"ids": [{"$step": 256}], "props": {"fills": [{"type": "linearGradient", "stops": ["#424957", "#333944"], "from": [0, 0], "to": [0.35, 1]}]}}}
+{"command": "shape.rectangle", "params": {"x": 41, "y": 637, "width": 290, "height": 2, "parent": {"$step": 0}, "props": {"fill": "#A3A7B159", "cornerRadius": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 256}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.65, "offset": [6, 18], "radius": 26, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 40, "y": 798, "width": 292, "height": 14, "parent": {"$step": 0}, "props": {"fill": "#221A16"}}}
+{"command": "text.create", "params": {"text": "THE TILL", "x": 60, "y": 664.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#FFE5D259", "letterSpacing": "0.22"}}}
+{"command": "shape.rectangle", "params": {"x": 64, "y": 682, "width": 244, "height": 54, "parent": {"$step": 0}, "props": {"fill": "#1A1D23", "cornerRadius": 8}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 262}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.9, "offset": [0, 4], "radius": 10}}}
+{"command": "shape.ellipse", "params": {"x": 94, "y": 716, "width": 22, "height": 22, "parent": {"$step": 0}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 264}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D280", "#FFE5D200"]}]}}}
+{"command": "shape.rectangle", "params": {"x": 103.5, "y": 724, "width": 3, "height": 9, "parent": {"$step": 0}, "props": {"fill": "#FF6A00", "cornerRadius": 1}}}
+{"command": "shape.rectangle", "params": {"x": 184.5, "y": 724, "width": 3, "height": 9, "parent": {"$step": 0}, "props": {"fill": "#66708580", "cornerRadius": 1}}}
+{"command": "shape.rectangle", "params": {"x": 265.5, "y": 724, "width": 3, "height": 9, "parent": {"$step": 0}, "props": {"fill": "#66708580", "cornerRadius": 1}}}
+{"command": "shape.rectangle", "params": {"x": 157, "y": 690, "width": 62, "height": 32, "parent": {"$step": 0}, "props": {"fill": "#A3A7B1", "cornerRadius": 5, "opacity": 0.06}}}
+{"command": "node.set", "params": {"ids": [{"$step": 269}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#424957"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "shape.rectangle", "params": {"x": 143, "y": 690, "width": 62, "height": 32, "parent": {"$step": 0}, "props": {"fill": "#A3A7B1", "cornerRadius": 5, "opacity": 0.11}}}
+{"command": "node.set", "params": {"ids": [{"$step": 271}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#424957"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "shape.rectangle", "params": {"x": 117, "y": 686, "width": 66, "height": 38, "parent": {"$step": 0}, "props": {"fill": "#A3A7B1", "cornerRadius": 5, "rotation": -5}}}
+{"command": "node.set", "params": {"ids": [{"$step": 273}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#424957", "#292E37"], "from": [0, 0], "to": [0.3, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 273}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.6, "offset": [4, 10], "radius": 12, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 130, "y": 694, "width": 2, "height": 22, "parent": {"$step": 0}, "props": {"fill": "#292E3780", "cornerRadius": 1}}}
+{"command": "shape.rectangle", "params": {"x": 142, "y": 694, "width": 2, "height": 22, "parent": {"$step": 0}, "props": {"fill": "#292E3780", "cornerRadius": 1}}}
+{"command": "shape.rectangle", "params": {"x": 154, "y": 694, "width": 2, "height": 22, "parent": {"$step": 0}, "props": {"fill": "#292E3780", "cornerRadius": 1}}}
+{"command": "shape.rectangle", "params": {"x": 166, "y": 694, "width": 2, "height": 22, "parent": {"$step": 0}, "props": {"fill": "#292E3780", "cornerRadius": 1}}}
+{"command": "text.create", "params": {"text": "FIND", "x": 60, "y": 761.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#FF6A00", "letterSpacing": "0.12", "width": 90, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "INVENTORY", "x": 141, "y": 761.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#FFE5D266", "letterSpacing": "0.12", "width": 90, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "DELTA", "x": 222, "y": 761.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#FFE5D266", "letterSpacing": "0.12", "width": 90, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 392, "y": 606, "width": 600, "height": 230, "parent": {"$step": 0}, "props": {"fill": "#20252C", "cornerRadius": 5}}}
+{"command": "node.set", "params": {"ids": [{"$step": 283}], "props": {"fills": [{"type": "linearGradient", "stops": ["#272C34", "#1B1F25"], "from": [0, 0], "to": [0.4, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 283}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.68, "offset": [8, 22], "radius": 30, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 392, "y": 606, "width": 600, "height": 2, "parent": {"$step": 0}, "props": {"fill": "#A3A7B166"}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 283}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.45, "offset": [0, 3], "radius": 8}}}
+{"command": "text.create", "params": {"text": "ripgrep", "x": 418, "y": 635.75, "parent": {"$step": 0}, "props": {"fontSize": 25, "fontFamily": "IBM Plex Sans", "fontWeight": 600, "fill": "#F7F3ED"}}}
+{"command": "text.create", "params": {"text": "14.1.0-1", "x": 860, "y": 638.04, "parent": {"$step": 0}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD", "width": 106, "textAlign": "right"}}}
+{"command": "shape.rectangle", "params": {"x": 418, "y": 660, "width": 548, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708547"}}}
+{"command": "text.create", "params": {"text": "PROVENANCE", "x": 418, "y": 683.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADB8", "letterSpacing": "0.18"}}}
+{"command": "text.create", "params": {"text": "extra \u00b7 official repository", "x": 512, "y": 682.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3EDE6"}}}
+{"command": "text.create", "params": {"text": "SIZE", "x": 418, "y": 733.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADB8", "letterSpacing": "0.18"}}}
+{"command": "text.create", "params": {"text": "5.1 MB \u00b7 21.4 MB installed", "x": 512, "y": 732.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3EDE6"}}}
+{"command": "text.create", "params": {"text": "DEPENDS", "x": 418, "y": 761.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADB8", "letterSpacing": "0.18"}}}
+{"command": "text.create", "params": {"text": "libpcre2-8 \u00b7 gcc-libs \u00b7 zlib", "x": 512, "y": 760.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3EDE6"}}}
+{"command": "text.create", "params": {"text": "FILES", "x": 418, "y": 789.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADB8", "letterSpacing": "0.18"}}}
+{"command": "text.create", "params": {"text": "/usr/bin/rg \u00b7 man1/rg.1.gz", "x": 512, "y": 788.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3EDE6"}}}
+{"command": "text.create", "params": {"text": "signed by the packagers \u2014 no build recipe", "x": 512, "y": 707.195, "parent": {"$step": 0}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADCC"}}}
+{"command": "text.create", "params": {"text": "CALIX COMMAND", "x": 730, "y": 679.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADB8", "letterSpacing": "0.18"}}}
+{"command": "shape.rectangle", "params": {"x": 730, "y": 692, "width": 236, "height": 38, "parent": {"$step": 0}, "props": {"fill": "#181B21", "cornerRadius": 4}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 301}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.8, "offset": [0, 3], "radius": 8}}}
+{"command": "text.create", "params": {"text": "calix install standard ripgrep", "x": 742, "y": 712.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF8E40"}}}
+{"command": "text.create", "params": {"text": "STATE", "x": 730, "y": 753.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADB8", "letterSpacing": "0.18"}}}
+{"command": "text.create", "params": {"text": "INSTALLED 14.1.0", "x": 730, "y": 774.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3EDE6"}}}
+{"command": "shape.rectangle", "params": {"x": 730, "y": 788, "width": 142, "height": 22, "parent": {"$step": 0}, "props": {"fill": "#FF6A00", "cornerRadius": 4}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 306}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.4, "offset": [0, 3], "radius": 7, "spread": 0}}}
+{"command": "text.create", "params": {"text": "UPDATE 14.1.1", "x": 730, "y": 800.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED", "letterSpacing": "0.08", "width": 142, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 1164, "y": 614, "width": 354, "height": 210, "parent": {"$step": 0}, "props": {"fill": "#221A16", "cornerRadius": 7, "rotation": -1.6}}}
+{"command": "node.set", "params": {"ids": [{"$step": 309}], "props": {"fills": [{"type": "linearGradient", "stops": ["#2D1E14", "#1C1817"], "from": [0, 0], "to": [0.4, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 309}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.62, "offset": [6, 16], "radius": 24, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 1178, "y": 628, "width": 326, "height": 182, "parent": {"$step": 0}, "props": {"fill": "#1A1D23", "cornerRadius": 4, "rotation": -1.6}}}
+{"command": "node.set", "params": {"ids": [{"$step": 312}], "props": {"fills": [{"type": "linearGradient", "stops": ["#22262E", "#171A20"], "from": [0, 0], "to": [0.2, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 312}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.6, "offset": [6, 16], "radius": 24, "spread": 0}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 312}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.6, "offset": [0, 3], "radius": 9}}}
+{"command": "shape.rectangle", "params": {"x": 1176, "y": 626, "width": 330, "height": 2, "parent": {"$step": 0}, "props": {"fill": "#A3A7B152"}}}
+{"command": "text.create", "params": {"text": "REQUEST", "x": 1200, "y": 661.03, "parent": {"$step": 0}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD99", "letterSpacing": "0.16"}}}
+{"command": "text.create", "params": {"text": "ri", "x": 1200, "y": 704.76, "parent": {"$step": 0}, "props": {"fontSize": 28, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#F7F3ED"}}}
+{"command": "shape.rectangle", "params": {"x": 1248, "y": 684, "width": 3, "height": 34, "parent": {"$step": 0}, "props": {"fill": "#FF6A00"}}}
+{"command": "shape.rectangle", "params": {"x": 1200, "y": 756, "width": 230, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#66708547"}}}
+{"command": "text.create", "params": {"text": "5 ON THE SHELF", "x": 1200, "y": 776.865, "parent": {"$step": 0}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085FF"}}}
+{"command": "vector.create", "params": {"path": "M 52.00 872.00 L 880.00 872.00 L 880.00 1012.00 L 52.00 1012.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#A9A7A5"}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 322}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.5, "offset": [4, 12], "radius": 18, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 52, "y": 872, "width": 828, "height": 1, "parent": {"$step": 0}, "props": {"fill": "#F7F3ED66"}}}
+{"command": "text.create", "params": {"text": "20:14:02   pacman -Sy --needed ripgrep", "x": 72, "y": 894.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#111418D1"}}}
+{"command": "text.create", "params": {"text": "20:14:02   resolving: libpcre2-8 gcc-libs zlib", "x": 72, "y": 913.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#111418D1"}}}
+{"command": "text.create", "params": {"text": "20:14:03   downloading ripgrep-14.1.1-1-x86_64.pkg.tar.zst", "x": 72, "y": 932.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#111418D1"}}}
+{"command": "text.create", "params": {"text": "20:14:04   verifying signature ... ok", "x": 72, "y": 951.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#C95400F2"}}}
+{"command": "text.create", "params": {"text": "20:14:05   installed ripgrep 14.1.1", "x": 72, "y": 970.535, "parent": {"$step": 0}, "props": {"fontSize": 10.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#111418D1"}}}
+{"command": "shape.rectangle", "params": {"x": 60, "y": 0, "width": 2, "height": 40, "parent": {"$step": 0}, "props": {"fill": "#66708599"}}}
+{"command": "shape.rectangle", "params": {"x": 172, "y": 0, "width": 2, "height": 40, "parent": {"$step": 0}, "props": {"fill": "#66708599"}}}
+{"command": "shape.rectangle", "params": {"x": 30, "y": 40, "width": 176, "height": 196, "parent": {"$step": 0}, "props": {"fill": "#20252C", "cornerRadius": 6}}}
+{"command": "node.set", "params": {"ids": [{"$step": 332}], "props": {"fills": [{"type": "linearGradient", "stops": ["#272C34", "#1A1D23"], "from": [0, 0], "to": [0.3, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 332}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.7, "offset": [8, 20], "radius": 28, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 30, "y": 40, "width": 176, "height": 2, "parent": {"$step": 0}, "props": {"fill": "#A3A7B166"}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 332}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.4, "offset": [0, 3], "radius": 8}}}
+{"command": "vector.create", "params": {"path": "M 82.80 69.20 C 96.00 76.40 132.00 76.40 145.20 69.20 L 145.20 76.40 C 132.00 84.80 96.00 84.80 82.80 76.40 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#373D49"}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 Q 110.40 86.00 80.90 67.34 C 83.83 63.55 85.97 65.65 85.11 64.81 C 85.97 65.65 83.83 63.55 87.57 60.56 C 91.27 57.52 92.88 60.05 92.24 59.04 C 92.88 60.05 91.27 57.52 95.59 55.45 C 99.88 53.33 100.88 56.15 100.48 55.02 C 100.88 56.15 99.88 53.33 104.55 52.28 C 109.21 51.17 109.55 54.15 109.42 52.96 C 109.55 54.15 109.21 51.17 114.00 51.20 C 118.79 51.17 118.45 54.15 118.58 52.96 C 118.45 54.15 118.79 51.17 123.45 52.28 C 128.12 53.33 127.12 56.15 127.52 55.02 C 127.12 56.15 128.12 53.33 132.41 55.45 C 136.73 57.52 135.12 60.05 135.76 59.04 C 135.12 60.05 136.73 57.52 140.43 60.56 C 144.17 63.55 142.03 65.65 142.89 64.81 C 142.03 65.65 144.17 63.55 147.10 67.34 Q 117.60 86.00 147.10 67.34 Q 116.40 95.00 114.00 93.20 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FF6A00"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 338}], "props": {"fills": [{"type": "linearGradient", "stops": ["#FF8E40", "#FF6A00", "#C95400"], "from": [0.05, 0], "to": [0.95, 1]}]}}}
+{"command": "vector.create", "params": {"path": "M 80.90 67.34 C 83.83 63.55 85.97 65.65 85.11 64.81 C 85.97 65.65 83.83 63.55 87.57 60.56 C 91.27 57.52 92.88 60.05 92.24 59.04 C 92.88 60.05 91.27 57.52 95.59 55.45 C 99.88 53.33 100.88 56.15 100.48 55.02 C 100.88 56.15 99.88 53.33 104.55 52.28 C 109.21 51.17 109.55 54.15 109.42 52.96 C 109.55 54.15 109.21 51.17 114.00 51.20 C 118.79 51.17 118.45 54.15 118.58 52.96 C 118.45 54.15 118.79 51.17 123.45 52.28 C 128.12 53.33 127.12 56.15 127.52 55.02 C 127.12 56.15 128.12 53.33 132.41 55.45 C 136.73 57.52 135.12 60.05 135.76 59.04 C 135.12 60.05 136.73 57.52 140.43 60.56 C 144.17 63.55 142.03 65.65 142.89 64.81 C 142.03 65.65 144.17 63.55 147.10 67.34", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#FFE5D2", "strokeWeight": 0.84, "opacity": 0.38}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 82.09 69.76 L 83.53 67.90 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 88.18 63.18 L 90.00 61.70 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 95.59 58.14 L 97.70 57.11 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 103.95 54.90 L 106.24 54.37 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 112.83 53.62 L 115.17 53.62 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 121.76 54.37 L 124.05 54.90 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 130.30 57.11 L 132.41 58.14 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 138.00 61.70 L 139.82 63.18 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 144.47 67.90 L 145.91 69.76 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 111.00 90.26 L 85.97 65.65", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 111.74 89.66 L 92.88 60.05", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 112.60 89.24 L 100.88 56.15", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 113.52 89.03 L 109.55 54.15", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 114.48 89.03 L 118.45 54.15", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 115.40 89.24 L 127.12 56.15", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 116.26 89.66 L 135.12 60.05", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 117.00 90.26 L 142.03 65.65", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 82.80 76.40 C 96.00 84.80 132.00 84.80 145.20 76.40 C 144.00 96.80 133.20 104.60 121.20 105.20 L 106.80 105.20 C 94.80 104.60 84.00 96.80 82.80 76.40 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#667085"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 358}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#424957", "#292E37"], "from": [0.05, 0], "to": [0.25, 1]}]}}}
+{"command": "vector.create", "params": {"path": "M 82.80 76.40 C 96.00 84.80 132.00 84.80 145.20 76.40", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"stroke": "#A3A7B1", "strokeWeight": 1.68, "opacity": 0.9}}}
+{"command": "shape.rectangle", "params": {"x": 111.0, "y": 104.6, "width": 6.0, "height": 16.2, "parent": {"$step": 0}, "props": {"fill": "#667085", "cornerRadius": 1.2}}}
+{"command": "node.set", "params": {"ids": [{"$step": 361}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37", "#A3A7B1"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "vector.create", "params": {"path": "M 111.00 120.20 L 117.00 120.20 L 122.40 123.80 L 105.60 123.80 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 0}, "props": {"fill": "#667085"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 363}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "shape.ellipse", "params": {"x": 100.8, "y": 122.0, "width": 26.4, "height": 6.0, "parent": {"$step": 0}, "props": {"fill": "#667085"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 365}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "text.create", "params": {"text": "CALIX", "x": 30, "y": 189.07, "parent": {"$step": 0}, "props": {"fontSize": 21, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3ED", "letterSpacing": "0.18", "width": 176, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 92, "y": 208, "width": 52, "height": 2, "parent": {"$step": 0}, "props": {"fill": "#FF8E40BF"}}}
+{"command": "frame.create", "params": {"x": 1700, "y": 0, "width": 1600, "height": 1000, "name": "Le Comptoir \u2014 quiet", "props": {"fill": "#111418", "clip": true}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 0, "width": 1600, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#1A1717"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 370}], "props": {"fills": [{"type": "linearGradient", "stops": ["#171617", "#1A1717", "#211916"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 370}], "effect": {"type": "noise", "opacity": 0.07}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 1, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 128, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 129, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 256, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 257, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 384, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 385, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 512, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 513, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 640, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 641, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 768, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 769, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 896, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 897, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 1024, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 1025, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 1152, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 1153, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 1280, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 1281, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 1408, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 1409, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 1536, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141866"}}}
+{"command": "shape.rectangle", "params": {"x": 1537, "y": 0, "width": 1, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#FFE5D20B"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 250, "width": 1600, "height": 3, "parent": {"$step": 369}, "props": {"fill": "#FFE5D221"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 253, "width": 1600, "height": 2, "parent": {"$step": 369}, "props": {"fill": "#11141880"}}}
+{"command": "shape.ellipse", "params": {"x": 240, "y": 120, "width": 1200, "height": 300, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 401}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D21F", "#FFE5D200"]}]}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 0, "width": 4, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141859"}}}
+{"command": "shape.rectangle", "params": {"x": 256, "y": 0, "width": 4, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141859"}}}
+{"command": "shape.rectangle", "params": {"x": 512, "y": 0, "width": 4, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141859"}}}
+{"command": "shape.rectangle", "params": {"x": 768, "y": 0, "width": 4, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141859"}}}
+{"command": "shape.rectangle", "params": {"x": 1024, "y": 0, "width": 4, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141859"}}}
+{"command": "shape.rectangle", "params": {"x": 1280, "y": 0, "width": 4, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141859"}}}
+{"command": "shape.rectangle", "params": {"x": 1536, "y": 0, "width": 4, "height": 556, "parent": {"$step": 369}, "props": {"fill": "#11141859"}}}
+{"command": "shape.ellipse", "params": {"x": 90, "y": 30, "width": 460, "height": 400, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 410}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D226", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": -60, "y": 40, "width": 420, "height": 480, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 412}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D21A", "#FFE5D200"]}]}}}
+{"command": "shape.rectangle", "params": {"x": 262, "y": 26, "width": 1300, "height": 168, "parent": {"$step": 369}, "props": {"fill": "#20252C", "cornerRadius": 4}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 414}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.6, "offset": [0, 12], "radius": 26, "spread": 0}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 414}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.5, "offset": [0, 3], "radius": 10}}}
+{"command": "shape.rectangle", "params": {"x": 262, "y": 26, "width": 1300, "height": 2, "parent": {"$step": 369}, "props": {"fill": "#A3A7B173"}}}
+{"command": "shape.rectangle", "params": {"x": 262, "y": 26, "width": 1300, "height": 30, "parent": {"$step": 369}, "props": {"fill": "#292E37"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 418}], "props": {"fills": [{"type": "linearGradient", "stops": ["#424957", "#292E37"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "shape.rectangle", "params": {"x": 262, "y": 55, "width": 1300, "height": 1, "parent": {"$step": 369}, "props": {"fill": "#11141899"}}}
+{"command": "text.create", "params": {"text": "THE SEVEN COUNTERS", "x": 282, "y": 43.865, "parent": {"$step": 369}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADCC", "letterSpacing": "0.22"}}}
+{"command": "shape.ellipse", "params": {"x": 1338, "y": 36, "width": 8, "height": 8, "parent": {"$step": 369}, "props": {"fill": "#FF8E40"}}}
+{"command": "text.create", "params": {"text": "ALPM INDEX \u00b7 4 MIN OLD", "x": 1352, "y": 41.7, "parent": {"$step": 369}, "props": {"fontSize": 10, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6ADF2", "letterSpacing": "0.04", "width": 190, "textAlign": "right"}}}
+{"command": "shape.ellipse", "params": {"x": 288.0, "y": 70, "width": 133.71428571428572, "height": 108, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 424}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D233", "#FFE5D200"]}]}}}
+{"command": "vector.create", "params": {"path": "M 341.86 90.00 L 367.86 90.00 L 361.86 72.00 L 347.86 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 426}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 353.3571428571429, "y": 60, "width": 3, "height": 12, "parent": {"$step": 369}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 348.8571428571429, "y": 84, "width": 12, "height": 10, "parent": {"$step": 369}, "props": {"fill": "#FFE5D2"}}}
+{"command": "shape.ellipse", "params": {"x": 334.8571428571429, "y": 76, "width": 40, "height": 36, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 430}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D273", "#FFE5D200"]}]}}}
+{"command": "text.create", "params": {"text": "ALPM", "x": 262.0, "y": 128.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3ED", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "OFFICIAL REPOS", "x": 262.0, "y": 149.195, "parent": {"$step": 369}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "1,284", "x": 262.0, "y": 172.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FF6A00", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 447.7142857142857, "y": 60, "width": 1, "height": 130, "parent": {"$step": 369}, "props": {"fill": "#66708533"}}}
+{"command": "vector.create", "params": {"path": "M 527.57 90.00 L 553.57 90.00 L 547.57 72.00 L 533.57 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 436}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 539.0714285714286, "y": 60, "width": 3, "height": 12, "parent": {"$step": 369}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 536.5714285714286, "y": 86, "width": 8, "height": 7, "parent": {"$step": 369}, "props": {"fill": "#667085B2"}}}
+{"command": "text.create", "params": {"text": "AUR", "x": 447.7142857142857, "y": 128.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADA8", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "BUILD RECIPES", "x": 447.7142857142857, "y": 149.195, "parent": {"$step": 369}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "8,431", "x": 447.7142857142857, "y": 172.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085D9", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 633.4285714285714, "y": 60, "width": 1, "height": 130, "parent": {"$step": 369}, "props": {"fill": "#66708533"}}}
+{"command": "vector.create", "params": {"path": "M 713.29 90.00 L 739.29 90.00 L 733.29 72.00 L 719.29 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 444}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 724.7857142857143, "y": 60, "width": 3, "height": 12, "parent": {"$step": 369}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 722.2857142857143, "y": 86, "width": 8, "height": 7, "parent": {"$step": 369}, "props": {"fill": "#667085B2"}}}
+{"command": "text.create", "params": {"text": "FLATPAK", "x": 633.4285714285714, "y": 128.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADA8", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "SANDBOXES", "x": 633.4285714285714, "y": 149.195, "parent": {"$step": 369}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "96", "x": 633.4285714285714, "y": 172.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085D9", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 819.1428571428571, "y": 60, "width": 1, "height": 130, "parent": {"$step": 369}, "props": {"fill": "#66708533"}}}
+{"command": "vector.create", "params": {"path": "M 899.00 90.00 L 925.00 90.00 L 919.00 72.00 L 905.00 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 452}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 910.5, "y": 60, "width": 3, "height": 12, "parent": {"$step": 369}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 908.0, "y": 86, "width": 8, "height": 7, "parent": {"$step": 369}, "props": {"fill": "#667085B2"}}}
+{"command": "text.create", "params": {"text": "APPIMAGE", "x": 819.1428571428571, "y": 128.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADA8", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "SINGLE BINARIES", "x": 819.1428571428571, "y": 149.195, "parent": {"$step": 369}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "41", "x": 819.1428571428571, "y": 172.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085D9", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 1004.8571428571429, "y": 60, "width": 1, "height": 130, "parent": {"$step": 369}, "props": {"fill": "#66708533"}}}
+{"command": "vector.create", "params": {"path": "M 1084.71 90.00 L 1110.71 90.00 L 1104.71 72.00 L 1090.71 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 460}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 1096.2142857142858, "y": 60, "width": 3, "height": 12, "parent": {"$step": 369}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 1093.7142857142858, "y": 86, "width": 8, "height": 7, "parent": {"$step": 369}, "props": {"fill": "#667085B2"}}}
+{"command": "text.create", "params": {"text": "CARGO", "x": 1004.8571428571429, "y": 128.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADA8", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "RUST CRATES", "x": 1004.8571428571429, "y": 149.195, "parent": {"$step": 369}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "612", "x": 1004.8571428571429, "y": 172.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085D9", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 1190.5714285714287, "y": 60, "width": 1, "height": 130, "parent": {"$step": 369}, "props": {"fill": "#66708533"}}}
+{"command": "vector.create", "params": {"path": "M 1270.43 90.00 L 1296.43 90.00 L 1290.43 72.00 L 1276.43 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 468}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 1281.9285714285716, "y": 60, "width": 3, "height": 12, "parent": {"$step": 369}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 1279.4285714285716, "y": 86, "width": 8, "height": 7, "parent": {"$step": 369}, "props": {"fill": "#667085B2"}}}
+{"command": "text.create", "params": {"text": "NPM", "x": 1190.5714285714287, "y": 128.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADA8", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "NODE PACKAGES", "x": 1190.5714285714287, "y": 149.195, "parent": {"$step": 369}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "1,308", "x": 1190.5714285714287, "y": 172.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085D9", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 1376.2857142857142, "y": 60, "width": 1, "height": 130, "parent": {"$step": 369}, "props": {"fill": "#66708533"}}}
+{"command": "vector.create", "params": {"path": "M 1456.14 90.00 L 1482.14 90.00 L 1476.14 72.00 L 1462.14 72.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 476}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 1467.642857142857, "y": 60, "width": 3, "height": 12, "parent": {"$step": 369}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 1465.142857142857, "y": 86, "width": 8, "height": 7, "parent": {"$step": 369}, "props": {"fill": "#667085B2"}}}
+{"command": "text.create", "params": {"text": "TRACKED RELEASES", "x": 1376.2857142857142, "y": 128.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#A1A6ADA8", "letterSpacing": "0.10", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "FOLLOWED BINARIES", "x": 1376.2857142857142, "y": 149.195, "parent": {"$step": 369}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#A1A6AD80", "letterSpacing": "0.04", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "0", "x": 1376.2857142857142, "y": 172.04, "parent": {"$step": 369}, "props": {"fontSize": 12, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085D9", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "NOTHING IN STOCK", "x": 1376.2857142857142, "y": 187.36, "parent": {"$step": 369}, "props": {"fontSize": 8, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085E6", "letterSpacing": "0.02", "width": 185.71428571428572, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 800, "y": 188, "width": 2, "height": 44, "parent": {"$step": 369}, "props": {"fill": "#667085B2"}}}
+{"command": "vector.create", "params": {"path": "M 760.00 232.00 L 840.00 232.00 L 822.00 264.00 L 778.00 264.00 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#424957"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 485}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "shape.rectangle", "params": {"x": 768, "y": 228, "width": 64, "height": 4, "parent": {"$step": 369}, "props": {"fill": "#292E37"}}}
+{"command": "shape.ellipse", "params": {"x": 788, "y": 256, "width": 26, "height": 22, "parent": {"$step": 369}, "props": {"fill": "#FFE5D2"}}}
+{"command": "shape.ellipse", "params": {"x": 756, "y": 242, "width": 88, "height": 76, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 489}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D273", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": 600, "y": 290, "width": 560, "height": 320, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 491}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D233", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": 180, "y": 210, "width": 1240, "height": 300, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 493}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D230", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": 420, "y": 300, "width": 900, "height": 220, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 495}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D21A", "#FFE5D200"]}]}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 452, "width": 1600, "height": 40, "parent": {"$step": 369}, "props": {"fill": "#221A16"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 497}], "props": {"fills": [{"type": "linearGradient", "stops": ["#291C15", "#362113"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 497}], "effect": {"type": "noise", "opacity": 0.09}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 492, "width": 1600, "height": 64, "parent": {"$step": 369}, "props": {"fill": "#221A16"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 500}], "props": {"fills": [{"type": "linearGradient", "stops": ["#362113", "#1F1916"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 500}], "effect": {"type": "noise", "opacity": 0.09}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 492, "width": 1600, "height": 2, "parent": {"$step": 369}, "props": {"fill": "#FFE5D261"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 494, "width": 1600, "height": 1, "parent": {"$step": 369}, "props": {"fill": "#11141880"}}}
+{"command": "shape.ellipse", "params": {"x": 316, "y": 500, "width": 7, "height": 7, "parent": {"$step": 369}, "props": {"fill": "#A3A7B152"}}}
+{"command": "shape.rectangle", "params": {"x": 319, "y": 503, "width": 1, "height": 9, "parent": {"$step": 369}, "props": {"fill": "#FFE5D224"}}}
+{"command": "shape.ellipse", "params": {"x": 562, "y": 500, "width": 7, "height": 7, "parent": {"$step": 369}, "props": {"fill": "#A3A7B152"}}}
+{"command": "shape.rectangle", "params": {"x": 565, "y": 503, "width": 1, "height": 9, "parent": {"$step": 369}, "props": {"fill": "#FFE5D224"}}}
+{"command": "shape.ellipse", "params": {"x": 808, "y": 500, "width": 7, "height": 7, "parent": {"$step": 369}, "props": {"fill": "#A3A7B152"}}}
+{"command": "shape.rectangle", "params": {"x": 811, "y": 503, "width": 1, "height": 9, "parent": {"$step": 369}, "props": {"fill": "#FFE5D224"}}}
+{"command": "shape.ellipse", "params": {"x": 1054, "y": 500, "width": 7, "height": 7, "parent": {"$step": 369}, "props": {"fill": "#A3A7B152"}}}
+{"command": "shape.rectangle", "params": {"x": 1057, "y": 503, "width": 1, "height": 9, "parent": {"$step": 369}, "props": {"fill": "#FFE5D224"}}}
+{"command": "shape.ellipse", "params": {"x": 1300, "y": 500, "width": 7, "height": 7, "parent": {"$step": 369}, "props": {"fill": "#A3A7B152"}}}
+{"command": "shape.rectangle", "params": {"x": 1303, "y": 503, "width": 1, "height": 9, "parent": {"$step": 369}, "props": {"fill": "#FFE5D224"}}}
+{"command": "text.create", "params": {"text": "0 ON THE SHELF \u00b7 1,284 AT THE ALPM COUNTER", "x": 44, "y": 509.195, "parent": {"$step": 369}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FFE5D266"}}}
+{"command": "text.create", "params": {"text": "NOTHING ASKED FOR YET", "x": 44, "y": 522.195, "parent": {"$step": 369}, "props": {"fontSize": 8.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FFE5D242"}}}
+{"command": "shape.rectangle", "params": {"x": 1470, "y": 496, "width": 92, "height": 36, "parent": {"$step": 369}, "props": {"fill": "#292E37", "cornerRadius": 3}}}
+{"command": "node.set", "params": {"ids": [{"$step": 517}], "props": {"fills": [{"type": "linearGradient", "stops": ["#424957", "#292E37"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "text.create", "params": {"text": "DETAILED", "x": 1478, "y": 508.525, "parent": {"$step": 369}, "props": {"fontSize": 7.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FFE5D280"}}}
+{"command": "text.create", "params": {"text": "COMPACT", "x": 1478, "y": 521.525, "parent": {"$step": 369}, "props": {"fontSize": 7.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#FFE5D238"}}}
+{"command": "shape.rectangle", "params": {"x": 1470, "y": 496, "width": 40, "height": 2, "parent": {"$step": 369}, "props": {"fill": "#FF6A00"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 556, "width": 1600, "height": 444, "parent": {"$step": 369}, "props": {"fill": "#2D1E14"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 522}], "props": {"fills": [{"type": "linearGradient", "stops": ["#231A16", "#1F1916", "#191717"], "from": [0, 0], "to": [0.8, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 522}], "effect": {"type": "noise", "opacity": 0.085}}}
+{"command": "shape.ellipse", "params": {"x": 200, "y": 540, "width": 1250, "height": 500, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 525}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D21C", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": 1180, "y": 700, "width": 620, "height": 420, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 527}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D20D", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": -30, "y": 600, "width": 420, "height": 320, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 529}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D213", "#FFE5D200"]}]}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 992, "width": 1600, "height": 2, "parent": {"$step": 369}, "props": {"fill": "#FFE5D229"}}}
+{"command": "shape.rectangle", "params": {"x": 0, "y": 990, "width": 1600, "height": 2, "parent": {"$step": 369}, "props": {"fill": "#11141880"}}}
+{"command": "shape.rectangle", "params": {"x": 40, "y": 636, "width": 292, "height": 176, "parent": {"$step": 369}, "props": {"fill": "#292E37", "cornerRadius": 10}}}
+{"command": "node.set", "params": {"ids": [{"$step": 533}], "props": {"fills": [{"type": "linearGradient", "stops": ["#424957", "#333944"], "from": [0, 0], "to": [0.35, 1]}]}}}
+{"command": "shape.rectangle", "params": {"x": 41, "y": 637, "width": 290, "height": 2, "parent": {"$step": 369}, "props": {"fill": "#A3A7B159", "cornerRadius": 1}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 533}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.65, "offset": [6, 18], "radius": 26, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 40, "y": 798, "width": 292, "height": 14, "parent": {"$step": 369}, "props": {"fill": "#221A16"}}}
+{"command": "text.create", "params": {"text": "THE TILL", "x": 60, "y": 664.865, "parent": {"$step": 369}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#FFE5D259", "letterSpacing": "0.22"}}}
+{"command": "shape.rectangle", "params": {"x": 64, "y": 682, "width": 244, "height": 54, "parent": {"$step": 369}, "props": {"fill": "#1A1D23", "cornerRadius": 8}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 539}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.9, "offset": [0, 4], "radius": 10}}}
+{"command": "shape.ellipse", "params": {"x": 94, "y": 716, "width": 22, "height": 22, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 541}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D280", "#FFE5D200"]}]}}}
+{"command": "shape.rectangle", "params": {"x": 103.5, "y": 724, "width": 3, "height": 9, "parent": {"$step": 369}, "props": {"fill": "#FF6A00", "cornerRadius": 1}}}
+{"command": "shape.rectangle", "params": {"x": 184.5, "y": 724, "width": 3, "height": 9, "parent": {"$step": 369}, "props": {"fill": "#66708580", "cornerRadius": 1}}}
+{"command": "shape.rectangle", "params": {"x": 265.5, "y": 724, "width": 3, "height": 9, "parent": {"$step": 369}, "props": {"fill": "#66708580", "cornerRadius": 1}}}
+{"command": "shape.rectangle", "params": {"x": 72, "y": 686, "width": 66, "height": 38, "parent": {"$step": 369}, "props": {"fill": "#A3A7B1", "cornerRadius": 5, "rotation": 0}}}
+{"command": "node.set", "params": {"ids": [{"$step": 546}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#424957", "#292E37"], "from": [0, 0], "to": [0.3, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 546}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.6, "offset": [4, 10], "radius": 12, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 85, "y": 694, "width": 2, "height": 22, "parent": {"$step": 369}, "props": {"fill": "#292E3780", "cornerRadius": 1}}}
+{"command": "shape.rectangle", "params": {"x": 97, "y": 694, "width": 2, "height": 22, "parent": {"$step": 369}, "props": {"fill": "#292E3780", "cornerRadius": 1}}}
+{"command": "shape.rectangle", "params": {"x": 109, "y": 694, "width": 2, "height": 22, "parent": {"$step": 369}, "props": {"fill": "#292E3780", "cornerRadius": 1}}}
+{"command": "shape.rectangle", "params": {"x": 121, "y": 694, "width": 2, "height": 22, "parent": {"$step": 369}, "props": {"fill": "#292E3780", "cornerRadius": 1}}}
+{"command": "text.create", "params": {"text": "FIND", "x": 60, "y": 761.03, "parent": {"$step": 369}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#FF6A00", "letterSpacing": "0.12", "width": 90, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "INVENTORY", "x": 141, "y": 761.03, "parent": {"$step": 369}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#FFE5D266", "letterSpacing": "0.12", "width": 90, "textAlign": "center"}}}
+{"command": "text.create", "params": {"text": "DELTA", "x": 222, "y": 761.03, "parent": {"$step": 369}, "props": {"fontSize": 9, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#FFE5D266", "letterSpacing": "0.12", "width": 90, "textAlign": "center"}}}
+{"command": "shape.ellipse", "params": {"x": 300, "y": 580, "width": 860, "height": 400, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 556}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D221", "#FFE5D200"]}]}}}
+{"command": "shape.ellipse", "params": {"x": 520, "y": 620, "width": 520, "height": 300, "parent": {"$step": 369}, "props": {"fill": "#00000000"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 558}], "props": {"fills": [{"type": "radialGradient", "stops": ["#FFE5D214", "#FFE5D200"]}]}}}
+{"command": "shape.rectangle", "params": {"x": 1164, "y": 614, "width": 354, "height": 210, "parent": {"$step": 369}, "props": {"fill": "#221A16", "cornerRadius": 7, "rotation": -1.6}}}
+{"command": "node.set", "params": {"ids": [{"$step": 560}], "props": {"fills": [{"type": "linearGradient", "stops": ["#2D1E14", "#1C1817"], "from": [0, 0], "to": [0.4, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 560}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.62, "offset": [6, 16], "radius": 24, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 1178, "y": 628, "width": 326, "height": 182, "parent": {"$step": 369}, "props": {"fill": "#1A1D23", "cornerRadius": 4, "rotation": -1.6}}}
+{"command": "node.set", "params": {"ids": [{"$step": 563}], "props": {"fills": [{"type": "linearGradient", "stops": ["#22262E", "#171A20"], "from": [0, 0], "to": [0.2, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 563}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.6, "offset": [6, 16], "radius": 24, "spread": 0}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 563}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.6, "offset": [0, 3], "radius": 9}}}
+{"command": "shape.rectangle", "params": {"x": 1176, "y": 626, "width": 330, "height": 2, "parent": {"$step": 369}, "props": {"fill": "#A3A7B152"}}}
+{"command": "text.create", "params": {"text": "WHAT ARE YOU", "x": 1200, "y": 685.07, "parent": {"$step": 369}, "props": {"fontSize": 21, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3EDE6", "letterSpacing": "0.04"}}}
+{"command": "text.create", "params": {"text": "LOOKING FOR?", "x": 1200, "y": 713.07, "parent": {"$step": 369}, "props": {"fontSize": 21, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3EDE6", "letterSpacing": "0.04"}}}
+{"command": "shape.rectangle", "params": {"x": 1200, "y": 736, "width": 3, "height": 28, "parent": {"$step": 369}, "props": {"fill": "#FF6A00"}}}
+{"command": "shape.rectangle", "params": {"x": 1200, "y": 756, "width": 230, "height": 1, "parent": {"$step": 369}, "props": {"fill": "#66708547"}}}
+{"command": "text.create", "params": {"text": "TYPE A NAME \u00b7 1,284 ON THIS COUNTER", "x": 1200, "y": 776.865, "parent": {"$step": 369}, "props": {"fontSize": 9.5, "fontFamily": "IBM Plex Mono", "fontWeight": 400, "fill": "#667085FF"}}}
+{"command": "shape.rectangle", "params": {"x": 60, "y": 0, "width": 2, "height": 40, "parent": {"$step": 369}, "props": {"fill": "#66708599"}}}
+{"command": "shape.rectangle", "params": {"x": 172, "y": 0, "width": 2, "height": 40, "parent": {"$step": 369}, "props": {"fill": "#66708599"}}}
+{"command": "shape.rectangle", "params": {"x": 30, "y": 40, "width": 176, "height": 196, "parent": {"$step": 369}, "props": {"fill": "#20252C", "cornerRadius": 6}}}
+{"command": "node.set", "params": {"ids": [{"$step": 575}], "props": {"fills": [{"type": "linearGradient", "stops": ["#272C34", "#1A1D23"], "from": [0, 0], "to": [0.3, 1]}]}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 575}], "effect": {"type": "dropShadow", "color": "#000000", "opacity": 0.7, "offset": [8, 20], "radius": 28, "spread": 0}}}
+{"command": "shape.rectangle", "params": {"x": 30, "y": 40, "width": 176, "height": 2, "parent": {"$step": 369}, "props": {"fill": "#A3A7B166"}}}
+{"command": "effect.add", "params": {"ids": [{"$step": 575}], "effect": {"type": "innerShadow", "color": "#000000", "opacity": 0.4, "offset": [0, 3], "radius": 8}}}
+{"command": "vector.create", "params": {"path": "M 82.80 69.20 C 96.00 76.40 132.00 76.40 145.20 69.20 L 145.20 76.40 C 132.00 84.80 96.00 84.80 82.80 76.40 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#373D49"}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 Q 110.40 86.00 80.90 67.34 C 83.83 63.55 85.97 65.65 85.11 64.81 C 85.97 65.65 83.83 63.55 87.57 60.56 C 91.27 57.52 92.88 60.05 92.24 59.04 C 92.88 60.05 91.27 57.52 95.59 55.45 C 99.88 53.33 100.88 56.15 100.48 55.02 C 100.88 56.15 99.88 53.33 104.55 52.28 C 109.21 51.17 109.55 54.15 109.42 52.96 C 109.55 54.15 109.21 51.17 114.00 51.20 C 118.79 51.17 118.45 54.15 118.58 52.96 C 118.45 54.15 118.79 51.17 123.45 52.28 C 128.12 53.33 127.12 56.15 127.52 55.02 C 127.12 56.15 128.12 53.33 132.41 55.45 C 136.73 57.52 135.12 60.05 135.76 59.04 C 135.12 60.05 136.73 57.52 140.43 60.56 C 144.17 63.55 142.03 65.65 142.89 64.81 C 142.03 65.65 144.17 63.55 147.10 67.34 Q 117.60 86.00 147.10 67.34 Q 116.40 95.00 114.00 93.20 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#FF6A00"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 581}], "props": {"fills": [{"type": "linearGradient", "stops": ["#FF8E40", "#FF6A00", "#C95400"], "from": [0.05, 0], "to": [0.95, 1]}]}}}
+{"command": "vector.create", "params": {"path": "M 80.90 67.34 C 83.83 63.55 85.97 65.65 85.11 64.81 C 85.97 65.65 83.83 63.55 87.57 60.56 C 91.27 57.52 92.88 60.05 92.24 59.04 C 92.88 60.05 91.27 57.52 95.59 55.45 C 99.88 53.33 100.88 56.15 100.48 55.02 C 100.88 56.15 99.88 53.33 104.55 52.28 C 109.21 51.17 109.55 54.15 109.42 52.96 C 109.55 54.15 109.21 51.17 114.00 51.20 C 118.79 51.17 118.45 54.15 118.58 52.96 C 118.45 54.15 118.79 51.17 123.45 52.28 C 128.12 53.33 127.12 56.15 127.52 55.02 C 127.12 56.15 128.12 53.33 132.41 55.45 C 136.73 57.52 135.12 60.05 135.76 59.04 C 135.12 60.05 136.73 57.52 140.43 60.56 C 144.17 63.55 142.03 65.65 142.89 64.81 C 142.03 65.65 144.17 63.55 147.10 67.34", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"stroke": "#FFE5D2", "strokeWeight": 0.84, "opacity": 0.38}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 82.09 69.76 L 83.53 67.90 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 88.18 63.18 L 90.00 61.70 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 95.59 58.14 L 97.70 57.11 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 103.95 54.90 L 106.24 54.37 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 112.83 53.62 L 115.17 53.62 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 121.76 54.37 L 124.05 54.90 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 130.30 57.11 L 132.41 58.14 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 138.00 61.70 L 139.82 63.18 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 114.00 93.20 L 144.47 67.90 L 145.91 69.76 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#FFE5D2", "opacity": 0.13}}}
+{"command": "vector.create", "params": {"path": "M 111.00 90.26 L 85.97 65.65", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 111.74 89.66 L 92.88 60.05", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 112.60 89.24 L 100.88 56.15", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 113.52 89.03 L 109.55 54.15", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 114.48 89.03 L 118.45 54.15", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 115.40 89.24 L 127.12 56.15", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 116.26 89.66 L 135.12 60.05", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 117.00 90.26 L 142.03 65.65", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"stroke": "#C95400", "strokeWeight": 0.78, "opacity": 0.34}}}
+{"command": "vector.create", "params": {"path": "M 82.80 76.40 C 96.00 84.80 132.00 84.80 145.20 76.40 C 144.00 96.80 133.20 104.60 121.20 105.20 L 106.80 105.20 C 94.80 104.60 84.00 96.80 82.80 76.40 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#667085"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 601}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#424957", "#292E37"], "from": [0.05, 0], "to": [0.25, 1]}]}}}
+{"command": "vector.create", "params": {"path": "M 82.80 76.40 C 96.00 84.80 132.00 84.80 145.20 76.40", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"stroke": "#A3A7B1", "strokeWeight": 1.68, "opacity": 0.9}}}
+{"command": "shape.rectangle", "params": {"x": 111.0, "y": 104.6, "width": 6.0, "height": 16.2, "parent": {"$step": 369}, "props": {"fill": "#667085", "cornerRadius": 1.2}}}
+{"command": "node.set", "params": {"ids": [{"$step": 604}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37", "#A3A7B1"], "from": [0, 0], "to": [1, 0]}]}}}
+{"command": "vector.create", "params": {"path": "M 111.00 120.20 L 117.00 120.20 L 122.40 123.80 L 105.60 123.80 Z", "x": 0, "y": 0, "closed": true, "parent": {"$step": 369}, "props": {"fill": "#667085"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 606}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "shape.ellipse", "params": {"x": 100.8, "y": 122.0, "width": 26.4, "height": 6.0, "parent": {"$step": 369}, "props": {"fill": "#667085"}}}
+{"command": "node.set", "params": {"ids": [{"$step": 608}], "props": {"fills": [{"type": "linearGradient", "stops": ["#A3A7B1", "#292E37"], "from": [0, 0], "to": [0, 1]}]}}}
+{"command": "text.create", "params": {"text": "CALIX", "x": 30, "y": 189.07, "parent": {"$step": 369}, "props": {"fontSize": 21, "fontFamily": "IBM Plex Sans Condensed", "fontWeight": 700, "fill": "#F7F3ED", "letterSpacing": "0.18", "width": 176, "textAlign": "center"}}}
+{"command": "shape.rectangle", "params": {"x": 92, "y": 208, "width": 52, "height": 2, "parent": {"$step": 369}, "props": {"fill": "#FF8E40BF"}}}

@@ -1,0 +1,94 @@
+{
+  "run_id": "calix-design-atelier-r2-20261020",
+  "kind": "design-proposal",
+  "status": "ok",
+  "objective": "Round 2, proposal 03 - 'L'Atelier': Calix as a workbench. Two states: loaded and quiet.",
+  "rules_observed": {
+    "did_not_open_round1_images": true,
+    "did_not_open_application_code": true,
+    "did_not_run_application": true,
+    "worked_alone": true,
+    "one_figcraft_process_per_file": true,
+    "forbidden_shape_avoided": "no left column, no right card column, no bottom console bar as a panel; the sources are a rack of trays above the bench, the detail is a card laid on the mat, the log is the near rail",
+    "keyboard_left_the_surface": "zero key hints on either screen (grep for command glyphs in the generator: 0)",
+    "information_kinds_on_surface": 8,
+    "tokens_only": true
+  },
+  "toolchain": {
+    "builder": "figcraft-cli",
+    "generator": "evidence/design-proposals/r2/build/03-atelier.build.py",
+    "command_script": "evidence/design-proposals/r2/build/03-atelier.build.jsonl",
+    "steps": 1216,
+    "run": "figcraft-cli run r2/build/03-atelier.build.jsonl --out r2/03-atelier.figcraft",
+    "export": "figcraft-cli export r2/03-atelier.figcraft -o r2/ --scale 2",
+    "frames": [
+      "03-atelier-loaded",
+      "03-atelier-quiet"
+    ]
+  },
+  "artefacts": {
+    "evidence/design-proposals/r2/03-atelier-loaded.png": {
+      "sha256": "41544ff68dd7aaded18ec0681bd4e3486374d20e3d1625fe21885231dc19882e",
+      "bytes": 836689
+    },
+    "evidence/design-proposals/r2/03-atelier-quiet.png": {
+      "sha256": "6a02864f53a5f4aafdc6a6aeeb3a61e198024271b5313968699ea8e54bd6de6d",
+      "bytes": 539466
+    },
+    "evidence/design-proposals/r2/03-atelier.figcraft": {
+      "sha256": "96a104ca40d2cd7f1c05345622559607aacbb10ce6df1d318decfc932407e0b1",
+      "bytes": 71736
+    },
+    "evidence/design-proposals/r2/03-atelier.md": {
+      "sha256": "6d74f472adac51620a5e43c7910712f0e3ab7d87597a2c999e73d3581a03dbdc",
+      "bytes": 12203
+    },
+    "evidence/design-proposals/r2/notes/03-atelier.md": {
+      "sha256": "eb1638907a44610ee3c6ab896e427d4ad7d3803b0da090bcd620b6461e2ded20",
+      "bytes": 613
+    },
+    "evidence/design-proposals/r2/build/03-atelier.build.py": {
+      "sha256": "26a24d5ff8b7f1212fbcba3c748ed46987a9578f39e3d3eeeaf62b0cc798d612",
+      "bytes": 34763
+    },
+    "evidence/design-proposals/r2/build/03-atelier.build.jsonl": {
+      "sha256": "5c7173a538b2a98d3362bc40db88bd4d618b07fab1e92f3b83690a702045ba6d",
+      "bytes": 208077
+    }
+  },
+  "checks": [
+    {
+      "check": "both screens exported at 1600x1000 logical (3200x2000 at 2x)",
+      "result": "pass"
+    },
+    {
+      "check": "one source file, two frames, export names from the frames",
+      "result": "pass"
+    },
+    {
+      "check": "both images were looked at and iterated",
+      "result": "pass",
+      "detail": "6 build->export->read cycles; fixed the rack offset, the tray lip clipping, the mat's vertical rhythm, the job chalk, the scale model, the cork and the cup ring"
+    },
+    {
+      "check": "no key hint anywhere on the surface",
+      "result": "pass"
+    },
+    {
+      "check": "information budget",
+      "result": "pass",
+      "detail": "identity, freshness, trays, job+slot, list state+scale, list, card, log"
+    },
+    {
+      "check": "one composed empty region, named in the rationale",
+      "result": "pass",
+      "detail": "the lower mat on the quiet screen: grid, one dashed slot that says what fits, the outlined landing place for the card, and the chalked statement"
+    }
+  ],
+  "known_gaps": [
+    "The card is 460px and follows the selection; at the bottom of the list it runs off the mat.",
+    "The compact density exists as a scale model, not as a real list on the surface.",
+    "The cork rail is a queue of one; two concurrent operations are not designed.",
+    "The brief asked for a cutting-mat green; the token rule forbids a new hue, so the mat is anthracite ruled in slate and the cork is warm speckle made from muted and signal orange 700."
+  ]
+}

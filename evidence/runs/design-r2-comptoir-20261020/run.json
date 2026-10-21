@@ -1,0 +1,97 @@
+{
+  "run_id": "design-r2-comptoir-20261020",
+  "kind": "design",
+  "status": "ok",
+  "started_at": "2026-10-20T20:55:00Z",
+  "finished_at": "2026-10-20T21:25:00Z",
+  "objective": "Round two, proposal 04: Le Comptoir, a package manager for Arch as a shop counter at night. The round is about arrangement and space, so the first round's column/list/card/bar skeleton is forbidden. Two states of one arrangement: loaded and quiet.",
+  "the_arrangement": {
+    "the_premise": "the user comes for one thing, takes it and goes; so the surface says what is on the counter, what is behind it, and what is out of stock, without listing the whole shop",
+    "the_planes": "near edge (a till receipt, running out of frame) / counter surface (the till, the ticket, the slate) / the shelf (the packages and their tags) / the wall (the board of seven counters, and the hanging sign in front of it)",
+    "the_sources": "seven counters on a horizontal board, each with a lamp, a name, a word for what it holds, and a count; the lit one is the counter you are at",
+    "the_operations": "one physical switch: a till on the counter, a handle that moves between FIND, INVENTORY and DELTA",
+    "the_keyboard": "off the surface entirely; not one key glyph appears in either state"
+  },
+  "the_budget": {
+    "on_the_surface": [
+      "the seven counters",
+      "the freshness of the answer, always on the board's rail at the right end, always mono",
+      "the operation, on the till",
+      "the request, on the slate",
+      "the list: the packages and their price tags",
+      "the state of the list and the density switch, engraved on the shelf's lip",
+      "the selected package, on the ticket",
+      "the log, on the receipt"
+    ],
+    "waits": [
+      "the key map (a help overlay)",
+      "the other six counters' contents",
+      "the dependency tree and the full file list",
+      "remove, until something is selected",
+      "the transaction history"
+    ]
+  },
+  "the_empty_region": "the counter's middle, in the quiet state: the same space the ticket will occupy when something is selected. It is lit by the pendant lamp, framed by the till on the left and the slate on the right, and the bare shelf above it keeps its furniture. In the loaded state the deliberate emptiness moves to the wall's left corner, under the hanging sign.",
+  "the_material": {
+    "wood": "mix(anthracite, signal-orange-700, 0.05..0.20): the only warmth the token set admits, so the colour comes from the lamp pools instead",
+    "metal": "the slate family, mixed towards shell white for the lit edges",
+    "paper": "the only place the ink flips: the shop's labels and the receipt are pale with dark ink",
+    "type": "IBM Plex Sans for the goods, IBM Plex Sans Condensed for the labels, IBM Plex Mono for every figure a machine owns"
+  },
+  "the_motion": [
+    "the shelf slides in, its objects moving at different depths",
+    "a selection is taken off the shelf: it lifts 28px, tilts 2.6 degrees, and throws a shadow; the place it came from is left visible in the dust on the plank",
+    "the till's handle is caught mid-travel, tilted, with two fading ghosts behind it and the FIND detent lit ahead of it",
+    "the receipt is still printing; it runs out of the frame"
+  ],
+  "how": [
+    "python3 build.py",
+    "figcraft-cli run build.jsonl --out 04-comptoir.figcraft",
+    "figcraft-cli export 04-comptoir.figcraft -o 04-comptoir-loaded.png --scale 1 --node 'Le Comptoir — loaded'",
+    "figcraft-cli export 04-comptoir.figcraft -o 04-comptoir-quiet.png --scale 1 --node 'Le Comptoir — quiet'",
+    "both PNGs were read back and corrected five times: the wood was too orange, the packages read as picture frames, the ticket's columns collided, the price tags read as form fields, and the quiet state was an accidental void until the pendant lamp was added"
+  ],
+  "artefacts": [
+    {
+      "path": "evidence/design-proposals/r2/04-comptoir-loaded.png",
+      "sha256": "be1269757d7771fedb01b246250f8a931141c6c3ac2014ce08ab832dfca44f24",
+      "size": "1600x1000"
+    },
+    {
+      "path": "evidence/design-proposals/r2/04-comptoir-quiet.png",
+      "sha256": "abd0de271c608c1110beb2c789cfeac82a85c4aa2d50e477d3e6c6425baaa88a",
+      "size": "1600x1000"
+    },
+    {
+      "path": "evidence/design-proposals/r2/04-comptoir.figcraft",
+      "sha256": "83906dcb3c3795261ed66634e0488e70d993493e9786d084cb0f9475105db817"
+    },
+    {
+      "path": "evidence/design-proposals/r2/04-comptoir.md",
+      "sha256": "4b9a937d43ed50ec7b8dce0f6246c57ad59209847b044a63c13c68e1716b7050"
+    },
+    {
+      "path": "evidence/design-proposals/r2/notes/04-comptoir.md"
+    },
+    {
+      "path": "evidence/runs/design-r2-comptoir-20261020/build.py",
+      "sha256": "146cb38b1c89de14892a90315dc923244dff443936162d849cd4c05ef9511c91"
+    },
+    {
+      "path": "evidence/runs/design-r2-comptoir-20261020/build.jsonl",
+      "sha256": "547518ded8815413507dc749b957a92c95b9941d9f0c3771649c6c35676817ec"
+    }
+  ],
+  "rules_kept": [
+    "the first round's images were not opened, the Calix repository was not opened, and the running application was not started",
+    "the two axes never share a control: a board of counters versus a till",
+    "the non-interchangeability of the sources is stated before the user asks, as a word under each counter's name: OFFICIAL REPOS, BUILD RECIPES, SANDBOXES, SINGLE BINARIES, RUST CRATES, NODE PACKAGES, FOLLOWED BINARIES",
+    "the freshness of the answer is always in the same place (the board's rail, right end) in the same typeface (mono)",
+    "two densities, both lists: DETAILED and COMPACT on the shelf's lip"
+  ],
+  "known_gaps": [
+    "the compact list is drawn as a switch, not as a second drawing of the shelf",
+    "the fonts are system fonts; a render on a machine without them falls back",
+    "the receipt cannot grow past five lines without becoming unreadable"
+  ]
+}
