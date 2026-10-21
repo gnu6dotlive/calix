@@ -48,6 +48,17 @@ command -v python3 >/dev/null 2>&1 || {
     exit 1
 }
 
+# The scratch of the run belongs to the repository, not to the shared tmpfs.
+#
+# /tmp is a memory-backed filesystem of sixteen gigabytes that every session on
+# the machine shares. A suite that writes its scratch there can fail with
+# ENOSPC because of somebody else's leftovers, which is a failure of the
+# environment, not of the code — and a failure of the environment looks exactly
+# like a failure of the code. The scratch goes under .ci-cache/, which the
+# repository ignores.
+mkdir -p "$ROOT/.ci-cache/tmp"
+export TMPDIR="$ROOT/.ci-cache/tmp"
+
 # ---- the floors -------------------------------------------------------------
 #
 # These are not targets, they are tripwires. A suite that suddenly runs 300

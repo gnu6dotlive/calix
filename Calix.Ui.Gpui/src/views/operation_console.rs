@@ -127,10 +127,13 @@ impl OperationConsoleView {
 }
 
 impl Render for OperationConsoleView {
-    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let animating = self.height_scalar.update(Instant::now());
         if animating || self.height_scalar.is_active() {
-            window.request_animation_frame();
+            // The view asks for the next frame itself: a window animation frame
+            // would notify the enclosing view instead of this one, and panics
+            // when the view is laid out on its own.
+            cx.notify();
         }
 
         let current_height = self.height_scalar.current;

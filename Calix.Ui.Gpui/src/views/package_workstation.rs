@@ -99,6 +99,50 @@ pub fn compute_splitter_bounds(content_width: f32) -> (f32, f32) {
     (list_min, list_max)
 }
 
+/// How far the wheel's distance may wait before the list is given it.
+pub const MAX_SCROLL_PENDING: f32 = 240.0;
+
+/// The distance that waits after a wheel notch.
+///
+/// The distance is bounded: a long scroll must not leave the list behind by a
+/// mile, and the list must never be asked for more than it can give.
+pub fn scroll_pending_after(pending: f32, delta: f32) -> f32 {
+    (pending + delta).clamp(-MAX_SCROLL_PENDING, MAX_SCROLL_PENDING)
+}
+
+/// The wheel, taken back from the list.
+///
+/// The list applies a notch in one jump. We take it back: the distance waits,
+/// to be handed over eased, frame by frame.
+///
+/// The two cancel out whichever order the handlers run in — the list adds the
+/// distance and we take it back, or we take it back and the list adds it. The
+/// list is where it was, and the distance waits.
+pub fn take_wheel_back(offset: &mut Point<Pixels>, delta: f32) {
+    offset.y -= px(delta);
+}
+
+/// The frame's movement: the part of the waiting distance given back now.
+pub fn apply_scroll_step(offset: &mut Point<Pixels>, step: f32) {
+    offset.y += px(step);
+}
+
+/// The eased step of the smooth scroll, and what is left of the distance.
+///
+/// A frame gives back a fifth of what waits. The notch is therefore a movement
+/// spread over a dozen frames rather than a jump, and the last frame gives the
+/// remainder back whole, so the list lands exactly where the wheel asked.
+pub fn scroll_step(pending: f32) -> (f32, f32) {
+    const SHARE: f32 = 0.22;
+    let step = pending * SHARE;
+    let rest = pending - step;
+    if rest.abs() < 0.5 {
+        (pending, 0.0)
+    } else {
+        (step, rest)
+    }
+}
+
 pub struct PackageWorkstationView {
     pub session: Entity<AppSession>,
     pub store: Entity<PackageStore>,
@@ -107,6 +151,12 @@ pub struct PackageWorkstationView {
     pub list_pane_width: f32,
     pub drag_state: Option<SplitterDragState>,
     pub scroll_handle: UniformListScrollHandle,
+    /// The distance the wheel asked for and the list has not been given yet.
+    ///
+    /// The list applies a wheel notch in one jump. We take the wheel back,
+    /// keep the distance here, and give it back eased, frame by frame: a notch
+    /// becomes a movement, not a step.
+    pub scroll_pending: f32,
     pub on_mutation: Option<PackageMutationHandler>,
     pub on_upgrade_all: Option<SystemUpgradeHandler>,
     pub on_retry_source: Option<SourceRetryHandler>,
@@ -186,6 +236,7 @@ impl PackageWorkstationView {
             list_pane_width: 640.0,
             drag_state: None,
             scroll_handle: UniformListScrollHandle::new(),
+            scroll_pending: 0.0,
             on_mutation: None,
             on_upgrade_all: None,
             on_retry_source: None,
@@ -561,6 +612,22 @@ impl Render for PackageWorkstationView {
         let theme = self.theme;
         let entity = cx.entity().clone();
         let is_busy = self.console.read(cx).is_running();
+
+        // The smooth scroll gives back what waits, a fifth at a time, until
+        // nothing waits any more. Each frame is one step, and the view asks
+        // for the next one.
+        if self.scroll_pending.abs() > 0.0 {
+            let (step, rest) = scroll_step(self.scroll_pending);
+            self.scroll_pending = rest;
+            let base = self.scroll_handle.0.borrow().base_handle.clone();
+            let mut offset = base.offset();
+            apply_scroll_step(&mut offset, step);
+            base.set_offset(offset);
+            // The view asks for the next frame itself: a window animation frame
+            // would notify the enclosing view instead of this one, and panics
+            // when the view is laid out on its own.
+            cx.notify();
+        }
 
         let sidebar_collapsed = self.session.read(cx).sidebar_collapsed;
         let sidebar_width = if sidebar_collapsed {
@@ -971,6 +1038,34 @@ impl Render for PackageWorkstationView {
             }
         };
 
+        // The wheel belongs to the workbench, not to the list. The list would
+        // apply a notch in one jump; we take the wheel before it does, and the
+        // distance waits to be given back eased, frame by frame.
+        let list_body = {
+            let entity = cx.entity().clone();
+            let scroll_base = self.scroll_handle.0.borrow().base_handle.clone();
+            div()
+                .flex_1()
+                .overflow_hidden()
+                .on_scroll_wheel(move |event, window, cx| {
+                    let delta: f32 = event.delta.pixel_delta(window.line_height()).y.into();
+                    if delta == 0.0 {
+                        return;
+                    }
+                    // The list has already taken this notch in one jump: give it
+                    // back, and keep the distance here. It is handed over eased,
+                    // a fifth at a time, frame by frame.
+                    let mut offset = scroll_base.offset();
+                    take_wheel_back(&mut offset, delta);
+                    scroll_base.set_offset(offset);
+                    entity.update(cx, |view, cx| {
+                        view.scroll_pending = scroll_pending_after(view.scroll_pending, delta);
+                        cx.notify();
+                    });
+                })
+                .child(list_body)
+        };
+
         let list_pane = if layout_mode == WorkstationLayoutMode::Horizontal {
             div()
                 .flex()
@@ -980,7 +1075,7 @@ impl Render for PackageWorkstationView {
                 .border_r_1()
                 .border_color(theme.border)
                 .child(top_bar)
-                .child(div().flex_1().overflow_hidden().child(list_body))
+                .child(list_body)
         } else {
             div()
                 .flex()
@@ -990,7 +1085,7 @@ impl Render for PackageWorkstationView {
                 .border_b_1()
                 .border_color(theme.border)
                 .child(top_bar)
-                .child(div().flex_1().overflow_hidden().child(list_body))
+                .child(list_body)
         };
 
         // ── 3. Splitter draggable isolé ─────────────────────────────────────
@@ -1210,6 +1305,163 @@ impl Render for PackageWorkstationView {
 mod tests {
     use super::*;
     use core::prelude::v1::test;
+    use gpui::prelude::StatefulInteractiveElement;
+    use gpui::ScrollHandle;
+
+    /// Le défilement fluide, proof : a wheel notch does not make the list jump,
+    /// the distance is handed over in steps, and it lands exactly where the
+    /// wheel asked.
+    ///
+    /// The harness cannot lay out the application's own uniform list — its
+    /// measured layout never resolves there, and a list of no size does not
+    /// scroll — so the proof is made on the same structure the application
+    /// uses: an outer container that takes the wheel from the scroller, and
+    /// the scroller itself, which is gpui's own scroll machinery.
+    #[gpui::test]
+    fn the_wheel_moves_the_list_by_steps(cx: &mut gpui::TestAppContext) {
+        struct ScrollFixture {
+            handle: ScrollHandle,
+            pending: f32,
+        }
+
+        impl Render for ScrollFixture {
+            fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+                // The frame: the waiting distance is given back, a fifth at a time.
+                if self.pending.abs() > 0.0 {
+                    let (step, rest) = scroll_step(self.pending);
+                    self.pending = rest;
+                    let mut offset = self.handle.offset();
+                    apply_scroll_step(&mut offset, step);
+                    self.handle.set_offset(offset);
+                    cx.notify();
+                }
+
+                // The wheel: the container takes it back from the scroller.
+                let handle = self.handle.clone();
+                let entity = cx.entity();
+                div()
+                    .size_full()
+                    .on_scroll_wheel(move |event, window, cx| {
+                        let delta: f32 = event.delta.pixel_delta(window.line_height()).y.into();
+                        if delta == 0.0 {
+                            return;
+                        }
+                        let mut offset = handle.offset();
+                        take_wheel_back(&mut offset, delta);
+                        handle.set_offset(offset);
+                        entity.update(cx, |view, cx| {
+                            view.pending = scroll_pending_after(view.pending, delta);
+                            cx.notify();
+                        });
+                    })
+                    .child(
+                        div()
+                            .id("scroll-fixture-inner")
+                            .size_full()
+                            .overflow_y_scroll()
+                            .track_scroll(&self.handle)
+                            .child(div().h(px(2000.)).w_full()),
+                    )
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let fixture = cx.new(|_| ScrollFixture {
+            handle: ScrollHandle::new(),
+            pending: 0.0,
+        });
+
+        let draw = |cx: &mut gpui::VisualTestContext| {
+            cx.draw(
+                point(px(0.), px(0.)),
+                size(px(800.), px(600.)),
+                |_window, _cx| fixture.clone(),
+            );
+        };
+        let offset = |cx: &mut gpui::VisualTestContext| {
+            cx.update(|_window, app| {
+                let handle = fixture.read(app).handle.clone();
+                let offset = handle.offset().y;
+                offset
+            })
+        };
+
+        // The scroller is there, and it has room to travel.
+        draw(cx);
+        assert_eq!(offset(cx), px(0.), "the list starts at the top");
+        let waiting = cx.update(|_window, app| fixture.read(app).pending);
+        assert_eq!(waiting, 0.0, "nothing waits before the wheel");
+
+        // The mouse goes over the list, then the wheel turns.
+        cx.simulate_event(MouseMoveEvent {
+            position: point(px(400.), px(300.)),
+            pressed_button: None,
+            modifiers: Modifiers::default(),
+        });
+        cx.simulate_event(ScrollWheelEvent {
+            position: point(px(400.), px(300.)),
+            delta: ScrollDelta::Pixels(point(px(0.), px(-200.))),
+            modifiers: Modifiers::default(),
+            touch_phase: TouchPhase::default(),
+        });
+
+        // The list was played back: it did not jump.
+        assert_eq!(
+            offset(cx),
+            px(0.),
+            "the wheel does not make the list jump"
+        );
+
+        // One frame: a fifth of the distance.
+        draw(cx);
+        let first = offset(cx);
+        assert!(
+            first < px(-30.) && first > px(-60.),
+            "the first frame gives a fraction of the distance, not all of it: {first:?}"
+        );
+
+        // A few frames: the whole distance, and not a pixel more.
+        for _ in 0..40 {
+            draw(cx);
+        }
+        assert!(
+            (offset(cx) - px(-200.)).abs() < px(1.),
+            "the list lands exactly where the wheel asked: {:?}",
+            offset(cx)
+        );
+    }
+
+    #[test]
+    fn the_smooth_scroll_gives_the_distance_back_in_several_frames() {
+        // Une molette : la distance revient en une vingtaine d'images, pas en
+        // un saut, et la liste finit exactement où la molette l'avait demandé.
+        let mut pending = 120.0f32;
+        let mut total = 0.0f32;
+        let mut frames = 0u32;
+        while pending.abs() > 0.0 {
+            let (step, rest) = scroll_step(pending);
+            total += step;
+            pending = rest;
+            frames += 1;
+            assert!(frames < 60, "le mouvement se termine");
+        }
+        assert!(frames >= 6, "la distance est rendue en plusieurs images");
+        assert!(
+            (total - 120.0).abs() < 0.01,
+            "toute la distance est rendue"
+        );
+        assert_eq!(pending, 0.0);
+    }
+
+    #[test]
+    fn the_pending_distance_is_bounded() {
+        // Une longue course ne doit pas laisser la liste en retard d'un mile.
+        let pending = scroll_pending_after(0.0, 10_000.0);
+        assert_eq!(pending, MAX_SCROLL_PENDING);
+        let pending = scroll_pending_after(0.0, -10_000.0);
+        assert_eq!(pending, -MAX_SCROLL_PENDING);
+        assert_eq!(scroll_pending_after(10.0, 5.0), 15.0);
+    }
 
     #[test]
     fn the_content_width_follows_the_mapped_window() {
