@@ -38,7 +38,7 @@ export CALIX_BIN
 
 # ─── Cibles principales ───────────────────────────────────────────────────────
 
-.PHONY: run build check test dependencies dependencies-update zig clean package package-install install help
+.PHONY: run build check test dependencies dependencies-update release install-machine zig clean package package-install install help
 
 ## Lance l'application en mode développement (cargo run)
 run: zig
@@ -63,6 +63,14 @@ test:
 ## L'état des dépendances : ce qui est en retard, et les épingles connues
 dependencies:
 	@./scripts/dependencies
+
+## La version, comme une commande : vérifie, étiquette, suit, contrôle
+release:
+	@./scripts/release --version $(VERSION)
+
+## La machine comme cible : construit, installe, redémarre, vérifie
+install-machine:
+	@./scripts/install-machine
 
 ## Met à jour le lockfile, repose les épingles, et laisse la porte décider
 dependencies-update:

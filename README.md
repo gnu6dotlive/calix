@@ -463,6 +463,39 @@ backend you just built:
 | `make install` | Development install into `/usr/local` (no PKGBUILD; needs elevated privileges) |
 | `make clean` | Remove Rust and Zig build artefacts |
 
+### The release, and the machine
+
+A release is not a tag: it is a claim that a specific commit is green, that
+the notes describe it, and that the artefacts exist afterwards. Each of those
+is a check.
+
+```bash
+scripts/release --version 0.3.1            # the whole thing
+scripts/release --version 0.3.1 --dry-run  # everything but the tag
+```
+
+The tree is clean and in step with the remote; the version is free; the
+notes' title names the version (the release body *is* the notes file); the
+local gate is green on that exact commit; the hosted workflow is watched to
+its end; the release carries the tarball and the tag names the commit; and
+the run is recorded in `evidence/runs/release-<version>/`.
+
+The gate is not optional. A release that skips it is a release whose green is
+a claim rather than a fact.
+
+Installing is the same discipline, with the machine as the target:
+
+```bash
+scripts/install-machine            # build, install, restart, verify
+scripts/install-machine --dry-run  # everything but the installation
+```
+
+The step that is easy to forget, and whose absence is invisible until a bug
+is chased, is the **restart**: a service that was running yesterday's binary
+keeps it in memory, and an upgrade does not touch it. The script restarts
+them, and checks that they run the code that is on disk now. The elevation
+is polkit, never sudo.
+
 ### The dependencies
 
 The lockfile is the dependency truth: `cargo build --locked` builds exactly
