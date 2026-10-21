@@ -158,11 +158,17 @@ impl ToastOverlay {
             } else {
                 match toast.lifecycle {
                     ToastLifecycle::Entering => {
+                        // The arrival: it rises and it lights up, on the out
+                        // curve — the launcher's toast, and the same tokens the
+                        // rest of the application uses.
                         let animated = toast_el.with_animation(
                             ElementId::NamedInteger("toast-enter".into(), toast_id),
-                            Animation::new(std::time::Duration::from_millis(120))
-                                .with_easing(gpui::ease_out_quint()),
-                            |el, delta| el.opacity(delta),
+                            Animation::new(crate::state::MotionDurations::FAST)
+                                .with_easing(crate::state::motion::ease_out),
+                            |el, delta| {
+                                let eased = crate::state::motion::ease_out(delta);
+                                el.opacity(eased).top(px(8.0 * (1.0 - eased)))
+                            },
                         );
                         container = container.child(animated);
                     }
@@ -170,11 +176,16 @@ impl ToastOverlay {
                         container = container.child(toast_el.opacity(1.0));
                     }
                     ToastLifecycle::Exiting => {
+                        // The exit: it goes back down and it fades, on the same
+                        // curve — the departure is the arrival reversed ✗.
                         let animated = toast_el.with_animation(
                             ElementId::NamedInteger("toast-exit".into(), toast_id),
-                            Animation::new(std::time::Duration::from_millis(120))
-                                .with_easing(gpui::ease_out_quint()),
-                            |el, delta| el.opacity(1.0 - delta),
+                            Animation::new(crate::state::MotionDurations::FAST)
+                                .with_easing(crate::state::motion::ease_out),
+                            |el, delta| {
+                                let eased = crate::state::motion::ease_out(delta);
+                                el.opacity(1.0 - eased).top(px(8.0 * eased))
+                            },
                         );
                         container = container.child(animated);
                     }

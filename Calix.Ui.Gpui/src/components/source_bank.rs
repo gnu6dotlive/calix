@@ -237,11 +237,11 @@ impl SourceBank {
                 aperture
                     .with_animation(
                         (arrival_id(kind), props.epoch),
-                        Animation::new(total).with_easing(gpui::ease_out_quint()),
+                        Animation::new(total).with_easing(crate::state::motion::ease_out),
                         move |element, delta| {
                             let local = ((delta - delay) / (1.0 - delay)).clamp(0.0, 1.0);
                             element
-                                .top(px(travel * (1.0 - gpui::ease_out_quint()(local))))
+                                .top(px(travel * (1.0 - crate::state::motion::ease_out(local))))
                                 .opacity(if local > 0.0 { 1.0 } else { 0.0 })
                         },
                     )

@@ -139,7 +139,7 @@ impl PackageInspectorView {
                 .with_animation(
                     ("tab-cut", tab_epoch as usize),
                     Animation::new(crate::state::MotionDurations::STANDARD)
-                        .with_easing(gpui::ease_out_quint()),
+                        .with_easing(crate::state::motion::ease_out),
                     |elem, delta| {
                         let (opacity, offset) = crate::state::motion::cut_entry(delta, 32.0);
                         elem.opacity(opacity).left(px(offset))

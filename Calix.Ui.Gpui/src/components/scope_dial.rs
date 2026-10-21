@@ -1,5 +1,5 @@
 use crate::icons::AppIcon;
-use crate::state::motion::{ease_out_back, AnimatedScalar, MotionDurations};
+use crate::state::motion::{ease_spring, AnimatedScalar, MotionDurations};
 use crate::state::NavScope;
 use crate::theme::Theme;
 use gpui::*;
@@ -57,7 +57,7 @@ impl ScopeDialView {
         let mut needle = AnimatedScalar::new(scope_angle(scope));
         // The needle overshoots the detent and comes back: an instrument
         // overshoots, a switch does not.
-        needle.easing = ease_out_back;
+        needle.easing = ease_spring;
         Self {
             scope,
             needle,

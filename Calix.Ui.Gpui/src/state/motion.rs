@@ -89,12 +89,13 @@ impl Curve {
 }
 
 /// Fonctions d'adoucissement pures (fn(f32) -> f32)
-pub fn ease_out_quint(t: f32) -> f32 {
-    Curve::OUT.ease(t)
-}
-
 pub fn ease_in_out(t: f32) -> f32 {
     Curve::IN_OUT.ease(t)
+}
+
+/// L'adoucissement de l'application : la sortie.
+pub fn ease_out(t: f32) -> f32 {
+    Curve::OUT.ease(t)
 }
 
 /// Le poids d'un élément dans une arrivée : il voyage plus loin et plus
@@ -195,15 +196,15 @@ pub fn cut_entry(delta: f32, travel: f32) -> (f32, f32) {
         ((t - 0.35) / 0.65).clamp(0.0, 1.0)
     };
     // La position : le voyage se referme, la même direction que la sortie.
-    let offset = travel * (1.0 - ease_out_quint(t));
+    let offset = travel * (1.0 - ease_out(t));
     (opacity, offset)
 }
 
-/// L'overshoot : l'aiguille dépasse sa position et revient.
+/// Le ressort : l'aiguille dépasse sa position et revient.
 ///
 /// Un instrument dépasse ; un commutateur, non. L'aiguille qui se jette sur
 /// son cran le franchit légèrement avant de revenir s'y poser.
-pub fn ease_out_back(t: f32) -> f32 {
+pub fn ease_spring(t: f32) -> f32 {
     Curve::SPRING.ease(t)
 }
 
@@ -238,7 +239,7 @@ impl AnimatedScalar {
             target_value: initial,
             start_time: None,
             duration: MotionDurations::STANDARD,
-            easing: ease_out_quint,
+            easing: ease_out,
         }
     }
 
@@ -407,11 +408,11 @@ mod tests {
     #[test]
     fn the_overshoot_passes_the_target_and_comes_back() {
         // L'aiguille franchit son cran, puis revient s'y poser.
-        assert!((ease_out_back(0.0) - 0.0).abs() < 1e-6, "le départ est à zéro");
-        assert!(ease_out_back(0.6) > 1.0, "le cran est dépassé");
-        assert!((ease_out_back(1.0) - 1.0).abs() < 1e-6, "l'arrivée est posée");
+        assert!((ease_spring(0.0) - 0.0).abs() < 1e-6, "le départ est à zéro");
+        assert!(ease_spring(0.6) > 1.0, "le cran est dépassé");
+        assert!((ease_spring(1.0) - 1.0).abs() < 1e-6, "l'arrivée est posée");
         // Et le dépassement reste un dépassement, pas un écart.
-        assert!(ease_out_back(0.6) < 1.2);
+        assert!(ease_spring(0.6) < 1.2);
     }
 
     #[test]
@@ -467,8 +468,8 @@ mod tests {
         assert_eq!(MotionDurations::STANDARD, Duration::from_millis(160));
         assert_eq!(MotionDurations::EMPHASIS, Duration::from_millis(220));
 
-        let q0 = ease_out_quint(0.0);
-        let q1 = ease_out_quint(1.0);
+        let q0 = ease_out(0.0);
+        let q1 = ease_out(1.0);
         assert_eq!(q0, 0.0);
         assert_eq!(q1, 1.0);
 

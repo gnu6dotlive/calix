@@ -2483,7 +2483,7 @@ impl Render for WorkspaceView {
                 .child(main_content)
                 .with_animation(
                     ("nav-fade", navigation_epoch as usize),
-                    Animation::new(MotionDurations::FAST).with_easing(gpui::ease_out_quint()),
+                    Animation::new(MotionDurations::FAST).with_easing(crate::state::motion::ease_out),
                     |elem, delta| elem.opacity(delta),
                 )
                 .into_any_element()

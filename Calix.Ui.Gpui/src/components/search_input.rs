@@ -759,7 +759,7 @@ impl Render for SearchInputView {
                         ("search_pulse", 0usize),
                         Animation::new(std::time::Duration::from_millis(700))
                             .repeat()
-                            .with_easing(gpui::ease_in_out),
+                            .with_easing(crate::state::motion::ease_in_out),
                         |el, delta| {
                             let opacity = 0.25 + 0.75 * (delta * std::f32::consts::PI).sin().abs();
                             el.opacity(opacity)
@@ -881,7 +881,7 @@ impl Render for SearchInputView {
                         if is_focused { 1usize } else { 0usize },
                     ),
                     Animation::new(std::time::Duration::from_millis(110))
-                        .with_easing(gpui::ease_out_quint()),
+                        .with_easing(crate::state::motion::ease_out),
                     move |el, delta| {
                         if is_focused {
                             el.opacity(0.9 + 0.1 * delta)

@@ -98,7 +98,7 @@ impl MenuSurface {
                     .with_animation(
                         ("menu_open_anim", props.anim_epoch),
                         Animation::new(std::time::Duration::from_millis(150))
-                            .with_easing(gpui::ease_out_quint()),
+                            .with_easing(crate::state::motion::ease_out),
                         |el, delta| {
                             let offset_y = px(-4.0 * (1.0 - delta));
                             el.opacity(delta).top(offset_y)
@@ -110,7 +110,7 @@ impl MenuSurface {
                     .with_animation(
                         ("menu_close_anim", props.anim_epoch),
                         Animation::new(std::time::Duration::from_millis(100))
-                            .with_easing(gpui::ease_out_quint()),
+                            .with_easing(crate::state::motion::ease_out),
                         |el, delta| {
                             let offset_y = px(-2.0 * delta);
                             el.opacity(1.0 - delta).top(offset_y)

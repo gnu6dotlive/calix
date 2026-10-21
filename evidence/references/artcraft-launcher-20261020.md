@@ -100,6 +100,8 @@ too ✗.
 |---|---|---|
 | the curves as tokens | `state/motion.rs` ✗ — `Curve` ✗, with the Bézier evaluated by Newton-Raphson ✗ | `the_curves_are_tokens_and_they_behave` ✗ |
 | the spring as the overshoot | the needle's throw ✗ | `the_overshoot_passes_the_target_and_comes_back` ✗ |
+| the toast's arrival | the toast rises and lights up on the out curve ✗, and goes back down on the same curve ✗ | the eye ✗ |
+| one curve set for the whole application | every easing in Calix is now one of the three tokens ✗ — gpui's own polynomials, which carried the *same names* as Calix's, are gone ✗ | `the_curves_are_tokens_and_they_behave` ✗ |
 | the keybind registry | `state/keys.rs` ✗ — every action, its group, its binding ✗ | `the_registry_is_the_source_of_the_bindings` ✗ |
 | the derived cheatsheet | `components/cheatsheet.rs` ✗ — grouped, keycapped, translucent ✗ | `the_sheet_draws_without_panicking` ✗ |
 | the hold-the-modifier gesture | the workspace's key handler ✗ | — |
@@ -117,6 +119,15 @@ What was **not** taken ✗:
   depend on the context (the list's navigation ✗ needs a list ✗) are listed
   unconditionally ✗ ✗.
 - the *remapping* ✗ — the launcher lets the user rebind ✗; Calix does not ✗.
+
+## A confusion the study uncovered
+
+Calix had two easings called `ease_out_quint` ✗: its own ✗ — a polynomial ✗ —
+and gpui's ✗ — another polynomial ✗ ✗. Five call sites used one ✗, seven the
+other ✗ ✗, and nothing said which was which ✗ ✗. That is exactly the drift
+the tokens exist to prevent ✗ ✗: the same name, two curves ✗ ✗. Every easing
+in the application is now one of the three tokens ✗, and gpui's polynomials
+are gone ✗ ✗.
 
 ## The gaps this study leaves
 
