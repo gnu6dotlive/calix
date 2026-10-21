@@ -1,4 +1,5 @@
 pub mod console;
+pub mod keys;
 pub mod motion;
 pub mod package_store;
 pub mod query;

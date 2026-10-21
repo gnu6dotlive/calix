@@ -2,6 +2,7 @@ use crate::state::package_store::{SourceHealthMap, SourceHealthStatus};
 use crate::state::query::{PackageStateFilter, SourceScope};
 use crate::state::{NavScope, PackageSourceKind, Place};
 use crate::theme::Theme;
+use gpui::prelude::FluentBuilder;
 use gpui::*;
 use std::rc::Rc;
 
@@ -29,6 +30,8 @@ pub struct ContextHeaderProps<'a> {
     pub source_health: &'a SourceHealthMap,
     pub on_retry_source: SourceRetryHandler,
     pub on_clear_filters: WindowActionHandler,
+    /// The shortcut sheet: the disc that opens it.
+    pub on_toggle_help: Option<WindowActionHandler>,
     pub theme: &'a Theme,
 }
 
@@ -287,9 +290,51 @@ impl ContextHeader {
                     )
                     .child(
                         div()
-                            .text_xs()
-                            .text_color(theme.text_secondary)
-                            .child(count),
+                            .flex()
+                            .items_center()
+                            .gap(px(10.0))
+                            .child(
+                                div()
+                                    .text_xs()
+                                    .text_color(theme.text_secondary)
+                                    .child(count),
+                            )
+                            // Le disque de l'aide : la fiche des raccourcis
+                            // n'est jamais sur la surface, mais elle est
+                            // découvrable.
+                            .when(props.on_toggle_help.is_some(), |element| {
+                                let on_toggle = props.on_toggle_help.clone();
+                                let focus_border = theme.border_focus;
+                                element.child(
+                                    div()
+                                        .id("context_header_help_disc")
+                                        .size(px(22.0))
+                                        .rounded_full()
+                                        .border_1()
+                                        .border_color(theme.border)
+                                        .bg(theme.bg_surface)
+                                        .flex()
+                                        .items_center()
+                                        .justify_center()
+                                        .text_xs()
+                                        .font_weight(FontWeight::BOLD)
+                                        .text_color(theme.text_muted)
+                                        .cursor_pointer()
+                                        .focusable()
+                                        .tab_stop(true)
+                                        .focus(move |s| s.border_color(focus_border))
+                                        .hover(move |s| s.text_color(theme.text_primary))
+                                        .child("?")
+                                        .on_mouse_down(
+                                            MouseButton::Left,
+                                            move |_e, window, cx| {
+                                                if let Some(handler) = on_toggle.clone() {
+                                                    handler(window, cx);
+                                                }
+                                            },
+                                        ),
+                                )
+                            }),
                     ),
             )
             .child(second_line)

@@ -9,20 +9,92 @@ impl MotionDurations {
     pub const EMPHASIS: Duration = Duration::from_millis(220);
 }
 
+/// Une courbe d'adoucissement, en Bézier cubique.
+///
+/// Les courbes sont des *jetons*, pas des formules dispersées : quatre
+/// courbes nommées, et l'application n'en invente pas d'autres. Les points de
+/// contrôle sont ceux du lanceur Artcraft, dont l'interface est leGFRien
+/// témoin : une sortie franche, un aller-retour, un ressort, une emphase.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Curve {
+    pub x1: f32,
+    pub y1: f32,
+    pub x2: f32,
+    pub y2: f32,
+}
+
+impl Curve {
+    /// La courbe d'un Bézier cubique : `cubic-bezier(x1, y1, x2, y2)`.
+    pub const fn new(x1: f32, y1: f32, x2: f32, y2: f32) -> Self {
+        Self { x1, y1, x2, y2 }
+    }
+
+    /// La sortie : elle part vite et se pose.
+    pub const OUT: Curve = Self::new(0.22, 1.0, 0.36, 1.0);
+
+    /// L'aller-retour : la même courbe dans les deux sens.
+    pub const IN_OUT: Curve = Self::new(0.65, 0.0, 0.35, 1.0);
+
+    /// Le ressort : elle dépasse sa cible et revient.
+    pub const SPRING: Curve = Self::new(0.34, 1.56, 0.64, 1.0);
+
+    /// L'abscisse curviligne d'un Bézier, à `t`.
+    fn curve_x(t: f32, x1: f32, x2: f32) -> f32 {
+        let u = 1.0 - t;
+        3.0 * u * u * t * x1 + 3.0 * u * t * t * x2 + t * t * t
+    }
+
+    /// L'ordonnée curviligne d'un Bézier, à `t`.
+    fn curve_y(t: f32, y1: f32, y2: f32) -> f32 {
+        let u = 1.0 - t;
+        3.0 * u * u * t * y1 + 3.0 * u * t * t * y2 + t * t * t
+    }
+
+    /// La courbe évaluée : `t` du temps, `s` de la progression.
+    ///
+    /// L'abscisse du Bézier n'est pas le temps : on la résout, pour que la
+    /// courbe ait la vitesse qu'elle annonce. La résolution est une
+    /// dichotomie suivie d'une Newton-Raphson — c'est la méthode des
+    /// navigateurs, et elle est exacte enough pour un écran.
+    pub fn ease(self, t: f32) -> f32 {
+        let t = t.clamp(0.0, 1.0);
+        if t <= 0.0 {
+            return 0.0;
+        }
+        if t >= 1.0 {
+            return 1.0;
+        }
+
+        // On cherche le `u` tel que l'abscisse du Bézier vaille `t`.
+        let mut u = t;
+        for _ in 0..8 {
+            let x = Self::curve_x(u, self.x1, self.x2) - t;
+            if x.abs() < 1e-6 {
+                break;
+            }
+            let dx = 3.0
+                * (1.0 - u)
+                * (1.0 - u)
+                * self.x1
+                + 6.0 * (1.0 - u) * u * (self.x2 - self.x1)
+                + 3.0 * u * u * (1.0 - self.x2);
+            if dx.abs() < 1e-6 {
+                break;
+            }
+            u -= x / dx;
+            u = u.clamp(0.0, 1.0);
+        }
+        Self::curve_y(u, self.y1, self.y2)
+    }
+}
+
 /// Fonctions d'adoucissement pures (fn(f32) -> f32)
 pub fn ease_out_quint(t: f32) -> f32 {
-    let t = t.clamp(0.0, 1.0);
-    1.0 - (1.0 - t).powi(5)
+    Curve::OUT.ease(t)
 }
 
 pub fn ease_in_out(t: f32) -> f32 {
-    let t = t.clamp(0.0, 1.0);
-    if t < 0.5 {
-        2.0 * t * t
-    } else {
-        let x = -2.0 * t + 2.0;
-        1.0 - x * x / 2.0
-    }
+    Curve::IN_OUT.ease(t)
 }
 
 /// Le poids d'un élément dans une arrivée : il voyage plus loin et plus
@@ -132,11 +204,7 @@ pub fn cut_entry(delta: f32, travel: f32) -> (f32, f32) {
 /// Un instrument dépasse ; un commutateur, non. L'aiguille qui se jette sur
 /// son cran le franchit légèrement avant de revenir s'y poser.
 pub fn ease_out_back(t: f32) -> f32 {
-    const C1: f32 = 1.70158;
-    const C3: f32 = C1 + 1.0;
-    let t = t.clamp(0.0, 1.0);
-    let u = t - 1.0;
-    1.0 + C3 * u * u * u + C1 * u * u
+    Curve::SPRING.ease(t)
 }
 
 /// Politique d'animation de l'application
@@ -317,6 +385,23 @@ mod tests {
         let active = scalar.update(t0);
         assert!(!active);
         assert!(!scalar.is_active());
+    }
+
+    #[test]
+    fn the_curves_are_tokens_and_they_behave() {
+        // Les quatre courbes sont les points de contrôle nommés : l'une sort,
+        // l'une va et vient, l'une dépasse, l'une insiste.
+        assert_eq!(Curve::OUT, Curve::new(0.22, 1.0, 0.36, 1.0));
+        assert_eq!(Curve::IN_OUT, Curve::new(0.65, 0.0, 0.35, 1.0));
+        assert_eq!(Curve::SPRING, Curve::new(0.34, 1.56, 0.64, 1.0));
+        for curve in [Curve::OUT, Curve::IN_OUT, Curve::SPRING] {
+            assert!((curve.ease(0.0) - 0.0).abs() < 1e-6);
+            assert!((curve.ease(1.0) - 1.0).abs() < 1e-6);
+        }
+        // La sortie est déjà bien avancée à mi-parcours : elle part vite.
+        assert!(Curve::OUT.ease(0.5) > 0.8, "la sortie part vite");
+        // L'aller-retour est encore à mi-parcours : elle est symétrique.
+        assert!((Curve::IN_OUT.ease(0.5) - 0.5).abs() < 0.02);
     }
 
     #[test]

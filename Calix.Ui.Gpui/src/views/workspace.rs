@@ -7,6 +7,7 @@ use crate::control::ipc::{ControlIpcMessage, ControlIpcServer};
 use crate::control::protocol::{
     ControlCommand, ControlFilters, ControlResponse, ControlStatus, CONTROL_PROTOCOL_VERSION,
 };
+use crate::components::cheatsheet::{Cheatsheet, CheatsheetProps};
 use crate::components::context_header::{ContextHeader, ContextHeaderProps};
 use crate::state::package_store::SourceHealth;
 use crate::state::query::SortMode;
@@ -54,6 +55,10 @@ pub struct WorkspaceView {
     pub news: Vec<ArchNewsItem>,
     pub is_loading_news: bool,
     pub motion_policy: crate::state::motion::MotionPolicy,
+    /// The shortcut sheet is up: the user held the modifier alone.
+    pub cheatsheet_visible: bool,
+    /// The gesture: the timer that reveals the sheet.
+    pub cheatsheet_hold: Option<Task<()>>,
 }
 
 impl WorkspaceView {
@@ -325,6 +330,8 @@ impl WorkspaceView {
             news: Vec::new(),
             is_loading_news: false,
             motion_policy: crate::state::motion::MotionPolicy::new(gpui_config.reduce_motion),
+            cheatsheet_visible: false,
+            cheatsheet_hold: None,
         };
 
         // Liaison des mutations depuis PackageWorkstationView vers WorkspaceView
@@ -1930,6 +1937,67 @@ impl WorkspaceView {
         }
     }
 
+    /// Le geste de l'aide : tenir la modificatrice seule.
+    ///
+    /// L'utilisateur tient ⌘ (ou Ctrl) sans autre touche : au bout de trois
+    /// secondes, la fiche des raccourcis apparaît. Une autre touche pendant
+    /// ce temps annule le geste — un vrai ⌘C n'ouvre donc jamais la fiche.
+    fn handle_help_gesture(&mut self, event: &KeyDownEvent, cx: &mut Context<Self>) {
+        let key = event.keystroke.key.as_str();
+        let is_modifier_alone = matches!(key, "meta" | "control" | "ctrl" | "command");
+
+        if !is_modifier_alone {
+            // Une autre touche : le geste est annulé, et la fiche se ferme.
+            if self.cheatsheet_hold.take().is_some() {
+                self.cheatsheet_visible = false;
+                cx.notify();
+            }
+            return;
+        }
+
+        // La répétition de la touche maintenue ne relance pas le minuteur.
+        if event.is_held || self.cheatsheet_hold.is_some() {
+            return;
+        }
+
+        let entity = cx.entity();
+        self.cheatsheet_hold = Some(cx.spawn(async move |this, cx| {
+            gpui::Timer::after(crate::state::keys::HELP_HOLD).await;
+            this.update(cx, |view, cx| {
+                view.cheatsheet_hold = None;
+                view.cheatsheet_visible = true;
+                cx.notify();
+            })
+            .ok();
+        }));
+        let _ = entity;
+    }
+
+    /// The list's navigation: the selection moves, and the list follows.
+    fn move_selection(&mut self, forward: bool, cx: &mut Context<Self>) {
+        let packages = self.current_display_packages(cx);
+        if packages.is_empty() {
+            return;
+        }
+        let selected_key = self.session.read(cx).selected_package_key.clone();
+        let current_idx = selected_key
+            .as_ref()
+            .and_then(|sk| packages.iter().position(|p| &p.key() == sk));
+        let index = match (current_idx, forward) {
+            (Some(idx), true) => (idx + 1).min(packages.len() - 1),
+            (Some(idx), false) => idx.saturating_sub(1),
+            (None, _) => 0,
+        };
+        let next_key = packages[index].key();
+        self.session.update(cx, |s, cx| {
+            s.select_package(Some(next_key), cx);
+        });
+        self.workstation.update(cx, |ws, _cx| {
+            ws.scroll_handle
+                .scroll_to_item_strict(index, ScrollStrategy::Top)
+        });
+    }
+
     /// Navigation au clavier dans la liste virtuelle (flèches Haut/Bas)
     pub fn on_key_down(
         &mut self,
@@ -1940,76 +2008,91 @@ impl WorkspaceView {
         let key = event.keystroke.key.as_str();
         let modifiers = event.keystroke.modifiers;
 
+        // ── Le geste : tenir la modificatrice seule ─────────────────────────
+        //
+        // La fiche d'aide n'est pas sur la surface. Elle apparaît quand
+        // l'utilisateur tient la touche modificatrice *seule* : un vrai
+        // ⌘C ne la déclenche jamais, parce qu'une autre touche l'annule.
+        self.handle_help_gesture(event, cx);
+
         // ── Les touches globales ─────────────────────────────────────────────
-        // ⌘1 à ⌘5 : les cinq entrées du rail. ⌥← et ⌥→ : le périmètre
-        // précédent et le suivant. ⌘F : la recherche. ⌘L : la console.
-        // ⌘⌥C : le rail.
-        if modifiers.platform {
-            let rail_target = match key {
-                "1" => Some((Place::Packages, Some(NavScope::Results))),
-                "2" => Some((Place::Packages, Some(NavScope::Installed))),
-                "3" => Some((Place::Packages, Some(NavScope::Updates))),
-                "4" => Some((Place::News, None)),
-                "5" => Some((Place::Settings, None)),
-                _ => None,
-            };
-            if let Some((place, scope)) = rail_target {
-                self.session.update(cx, |s, cx| {
-                    if let Some(scope) = scope {
-                        s.set_scope(scope, cx);
+        //
+        // Le registre est la source : le handler demande au registre ce que
+        // la touche signifie, et la fiche d'aide en découle. Les deux ne
+        // peuvent pas se contredire, puisqu'il n'y a qu'une liste.
+        if let Some(action) = crate::state::keys::action_for(
+            key,
+            modifiers.platform,
+            modifiers.alt,
+            modifiers.shift,
+        ) {
+            match action.id {
+                "rail.search" | "rail.installed" | "rail.updates" | "rail.news" | "rail.settings" => {
+                    if let Some((place, scope)) = crate::state::keys::rail_target(action.id) {
+                        self.session.update(cx, |s, cx| {
+                            if let Some(scope) = scope {
+                                s.set_scope(scope, cx);
+                            }
+                            s.set_place(place, cx);
+                        });
                     }
-                    s.set_place(place, cx);
-                });
-                return;
+                }
+                "search.focus" => {
+                    let search_input = self.workstation.read(cx).search_input.clone();
+                    search_input.update(cx, |si, _cx| si.focus(window));
+                }
+                "console.toggle" => {
+                    self.console.update(cx, |c, cx| c.toggle_drawer(cx));
+                }
+                "sidebar.toggle" => {
+                    self.session.update(cx, |s, cx| s.toggle_sidebar(cx));
+                }
+                "scope.previous" | "scope.next" => {
+                    let scope = self.session.read(cx).scope;
+                    let next = if action.id == "scope.previous" {
+                        scope.previous()
+                    } else {
+                        scope.next()
+                    };
+                    if let Some(next) = next {
+                        self.session.update(cx, |s, cx| {
+                            s.set_scope(next, cx);
+                            s.set_place(Place::Packages, cx);
+                        });
+                    }
+                }
+                "search.open" => {
+                    let search_input = self.workstation.read(cx).search_input.clone();
+                    let is_focused = search_input.read(cx).is_focused(window);
+                    if !is_focused {
+                        search_input.update(cx, |si, _cx| si.focus(window));
+                    }
+                }
+                "list.clear" => {
+                    // Escape is the local way back: it clears the search, then
+                    // it leaves the place, then it empties the selection.
+                    let search_input = self.workstation.read(cx).search_input.clone();
+                    let query = self.session.read(cx).search_query.clone();
+                    if search_input.read(cx).is_focused(window) && !query.trim().is_empty() {
+                        search_input.update(cx, |si, cx| si.set_text(String::new(), cx));
+                        self.session.update(cx, |s, cx| {
+                            s.set_search_query(String::new(), cx)
+                        });
+                        self.on_search_input(String::new(), cx);
+                        return;
+                    }
+                    let place = self.session.read(cx).place;
+                    if place != Place::Packages {
+                        self.session.update(cx, |s, cx| s.set_place(Place::Packages, cx));
+                        return;
+                    }
+                    self.session.update(cx, |s, cx| s.select_package(None, cx));
+                }
+                "list.next" | "list.previous" => {
+                    self.move_selection(action.id == "list.next", cx);
+                }
+                _ => {}
             }
-            if key == "f" {
-                let search_input = self.workstation.read(cx).search_input.clone();
-                search_input.update(cx, |si, _cx| si.focus(window));
-                return;
-            }
-            if key == "l" {
-                self.console.update(cx, |c, cx| c.toggle_drawer(cx));
-                return;
-            }
-            if key == "c" && modifiers.alt {
-                self.session.update(cx, |s, cx| s.toggle_sidebar(cx));
-                return;
-            }
-        }
-
-        if modifiers.alt && !modifiers.platform {
-            let scope = self.session.read(cx).scope;
-            let next = match key {
-                "left" => scope.previous(),
-                "right" => scope.next(),
-                _ => None,
-            };
-            if let Some(next) = next {
-                self.session.update(cx, |s, cx| {
-                    s.set_scope(next, cx);
-                    s.set_place(Place::Packages, cx);
-                });
-                return;
-            }
-        }
-
-        if key == "escape" {
-            // Échap est le retour local : il efface la recherche, puis il
-            // quitte le lieu, puis il vide la sélection.
-            let search_input = self.workstation.read(cx).search_input.clone();
-            let query = self.session.read(cx).search_query.clone();
-            if search_input.read(cx).is_focused(window) && !query.trim().is_empty() {
-                search_input.update(cx, |si, cx| si.set_text(String::new(), cx));
-                self.session.update(cx, |s, cx| s.set_search_query(String::new(), cx));
-                self.on_search_input(String::new(), cx);
-                return;
-            }
-            let place = self.session.read(cx).place;
-            if place != Place::Packages {
-                self.session.update(cx, |s, cx| s.set_place(Place::Packages, cx));
-                return;
-            }
-            self.session.update(cx, |s, cx| s.select_package(None, cx));
             return;
         }
 
@@ -2022,65 +2105,8 @@ impl WorkspaceView {
             return;
         }
 
-        if key == "/" && !event.keystroke.modifiers.control && !event.keystroke.modifiers.alt {
-            let search_input = self.workstation.read(cx).search_input.clone();
-            let is_focused = search_input.read(cx).is_focused(window);
-            if !is_focused {
-                search_input.update(cx, |si, _cx| si.focus(window));
-                return;
-            }
-        }
-
-        let packages = self.current_display_packages(cx);
-        if packages.is_empty() {
-            return;
-        }
-
-        let selected_key = self.session.read(cx).selected_package_key.clone();
-
-        let current_idx = selected_key
-            .as_ref()
-            .and_then(|sk| packages.iter().position(|p| &p.key() == sk));
-
-        match key {
-            "down" => {
-                let next_idx = match current_idx {
-                    Some(idx) => (idx + 1).min(packages.len().saturating_sub(1)),
-                    None => 0,
-                };
-                let next_pkg = &packages[next_idx];
-                let next_key = next_pkg.key();
-                self.session.update(cx, |s, cx| {
-                    s.select_package(Some(next_key), cx);
-                });
-                self.workstation.update(cx, |ws, _cx| {
-                    ws.scroll_handle
-                        .scroll_to_item_strict(next_idx, ScrollStrategy::Top)
-                });
-            }
-            "up" => {
-                let prev_idx = match current_idx {
-                    Some(idx) => idx.saturating_sub(1),
-                    None => 0,
-                };
-                let prev_pkg = &packages[prev_idx];
-                let prev_key = prev_pkg.key();
-                self.session.update(cx, |s, cx| {
-                    s.select_package(Some(prev_key), cx);
-                });
-                self.workstation.update(cx, |ws, _cx| {
-                    ws.scroll_handle
-                        .scroll_to_item_strict(prev_idx, ScrollStrategy::Top)
-                });
-            }
-            "escape" => {
-                self.session.update(cx, |s, cx| {
-                    s.select_package(None, cx);
-                });
-            }
-            _ => {}
-        }
     }
+
     /// La surface de développement : le laboratoire de rendu.
     ///
     /// Ce n'est pas un lieu : il s'ouvre par-dessus, et le lieu d'en dessous
@@ -2527,6 +2553,7 @@ impl Render for WorkspaceView {
         let appimage_enabled = self.calix_settings.app_image_enabled;
 
         let entity_clear = self.session.clone();
+        let entity_help = cx.entity();
         let context_header = ContextHeader::render(ContextHeaderProps {
             place: header_place,
             scope: header_scope,
@@ -2547,6 +2574,12 @@ impl Render for WorkspaceView {
                     });
                 })
             },
+            on_toggle_help: Some(Rc::new(move |_w, cx| {
+                entity_help.update(cx, |view, cx| {
+                    view.cheatsheet_visible = !view.cheatsheet_visible;
+                    cx.notify();
+                });
+            })),
             on_clear_filters: Rc::new(move |_w, cx| {
                 entity_clear.update(cx, |s, cx| {
                     s.clear_filters(aur_enabled, flatpak_enabled, appimage_enabled, cx);
@@ -2557,6 +2590,14 @@ impl Render for WorkspaceView {
 
         // ── 4. Assemblage final du shell ─────────────────────────────────────
         let entity_key = entity.clone();
+
+        // The shortcut sheet, above the frame: it appears when the user holds
+        // the modifier alone, and it never sits on the surface.
+        let cheatsheet = if self.cheatsheet_visible {
+            Some(Cheatsheet::render(CheatsheetProps { theme: &theme }))
+        } else {
+            None
+        };
 
         div()
             .id("workspace_root")
@@ -2591,6 +2632,7 @@ impl Render for WorkspaceView {
                     .child(self.console_view.clone()),
             )
             .child(toast_overlay)
+            .children(cheatsheet)
     }
 }
 
