@@ -432,7 +432,7 @@ mod tests {
             cx.draw(
                 point(px(0.0), px(0.0)),
                 size(px(900.0), px(600.0)),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
         };
 

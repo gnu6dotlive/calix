@@ -743,7 +743,7 @@ mod tests {
         cx.draw(
             point(px(0.0), px(0.0)),
             size(px(400.0), px(300.0)),
-            |_window, _cx| probe.clone(),
+            |_window, _cx| probe.clone().into_element(),
         );
 
         let displaced = cx.debug_bounds("displaced").expect("dessiné");

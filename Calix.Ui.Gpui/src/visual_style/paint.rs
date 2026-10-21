@@ -60,6 +60,7 @@ pub fn apply_surface_projection<E: Styled>(
             offset: point(px(0.0), px(paint.shadow_offset_y_px)),
             blur_radius: px(paint.shadow_blur_px),
             spread_radius: px(0.0),
+            inset: false,
             color: rgba(shadow_alpha).into(),
         }]);
     }

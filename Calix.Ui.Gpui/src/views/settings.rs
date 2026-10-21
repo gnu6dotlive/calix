@@ -745,7 +745,7 @@ impl SettingsView {
             Some(
                 deferred(
                     anchored()
-                        .anchor(Corner::TopLeft)
+                        .anchor(Anchor::TopLeft)
                         .offset(point(px(0.0), px(34.0)))
                         .snap_to_window()
                         .child(MenuSurface::render(MenuSurfaceProps {

@@ -33,6 +33,7 @@ mod tests {
                 cx.new(|_| SheetFixture {
                     theme: Theme::dark(),
                 })
+                .into_element()
             },
         );
     }

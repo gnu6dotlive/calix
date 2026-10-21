@@ -1,0 +1,48 @@
+{
+  "run_id": "gpui-0.3-port-20261021",
+  "kind": "port",
+  "status": "ok",
+  "objective": "Leave the dead branch: port the front-end from gpui 0.2.2 — frozen since 2025-10-22 — to the live line, gpui-pre 0.3.9, published nine days ago.",
+  "why": {
+    "the_branch_was_dead": "gpui 0.2.2 was last published on 2025-10-22 and has seven versions; the live line is gpui-pre, at 0.3.9 on 2026-10-12. blade-graphics moved from 0.7.1 to 0.6 under the new platform crates. Staying meant staying on a snapshot of a moving framework.",
+    "the_order": "The interaction gate came first, on purpose: a port done blind would have had no witness for the clicks, the focus and the drags. The bench is that witness, and it became the port's arbiter."
+  },
+  "the_port": {
+    "the_dependency_set": {
+      "gpui 0.2.2": "gpui-pre 0.3.9 (the library is still named `gpui`: the package was renamed, the library was not — so no import changed)",
+      "blade-graphics =0.7.1": "blade-graphics 0.6 (the GPU layer, under the platform crates)",
+      "added": "gpui-pre-platform 0.3.9, gpui-pre-linux 0.3.9 — the platform is no longer inside gpui"
+    },
+    "the_adaptations": [
+      "Application::new() → Application::with_platform(gpui_linux::current_platform(false)): the platform is explicit now",
+      "Corner → Anchor (the anchored element's corner, with more variants)",
+      "window.focus(handle) → window.focus(handle, cx); focus_next/focus_prev take the app",
+      "flex_grow() → flex_grow(1.0): the factor is an argument",
+      "track_scroll(handle) → track_scroll(&handle): the handle is borrowed",
+      "BoxShadow gained an `inset` field",
+      "gpui::Timer::after(d) → cx.background_executor().timer(d): the timer moved to the executor",
+      "the text line's paint takes the alignment and its width",
+      "an Entity is an IntoElement, not an Element: the bench's draw closures convert"
+    ],
+    "the_size": "24 errors on the first compile, 21 in the tests, 0 at the end. 44 files imported gpui and none of them changed: the library kept its name."
+  },
+  "the_finding_that_changed_the_gate": {
+    "what": "gpui 0.3 records the bounds of an element — what the visual bench measures — only under `all(debug_assertions, feature = \"test-support\")`. A release build has no debug assertions, so the measurements find nothing and the sixteen measurement tests fail.",
+    "the_consequence": "The UI tests run in the *debug* profile, and the release build is still made for the artefact it ships. This is not a preference: it is the upstream's own condition.",
+    "the_cost": "A second build tree in the gate: 65 s of tests against 102 s of release build, in the runner's container, with the caches the lockfile keys."
+  },
+  "the_result": {
+    "the_tests": "263 UI tests, green — including every measurement test, unchanged",
+    "the_layout_is_identical": "The measurements did not move by a pixel: the row's 495 px floor, the catalogue's 660 px minimum, the 165 px name cell, the bank's 100.5 px, the plate's 96 px, the 143 px p90 name — all the same. The contract's numbers are properties of the *composition*, not of gpui's version, and the port confirms it.",
+    "the_gates": "scripts/verify and scripts/ci-replay, both green, in the runner's container"
+  },
+  "the_gates": {
+    "local": "scripts/verify — PASSED on the dirty tree, run local-verify-20261021T234839Z: 1386 package-manager tests, 392 CLI tests, 263 UI tests",
+    "ci_replay": "scripts/ci-replay --worktree — PASSED inside archlinux:latest on a clean worktree, run local-verify-20261021T235200Z: 1388 package-manager tests, 392 CLI tests, 263 UI tests"
+  },
+  "the_limitations": [
+    "The port is green in the *bench*; the application has not been run on a screen since the port. The interaction gate and the measurements are the witnesses, but a human eye has not looked at the ported application.",
+    "The platform crates (gpui-pre-platform, gpui-pre-linux) are new dependencies: they are published in lockstep with gpui-pre, and the same question applies to them — they will move too.",
+    "The debug assertions of the *test* build are the price of the measurements; the shipped binary keeps its assertions off, and the release build is still made for the artefact."
+  ]
+}

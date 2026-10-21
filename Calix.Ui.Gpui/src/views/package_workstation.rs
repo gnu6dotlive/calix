@@ -426,7 +426,7 @@ impl PackageWorkstationView {
                 anim_epoch: epoch,
                 highlighted_index: 0,
             });
-            window.focus(&self.menu_surface_focus);
+            window.focus(&self.menu_surface_focus, cx);
             cx.notify();
         } else {
             self.active_menu = Some(ActiveMenuState {
@@ -435,7 +435,7 @@ impl PackageWorkstationView {
                 anim_epoch: epoch,
                 highlighted_index: 0,
             });
-            window.focus(&self.menu_surface_focus);
+            window.focus(&self.menu_surface_focus, cx);
             cx.notify();
 
             cx.spawn(async move |this, cx| {
@@ -466,8 +466,8 @@ impl PackageWorkstationView {
         }
 
         match current.menu {
-            WorkbenchMenu::State => window.focus(&self.state_btn_focus),
-            WorkbenchMenu::Sort => window.focus(&self.sort_btn_focus),
+            WorkbenchMenu::State => window.focus(&self.state_btn_focus, cx),
+            WorkbenchMenu::Sort => window.focus(&self.sort_btn_focus, cx),
         }
 
         if self.reduce_motion {
@@ -1140,7 +1140,7 @@ impl Render for PackageWorkstationView {
                             // the bounds of the list under this name. A noop
                             // outside the tests.
                             .debug_selector(|| "package_list".to_string())
-                            .track_scroll(self.scroll_handle.clone()),
+                            .track_scroll(&self.scroll_handle),
                         ),
                     )
                     .into_any_element()
@@ -1191,7 +1191,7 @@ impl Render for PackageWorkstationView {
                     }
                 })
                 .h_full()
-                .track_scroll(self.scroll_handle.clone())
+                .track_scroll(&self.scroll_handle)
                 .into_any_element()
             }
         };
@@ -1745,7 +1745,7 @@ mod tests {
             cx.draw(
                 point(px(0.), px(0.)),
                 size(px(800.), px(600.)),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
         };
         let offset = |cx: &mut gpui::VisualTestContext| {
@@ -2162,7 +2162,7 @@ mod tests {
             cx.draw(
                 point(px(0.0), px(0.0)),
                 size(window.0, window.1),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
         };
 
@@ -2361,7 +2361,7 @@ mod tests {
         cx.draw(
             point(px(0.0), px(0.0)),
             size(px(1080.0), px(700.0)),
-            |_window, _cx| fixture.clone(),
+            |_window, _cx| fixture.clone().into_element(),
         );
         let row = cx
             .debug_bounds("package_row-ripgrep")

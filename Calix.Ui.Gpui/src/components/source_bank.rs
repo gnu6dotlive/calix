@@ -144,7 +144,7 @@ impl SourceBank {
             // The aperture that carries the scope's work is wider than the
             // others: the bank has a front, and the eye has a place to land.
             .flex_basis(px(if anchor { 160.0 } else { 0.0 }))
-            .flex_grow()
+            .flex_grow(1.0)
             .px_3()
             .py_2()
             .border_b_2()
@@ -409,7 +409,7 @@ mod tests {
             cx.draw(
                 point(px(0.0), px(0.0)),
                 size(px(1080.0), px(200.0)),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
         };
 
@@ -494,7 +494,7 @@ mod tests {
             cx.draw(
                 point(px(0.0), px(0.0)),
                 size(px(1080.0), px(200.0)),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
             let bounds = cx
                 .debug_bounds(aperture_selector(entry.kind))

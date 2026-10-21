@@ -157,7 +157,7 @@ impl QueryWorkbench {
                 Some(
                     deferred(
                         anchored()
-                            .anchor(Corner::TopLeft)
+                            .anchor(Anchor::TopLeft)
                             .offset(point(px(0.0), px(30.0)))
                             .snap_to_window()
                             .child(MenuSurface::render(MenuSurfaceProps {
@@ -319,7 +319,7 @@ impl QueryWorkbench {
             Some(
                 deferred(
                     anchored()
-                        .anchor(Corner::TopLeft)
+                        .anchor(Anchor::TopLeft)
                         .offset(point(px(0.0), px(30.0)))
                         .snap_to_window()
                         .child(MenuSurface::render(MenuSurfaceProps {
@@ -610,7 +610,7 @@ mod tests {
             cx.draw(
                 point(px(0.0), px(0.0)),
                 size(px(width), px(120.0)),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
             let state = cx
                 .debug_bounds("workbench_state_btn")

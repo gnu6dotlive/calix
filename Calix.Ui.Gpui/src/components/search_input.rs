@@ -100,8 +100,8 @@ impl SearchInputView {
         cx.notify();
     }
 
-    pub fn focus(&self, window: &mut Window) {
-        window.focus(&self.focus_handle);
+    pub fn focus(&self, window: &mut Window, cx: &mut App) {
+        window.focus(&self.focus_handle, cx);
     }
 
     pub fn is_focused(&self, window: &Window) -> bool {
@@ -240,7 +240,7 @@ impl SearchInputView {
 
     pub fn clear_and_focus(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         self.clear_internal();
-        self.focus(window);
+        self.focus(window, cx);
         cx.emit(SearchEvent::Cleared);
         cx.emit(SearchEvent::Changed(String::new()));
         cx.notify();
@@ -303,7 +303,7 @@ impl SearchInputView {
 
     fn escape(&mut self, _: &Escape, window: &mut Window, cx: &mut Context<Self>) {
         self.clear_internal();
-        self.focus(window);
+        self.focus(window, cx);
         cx.emit(SearchEvent::Cleared);
         cx.emit(SearchEvent::Changed(String::new()));
         cx.notify();
@@ -351,7 +351,7 @@ impl SearchInputView {
         window: &mut Window,
         cx: &mut Context<Self>,
     ) {
-        self.focus(window);
+        self.focus(window, cx);
         self.is_selecting = true;
         let idx = self.index_for_mouse_position(event.position);
         if event.modifiers.shift {
@@ -684,7 +684,14 @@ impl Element for SearchInputElement {
             window.paint_quad(selection);
         }
         let line = prepaint.line.take().unwrap();
-        let _ = line.paint(bounds.origin, window.line_height(), window, cx);
+        let _ = line.paint(
+            bounds.origin,
+            window.line_height(),
+            gpui::TextAlign::Left,
+            None,
+            window,
+            cx,
+        );
 
         if focus_handle.is_focused(window) {
             if let Some(cursor) = prepaint.cursor.take() {
@@ -846,13 +853,13 @@ impl Render for SearchInputView {
             .on_mouse_up(MouseButton::Left, cx.listener(Self::on_mouse_up))
             .on_mouse_up_out(MouseButton::Left, cx.listener(Self::on_mouse_up))
             .on_mouse_move(cx.listener(Self::on_mouse_move))
-            .on_key_down(cx.listener(|_this, event: &KeyDownEvent, window, _cx| {
+            .on_key_down(cx.listener(|_this, event: &KeyDownEvent, window, cx| {
                 let key = event.keystroke.key.as_str();
                 if key == "tab" {
                     if event.keystroke.modifiers.shift {
-                        window.focus_prev();
+                        window.focus_prev(cx);
                     } else {
-                        window.focus_next();
+                        window.focus_next(cx);
                     }
                 }
             }))

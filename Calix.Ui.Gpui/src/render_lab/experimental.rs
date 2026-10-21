@@ -94,7 +94,6 @@ fn render_shader_once() -> Result<ShaderProbeOutput, String> {
         sample_count: 1,
         dimension: TextureDimension::D2,
         usage: TextureUsage::TARGET | TextureUsage::COPY,
-        external: None,
     });
     let subresources = TextureSubresources {
         base_mip_level: 0,
