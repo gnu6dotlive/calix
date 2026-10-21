@@ -38,6 +38,56 @@ pub fn scope_angle(scope: NavScope) -> f32 {
     }
 }
 
+/// The geometry of the dial, in page units.
+///
+/// The dial is mounted beside the scope's name, in the header: the name is its
+/// label, so it carries none of its own, and it fits in a band without
+/// hollowing it out above and below.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct DialGeometry {
+    pub width: f32,
+    pub height: f32,
+    pub face: f32,
+    pub face_top: f32,
+    pub radius: f32,
+    pub detent: f32,
+    pub icon: f32,
+    pub hub: f32,
+}
+
+impl DialGeometry {
+    pub const fn new() -> Self {
+        Self {
+            width: 72.0,
+            height: 72.0,
+            face: 56.0,
+            face_top: 12.0,
+            radius: 31.0,
+            detent: 16.0,
+            icon: 10.0,
+            hub: 6.0,
+        }
+    }
+
+    pub fn centre_x(&self) -> f32 {
+        self.width / 2.0
+    }
+
+    pub fn centre_y(&self) -> f32 {
+        self.face_top + self.face / 2.0
+    }
+
+    pub fn face_left(&self) -> f32 {
+        (self.width - self.face) / 2.0
+    }
+}
+
+impl Default for DialGeometry {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// The dial: the entity that holds the needle's angle.
 pub struct ScopeDialView {
     scope: NavScope,
@@ -109,15 +159,16 @@ impl Render for ScopeDialView {
         let theme = self.theme;
         let angle = self.needle.current;
         let selected = self.scope;
+        let g = DialGeometry::new();
 
         // The face: a machined disc, standing proud of the plate. It sits
         // low in its box, so that the arc above it has room.
         let face = div()
             .id("scope_dial_face")
             .absolute()
-            .left(px(10.0))
-            .top(px(30.0))
-            .size(px(76.0))
+            .left(px(g.face_left()))
+            .top(px(g.face_top))
+            .size(px(g.face))
             .rounded_full()
             .bg(theme.bg_surface)
             .border_1()
@@ -135,7 +186,7 @@ impl Render for ScopeDialView {
                     .child(
                         svg()
                             .path(AppIcon::DialNeedle.path())
-                            .size(px(44.0))
+                            .size(px(g.face))
                             .text_color(theme.accent)
                             .with_transformation(Transformation::rotate(
                                 gpui::radians(angle.to_radians()),
@@ -146,11 +197,11 @@ impl Render for ScopeDialView {
                 // The hub: the needle's pivot.
                 div()
                     .absolute()
-                    .size(px(8.0))
+                    .size(px(g.hub))
                     .rounded_full()
                     .bg(theme.accent)
-                    .top(px(34.0))
-                    .left(px(34.0)),
+                    .top(px(g.centre_y() - g.hub / 2.0))
+                    .left(px(g.centre_x() - g.hub / 2.0)),
             );
 
         // The detents: three marks on the upper arc, each carrying the sign
@@ -160,9 +211,9 @@ impl Render for ScopeDialView {
         for scope in NavScope::ALL {
             let scope_angle = scope_angle(*scope);
             let radians = scope_angle.to_radians();
-            let radius = 42.0_f32;
-            let x = 48.0 + radius * radians.sin();
-            let y = 68.0 - radius * radians.cos();
+            let radius = g.radius;
+            let x = g.centre_x() + radius * radians.sin();
+            let y = g.centre_y() - radius * radians.cos();
             let is_selected = *scope == selected;
             let on_select = self.on_select.clone();
             let entity = cx.entity();
@@ -170,10 +221,10 @@ impl Render for ScopeDialView {
                 div()
                     .id(detent_id(*scope))
                     .absolute()
-                    .left(px(x - 10.0))
-                    .top(px(y - 10.0))
-                    .w(px(20.0))
-                    .h(px(20.0))
+                    .left(px(x - g.detent / 2.0))
+                    .top(px(y - g.detent / 2.0))
+                    .w(px(g.detent))
+                    .h(px(g.detent))
                     .flex()
                     .items_center()
                     .justify_center()
@@ -216,7 +267,7 @@ impl Render for ScopeDialView {
                     .child(
                         svg()
                             .path(scope.icon().path())
-                            .size(px(13.0))
+                            .size(px(g.icon))
                             .text_color(if is_selected {
                                 theme.accent
                             } else {
@@ -229,24 +280,11 @@ impl Render for ScopeDialView {
         div()
             .id("scope_dial")
             .relative()
-            .w(px(96.0))
-            .h(px(124.0))
+            .w(px(g.width))
+            .h(px(g.height))
             .flex_shrink_0()
             .child(face)
             .children(detents)
-            .child(
-                // The name of the scope the needle is on.
-                div()
-                    .absolute()
-                    .left(px(0.0))
-                    .top(px(108.0))
-                    .w(px(96.0))
-                    .text_xs()
-                    .text_align(TextAlign::Center)
-                    .font_weight(FontWeight::BOLD)
-                    .text_color(theme.accent)
-                    .child(selected.label()),
-            )
     }
 }
 

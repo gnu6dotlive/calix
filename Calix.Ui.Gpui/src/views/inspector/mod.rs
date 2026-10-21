@@ -7,13 +7,26 @@ use crate::components::inspector_header::{
     InspectorHeader, InspectorHeaderProps, TabSelectHandler, WindowActionHandler,
 };
 use crate::components::semantic_value::StringActionHandler;
-use crate::icons::AppIcon;
 use crate::state::{AlsoIn, InspectorTab, PackageCapabilities};
 use crate::theme::Theme;
 use crate::views::inspector::dependencies::{DependenciesView, DependenciesViewProps};
 use crate::views::inspector::files_build::{FilesBuildView, FilesBuildViewProps};
 use crate::views::inspector::overview::{OverviewView, OverviewViewProps};
 use gpui::*;
+
+/// La plaque au repos : ce que la plaque de nom inscrit quand rien n'est
+/// sélectionné.
+///
+/// Elle n'est pas un message d'attente. Une plaque qui s'excuse au centre
+/// d'un vide se lit comme un panneau qui n'a pas chargé ; une inscription à
+/// gauche, avec du vide au-dessous, se lit comme une plaque. Le sujet est le
+/// canal que la banque met en avant, et le détail dit ce qu'il porte.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct QuietPlate {
+    pub heading: &'static str,
+    pub subject: String,
+    pub detail: String,
+}
 
 pub struct PackageInspectorProps<'a> {
     pub package: Option<&'a UnifiedPackage>,
@@ -27,6 +40,8 @@ pub struct PackageInspectorProps<'a> {
     pub theme: &'a Theme,
     pub is_busy: bool,
     pub copy_feedback: bool,
+    /// Ce que la plaque inscrit quand aucun paquet n'est ouvert.
+    pub quiet: QuietPlate,
     pub on_select_tab: TabSelectHandler,
     pub on_install: Option<WindowActionHandler>,
     pub on_remove: Option<WindowActionHandler>,
@@ -47,34 +62,49 @@ impl PackageInspectorView {
         let theme = props.theme;
 
         let Some(pkg) = props.package else {
+            let quiet = props.quiet;
             return div()
-                .id("empty_inspector")
+                .id("quiet_nameplate")
                 .flex()
                 .flex_col()
-                .items_center()
-                .justify_center()
-                .gap_3()
+                .items_start()
+                .justify_between()
                 .size_full()
-                .p_6()
+                .px(px(24.0))
+                .py(px(20.0))
                 .bg(theme.bg_app)
                 .child(
-                    svg()
-                        .path(AppIcon::PackageGeneric.path())
-                        .size(px(40.0))
-                        .text_color(theme.text_muted),
-                )
-                .child(
                     div()
-                        .text_sm()
-                        .font_weight(FontWeight::SEMIBOLD)
-                        .text_color(theme.text_primary)
-                        .child("No Package Selected"),
+                        .flex()
+                        .flex_col()
+                        .gap(px(5.0))
+                        .child(
+                            div()
+                                .text_xs()
+                                .text_color(theme.text_muted)
+                                .child(quiet.heading),
+                        )
+                        .child(
+                            div()
+                                .text_lg()
+                                .font_weight(FontWeight::BOLD)
+                                .text_color(theme.text_primary)
+                                .child(quiet.subject),
+                        )
+                        .child(
+                            div()
+                                .text_xs()
+                                .text_color(theme.text_secondary)
+                                .child(quiet.detail),
+                        ),
                 )
+                // La seule phrase qui enseigne le geste, au bas de la plaque,
+                // là où une légende se tient.
                 .child(
                     div()
                         .text_xs()
                         .text_color(theme.text_muted)
-                        .child("Select a package from the results to inspect its details, dependencies, and files."),
+                        .child("Select a row above and it opens here."),
                 )
                 .into_any_element();
         };
@@ -244,6 +274,11 @@ mod tests {
             theme: &theme,
             is_busy: false,
             copy_feedback: false,
+            quiet: QuietPlate {
+                heading: "THE BANK",
+                subject: "Official / ALPM".to_string(),
+                detail: "official repositories — binaries · 1914 rows in this scope".to_string(),
+            },
             on_select_tab: on_tab.clone(),
             on_install: None,
             on_remove: None,
@@ -278,6 +313,13 @@ mod tests {
             theme: &theme,
             is_busy: false,
             copy_feedback: false,
+            // La plaque au repos n'est pas rendue quand un paquet est ouvert,
+            // mais la charge est toujours fournie : une seule forme de props.
+            quiet: QuietPlate {
+                heading: "THE BANK",
+                subject: "Official / ALPM".to_string(),
+                detail: String::new(),
+            },
             on_select_tab: on_tab,
             on_install: None,
             on_remove: None,

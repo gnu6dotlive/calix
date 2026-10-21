@@ -22,6 +22,11 @@ only until the next change.
 | A16 | The state where there is no table yet is a screen, not an empty table | the discovery screen (the scope, the four searchable sources, how to use it) replaces the readout entirely, and the ruler goes with it — a header over columns that do not exist would be a lie | **done**, by the eye |
 | A13 | The value that changes re-reads and flashes once | the count in the bank flashes once when it changes | **done**, by the eye |
 | A14 | The curves are tokens, not formulas | `state/motion.rs`: three named Bézier curves ✗ — out ✗, in-out ✗, spring ✗ — evaluated by Newton-Raphson ✗, and the application invents no others ✗ | **done**: `the_curves_are_tokens_and_they_behave` ✗ |
+| A17 | The selection is a carrier: a bar that travels from the row it marked to the row chosen, and keeps its departure through the repaints the voyage crosses | `the_carrier_leaves_from_the_line_it_occupied`, `a_repaint_does_not_throw_the_carrier_at_its_destination`, `the_carrier_sits_on_the_line_it_marks`; seen at 1080 × 935: the bar crossing two rows between the frames taken at 80 ms and 107 ms | **done** |
+| A18 | The scope enters from the side the dial turned | `the_scope_dirties_the_side_of_the_cut`, `the_cut_lands_where_it_was_aimed`; seen: the readout 35 px off its seat on the first frame after the change, at rest by the fourth | **done** |
+| A19 | The nameplate enters with the selection | `PLATE_ENTRY`, `PLATE_ENTRY_TRAVEL`; seen: the name's top at 673, then 652, then 651, over 80 ms | **done** |
+| A20 | An entry is a displacement, not a fade — and it moves | `left`/`top` on a flow child is ignored by this version of gpui: a probe of 240 px over two seconds moved nothing. Every animated surface is therefore laid out absolutely inside its band, and the offset is applied there; a layer of opacity around the virtualised readout is refused, because it dims the whole window | **done**: the probe, then the frames after it |
+| A21 | The bank has a front: the anchor carries its full name and what it holds, the narrow apertures carry their short name, and the seven counts share a line | `anchor_index` (ties go to the first), `the_stores_come_before_the_installation_methods`; the short names are `PackageSourceKind::short_label` | **done**, by the eye |
 
 ## The reference
 
@@ -41,6 +46,9 @@ the application now, and what it does:
 |---|---|---|---|
 | The bank's arrival | the seven apertures come in as a wave: they overlap, the gaps shrink, and the anchors travel further and longer | the waterfall entry | `the_cascade_overlaps_and_its_gaps_shrink` |
 | The needle's throw | the needle passes its detent and comes back | the overshoot | `the_overshoot_passes_the_target_and_comes_back` |
+| The scope's change | the readout is a cut: the new scope's content lands displaced from the side the dial turned, and closes the distance | the cut, positional | `the_cut_lands_where_it_was_aimed`, `the_scope_dirties_the_side_of_the_cut`; the frames at 1080 × 935 |
+| The selection's move | the carrier leaves the row it marked and travels to the row chosen | the travelling marker | `the_carrier_leaves_from_the_line_it_occupied`, `a_repaint_does_not_throw_the_carrier_at_its_destination`, `the_carrier_sits_on_the_line_it_marks`; the frames |
+| The plate's arrival | the nameplate's content lands 22 px low and rises into its band | the cut, positional | the frames |
 | The panel's switch | the outgoing panel accelerates, the cut lands mid-motion, the incoming panel continues in the same direction and decelerates, and it ignites at 35 % instead of fading in | the cut on the curve | `the_cut_entry_ignites_mid_path_and_keeps_the_direction` |
 | A value that changes | the count re-reads and flashes once; it does not glide into place | the instrument's readout | the eye |
 | The list's scroll | a wheel notch is a movement, not a jump | the eased hand | `the_wheel_moves_the_list_by_steps` |
@@ -50,24 +58,24 @@ the bank's arrival, and leaves the scroll as it is.
 
 ## The gaps of this run
 
-- The bank's apertures are seven equal cells. On a narrow window the note
-  under the name is cut rather than wrapped: the band stays a band, and the
-  note is the first thing to lose its room.
-- The nameplate's empty state is centred in a wide band. The Instrument's
-  empty nameplate names the channel instead of a package; this one says
-  *No Package Selected* and centres it.
-- The tape is the drawer as it was. It shows the backend's output; it does
-  not yet put the product's own command on the line above the backend's
-  actual run.
-- The readout is the list, measured but not yet recessed: the Instrument's
-  readout is a recess cut into the plate, ruled, with the grid visible. The
-  measurement is there, the recess is not.
+- A8 is open: the filters menu still offers the sources, bound to the same
+  selection. The bank is meant to be the only source control, and until the
+  menu gives them up the two axes share one.
+- The inspector's tab body still animates its opacity only. Its `left` offset
+  falls on a flow child, where this version of gpui ignores it, so the fade
+  carries the change alone.
+- The carrier's geometry inside the virtualised list is proved by the rule
+  (`carrier_top`) and by the frames, not by a test that lays the list out: a
+  `uniform_list` does not resolve its layout in the test harness.
+- The synthetic keyboard of this machine never reaches the client, so A7's
+  three-second gesture is still unproven by hand. The keys that were checked
+  were checked with the pointer.
 - The measurement's scale is logarithmic, and the header says so. A linear
   scale would bury every small package under a sliver, and the sizes span
   orders of magnitude.
 - The recess's ground is darker than the plate's by five points out of 255 —
   the same subtlety as the Instrument's mock, where the inset is a hairline
   and a shade, not a hole.
-- The nameplate's empty state is centred in a wide band, where the
-  Instrument's names the channel. The application's says *No Package Selected*,
-  which is honest about the selection but says nothing about the scope.
+- Below about a thousand pixels the seven apertures crowd. The anchor keeps
+  its extra basis, the short names hold, and the note under the anchor is the
+  first thing to lose its room.

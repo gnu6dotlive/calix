@@ -236,6 +236,21 @@ pub fn source_axis(
         .collect()
 }
 
+/// L'ancre de la banque : le canal qui porte le plus de lignes du périmètre.
+///
+/// La banque a un devant. À égalité, le premier l'emporte — au repos, quand
+/// toutes les sources sont vides, la banque montre la même face, au lieu de
+/// changer d'ancre au gré de l'ordre de l'inventaire.
+pub fn anchor_index(axis: &[SourceAxisEntry]) -> usize {
+    let mut best = 0;
+    for (index, entry) in axis.iter().enumerate() {
+        if entry.count > axis[best].count {
+            best = index;
+        }
+    }
+    best
+}
+
 /// The same package, in another source.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AlsoIn {
@@ -421,6 +436,32 @@ mod tests {
             .find(|entry| entry.kind == PackageSourceKind::Alpm)
             .expect("ALPM is offered");
         assert!(alpm.selected);
+    }
+
+    #[test]
+    fn the_bank_is_anchored_on_the_channel_that_carries_the_most() {
+        let packages = vec![
+            alpm("ripgrep", "14.1.0"),
+            alpm("fd", "9.0.0"),
+            from_source("ripgrep", "AUR", "14.1.0-1"),
+        ];
+        let axis = source_axis(NavScope::Results, &packages, &SourceScope::all());
+        let anchor = &axis[anchor_index(&axis)];
+        assert_eq!(anchor.kind, PackageSourceKind::Alpm);
+        assert_eq!(anchor.count, 2);
+
+        // À égalité, le premier l'emporte : la banque ne change pas de face
+        // quand deux canaux portent autant.
+        let tie = vec![
+            alpm("ripgrep", "14.1.0"),
+            from_source("ripgrep", "AUR", "14.1.0-1"),
+        ];
+        let axis = source_axis(NavScope::Results, &tie, &SourceScope::all());
+        assert_eq!(axis[anchor_index(&axis)].kind, PackageSourceKind::Alpm);
+
+        // Au repos, la banque garde la même ancre.
+        let axis = source_axis(NavScope::Results, &[], &SourceScope::all());
+        assert_eq!(axis[anchor_index(&axis)].kind, PackageSourceKind::Alpm);
     }
 
     #[test]

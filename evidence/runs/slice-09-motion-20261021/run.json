@@ -1,0 +1,44 @@
+{
+  "run_id": "slice-09-motion-20261021",
+  "kind": "implementation",
+  "status": "ok",
+  "objective": "Answer \u00ab tr\u00e8s statique \u00bb: the plate moves. A selection is a carrier that travels, a scope change is a cut that lands from the side the dial turned, and the nameplate enters with the selection.",
+  "the_mechanisms": {
+    "the_carrier": "the selection mark is a bar, not a row highlight. It leaves the line it occupied and travels to the line chosen on the application's own out-curve, keeping its departure through every repaint the voyage crosses. The selected row's accent underline and its left border were removed: one mark only.",
+    "the_scope_cut": "the readout is a cut, not a fade. On a scope change the recess lands displaced from the side the dial turned (44 px) and closes the distance over 280 ms. No opacity layer is placed around the virtualised list: it dims the whole window, and a fade is not a cut.",
+    "the_plate_entry": "the nameplate's content lands 22 px low and rises into its band over 220 ms. It is a displacement, not a fade.",
+    "the_banks_front": "the bank has a front now: the anchor carries its full name, what it holds and its count; the narrow apertures carry their short name (AppImage, Tracked), and the seven counts share one line so they can be compared at a glance.",
+    "the_quiet_plate": "with nothing selected the nameplate names the bank instead of centring \u00ab No Package Selected \u00bb in a wide band."
+  },
+  "what_was_proved": {
+    "the_offset_that_moves_nothing": "in this version of gpui an inset on a flow child is ignored: a probe of 240 px over two seconds slid an absolutely positioned child and left a flow child exactly where it was. Every animated surface is therefore laid out absolutely inside a band that carries the real geometry.",
+    "the_scope_entry_seen": "at 1080 \u00d7 935, the readout is ~35 px off its seat on the first captured frame after the change and back on it by the fourth (frames 76\u2013146 ms after the click).",
+    "the_plate_entry_seen": "the name's top at 673, then 652, then 651 \u2014 22 px of travel closed in ~80 ms.",
+    "the_carrier_seen": "the bar at 470..505 at 80 ms and at 368..403 at 107 ms while leaving the seventh row for the first, settling pixel-aligned on its row.",
+    "the_name_that_collapsed": "under the absolute wrapper the package name disappeared: a flex child with ellipsis and no basis resolved to zero width. `.flex_1().min_w_0()` restores it, and the version stays pinned to the right.",
+    "the_tab_body_is_safe": "switching to Dependencies leaves the window's header mean exactly unchanged (34.1, 34.3, 45.6 before and after): the inspector's opacity cut does not dim the application."
+  },
+  "the_artefacts": [
+    {"path": "Calix.Ui.Gpui/src/state/motion.rs", "what": "cut_travel, carrier_travel, SCOPE_ENTRY and PLATE_ENTRY durations, and their tests"},
+    {"path": "Calix.Ui.Gpui/src/views/package_workstation.rs", "what": "the marker and its epoch, the readout's recess, the nameplate's entry, the pure rules advance_marker, carrier_top, scope_order"},
+    {"path": "Calix.Ui.Gpui/src/components/package_table.rs", "what": "the neutral row: background only for the selection, one mark"},
+    {"path": "Calix.Ui.Gpui/src/components/source_bank.rs", "what": "the anchor's full name, the short names, the counts on one line"},
+    {"path": "Calix.Ui.Gpui/src/components/inspector_header.rs", "what": "the name takes the remaining room"},
+    {"path": "Calix.Ui.Gpui/src/views/inspector/mod.rs", "what": "the quiet plate"},
+    {"path": "docs/gpui/slice-09/05-ACCEPTANCE-MATRIX.md", "what": "A17\u2013A21, the motion table, and the gaps that are still true"}
+  ],
+  "the_gates": {
+    "local": "scripts/verify \u2014 PASSED, run local-verify-20261021T055750Z, 1386 package-manager tests, 235 UI tests",
+    "ci_replay": "scripts/ci-replay --worktree \u2014 PASSED inside archlinux:latest on a clean checkout, run local-verify-20261021T060013Z, 1388 package-manager tests, 235 UI tests"
+  },
+  "the_environment": {
+    "a_red_gate_that_was_not_the_code": "the first run of this pass failed 79 package-manager tests, all of them in SyncTestWorkspace, which writes to /tmp/calix-alpm-test-*. /tmp was 100 % full: an orphaned pw-cat, eleven hours old, was still writing to a deleted /tmp/opencode/cap.wav and held 7.8 GB of unlinked inodes. Releasing it returned /tmp to 7.3 GB free and the suite to 1386 passing.",
+    "the_rule_it_teaches": "a suite that fails en masse in its filesystem tests is a machine, not a commit, until the filesystem says otherwise."
+  },
+  "the_gaps": [
+    "A8 is open: the filters menu still offers the sources, bound to the same selection, while the bank is meant to be the only source control",
+    "the inspector's tab body still animates its opacity only; its `left` offset falls on a flow child and moves nothing",
+    "the carrier's geometry inside the virtualised list is proved by the pure rule and by the frames, not by a test that lays the list out",
+    "the synthetic keyboard of this machine never reaches the client, so the three-second help gesture remains unproven by hand"
+  ]
+}

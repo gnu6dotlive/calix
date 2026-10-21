@@ -216,11 +216,10 @@ impl PackageTable {
             gpui::rgba(0x00000000)
         };
 
-        let border_color = if is_selected {
-            theme.border_focus
-        } else {
-            theme.border
-        };
+        // La sélection est marquée une fois : par la barre du porteur, que le
+        // renfoncement pose sur la ligne. La règle de la ligne reste la règle
+        // du tableau.
+        let border_color = theme.border;
 
         let row_height = if compact {
             UiMetrics::ROW_HEIGHT_COMPACT
@@ -259,7 +258,6 @@ impl PackageTable {
             .bg(bg_color)
             .cursor_pointer()
             .overflow_hidden()
-            .when(is_selected, |el| el.border_l_4().border_color(theme.accent))
             .when(!is_selected, |el| {
                 let hover_bg = theme.bg_surface_hover;
                 el.hover(move |s| s.bg(hover_bg))

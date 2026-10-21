@@ -2580,6 +2580,14 @@ impl Render for WorkspaceView {
                     cx.notify();
                 });
             })),
+            dial: (header_place == Place::Packages)
+                .then(|| {
+                    self.workstation
+                        .read(cx)
+                        .scope_dial
+                        .clone()
+                        .into_any_element()
+                }),
             on_clear_filters: Rc::new(move |_w, cx| {
                 entity_clear.update(cx, |s, cx| {
                     s.clear_filters(aur_enabled, flatpak_enabled, appimage_enabled, cx);

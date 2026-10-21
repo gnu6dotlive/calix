@@ -3,7 +3,6 @@ use crate::components::menu::{
     MenuKeyHandler, MenuLifecycle, MenuSection, MenuSurface, MenuSurfaceProps,
 };
 use crate::components::search_input::SearchInputView;
-use crate::components::scope_dial::ScopeDialView;
 use crate::components::view_mode_switcher::{ViewModeSwitcher, ViewModeSwitcherProps};
 use crate::state::package_store::{SourceHealthMap, SourceHealthStatus};
 use crate::state::query::{PackageStateFilter, SortMode, SourceScope, WorkbenchBreakpoint};
@@ -43,7 +42,6 @@ pub type ActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 pub struct QueryWorkbenchProps<'a> {
     pub search_input: Entity<SearchInputView>,
     /// The dial of the scope: one object with three positions.
-    pub scope_dial: Entity<ScopeDialView>,
     pub list_pane_width: f32,
     /// Le périmètre : il décide de ce que le contrôle des sources et de l'état
     /// proposent.
@@ -676,13 +674,12 @@ impl QueryWorkbench {
             })
             .children(sort_dropdown);
 
-        // ── 5. Le cadran du périmètre, et le commutateur de vue ─────────────
+        // ── 5. Le commutateur de vue ─────────────────────────────────────────
         //
-        // Le cadran est un objet d'une autre nature que la banque : il a ses
-        // propres positions, son propre geste et son propre mouvement. Les
-        // deux axes ne se ressemblent pas, et ne se partagent pas un contrôle.
-        let scope_dial = props.scope_dial.clone();
-
+        // Le cadran a quitté le bandeau : un objet de la taille d'un cadran
+        // ne peut pas tenir dans une rangée d'outils sans creuser un vide
+        // au-dessus et au-dessous. Il est monté dans l'en-tête, à côté du
+        // nom du périmètre, qui est son étiquette.
         let view_switcher = ViewModeSwitcher::render(ViewModeSwitcherProps {
             current_mode: props.view_mode,
             theme,
@@ -720,28 +717,18 @@ impl QueryWorkbench {
                 div()
                     .flex()
                     .items_center()
-                    .gap(px(4.0))
-                    .child(filters_trigger),
+                    .gap(px(10.0))
+                    .child(filters_trigger)
+                    .children(state_btn)
+                    .child(sort_btn),
             )
             .child(
                 div()
                     .flex()
                     .items_center()
-                    .gap(px(4.0))
-                    .children(state_btn)
-                    .child(sort_btn)
+                    .gap(px(10.0))
                     .child(view_switcher)
                     .children(scope_action),
-            )
-            .child(
-                // Le cadran, à sa place : un objet seul, dans son coin, qui
-                // ne ressemble à rien d'autre sur la plaque.
-                div()
-                    .flex()
-                    .items_center()
-                    .justify_end()
-                    .w_full()
-                    .child(scope_dial.clone()),
             );
 
 

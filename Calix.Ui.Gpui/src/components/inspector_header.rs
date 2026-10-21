@@ -185,10 +185,15 @@ impl InspectorHeader {
                     .justify_between()
                     .gap_2()
                     .child(
+                        // Le nom prend la place qui reste et cède le pas à la
+                        // version : sans une base de flex, un nom long n'a pas
+                        // de largeur à lui et l'ellipse le réduit à rien.
                         div()
                             .text_base()
                             .font_weight(FontWeight::BOLD)
                             .text_color(theme.text_primary)
+                            .flex_1()
+                            .min_w_0()
                             .overflow_hidden()
                             .text_ellipsis()
                             .child(pkg.name.clone()),

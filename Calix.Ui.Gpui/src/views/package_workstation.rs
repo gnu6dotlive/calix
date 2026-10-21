@@ -17,7 +17,7 @@ use crate::state::{
 };
 use crate::theme::Theme;
 use crate::ui_metrics::UiMetrics;
-use crate::views::inspector::{PackageInspectorProps, PackageInspectorView};
+use crate::views::inspector::{PackageInspectorProps, PackageInspectorView, QuietPlate};
 use crate::visual_style::VisualStyleId;
 use gpui::prelude::FluentBuilder;
 use gpui::*;
@@ -66,9 +66,6 @@ pub fn nameplate_height_after_drag(
     nameplate_height(content_height, drag_start_height - delta_y)
 }
 
-/// Calcul pur et robuste de la largeur du panneau dérivé des deltas de pointeur
-/// Garantit les invariants stricts du contrat UX :
-/// Bornes légales strictes de la largeur de liste dans le domaine horizontal
 /// La largeur de la zone de contenu : la largeur *mappée* de la fenêtre, moins le rail.
 ///
 /// La largeur que l'application a *demandée* (`window.window_bounds()`) n'est pas
@@ -126,6 +123,73 @@ pub fn scroll_step(pending: f32) -> (f32, f32) {
     }
 }
 
+/// La barre du porteur : la sélection est un objet qui voyage d'une ligne à
+/// l'autre.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SelectionMarker {
+    /// La ligne où la barre se pose.
+    pub index: usize,
+    /// La ligne d'où elle part, quand elle vient de quelque part.
+    pub from: Option<usize>,
+    /// Le numéro du voyage : il change à chaque sélection, et l'animation
+    /// recommence.
+    pub epoch: usize,
+}
+
+/// Le porteur après un changement de sélection.
+///
+/// Rien ne bouge quand la sélection ne change pas : la barre reste où elle
+/// est, et l'animation ne recommence pas à chaque rendu. Le porteur garde
+/// alors sa ligne de départ : un rendu au milieu du voyage — la fiche qui
+/// arrive, un survol — ne doit pas poser la barre d'un coup sur sa
+/// destination. Un premier choix n'a pas de ligne de départ : la barre
+/// s'allume sur place.
+pub fn advance_marker(
+    previous: Option<SelectionMarker>,
+    selected: Option<usize>,
+) -> (Option<SelectionMarker>, usize) {
+    let previous_epoch = previous.map(|marker| marker.epoch).unwrap_or(0);
+    match (previous, selected) {
+        (None, None) => (None, previous_epoch),
+        (Some(marker), Some(next)) if marker.index == next => (Some(marker), marker.epoch),
+        (previous, selected) => {
+            let epoch = previous_epoch + 1;
+            let marker = selected.map(|index| SelectionMarker {
+                index,
+                from: previous.map(|marker| marker.index),
+                epoch,
+            });
+            (marker, epoch)
+        }
+    }
+}
+
+/// La position du porteur dans le renfoncement : le haut de la liste, puis la
+/// ligne, moins ce que la liste a défilé.
+///
+/// La ligne peut être fractionnaire : la barre voyage entre deux lignes.
+pub fn carrier_top(header_height: f32, row_height: f32, row: f32, scroll_y: f32) -> f32 {
+    header_height + row * row_height - scroll_y
+}
+
+/// L'ordre des périmètres sur le cadran : la gauche, le haut, la droite. Le
+/// sens du changement décide du côté par lequel l'entrée arrive.
+pub fn scope_order(scope: NavScope) -> i32 {
+    match scope {
+        NavScope::Results => 0,
+        NavScope::Installed => 1,
+        NavScope::Updates => 2,
+    }
+}
+
+/// Le voyage de l'entrée du périmètre, en pixels. La courbe de sortie dépense
+/// l'essentiel de sa course au début : la surface doit donc parcourir une part
+/// de sa propre largeur pour que le mouvement se voie.
+pub const SCOPE_ENTRY_TRAVEL: f32 = 44.0;
+
+/// Le voyage de l'entrée de la plaque, en pixels.
+pub const PLATE_ENTRY_TRAVEL: f32 = 22.0;
+
 pub struct PackageWorkstationView {
     pub session: Entity<AppSession>,
     pub store: Entity<PackageStore>,
@@ -141,6 +205,16 @@ pub struct PackageWorkstationView {
     /// keep the distance here, and give it back eased, frame by frame: a notch
     /// becomes a movement, not a step.
     pub scroll_pending: f32,
+    /// La sélection est un objet qui voyage : la barre du porteur glisse d'une
+    /// ligne à l'autre au lieu de sauter.
+    pub marker: Option<SelectionMarker>,
+    /// Le numéro du dernier changement de sélection : la plaque de nom entre
+    /// avec la sélection, pas à chaque rendu.
+    pub selection_epoch: usize,
+    /// Le périmètre précédent : il donne la direction de l'entrée.
+    pub last_scope: NavScope,
+    pub scope_epoch: usize,
+    pub scope_direction: f32,
     pub on_mutation: Option<PackageMutationHandler>,
     pub on_upgrade_all: Option<SystemUpgradeHandler>,
     pub on_retry_source: Option<SourceRetryHandler>,
@@ -271,6 +345,11 @@ impl PackageWorkstationView {
             flatpak_enabled: config.flatpak_enabled,
             appimage_enabled: config.appimage_enabled,
             search_input,
+            marker: None,
+            selection_epoch: 0,
+            last_scope: initial_scope,
+            scope_epoch: 0,
+            scope_direction: 1.0,
             scope_dial,
             _scope_dial_sub: dial_subscription,
             active_menu: None,
@@ -691,6 +770,19 @@ impl Render for PackageWorkstationView {
             )
         };
 
+        // Le périmètre a-t-il changé ? Le sens du changement donne la
+        // direction de l'entrée : on ne coupe pas du même côté quand on
+        // tourne le cadran vers la gauche ou vers la droite.
+        if self.last_scope != scope {
+            self.scope_direction = if scope_order(scope) >= scope_order(self.last_scope) {
+                1.0
+            } else {
+                -1.0
+            };
+            self.last_scope = scope;
+            self.scope_epoch += 1;
+        }
+
         let (source_scope, state_filter, sort_mode) = {
             let s = self.session.read(cx);
             (s.source_scope, s.state_filter, s.sort_mode)
@@ -736,6 +828,15 @@ impl Render for PackageWorkstationView {
         let selected_pkg = selected_key
             .as_ref()
             .and_then(|key| packages.iter().find(|p| &p.key() == key).cloned());
+        let selected_index = selected_key
+            .as_ref()
+            .and_then(|key| packages.iter().position(|p| &p.key() == key));
+
+        // Le porteur : la barre qui voyage de la ligne quittée à la ligne
+        // choisie. Elle n'existe qu'avec une sélection.
+        let (marker, selection_epoch) = advance_marker(self.marker, selected_index);
+        self.marker = marker;
+        self.selection_epoch = selection_epoch;
 
         let entity_mode = entity.clone();
         let entity_select = entity.clone();
@@ -795,7 +896,6 @@ impl Render for PackageWorkstationView {
 
         let top_bar = QueryWorkbench::render(&QueryWorkbenchProps {
             search_input: self.search_input.clone(),
-            scope_dial: self.scope_dial.clone(),
             list_pane_width: active_list_width,
             scope,
             source_scope,
@@ -1128,6 +1228,53 @@ impl Render for PackageWorkstationView {
         // The frame stays when the readout is empty. The glass is calibrated —
         // the column names, the rules, the scale — and a calibrated glass that
         // waits reads as glass, not as a panel that failed to draw.
+        // La barre du porteur : la sélection est un objet posé sur la ligne,
+        // pas une bordure qui pousse le contenu. Elle voyage d'une ligne à
+        // l'autre — la courbe est la sortie de l'application.
+        let row_height = if self.compact {
+            UiMetrics::ROW_HEIGHT_COMPACT
+        } else {
+            UiMetrics::ROW_HEIGHT_NORMAL
+        };
+        let scroll_y: f32 = self.scroll_handle.0.borrow().base_handle.offset().y.into();
+        let carrier = self.marker.map(|marker| {
+            let row = marker.index as f32;
+            let from = marker.from.map(|index| index as f32).unwrap_or(row);
+            let bar = div()
+                .id("readout_carrier")
+                .absolute()
+                .left(px(1.0))
+                .top(px(carrier_top(
+                    UiMetrics::ROW_HEIGHT_HEADER,
+                    row_height,
+                    row,
+                    scroll_y,
+                )))
+                .w(px(3.0))
+                .h(px(row_height))
+                .bg(theme.accent);
+            if self.reduce_motion {
+                bar.into_any_element()
+            } else {
+                bar.with_animation(
+                    ("readout_carrier", marker.epoch),
+                    Animation::new(crate::state::MotionDurations::EMPHASIS)
+                        .with_easing(crate::state::motion::ease_out),
+                    move |bar, delta| {
+                        let row =
+                            crate::state::motion::carrier_travel(from, row, delta);
+                        bar.top(px(carrier_top(
+                            UiMetrics::ROW_HEIGHT_HEADER,
+                            row_height,
+                            row,
+                            scroll_y,
+                        )))
+                    },
+                )
+                .into_any_element()
+            }
+        });
+
         // The ruler — the column names and the scale — is part of the recess.
         // It stays when the table is empty: a calibrated glass that waits
         // reads as glass, not as a panel that failed to draw. It does not stay
@@ -1151,6 +1298,9 @@ impl Render for PackageWorkstationView {
                     ))
                 })
                 .child(list_body)
+                // Le porteur se pose sur les lignes, après elles : c'est un
+                // objet de la sélection, pas une ligne du tableau.
+                .children(carrier)
         } else {
             div()
                 .flex()
@@ -1163,6 +1313,52 @@ impl Render for PackageWorkstationView {
                 .bg(theme.bg_sidebar)
                 .child(list_body)
         };
+
+        // Le périmètre entre par le côté où le cadran a tourné : l'entrée
+        // n'est pas un fondu, c'est une coupe — le nouveau contenu se pose
+        // décalé et vient à sa place.
+        //
+        // Le renfoncement est posé en absolu dans la bande : un décalage
+        // relatif (`left`) ne déplace rien dans cette version de gpui — un
+        // enfant en flux ignore son `inset` — et une entrée qui ne bouge pas
+        // n'est pas une entrée. Pas d'opacité non plus : une couche d'opacité
+        // autour d'une liste virtualisée se paie sur toute la fenêtre, et un
+        // fondu n'est de toute façon pas une coupe.
+        let readout_recess = if self.reduce_motion || self.scope_epoch == 0 {
+            readout_recess.into_any_element()
+        } else {
+            let direction = self.scope_direction;
+            readout_recess.with_animation(
+                ("scope_entry", self.scope_epoch),
+                Animation::new(crate::state::MotionDurations::SCOPE_ENTRY)
+                    .with_easing(crate::state::motion::ease_out),
+                move |element, delta| {
+                    element.left(px(direction * crate::state::motion::cut_travel(
+                        delta,
+                        SCOPE_ENTRY_TRAVEL,
+                    )))
+                },
+            )
+            .into_any_element()
+        };
+
+        // La bande du renfoncement : une scène qui donne au renfoncement sa
+        // place et sa coupe. Le renfoncement lui-même est en absolu, et c'est
+        // son décalage qui porte l'entrée.
+        let readout_recess = div()
+            .relative()
+            .w_full()
+            .flex_1()
+            .min_h(px(0.0))
+            .overflow_hidden()
+            .child(
+                div()
+                    .absolute()
+                    .top(px(0.0))
+                    .left(px(0.0))
+                    .size_full()
+                    .child(readout_recess),
+            );
 
         // The readout: the band where the work happens, in full width.
         let readout = div()
@@ -1249,9 +1445,29 @@ impl Render for PackageWorkstationView {
         let entity_nav_dep = entity.clone();
         let tc_entity = self.toast_center.clone();
 
+        // La plaque au repos : le canal que la banque met en avant, ce qu'il
+        // porte, et le nombre de lignes du périmètre. Une inscription, pas une
+        // excuse.
+        let anchor_entry = source_axis.get(crate::state::anchor_index(&source_axis));
+        let quiet = QuietPlate {
+            heading: "THE BANK",
+            subject: anchor_entry
+                .map(|entry| entry.label.to_string())
+                .unwrap_or_else(|| "All sources".to_string()),
+            detail: anchor_entry.map_or_else(String::new, |entry| {
+                let rows = if entry.count == 1 {
+                    "one row in this scope".to_string()
+                } else {
+                    format!("{} rows in this scope", entry.count)
+                };
+                format!("{} · {}", entry.holds, rows)
+            }),
+        };
+
         let inspector_element = PackageInspectorView::render_with_motion(
             PackageInspectorProps {
                 package: selected_pkg.as_ref(),
+                quiet,
                 alpm_details: alpm_details.as_ref(),
                 also_in: &also_in,
                 detail_error: detail_error.as_deref(),
@@ -1338,6 +1554,36 @@ impl Render for PackageWorkstationView {
             reduce_motion,
             inspector_tab_epoch,
         );
+
+        // La plaque entre avec la sélection : elle ne se remplace pas d'un
+        // coup, elle arrive. Une coupe, pas un fondu : c'est la position qui
+        // donne le geste.
+        let inspector_element = if self.reduce_motion {
+            inspector_element
+        } else {
+            // La hauteur est celle de la bande, en pixels : la bande la
+            // connaît, et une hauteur relative dans un conteneur en absolu
+            // n'ajoute qu'une règle de résolution à vérifier.
+            div()
+                .absolute()
+                .top(px(0.0))
+                .left(px(0.0))
+                .w_full()
+                .h(px(effective_nameplate_height))
+                .child(inspector_element)
+                .with_animation(
+                    ("nameplate_entry", self.selection_epoch),
+                    Animation::new(crate::state::MotionDurations::PLATE_ENTRY)
+                        .with_easing(crate::state::motion::ease_out),
+                    |element, delta| {
+                        element.top(px(crate::state::motion::cut_travel(
+                            delta,
+                            PLATE_ENTRY_TRAVEL,
+                        )))
+                    },
+                )
+                .into_any_element()
+        };
 
         // The nameplate: the caption of the readout, in full width, under it.
         let nameplate = div()
@@ -1607,5 +1853,91 @@ mod tests {
         let (min, max) = nameplate_bounds(content);
         assert_eq!(min, UiMetrics::NAMEPLATE_MIN_HEIGHT);
         assert_eq!(max, UiMetrics::NAMEPLATE_MIN_HEIGHT);
+    }
+
+    #[test]
+    fn the_first_selection_has_no_departure() {
+        // Le premier choix n'a pas de ligne quittée : la barre s'allume sur
+        // place, sans traverser la liste.
+        let (marker, epoch) = advance_marker(None, Some(4));
+        let marker = marker.expect("une sélection a un porteur");
+        assert_eq!(marker.index, 4);
+        assert_eq!(marker.from, None);
+        assert_eq!(epoch, 1);
+    }
+
+    #[test]
+    fn the_carrier_leaves_from_the_line_it_occupied() {
+        // La barre part de la ligne quittée : la sélection voyage, elle ne
+        // saute pas.
+        let (first, epoch) = advance_marker(None, Some(4));
+        let (marker, next_epoch) = advance_marker(first, Some(1));
+        let marker = marker.expect("la sélection reste");
+        assert_eq!(marker.index, 1);
+        assert_eq!(marker.from, Some(4));
+        assert!(next_epoch > epoch, "le voyage a son propre numéro");
+    }
+
+    #[test]
+    fn the_carrier_does_not_restart_when_nothing_changes() {
+        // Chaque rendu redemande le porteur : sans changement de sélection, le
+        // numéro du voyage ne bouge pas, et l'animation ne recommence pas.
+        let (first, epoch) = advance_marker(None, Some(2));
+        let (again, same_epoch) = advance_marker(first, Some(2));
+        assert_eq!(same_epoch, epoch);
+        assert_eq!(again.map(|marker| marker.index), Some(2));
+
+        // La sélection se referme : plus de porteur, et le changement a son
+        // numéro — la plaque au repos entre à son tour.
+        let (gone, closed) = advance_marker(again, None);
+        assert!(gone.is_none());
+        assert!(closed > same_epoch);
+    }
+
+    #[test]
+    fn a_repaint_does_not_throw_the_carrier_at_its_destination() {
+        // Le voyage dure 220 ms ; entre-temps, la fiche arrive et la scène se
+        // redessine. Le porteur doit garder sa ligne de départ, sinon le
+        // rendu suivant le pose d'un coup et le voyage n'existe jamais.
+        let (leaving, epoch) = advance_marker(None, Some(6));
+        let leaving = leaving.expect("une sélection a un porteur");
+        let (arriving, new_epoch) = advance_marker(Some(leaving), Some(2));
+        assert_eq!(new_epoch, epoch + 1);
+        let arriving = arriving.expect("la sélection reste");
+        assert_eq!(arriving.from, Some(6));
+
+        // Le rendu suivant, au milieu du voyage.
+        let (same, quieter_epoch) = advance_marker(Some(arriving), Some(2));
+        let same = same.expect("la sélection reste");
+        assert_eq!(quieter_epoch, new_epoch);
+        assert_eq!(same.from, Some(6), "la ligne de départ tient");
+        assert_eq!(same.index, 2);
+    }
+
+    #[test]
+    fn the_carrier_sits_on_the_line_it_marks() {
+        // Le haut du renfoncement, puis les lignes, moins le défilement.
+        let header = UiMetrics::ROW_HEIGHT_HEADER;
+        let row = UiMetrics::ROW_HEIGHT_NORMAL;
+        assert_eq!(carrier_top(header, row, 0.0, 0.0), header);
+        assert_eq!(carrier_top(header, row, 3.0, 0.0), header + 3.0 * row);
+        assert_eq!(
+            carrier_top(header, row, 3.0, row),
+            header + 2.0 * row,
+            "une ligne défilée remonte d'une ligne"
+        );
+        // Entre deux lignes, quand elle voyage.
+        assert_eq!(
+            carrier_top(header, row, 1.5, 0.0),
+            header + 1.5 * row
+        );
+    }
+
+    #[test]
+    fn the_scope_dirties_the_side_of_the_cut() {
+        // Le cadran tourne : la gauche, le haut, la droite. Deux périmètres
+        // voisins ne coupent pas du même côté quand on inverse le sens.
+        assert!(scope_order(NavScope::Results) < scope_order(NavScope::Installed));
+        assert!(scope_order(NavScope::Installed) < scope_order(NavScope::Updates));
     }
 }

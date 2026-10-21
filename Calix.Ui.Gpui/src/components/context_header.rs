@@ -32,6 +32,9 @@ pub struct ContextHeaderProps<'a> {
     pub on_clear_filters: WindowActionHandler,
     /// The shortcut sheet: the disc that opens it.
     pub on_toggle_help: Option<WindowActionHandler>,
+    /// The dial of the scope, when the place has one. It stands beside the
+    /// scope's name, because the name is the gauge's label.
+    pub dial: Option<AnyElement>,
     pub theme: &'a Theme,
 }
 
@@ -253,91 +256,95 @@ impl ContextHeader {
             );
         }
 
+        // The gauge and its name: one block, at the top left of the plate,
+        // where the eye starts. The name of the scope is the dial's label —
+        // a compact dial carries none of its own.
+        let mut nameplate = div()
+            .flex()
+            .flex_1()
+            .items_center()
+            .gap(px(14.0))
+            .min_w(px(0.0));
+        if let Some(dial) = props.dial {
+            nameplate = nameplate.child(dial);
+        }
+        let nameplate = nameplate.child(
+            div()
+                .flex()
+                .flex_col()
+                .gap(px(3.0))
+                .min_w(px(0.0))
+                .child(
+                    div()
+                        .text_sm()
+                        .font_weight(FontWeight::BOLD)
+                        .text_color(theme.text_primary)
+                        .child(title),
+                )
+                .child(second_line),
+        );
+
         div()
             .id("context_header")
             // L'en-tête ne se comprime pas : la liste prend le reste. Sa
-            // hauteur est celle de ses deux lignes — la colonne lui laisse
-            // la sienne, et le contenu de l'en-tête ne se fait pas couper.
+            // hauteur est celle de son bloc — le cadran, son nom, la
+            // couverture — et le contenu de l'en-tête ne se fait pas couper.
             .flex_shrink_0()
             .w_full()
             .flex()
-            .flex_col()
-            .justify_start()
+            .items_center()
+            .justify_between()
+            .gap(px(16.0))
             .px(px(16.0))
-            .pt(px(2.0))
-            .pb(px(4.0))
+            .py(px(6.0))
             .bg(theme.bg_sidebar)
             .border_b_1()
             .border_color(theme.border)
+            .child(nameplate)
             .child(
                 div()
                     .flex()
                     .items_center()
-                    .justify_between()
-                    .gap(px(12.0))
+                    .gap(px(10.0))
                     .child(
                         div()
-                            .flex()
-                            .items_center()
-                            .gap(px(10.0))
-                            .child(
-                                div()
-                                    .text_sm()
-                                    .font_weight(FontWeight::BOLD)
-                                    .text_color(theme.text_primary)
-                                    .child(title),
-                            ),
+                            .text_xs()
+                            .text_color(theme.text_secondary)
+                            .child(count),
                     )
-                    .child(
-                        div()
-                            .flex()
-                            .items_center()
-                            .gap(px(10.0))
-                            .child(
-                                div()
-                                    .text_xs()
-                                    .text_color(theme.text_secondary)
-                                    .child(count),
-                            )
-                            // Le disque de l'aide : la fiche des raccourcis
-                            // n'est jamais sur la surface, mais elle est
-                            // découvrable.
-                            .when(props.on_toggle_help.is_some(), |element| {
-                                let on_toggle = props.on_toggle_help.clone();
-                                let focus_border = theme.border_focus;
-                                element.child(
-                                    div()
-                                        .id("context_header_help_disc")
-                                        .size(px(22.0))
-                                        .rounded_full()
-                                        .border_1()
-                                        .border_color(theme.border)
-                                        .bg(theme.bg_surface)
-                                        .flex()
-                                        .items_center()
-                                        .justify_center()
-                                        .text_xs()
-                                        .font_weight(FontWeight::BOLD)
-                                        .text_color(theme.text_muted)
-                                        .cursor_pointer()
-                                        .focusable()
-                                        .tab_stop(true)
-                                        .focus(move |s| s.border_color(focus_border))
-                                        .hover(move |s| s.text_color(theme.text_primary))
-                                        .child("?")
-                                        .on_mouse_down(
-                                            MouseButton::Left,
-                                            move |_e, window, cx| {
-                                                if let Some(handler) = on_toggle.clone() {
-                                                    handler(window, cx);
-                                                }
-                                            },
-                                        ),
-                                )
-                            }),
-                    ),
+                    // Le disque de l'aide : la fiche des raccourcis n'est
+                    // jamais sur la surface, mais elle est découvrable.
+                    .when(props.on_toggle_help.is_some(), |element| {
+                        let on_toggle = props.on_toggle_help.clone();
+                        let focus_border = theme.border_focus;
+                        element.child(
+                            div()
+                                .id("context_header_help_disc")
+                                .size(px(22.0))
+                                .rounded_full()
+                                .border_1()
+                                .border_color(theme.border)
+                                .bg(theme.bg_surface)
+                                .flex()
+                                .items_center()
+                                .justify_center()
+                                .text_xs()
+                                .font_weight(FontWeight::BOLD)
+                                .text_color(theme.text_muted)
+                                .cursor_pointer()
+                                .focusable()
+                                .tab_stop(true)
+                                .focus(move |s| s.border_color(focus_border))
+                                .hover(move |s| s.text_color(theme.text_primary))
+                                .child("?")
+                                .on_mouse_down(MouseButton::Left, move |_e, window, cx| {
+                                    if let Some(handler) = on_toggle.clone() {
+                                        handler(window, cx);
+                                    }
+                                }),
+                        )
+                    }),
             )
-            .child(second_line)
     }
 }
 

@@ -85,6 +85,10 @@ impl SourceBank {
     fn render_aperture(
         entry: &SourceAxisEntry,
         health: Option<(&'static str, bool)>,
+        // The anchor: the channel that carries the most of this scope's
+        // work. It is wider than the others and it is the only one that
+        // says what it holds — seven equal slabs read as a form.
+        anchor: bool,
         props: &SourceBankProps,
         on_toggle: SourceToggleHandler,
         step: Option<(WaterfallStep, Duration)>,
@@ -92,8 +96,7 @@ impl SourceBank {
         let theme = props.theme;
         let on_retry = props.on_retry.clone();
         let kind = entry.kind;
-        let selected = entry.selected;
-        let border = if selected {
+        let border = if anchor {
             theme.accent
         } else {
             theme.border
@@ -117,12 +120,15 @@ impl SourceBank {
             .flex_col()
             .gap(px(2.0))
             .min_w(px(96.0))
-            .flex_1()
+            // The aperture that carries the scope's work is wider than the
+            // others: the bank has a front, and the eye has a place to land.
+            .flex_basis(px(if anchor { 160.0 } else { 0.0 }))
+            .flex_grow()
             .px_3()
             .py_2()
             .border_b_2()
             .border_color(border)
-            .bg(if selected {
+            .bg(if anchor {
                 theme.bg_surface_hover
             } else {
                 theme.bg_surface
@@ -154,23 +160,19 @@ impl SourceBank {
                     .font_weight(FontWeight::BOLD)
                     .whitespace_nowrap()
                     .overflow_hidden()
-                    .text_color(if selected {
+                    .text_color(if anchor {
                         theme.accent
                     } else {
                         theme.text_primary
                     })
-                    .child(entry.label),
-            )
-            // What it holds: the non-interchangeability, stated up front. The
-            // line is cut rather than wrapped: the bank is a band, and a band
-            // does not grow.
-            .child(
-                div()
-                    .text_xs()
-                    .text_color(theme.text_muted)
-                    .whitespace_nowrap()
-                    .overflow_hidden()
-                    .child(entry.holds),
+                    // L'ancre a la place de son nom entier ; les autres
+                    // canaux sont étroits et portent leur nom court. Un nom
+                    // coupé au milieu d'un mot se lirait comme un défaut.
+                    .child(if anchor {
+                        entry.label
+                    } else {
+                        entry.kind.short_label()
+                    }),
             )
             // The count of the scope's rows in this source. A value that
             // changes re-reads and flashes once: it does not glide into place.
@@ -195,6 +197,18 @@ impl SourceBank {
                         )
                         .into_any_element()
                 }
+            })
+            // What it holds: the non-interchangeability, stated up front.
+            // Only the engaged aperture has the room to say it — the others
+            // are narrow enough that the line would be cut in the middle of
+            // a word, which reads as a defect, not as a caption.
+            .when(anchor, |element| {
+                element.child(
+                    div()
+                        .text_xs()
+                        .text_color(theme.text_muted)
+                        .child(entry.holds),
+                )
             })
             // The state of the source: a source that did not answer says so.
             .children(health_line)
@@ -281,11 +295,15 @@ impl SourceBank {
         let steps = waterfall_entry(&weights);
         let total = waterfall_duration(&steps);
 
+        // L'ancre : le canal qui porte le plus de lignes du périmètre.
+        let anchor = crate::state::anchor_index(props.axis);
+
         let mut apertures = Vec::with_capacity(props.axis.len());
         for (index, entry) in props.axis.iter().enumerate() {
             apertures.push(Self::render_aperture(
                 entry,
                 health_of(entry.kind),
+                index == anchor,
                 &props,
                 props.on_toggle.clone(),
                 steps.get(index).copied().map(|step| (step, total)),

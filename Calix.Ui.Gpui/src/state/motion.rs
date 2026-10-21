@@ -7,6 +7,11 @@ impl MotionDurations {
     pub const FAST: Duration = Duration::from_millis(120);
     pub const STANDARD: Duration = Duration::from_millis(160);
     pub const EMPHASIS: Duration = Duration::from_millis(220);
+    /// L'entrée d'une surface : plus longue que l'emphase, pour que la queue
+    /// de la courbe de sortie — celle où l'élément se pose — se voie.
+    pub const SCOPE_ENTRY: Duration = Duration::from_millis(280);
+    /// L'entrée de la plaque, sous le renfoncement.
+    pub const PLATE_ENTRY: Duration = Duration::from_millis(220);
 }
 
 /// Une courbe d'adoucissement, en Bézier cubique.
@@ -195,9 +200,28 @@ pub fn cut_entry(delta: f32, travel: f32) -> (f32, f32) {
     } else {
         ((t - 0.35) / 0.65).clamp(0.0, 1.0)
     };
-    // La position : le voyage se referme, la même direction que la sortie.
-    let offset = travel * (1.0 - ease_out(t));
-    (opacity, offset)
+    (opacity, cut_travel(t, travel))
+}
+
+/// La moitié positionnelle de la coupure : le voyage qui se referme.
+///
+/// Une entrée se pose décalée et vient à sa place, dans la direction de la
+/// sortie. C'est toute la coupe quand la surface qui entre contient une liste
+/// virtualisée : une couche d'opacité autour d'elle laisse la fenêtre entière
+/// à demi éteinte, et le mouvement seul suffit.
+pub fn cut_travel(delta: f32, travel: f32) -> f32 {
+    travel * (1.0 - ease_out(delta.clamp(0.0, 1.0)))
+}
+
+/// Le voyage du porteur : la barre part de la ligne quittée et se pose sur
+/// la ligne choisie.
+///
+/// Elle ne saute pas. Une sélection qui saute est un état ; une barre qui
+/// voyage est un geste, et l'œil la suit d'une ligne à l'autre. La courbe est
+/// la sortie de l'application : elle part vite et se pose.
+pub fn carrier_travel(from: f32, to: f32, delta: f32) -> f32 {
+    let t = delta.clamp(0.0, 1.0);
+    from + (to - from) * ease_out(t)
 }
 
 /// Le ressort : l'aiguille dépasse sa position et revient.
@@ -477,5 +501,37 @@ mod tests {
         let io1 = ease_in_out(1.0);
         assert_eq!(io0, 0.0);
         assert_eq!(io1, 1.0);
+    }
+
+    #[test]
+    fn the_cut_lands_where_it_was_aimed() {
+        // L'entrée se pose décalée, puis vient à sa place : le voyage se
+        // referme et finit exactement à zéro.
+        assert_eq!(cut_travel(0.0, 18.0), 18.0);
+        assert!(cut_travel(0.5, 18.0) < 18.0);
+        assert!((cut_travel(1.0, 18.0)).abs() < 1e-4);
+
+        // La moitié positionnelle de `cut_entry` est la même règle : une seule
+        // courbe pour la coupe.
+        for delta in [0.0, 0.2, 0.5, 0.8, 1.0] {
+            assert_eq!(cut_entry(delta, 12.0).1, cut_travel(delta, 12.0));
+        }
+    }
+
+    #[test]
+    fn the_carrier_lands_on_the_line_it_was_sent_to() {
+        // Au départ, la barre est exactement sur la ligne quittée ; à la fin,
+        // exactement sur la ligne choisie. Entre les deux, elle avance.
+        assert_eq!(carrier_travel(3.0, 7.0, 0.0), 3.0);
+        assert!((carrier_travel(3.0, 7.0, 1.0) - 7.0).abs() < 1e-4);
+        let mid = carrier_travel(3.0, 7.0, 0.5);
+        assert!(mid > 3.0 && mid < 7.0, "la barre avance, elle ne saute pas");
+
+        // Descendre et monter parcourent le même chemin.
+        let up = carrier_travel(7.0, 3.0, 0.5);
+        assert!((mid + up - 10.0).abs() < 1e-4, "le voyage est symétrique");
+
+        // Une sélection sans ligne quittée reste immobile.
+        assert_eq!(carrier_travel(5.0, 5.0, 0.42), 5.0);
     }
 }
