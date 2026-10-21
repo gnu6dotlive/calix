@@ -82,15 +82,51 @@ impl UiMetrics {
     /// 43 px of text — six characters.
     pub const CATALOGUE_MIN_WIDTH: f32 = 660.0;
 
+    // ── The row's own ladder ────────────────────────────────────────────────
+    //
+    // The row's fixed columns do not all have the same importance. The name
+    // is the package's key; the version and the source say where it comes
+    // from; the measurement, the size and the status are the instrument's
+    // reading. When the row is too narrow, the ones that say *where* give way
+    // first, and the name is the last to be cut — and the row is clipped
+    // only when there is nothing left to give.
+    pub const ROW_VERSION_MIN_WIDTH: f32 = 60.0;
+    pub const ROW_SIZE_MIN_WIDTH: f32 = 60.0;
+    pub const ROW_STATUS_MIN_WIDTH: f32 = 74.0;
+    /// The name's floor: the cell that holds the p90 of the real packages
+    /// (143 px of text) plus the identity glyph and its gap (22 px).
+    /// Below it, the name is cut — which is the last thing that happens.
+    pub const ROW_NAME_MIN_WIDTH: f32 = 165.0;
+
+    /// L'ordre dans lequel la ligne cède quand elle est trop étroite.
+    ///
+    /// Le flexbox répartit le manque au prorata des facteurs de rétrécissement :
+    /// ces trois nombres sont donc l'ordre lui-même.
+    ///
+    /// La source d'abord — c'est la plus jetable : le nom la dit presque
+    /// toujours, et l'inspecteur la donne en entier. La lecture de
+    /// l'instrument ensuite — la taille exacte a sa propre colonne. La
+    /// version en dernier des secondaires.
+    ///
+    /// La taille et l'état ne rétrécissent jamais : l'un est la figure, l'autre
+    /// l'état du paquet. Et le nom ne rétrécit jamais non plus : c'est la clé.
+    pub const ROW_SHRINK_SOURCE: f32 = 4.0;
+    pub const ROW_SHRINK_MEASUREMENT: f32 = 2.0;
+    pub const ROW_SHRINK_VERSION: f32 = 1.0;
+
     // ── The vertical budget, inside the station ─────────────────────────────
     //
     /// The bank's band: the seven sources. Measured, and *reserved* — the
     /// plate's share is computed after it, so the reservation has to be an
     /// upper bound of what the bank really takes.
     pub const BANK_HEIGHT: f32 = 100.5;
-    /// The vertical space the catalogue keeps, whatever else: two rows, and
-    /// the rest is scrolling.
-    pub const CATALOGUE_MIN_HEIGHT: f32 = 72.0;
+    /// The vertical space the catalogue keeps, whatever else.
+    ///
+    /// Six rows: a catalogue that shows two rows is a strip, and a strip is
+    /// not a catalogue. Below this, the plate leaves the flow rather than
+    /// squeezing the catalogue — the plate is a context surface, and it
+    /// yields entirely before the body is reduced.
+    pub const CATALOGUE_MIN_HEIGHT: f32 = 216.0;
 }
 
 #[cfg(test)]
