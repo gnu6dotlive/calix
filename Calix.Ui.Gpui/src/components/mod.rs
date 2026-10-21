@@ -8,6 +8,7 @@ pub mod package_table;
 pub mod query_workbench;
 pub mod search_input;
 pub mod semantic_value;
+pub mod scope_dial;
 pub mod sidebar;
 pub mod source_bank;
 pub mod status_pill;

@@ -25,6 +25,120 @@ pub fn ease_in_out(t: f32) -> f32 {
     }
 }
 
+/// Le poids d'un élément dans une arrivée : il voyage plus loin et plus
+/// longtemps, ou il s'ajuste vite.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Weight {
+    /// L'ancre : l'élément qui porte la lecture.
+    Heavy,
+    /// L'élément ordinaire.
+    Normal,
+    /// L'élément léger : il s'ajuste, il ne voyage pas.
+    Light,
+}
+
+impl Weight {
+    /// La distance parcourue, en pixels.
+    pub fn travel(self) -> f32 {
+        match self {
+            Weight::Heavy => 14.0,
+            Weight::Normal => 10.0,
+            Weight::Light => 7.0,
+        }
+    }
+
+    /// La durée de son propre mouvement.
+    pub fn duration(self) -> Duration {
+        match self {
+            Weight::Heavy => Duration::from_millis(180),
+            Weight::Normal => Duration::from_millis(140),
+            Weight::Light => Duration::from_millis(110),
+        }
+    }
+
+}
+
+/// L'écart entre deux éléments de la cascade, avant rétrécissement.
+///
+/// L'écart appartient à la cascade, pas à l'élément : le poids d'un élément
+/// décide de la distance qu'il parcourt et de la durée de son mouvement, et
+/// l'écart se rétrécit d'un élément à l'autre pour que la vague s'accélère.
+pub const WATERFALL_BASE_GAP: Duration = Duration::from_millis(50);
+
+/// Un élément d'une arrivée en cascade.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct WaterfallStep {
+    /// Le temps qui passe avant que cet élément ne bouge.
+    pub delay: Duration,
+    /// La distance qu'il parcourt, en pixels.
+    pub travel: f32,
+    /// La durée de son propre mouvement.
+    pub duration: Duration,
+}
+
+/// L'arrivée en cascade : des éléments qui arrivent par en dessous, l'un après
+/// l'autre, sans se faire la queue.
+///
+/// Les écarts se rétrécissent d'un élément à l'autre : la cascade est une
+/// vague qui s'accélère, pas une file. Le dernier s'ajuste.
+pub fn waterfall_entry(weights: &[Weight]) -> Vec<WaterfallStep> {
+    let mut steps = Vec::with_capacity(weights.len());
+    let mut delay = Duration::ZERO;
+    for (index, weight) in weights.iter().enumerate() {
+        steps.push(WaterfallStep {
+            delay,
+            travel: weight.travel(),
+            duration: weight.duration(),
+        });
+        // Les écarts se rétrécissent : ×0,84 à chaque élément.
+        delay += WATERFALL_BASE_GAP.mul_f32(0.84f32.powi(index as i32));
+    }
+    steps
+}
+
+/// La durée totale d'une arrivée en cascade.
+pub fn waterfall_duration(steps: &[WaterfallStep]) -> Duration {
+    steps
+        .iter()
+        .map(|step| step.delay + step.duration)
+        .max()
+        .unwrap_or(Duration::ZERO)
+}
+
+/// La coupure à la courbe : l'entrée qui suit une coupe.
+///
+/// L'élément sortant accélère dans une direction ; la coupe tombe au milieu
+/// du mouvement ; l'élément entrant continue dans la *même* direction et
+/// décélère. L'assombrissement s'allume en plein chemin : une apparition en
+/// fondu, de 0 à 1, se lirait comme un fondu et non comme une arrivée.
+///
+/// Le voyage est partiel : environ 12 % de la surface, jamais un travers
+/// complet.
+pub fn cut_entry(delta: f32, travel: f32) -> (f32, f32) {
+    let t = delta.clamp(0.0, 1.0);
+    // L'assombrissement s'allume à 0,35 en plein chemin.
+    let opacity = if t < 0.35 {
+        0.0
+    } else {
+        ((t - 0.35) / 0.65).clamp(0.0, 1.0)
+    };
+    // La position : le voyage se referme, la même direction que la sortie.
+    let offset = travel * (1.0 - ease_out_quint(t));
+    (opacity, offset)
+}
+
+/// L'overshoot : l'aiguille dépasse sa position et revient.
+///
+/// Un instrument dépasse ; un commutateur, non. L'aiguille qui se jette sur
+/// son cran le franchit légèrement avant de revenir s'y poser.
+pub fn ease_out_back(t: f32) -> f32 {
+    const C1: f32 = 1.70158;
+    const C3: f32 = C1 + 1.0;
+    let t = t.clamp(0.0, 1.0);
+    let u = t - 1.0;
+    1.0 + C3 * u * u * u + C1 * u * u
+}
+
 /// Politique d'animation de l'application
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct MotionPolicy {
@@ -203,6 +317,60 @@ mod tests {
         let active = scalar.update(t0);
         assert!(!active);
         assert!(!scalar.is_active());
+    }
+
+    #[test]
+    fn the_overshoot_passes_the_target_and_comes_back() {
+        // L'aiguille franchit son cran, puis revient s'y poser.
+        assert!((ease_out_back(0.0) - 0.0).abs() < 1e-6, "le départ est à zéro");
+        assert!(ease_out_back(0.6) > 1.0, "le cran est dépassé");
+        assert!((ease_out_back(1.0) - 1.0).abs() < 1e-6, "l'arrivée est posée");
+        // Et le dépassement reste un dépassement, pas un écart.
+        assert!(ease_out_back(0.6) < 1.2);
+    }
+
+    #[test]
+    fn the_cascade_overlaps_and_its_gaps_shrink() {
+        // La vague : les éléments se rejoignent, les écarts se rétrécissent.
+        let steps = waterfall_entry(&[
+            Weight::Heavy,
+            Weight::Normal,
+            Weight::Normal,
+            Weight::Light,
+        ]);
+        assert_eq!(steps.len(), 4);
+        // L'ancre part la première.
+        assert_eq!(steps[0].delay, Duration::ZERO);
+        // Les écarts se rétrécissent : le premier intervalle est le plus large.
+        let first_gap = steps[1].delay - steps[0].delay;
+        let second_gap = steps[2].delay - steps[1].delay;
+        let third_gap = steps[3].delay - steps[2].delay;
+        assert!(first_gap > second_gap, "les écarts se rétrécissent");
+        assert!(second_gap > third_gap, "les écarts se rétrécissent");
+        // Le premier écart est l'écart de base.
+        assert_eq!(first_gap, WATERFALL_BASE_GAP);
+        // L'ancre voyage plus loin et plus longtemps.
+        assert!(steps[0].travel > steps[1].travel);
+        assert!(steps[0].duration > steps[1].duration);
+        // Le total couvre le dernier élément.
+        let total = waterfall_duration(&steps);
+        assert!(total >= steps[3].delay + steps[3].duration);
+    }
+
+    #[test]
+    fn the_cut_entry_ignites_mid_path_and_keeps_the_direction() {
+        // Avant 0,35, rien n'est visible : l'arrivée s'allume en plein chemin.
+        let (opacity, offset) = cut_entry(0.0, 40.0);
+        assert_eq!(opacity, 0.0);
+        assert_eq!(offset, 40.0);
+        let (opacity, offset) = cut_entry(0.5, 40.0);
+        assert!(opacity > 0.0, "l'assombrissement s'allume en chemin");
+        assert!(offset < 40.0 && offset > 0.0, "le voyage se referme");
+        let (opacity, offset) = cut_entry(1.0, 40.0);
+        assert_eq!(opacity, 1.0);
+        assert_eq!(offset, 0.0);
+        // Le voyage est partiel : il ne franchit jamais toute la surface.
+        assert!(40.0 < 120.0);
     }
 
     #[test]

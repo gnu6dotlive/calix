@@ -2516,7 +2516,6 @@ impl Render for WorkspaceView {
         let flatpak_enabled = self.calix_settings.flat_pack_enabled;
         let appimage_enabled = self.calix_settings.app_image_enabled;
 
-        let entity_scope = self.session.clone();
         let entity_clear = self.session.clone();
         let context_header = ContextHeader::render(ContextHeaderProps {
             place: header_place,
@@ -2538,12 +2537,6 @@ impl Render for WorkspaceView {
                     });
                 })
             },
-            on_select_scope: Rc::new(move |scope: NavScope, _w, cx| {
-                entity_scope.update(cx, |s, cx| {
-                    s.set_scope(scope, cx);
-                    s.set_place(Place::Packages, cx);
-                });
-            }),
             on_clear_filters: Rc::new(move |_w, cx| {
                 entity_clear.update(cx, |s, cx| {
                     s.clear_filters(aur_enabled, flatpak_enabled, appimage_enabled, cx);

@@ -5,7 +5,6 @@ use crate::theme::Theme;
 use gpui::*;
 use std::rc::Rc;
 
-pub type ScopeSelectHandler = Rc<dyn Fn(NavScope, &mut Window, &mut App) + 'static>;
 pub type WindowActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 pub type SourceRetryHandler = Rc<dyn Fn(PackageSourceKind, &mut Window, &mut App) + 'static>;
 
@@ -29,7 +28,6 @@ pub struct ContextHeaderProps<'a> {
     /// La santé des sources : une source qui n'a pas répondu se dit.
     pub source_health: &'a SourceHealthMap,
     pub on_retry_source: SourceRetryHandler,
-    pub on_select_scope: ScopeSelectHandler,
     pub on_clear_filters: WindowActionHandler,
     pub theme: &'a Theme,
 }
@@ -92,76 +90,6 @@ impl ContextHeader {
         } else {
             props.place.label()
         };
-
-        // ── Le commutateur de périmètre ─────────────────────────────────────
-        // Le commutateur n'existe que là où il y a un périmètre : Actualités et
-        // Réglages n'en ont pas.
-        let mut switcher = div().flex().items_center().gap(px(2.0));
-        for target in NavScope::ALL {
-            let is_active = is_packages && *target == props.scope;
-            let select_cb = props.on_select_scope.clone();
-            let select_cb_key = select_cb.clone();
-            let focus_border = theme.border_focus;
-            let target_val = *target;
-            let label = target.label();
-            let icon = target.icon();
-
-            let segment = div()
-                .id(ElementId::Name(
-                    format!("context_header_scope_{}", target.as_str()).into(),
-                ))
-                .flex()
-                .items_center()
-                .gap(px(6.0))
-                .px(px(8.0))
-                .py(px(2.0))
-                .rounded_sm()
-                .cursor_pointer()
-                .focusable()
-                .tab_stop(true)
-                .focus(move |s| s.border_1().border_color(focus_border))
-                .on_key_down(move |event, window, cx| {
-                    let key = event.keystroke.key.as_str();
-                    if key == "enter" || key == "space" {
-                        select_cb_key(target_val, window, cx);
-                    }
-                })
-                .on_mouse_down(MouseButton::Left, move |_e, window, cx| {
-                    select_cb(target_val, window, cx);
-                })
-                .bg(if is_active {
-                    theme.bg_surface_active
-                } else {
-                    theme.bg_app
-                })
-                .child(
-                    svg()
-                        .path(icon.path())
-                        .size_4()
-                        .text_color(if is_active {
-                            theme.accent
-                        } else {
-                            theme.text_secondary
-                        }),
-                )
-                .child(
-                    div()
-                        .text_xs()
-                        .font_weight(if is_active {
-                            FontWeight::BOLD
-                        } else {
-                            FontWeight::NORMAL
-                        })
-                        .text_color(if is_active {
-                            theme.text_primary
-                        } else {
-                            theme.text_secondary
-                        })
-                        .child(label),
-                );
-
-            switcher = switcher.child(segment);
-        }
 
         // ── Le compte ───────────────────────────────────────────────────────
         // Les lignes du périmètre, les annonces, ou rien : un compte qui ne
@@ -355,8 +283,7 @@ impl ContextHeader {
                                     .font_weight(FontWeight::BOLD)
                                     .text_color(theme.text_primary)
                                     .child(title),
-                            )
-                            .child(if is_packages { switcher } else { div() }),
+                            ),
                     )
                     .child(
                         div()

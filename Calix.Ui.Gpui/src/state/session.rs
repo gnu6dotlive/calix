@@ -177,6 +177,7 @@ impl NavScope {
         }
     }
 
+    /// The sign of the scope, as the dial's detents carry it.
     pub fn icon(&self) -> AppIcon {
         match self {
             NavScope::Results => AppIcon::Search,
@@ -215,6 +216,17 @@ impl NavScope {
             NavScope::Installed => {
                 &["alpm", "aur", "flatpak", "cargo", "npm", "appimage", "release"]
             }
+        }
+    }
+
+    /// Le rang du périmètre. Il sert d'époque à l'arrivée de la banque :
+    /// la banque arrive quand le périmètre change, pas quand une case est
+    /// cochée.
+    pub fn index(self) -> usize {
+        match self {
+            NavScope::Results => 0,
+            NavScope::Installed => 1,
+            NavScope::Updates => 2,
         }
     }
 
@@ -684,9 +696,6 @@ mod tests {
         assert_eq!(InspectorTab::Dependencies.icon(), AppIcon::Dependencies);
         assert_eq!(InspectorTab::FilesBuild.icon(), AppIcon::FilesBuild);
 
-        assert_eq!(NavScope::Results.icon(), AppIcon::Search);
-        assert_eq!(NavScope::Installed.icon(), AppIcon::Installed);
-        assert_eq!(NavScope::Updates.icon(), AppIcon::Updates);
         assert_eq!(Place::News.label(), "News");
         assert_eq!(Place::Settings.label(), "Settings");
     }

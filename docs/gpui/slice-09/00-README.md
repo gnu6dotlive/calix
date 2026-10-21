@@ -60,6 +60,11 @@ dial, standing on its own in the strip, above the readout it governs. Turning
 the dial never changes the source. Choosing a source never changes the
 scope. A user must be able to tell them apart with the mouse still.
 
+The dial's needle is thrown at its detent and settles with a slight
+overshoot: an instrument overshoots, a switch does not. The segmented
+switcher the header used to carry is gone — two controls of the same kind
+for two different axes is how the first round made them look alike.
+
 **S3 — The bank states the non-interchangeability before the user asks.**
 Each aperture carries the kind (`binaries`, `recipes`, `sandboxes`, `crates`,
 `node packages`, `a single binary`, `a followed binary`) and the count. A
@@ -71,7 +76,8 @@ absent action lives in the source's own entry.
 The specification of the selection is a full-width band of engraved cells
 under the readout: the version, the provenance, the dependencies, the files,
 the product's own command. It is the list's caption. It does not sit in a
-column, and it does not float over the rows.
+column, and it does not float over the rows. The edge between the two is
+dragged; the nameplate never swallows the readout, and never disappears.
 
 **S5 — The log is a tape.**
 What the backend actually ran is a band of perforated lines at the bottom: the
@@ -110,5 +116,8 @@ visible.
   bank carries the keyboard on its own.
 - It does not redraw the list's rows. The Δ column is measured in the readout
   when the readout is requalified; until then, the list is the list.
-- It does not build the rotary. The scope stays a segmented control in the
-  strip until the dial's behaviour is specified and proven.
+- It does not requalify the readout: the list is still the list, and the
+  delta is still a column. The Instrument's readout is a recess cut into the
+  plate, with the delta measured as bars on a calibrated scale.
+- It does not make the tape a perforated tape: the operation log is still the
+  drawer as it was.

@@ -1,10 +1,12 @@
 use crate::components::query_workbench::{SourceRetryHandler, SourceToggleHandler};
+use crate::state::motion::{waterfall_duration, waterfall_entry, Weight, WaterfallStep};
 use crate::state::package_store::{SourceHealthMap, SourceHealthStatus};
 use crate::state::sources::SourceAxisEntry;
 use crate::state::PackageSourceKind;
 use crate::theme::Theme;
 use gpui::prelude::FluentBuilder;
 use gpui::*;
+use std::time::Duration;
 
 /// The source bank: seven apertures, one per source.
 ///
@@ -17,6 +19,10 @@ pub struct SourceBankProps<'a> {
     pub axis: &'a [SourceAxisEntry],
     pub source_health: &'a SourceHealthMap,
     pub theme: &'a Theme,
+    /// The arrival: the bank comes in as a wave, not as a queue.
+    pub epoch: usize,
+    /// The user asked for less movement.
+    pub reduce_motion: bool,
     pub on_toggle: SourceToggleHandler,
     pub on_retry: SourceRetryHandler,
 }
@@ -31,6 +37,32 @@ fn aperture_id(kind: PackageSourceKind) -> &'static str {
         PackageSourceKind::Cargo => "source_aperture_cargo",
         PackageSourceKind::Npm => "source_aperture_npm",
         PackageSourceKind::Release => "source_aperture_release",
+    }
+}
+
+/// The id of the count, one per source.
+fn count_id(kind: PackageSourceKind) -> &'static str {
+    match kind {
+        PackageSourceKind::Alpm => "source_count_alpm",
+        PackageSourceKind::Aur => "source_count_aur",
+        PackageSourceKind::Flatpak => "source_count_flatpak",
+        PackageSourceKind::AppImage => "source_count_appimage",
+        PackageSourceKind::Cargo => "source_count_cargo",
+        PackageSourceKind::Npm => "source_count_npm",
+        PackageSourceKind::Release => "source_count_release",
+    }
+}
+
+/// The id of the arrival animation, one per source.
+fn arrival_id(kind: PackageSourceKind) -> &'static str {
+    match kind {
+        PackageSourceKind::Alpm => "source_arrival_alpm",
+        PackageSourceKind::Aur => "source_arrival_aur",
+        PackageSourceKind::Flatpak => "source_arrival_flatpak",
+        PackageSourceKind::AppImage => "source_arrival_appimage",
+        PackageSourceKind::Cargo => "source_arrival_cargo",
+        PackageSourceKind::Npm => "source_arrival_npm",
+        PackageSourceKind::Release => "source_arrival_release",
     }
 }
 
@@ -55,6 +87,7 @@ impl SourceBank {
         health: Option<(&'static str, bool)>,
         props: &SourceBankProps,
         on_toggle: SourceToggleHandler,
+        step: Option<(WaterfallStep, Duration)>,
     ) -> AnyElement {
         let theme = props.theme;
         let on_retry = props.on_retry.clone();
@@ -78,7 +111,7 @@ impl SourceBank {
                 .child(label)
         });
 
-        div()
+        let aperture = div()
             .id(aperture_id(kind))
             .flex()
             .flex_col()
@@ -119,6 +152,8 @@ impl SourceBank {
                 div()
                     .text_xs()
                     .font_weight(FontWeight::BOLD)
+                    .whitespace_nowrap()
+                    .overflow_hidden()
                     .text_color(if selected {
                         theme.accent
                     } else {
@@ -126,21 +161,41 @@ impl SourceBank {
                     })
                     .child(entry.label),
             )
-            // What it holds: the non-interchangeability, stated up front.
+            // What it holds: the non-interchangeability, stated up front. The
+            // line is cut rather than wrapped: the bank is a band, and a band
+            // does not grow.
             .child(
                 div()
                     .text_xs()
                     .text_color(theme.text_muted)
+                    .whitespace_nowrap()
+                    .overflow_hidden()
                     .child(entry.holds),
             )
-            // The count of the scope's rows in this source.
-            .child(
-                div()
+            // The count of the scope's rows in this source. A value that
+            // changes re-reads and flashes once: it does not glide into place.
+            .child({
+                let count = div()
+                    .id(count_id(kind))
                     .text_sm()
                     .font_family("monospace")
                     .text_color(count_color)
-                    .child(entry.count.to_string()),
-            )
+                    .child(entry.count.to_string());
+                if props.reduce_motion {
+                    count.into_any_element()
+                } else {
+                    count
+                        .with_animation(
+                            (count_id(kind), entry.count),
+                            Animation::new(crate::state::MotionDurations::EMPHASIS),
+                            |element, delta| {
+                                element
+                                    .opacity(1.0 - 0.45 * (std::f32::consts::PI * delta).sin())
+                            },
+                        )
+                        .into_any_element()
+                }
+            })
             // The state of the source: a source that did not answer says so.
             .children(health_line)
             .when(
@@ -169,8 +224,31 @@ impl SourceBank {
                         .text_color(theme.text_muted)
                         .child("listed, not queried"),
                 )
-            })
-            .into_any_element()
+            });
+
+        // L'arrivée : la banque arrive par en dessous, dans une vague qui
+        // s'accélère, et elle s'allume d'un coup — une apparition en fondu se
+        // lirait comme un fondu, pas comme une arrivée.
+        match step {
+            Some((step, total)) if !props.reduce_motion => {
+                let total_ms = total.as_millis().max(1) as f32;
+                let delay = step.delay.as_millis() as f32 / total_ms;
+                let travel = step.travel;
+                aperture
+                    .with_animation(
+                        (arrival_id(kind), props.epoch),
+                        Animation::new(total).with_easing(gpui::ease_out_quint()),
+                        move |element, delta| {
+                            let local = ((delta - delay) / (1.0 - delay)).clamp(0.0, 1.0);
+                            element
+                                .top(px(travel * (1.0 - gpui::ease_out_quint()(local))))
+                                .opacity(if local > 0.0 { 1.0 } else { 0.0 })
+                        },
+                    )
+                    .into_any_element()
+            }
+            _ => aperture.into_any_element(),
+        }
     }
 
     pub fn render(props: SourceBankProps) -> impl IntoElement {
@@ -185,13 +263,32 @@ impl SourceBank {
             })
         };
 
+        // Les poids : l'ouverture retenue est l'ancre, elle voyage plus loin ;
+        // une source sans ligne est légère, elle s'ajuste.
+        let weights: Vec<Weight> = props
+            .axis
+            .iter()
+            .map(|entry| {
+                if entry.selected {
+                    Weight::Heavy
+                } else if entry.count == 0 {
+                    Weight::Light
+                } else {
+                    Weight::Normal
+                }
+            })
+            .collect();
+        let steps = waterfall_entry(&weights);
+        let total = waterfall_duration(&steps);
+
         let mut apertures = Vec::with_capacity(props.axis.len());
-        for entry in props.axis {
+        for (index, entry) in props.axis.iter().enumerate() {
             apertures.push(Self::render_aperture(
                 entry,
                 health_of(entry.kind),
                 &props,
                 props.on_toggle.clone(),
+                steps.get(index).copied().map(|step| (step, total)),
             ));
         }
 

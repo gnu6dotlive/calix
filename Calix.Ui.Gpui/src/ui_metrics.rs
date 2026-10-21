@@ -12,13 +12,14 @@ impl UiMetrics {
     pub const ROW_HEIGHT_NORMAL: f32 = 36.0;
     pub const ROW_HEIGHT_COMPACT: f32 = 30.0;
 
-    // ── Workspace Splitter & Pane Limits ─────────────────────────────────────
-    pub const SPLITTER_WIDTH: f32 = 5.0;
-    pub const LIST_MIN_USABLE: f32 = 340.0;
-    pub const INSPECTOR_MIN_USABLE: f32 = 320.0;
-    pub const INSPECTOR_MAX_WIDTH: f32 = 520.0;
-    pub const INSPECTOR_MAX_RATIO: f32 = 3.0 / 7.0;
-    pub const HORIZONTAL_SPLIT_MIN_CONTENT_WIDTH: f32 = 320.0 * (7.0 / 3.0);
+    // ── The plate: the nameplate's bounds ───────────────────────────────────
+    //
+    // The plate is read from the top down in full-width bands. The nameplate
+    // is the caption of the readout: it never swallows it, and it never
+    // disappears.
+    pub const SPLITTER_THICKNESS: f32 = 5.0;
+    pub const NAMEPLATE_MIN_HEIGHT: f32 = 168.0;
+    pub const NAMEPLATE_MAX_RATIO: f32 = 0.55;
 
     // ── Workbench Dimensions ─────────────────────────────────────────────────
     pub const SEARCH_INPUT_HEIGHT: f32 = 40.0;
@@ -73,24 +74,21 @@ mod tests {
             "Collapsed sidebar must be narrower than expanded sidebar"
         );
         assert!(
-            UiMetrics::LIST_MIN_USABLE > 0.0,
-            "List minimum usable width must be positive"
+            UiMetrics::NAMEPLATE_MIN_HEIGHT > 0.0,
+            "The nameplate's minimum height must be positive"
         );
         assert!(
-            UiMetrics::INSPECTOR_MIN_USABLE > 0.0,
-            "Inspector minimum usable width must be positive"
+            UiMetrics::NAMEPLATE_MAX_RATIO > 0.0 && UiMetrics::NAMEPLATE_MAX_RATIO < 1.0,
+            "The nameplate's maximum share must be a share"
         );
         assert!(
-            UiMetrics::SPLITTER_WIDTH > 0.0,
-            "Splitter width must be positive"
+            UiMetrics::SPLITTER_THICKNESS > 0.0,
+            "The splitter's thickness must be positive"
         );
     }
 
     #[test]
-    fn test_inspector_ratio_constants() {
-        assert!(UiMetrics::INSPECTOR_MAX_RATIO > 0.42 && UiMetrics::INSPECTOR_MAX_RATIO < 0.43);
-        assert_eq!(UiMetrics::INSPECTOR_MAX_WIDTH, 520.0);
-        assert_eq!(UiMetrics::INSPECTOR_MIN_USABLE, 320.0);
-        assert!(UiMetrics::HORIZONTAL_SPLIT_MIN_CONTENT_WIDTH > 746.0);
+    fn test_nameplate_ratio_constants() {
+        assert!(UiMetrics::NAMEPLATE_MAX_RATIO > 0.5 && UiMetrics::NAMEPLATE_MAX_RATIO < 0.56);
     }
 }

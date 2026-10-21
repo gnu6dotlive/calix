@@ -34,6 +34,8 @@ pub enum AppIcon {
     SourceRelease,
     PackageGeneric,
     RenderLab,
+    /// The needle of the scope's dial.
+    DialNeedle,
 }
 
 impl AppIcon {
@@ -69,6 +71,7 @@ impl AppIcon {
         AppIcon::SourceRelease,
         AppIcon::PackageGeneric,
         AppIcon::RenderLab,
+        AppIcon::DialNeedle,
     ];
 
     pub fn path(self) -> &'static str {
@@ -103,6 +106,7 @@ impl AppIcon {
             AppIcon::SourceNpm => "icons/source-npm.svg",
             AppIcon::SourceRelease => "icons/source-release.svg",
             AppIcon::PackageGeneric => "icons/package-generic.svg",
+            AppIcon::DialNeedle => "icons/dial-needle.svg",
             AppIcon::RenderLab => "icons/render-lab.svg",
         }
     }
@@ -150,6 +154,7 @@ impl AssetSource for AppIcons {
             "icons/source-npm.svg" => Some(include_bytes!("icons/source-npm.svg")),
             "icons/source-release.svg" => Some(include_bytes!("icons/source-release.svg")),
             "icons/package-generic.svg" => Some(include_bytes!("icons/package-generic.svg")),
+            "icons/dial-needle.svg" => Some(include_bytes!("icons/dial-needle.svg")),
             "icons/render-lab.svg" => Some(include_bytes!("icons/render-lab.svg")),
             _ => None,
         };

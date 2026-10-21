@@ -123,6 +123,10 @@ impl PackageInspectorView {
             .into_any_element(),
         };
 
+        // La bascule de panneau est une coupe à la courbe : le panneau
+        // sortant accélère, la coupe tombe au milieu du mouvement, et le
+        // panneau entrant continue dans la même direction et décélère. Il
+        // s'allume en plein chemin, pas en fondu.
         let animated_body = if reduce_motion {
             div()
                 .id("inspector_tab_body")
@@ -133,10 +137,13 @@ impl PackageInspectorView {
                 .id("inspector_tab_body")
                 .child(body)
                 .with_animation(
-                    ("tab-fade", tab_epoch as usize),
-                    Animation::new(crate::state::MotionDurations::FAST)
+                    ("tab-cut", tab_epoch as usize),
+                    Animation::new(crate::state::MotionDurations::STANDARD)
                         .with_easing(gpui::ease_out_quint()),
-                    |elem, delta| elem.opacity(delta),
+                    |elem, delta| {
+                        let (opacity, offset) = crate::state::motion::cut_entry(delta, 32.0);
+                        elem.opacity(opacity).left(px(offset))
+                    },
                 )
                 .into_any_element()
         };

@@ -5,6 +5,7 @@ use crate::components::package_table::PackageTable;
 use crate::components::query_workbench::{
     ActiveMenuState, QueryWorkbench, QueryWorkbenchProps, ScopeAction, WorkbenchMenu,
 };
+use crate::components::scope_dial::ScopeDialView;
 use crate::components::search_input::SearchInputView;
 use crate::components::source_bank::{SourceBank, SourceBankProps};
 use crate::components::unified_search::UnifiedSearch;
@@ -12,7 +13,7 @@ use crate::state::console::{ConsoleEvent, ConsoleModel};
 use crate::state::query::{PackageStateFilter, SortMode, SourceScope, WorkbenchBreakpoint};
 use crate::state::{
     also_in, canonical_install_command, source_axis, AlsoIn, AppSession, NavScope, PackageKey,
-    PackageSourceKind, PackageStore, PackageViewMode, ToastCenter, ToastKind,
+    PackageSourceKind, PackageStore, PackageViewMode, SessionEvent, ToastCenter, ToastKind,
 };
 use crate::theme::Theme;
 use crate::ui_metrics::UiMetrics;
@@ -30,52 +31,42 @@ pub type SourceRetryHandler = Rc<dyn Fn(PackageSourceKind, &mut Window, &mut App
 pub type ActionReloadHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 pub type DetailsRetryHandler = Rc<dyn Fn(&PackageKey, &mut Window, &mut App) + 'static>;
 
+/// The drag of the nameplate's edge.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct SplitterDragState {
-    pub start_width: f32,
-    pub start_pointer_x: f32,
+pub struct NameplateDragState {
+    pub start_height: f32,
+    pub start_pointer_y: f32,
 }
 
-/// Mode de disposition adaptatif du workbench
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum WorkstationLayoutMode {
-    /// Mode scindé horizontal : liste à gauche, splitter, inspecteur docké à droite
-    Horizontal,
-    /// Mode empilé : liste au-dessus, inspecteur en-dessous (zéro overlay)
-    Stacked,
+/// The nameplate's bounds: it never swallows the readout, never disappears.
+///
+/// The plate is read from the top down in full-width bands. The nameplate is
+/// the caption of the readout: below it, always, between a floor and a share.
+pub fn nameplate_bounds(content_height: f32) -> (f32, f32) {
+    let min = UiMetrics::NAMEPLATE_MIN_HEIGHT;
+    let max = (content_height * UiMetrics::NAMEPLATE_MAX_RATIO).max(min);
+    (min, max)
 }
 
-impl WorkstationLayoutMode {
-    pub fn from_content_width(content_width: f32) -> Self {
-        if content_width >= UiMetrics::HORIZONTAL_SPLIT_MIN_CONTENT_WIDTH {
-            WorkstationLayoutMode::Horizontal
-        } else {
-            WorkstationLayoutMode::Stacked
-        }
-    }
+/// The height of the nameplate, bounded.
+pub fn nameplate_height(content_height: f32, requested: f32) -> f32 {
+    let (min, max) = nameplate_bounds(content_height);
+    requested.clamp(min, max)
+}
+
+/// The height of the nameplate after a drag: pulling up makes it grow.
+pub fn nameplate_height_after_drag(
+    drag_start_height: f32,
+    drag_start_pointer_y: f32,
+    current_pointer_y: f32,
+    content_height: f32,
+) -> f32 {
+    let delta_y = current_pointer_y - drag_start_pointer_y;
+    nameplate_height(content_height, drag_start_height - delta_y)
 }
 
 /// Calcul pur et robuste de la largeur du panneau dérivé des deltas de pointeur
 /// Garantit les invariants stricts du contrat UX :
-/// 1. inspector_width <= min(520.0, content_width * 3/7)
-/// 2. inspector_width >= 320.0 (INSPECTOR_MIN_USABLE)
-/// 3. list_width >= LIST_MIN_USABLE (340.0)
-pub fn compute_splitter_width(
-    drag_start_width: f32,
-    drag_start_pointer_x: f32,
-    current_pointer_x: f32,
-    content_width: f32,
-) -> f32 {
-    let delta_x = current_pointer_x - drag_start_pointer_x;
-    let requested_width = drag_start_width + delta_x;
-    let (list_min, list_max) = compute_splitter_bounds(content_width);
-    if list_min <= list_max {
-        requested_width.clamp(list_min, list_max)
-    } else {
-        list_min
-    }
-}
-
 /// Bornes légales strictes de la largeur de liste dans le domaine horizontal
 /// La largeur de la zone de contenu : la largeur *mappée* de la fenêtre, moins le rail.
 ///
@@ -88,16 +79,6 @@ pub fn compute_splitter_width(
 /// `viewport_size()`, qui fait foi.
 pub fn content_width(viewport_width: f32, sidebar_width: f32) -> f32 {
     (viewport_width - sidebar_width).max(0.0)
-}
-
-pub fn compute_splitter_bounds(content_width: f32) -> (f32, f32) {
-    let inspector_max =
-        (content_width * UiMetrics::INSPECTOR_MAX_RATIO).min(UiMetrics::INSPECTOR_MAX_WIDTH);
-    let inspector_min = UiMetrics::INSPECTOR_MIN_USABLE;
-    let list_min =
-        (content_width - UiMetrics::SPLITTER_WIDTH - inspector_max).max(UiMetrics::LIST_MIN_USABLE);
-    let list_max = (content_width - UiMetrics::SPLITTER_WIDTH - inspector_min).max(list_min);
-    (list_min, list_max)
 }
 
 /// How far the wheel's distance may wait before the list is given it.
@@ -149,8 +130,9 @@ pub struct PackageWorkstationView {
     pub store: Entity<PackageStore>,
     pub console: Entity<ConsoleModel>,
     pub toast_center: Entity<ToastCenter>,
-    pub list_pane_width: f32,
-    pub drag_state: Option<SplitterDragState>,
+    /// The height of the nameplate: the caption of the readout, under it.
+    pub nameplate_height: f32,
+    pub nameplate_drag: Option<NameplateDragState>,
     pub scroll_handle: UniformListScrollHandle,
     /// The distance the wheel asked for and the list has not been given yet.
     ///
@@ -174,6 +156,10 @@ pub struct PackageWorkstationView {
     pub flatpak_enabled: bool,
     pub appimage_enabled: bool,
     pub search_input: Entity<SearchInputView>,
+    /// The dial of the scope: one object with three positions.
+    pub scope_dial: Entity<ScopeDialView>,
+    /// The dial's ear to the session: the needle follows the scope.
+    _scope_dial_sub: Subscription,
     pub active_menu: Option<ActiveMenuState>,
     pub menu_epoch: usize,
     pub filters_btn_focus: FocusHandle,
@@ -229,13 +215,43 @@ impl PackageWorkstationView {
             )
         });
 
+        // Le cadran du périmètre. Il est une entité à part entière : l'aiguille
+        // a son propre état, et elle se jette sur son cran quand le
+        // périmètre change, d'où qu'il vienne.
+        let dial_entity = cx.entity();
+        let initial_scope = session.read(cx).scope;
+        let scope_dial = cx.new(|_cx| {
+            ScopeDialView::new(
+                initial_scope,
+                config.theme,
+                config.reduce_motion,
+                Rc::new(move |scope, _window, cx| {
+                    dial_entity.update(cx, |view, cx| {
+                        view.session.update(cx, |s, cx| {
+                            s.set_scope(scope, cx);
+                        });
+                    });
+                }),
+            )
+        });
+
+        // Le cadran suit le périmètre, d'où qu'il vienne.
+        let dial = scope_dial.clone();
+        let dial_subscription = cx.subscribe(&session, move |_this, _emitter, event, cx| {
+            if let SessionEvent::ScopeChanged(scope) = event {
+                dial.update(cx, |view, cx| {
+                    view.set_scope(*scope, cx);
+                });
+            }
+        });
+
         Self {
             session,
             store,
             console,
             toast_center,
-            list_pane_width: 640.0,
-            drag_state: None,
+            nameplate_height: 260.0,
+            nameplate_drag: None,
             scroll_handle: UniformListScrollHandle::new(),
             scroll_pending: 0.0,
             on_mutation: None,
@@ -254,6 +270,8 @@ impl PackageWorkstationView {
             flatpak_enabled: config.flatpak_enabled,
             appimage_enabled: config.appimage_enabled,
             search_input,
+            scope_dial,
+            _scope_dial_sub: dial_subscription,
             active_menu: None,
             menu_epoch: 0,
             filters_btn_focus: cx.focus_handle(),
@@ -556,19 +574,19 @@ impl PackageWorkstationView {
     pub fn on_pointer_move(
         &mut self,
         event: &MouseMoveEvent,
-        content_width: f32,
+        content_height: f32,
         cx: &mut Context<Self>,
     ) {
-        if let Some(drag) = self.drag_state {
-            let current_x = event.position.x.to_f64() as f32;
-            let new_width = compute_splitter_width(
-                drag.start_width,
-                drag.start_pointer_x,
-                current_x,
-                content_width,
+        if let Some(drag) = self.nameplate_drag {
+            let current_y = event.position.y.to_f64() as f32;
+            let new_height = nameplate_height_after_drag(
+                drag.start_height,
+                drag.start_pointer_y,
+                current_y,
+                content_height,
             );
-            if (new_width - self.list_pane_width).abs() >= 1.0 {
-                self.list_pane_width = new_width;
+            if (new_height - self.nameplate_height).abs() >= 1.0 {
+                self.nameplate_height = new_height;
                 cx.notify();
             }
         }
@@ -601,8 +619,8 @@ impl PackageWorkstationView {
     }
 
     pub fn on_pointer_up(&mut self, cx: &mut Context<Self>) {
-        if self.drag_state.is_some() {
-            self.drag_state = None;
+        if self.nameplate_drag.is_some() {
+            self.nameplate_drag = None;
             cx.notify();
         }
     }
@@ -638,17 +656,16 @@ impl Render for PackageWorkstationView {
         };
         let window_width = window.viewport_size().width / px(1.0);
         let content_width = content_width(window_width, sidebar_width);
-        let layout_mode = WorkstationLayoutMode::from_content_width(content_width);
+        let window_height = window.viewport_size().height / px(1.0);
 
-        let (list_min, list_max) = compute_splitter_bounds(content_width);
-        let effective_list_width = self.list_pane_width.clamp(list_min, list_max);
-        self.list_pane_width = effective_list_width;
+        // The plate is read from the top down: the band of the header, the
+        // bank, the readout, the nameplate. The content's height is what the
+        // nameplate is bounded against.
+        let content_height = (window_height - UiMetrics::NAMEPLATE_MIN_HEIGHT).max(0.0);
+        let effective_nameplate_height = nameplate_height(content_height, self.nameplate_height);
+        self.nameplate_height = effective_nameplate_height;
 
-        let active_list_width = if layout_mode == WorkstationLayoutMode::Horizontal {
-            effective_list_width
-        } else {
-            content_width
-        };
+        let active_list_width = content_width;
 
         let (
             scope,
@@ -752,6 +769,8 @@ impl Render for PackageWorkstationView {
             axis: &source_axis,
             source_health: &store.source_health,
             theme: &theme,
+            epoch: scope.index(),
+            reduce_motion: self.reduce_motion,
             on_toggle: {
                 let entity = on_toggle_source.clone();
                 Rc::new(move |kind, _w, cx| {
@@ -775,6 +794,7 @@ impl Render for PackageWorkstationView {
 
         let top_bar = QueryWorkbench::render(&QueryWorkbenchProps {
             search_input: self.search_input.clone(),
+            scope_dial: self.scope_dial.clone(),
             list_pane_width: active_list_width,
             scope,
             source_scope,
@@ -1099,50 +1119,39 @@ impl Render for PackageWorkstationView {
                 .child(list_body)
         };
 
-        let list_pane = if layout_mode == WorkstationLayoutMode::Horizontal {
-            div()
-                .flex()
-                .flex_col()
-                .w(px(effective_list_width))
-                .h_full()
-                .border_r_1()
-                .border_color(theme.border)
-                .child(top_bar)
-                .child(list_body)
-        } else {
-            div()
-                .flex()
-                .flex_col()
-                .w_full()
-                .flex_1()
-                .border_b_1()
-                .border_color(theme.border)
-                .child(top_bar)
-                .child(list_body)
-        };
+        // The readout: the band where the work happens, in full width.
+        let readout = div()
+            .flex()
+            .flex_col()
+            .w_full()
+            .flex_1()
+            .overflow_hidden()
+            .child(top_bar)
+            .child(list_body);
 
-        // ── 3. Splitter draggable isolé ─────────────────────────────────────
-        let is_resizing = self.drag_state.is_some();
+        // ── 3. The nameplate's edge, drawn between the bands ────────────────
+        let is_resizing = self.nameplate_drag.is_some();
         let splitter = div()
-            .id("workstation_splitter")
-            .w(px(5.0))
-            .h_full()
+            .id("workstation_nameplate_edge")
+            .w_full()
+            .h(px(UiMetrics::SPLITTER_THICKNESS))
+            .flex_shrink_0()
             .bg(if is_resizing {
                 theme.accent
             } else {
                 theme.border
             })
-            .cursor_col_resize()
+            .cursor_row_resize()
             .hover({
                 let h = theme.accent;
                 move |s| s.bg(h)
             })
             .on_mouse_down(MouseButton::Left, move |event, _window, cx| {
-                let pointer_x = event.position.x.to_f64() as f32;
+                let pointer_y = event.position.y.to_f64() as f32;
                 entity_split.update(cx, |view, cx| {
-                    view.drag_state = Some(SplitterDragState {
-                        start_width: view.list_pane_width,
-                        start_pointer_x: pointer_x,
+                    view.nameplate_drag = Some(NameplateDragState {
+                        start_height: view.nameplate_height,
+                        start_pointer_y: pointer_y,
                     });
                     cx.notify();
                 });
@@ -1285,72 +1294,36 @@ impl Render for PackageWorkstationView {
             inspector_tab_epoch,
         );
 
-        let details_pane = if layout_mode == WorkstationLayoutMode::Horizontal {
-            div()
-                .flex_1()
-                .h_full()
-                .overflow_hidden()
-                .child(inspector_element)
-        } else {
-            div()
-                .w_full()
-                .h(px(280.0))
-                .overflow_hidden()
-                .child(inspector_element)
-        };
+        // The nameplate: the caption of the readout, in full width, under it.
+        let nameplate = div()
+            .w_full()
+            .h(px(effective_nameplate_height))
+            .flex_shrink_0()
+            .overflow_hidden()
+            .child(inspector_element);
 
         // ── 5. Conteneur racine de la station de travail absorbant les moves ──
-        if layout_mode == WorkstationLayoutMode::Horizontal {
-            div()
-                .id("package_workstation_root")
-                .flex()
-                .flex_col()
-                .size_full()
-                .overflow_hidden()
-                .on_mouse_move(move |event, window, cx| {
-                    let window_width = window.window_bounds().get_bounds().size.width / px(1.0);
-                    let sidebar_width = if sidebar_collapsed {
-                        UiMetrics::SIDEBAR_COLLAPSED
-                    } else {
-                        UiMetrics::SIDEBAR_EXPANDED
-                    };
-                    let content_width = (window_width - sidebar_width).max(0.0);
-                    entity_move.update(cx, |view, cx| {
-                        view.on_pointer_move(event, content_width, cx);
-                    });
-                })
-                .on_mouse_up(MouseButton::Left, move |_event, _window, cx| {
-                    entity_up.update(cx, |view, cx| {
-                        view.on_pointer_up(cx);
-                    });
-                })
-                .child(source_bank)
-                .child(
-                    div()
-                        .flex()
-                        .flex_row()
-                        .size_full()
-                        .flex_1()
-                        .child(list_pane)
-                        .child(splitter)
-                        .child(details_pane),
-                )
-        } else {
-            div()
-                .id("package_workstation_root")
-                .flex()
-                .flex_col()
-                .size_full()
-                .overflow_hidden()
-                .on_mouse_up(MouseButton::Left, move |_event, _window, cx| {
-                    entity_up.update(cx, |view, cx| {
-                        view.on_pointer_up(cx);
-                    });
-                })
-                .child(source_bank)
-                .child(list_pane)
-                .child(details_pane)
-        }
+        div()
+            .id("package_workstation_root")
+            .flex()
+            .flex_col()
+            .size_full()
+            .overflow_hidden()
+            .on_mouse_move(move |event, window, cx| {
+                let window_height = window.window_bounds().get_bounds().size.height / px(1.0);
+                entity_move.update(cx, |view, cx| {
+                    view.on_pointer_move(event, window_height, cx);
+                });
+            })
+            .on_mouse_up(MouseButton::Left, move |_event, _window, cx| {
+                entity_up.update(cx, |view, cx| {
+                    view.on_pointer_up(cx);
+                });
+            })
+            .child(source_bank)
+            .child(readout)
+            .child(splitter)
+            .child(nameplate)
     }
 }
 
@@ -1534,180 +1507,60 @@ mod tests {
     }
 
     #[test]
-    fn the_inspector_stays_inside_its_bounds_at_the_widths_a_tiling_compositor_uses() {
-        // Les largeurs que le compositeur à tuiles a données pendant la mesure :
-        // 1056px et 2542px. Dans les deux, l'inspecteur doit rester dans
-        // [320, min(520, 3/7·w_c)] — ce que la largeur *demandée* ne garantissait
-        // pas.
-        for window_width in [1056.0_f32, 2542.0] {
-            let content = content_width(window_width, UiMetrics::SIDEBAR_EXPANDED);
-            let (list_min, list_max) = compute_splitter_bounds(content);
-            let list = 640.0_f32.clamp(list_min, list_max);
-            let inspector = content - UiMetrics::SPLITTER_WIDTH - list;
+    fn the_nameplate_stays_inside_its_bounds_at_the_heights_a_tiling_compositor_uses() {
+        // Les hauteurs que le compositeur à tuiles a données pendant la
+        // mesure : 720px et 1440px. Dans les deux, la plaque de nom reste
+        // entre son plancher et sa part — elle n'avale jamais la lecture.
+        for window_height in [720.0_f32, 1440.0] {
+            let content = (window_height - UiMetrics::NAMEPLATE_MIN_HEIGHT).max(0.0);
+            let nameplate = nameplate_height(content, 320.0);
 
             assert!(
-                inspector >= UiMetrics::INSPECTOR_MIN_USABLE - 0.01,
-                "l'inspecteur tombe sous son plancher : {inspector}px dans une fenêtre de {window_width}px"
+                nameplate >= UiMetrics::NAMEPLATE_MIN_HEIGHT - 0.01,
+                "la plaque de nom tombe sous son plancher : {nameplate}px dans une fenêtre de {window_height}px"
             );
             assert!(
-                inspector <= (content * UiMetrics::INSPECTOR_MAX_RATIO).min(UiMetrics::INSPECTOR_MAX_WIDTH) + 0.01,
-                "l'inspecteur dépasse son plafond : {inspector}px dans une fenêtre de {window_width}px"
+                nameplate <= content * UiMetrics::NAMEPLATE_MAX_RATIO + 0.01,
+                "la plaque de nom dépasse sa part : {nameplate}px dans une fenêtre de {window_height}px"
             );
+            // Et la lecture garde le reste.
             assert!(
-                list >= UiMetrics::LIST_MIN_USABLE - 0.01,
-                "la liste tombe sous son plancher : {list}px dans une fenêtre de {window_width}px"
+                content - nameplate > 0.0,
+                "la lecture garde de la place : {content}px de contenu, {nameplate}px de plaque"
             );
         }
     }
 
     #[test]
-    fn test_inspector_ratio_pure_math_and_bounds() {
-        // 1. Boundary at HORIZONTAL_SPLIT_MIN_CONTENT_WIDTH (~746.67px)
-        let min_w = UiMetrics::HORIZONTAL_SPLIT_MIN_CONTENT_WIDTH;
-        let (list_min_boundary, list_max_boundary) = compute_splitter_bounds(min_w);
-        assert!((list_min_boundary - list_max_boundary).abs() < 0.01);
-        let inspector_at_boundary = min_w - UiMetrics::SPLITTER_WIDTH - list_min_boundary;
-        assert!((inspector_at_boundary - UiMetrics::INSPECTOR_MIN_USABLE).abs() < 0.01);
-        assert!(inspector_at_boundary <= min_w * UiMetrics::INSPECTOR_MAX_RATIO + 0.01);
-
-        // 2. Reference 900px viewport
-        let (list_min_900, list_max_900) = compute_splitter_bounds(900.0);
-        let inspector_at_min_list = 900.0 - UiMetrics::SPLITTER_WIDTH - list_min_900;
-        let inspector_at_max_list = 900.0 - UiMetrics::SPLITTER_WIDTH - list_max_900;
-        assert!(inspector_at_min_list <= 900.0 * UiMetrics::INSPECTOR_MAX_RATIO + 0.01);
-        assert!(inspector_at_max_list >= UiMetrics::INSPECTOR_MIN_USABLE - 0.01);
-
-        // 3. Reference 1280px viewport (cap at 520px)
-        let (list_min_1280, list_max_1280) = compute_splitter_bounds(1280.0);
-        let inspector_max_1280 = 1280.0 - UiMetrics::SPLITTER_WIDTH - list_min_1280;
-        let inspector_min_1280 = 1280.0 - UiMetrics::SPLITTER_WIDTH - list_max_1280;
-        assert_eq!(inspector_max_1280, UiMetrics::INSPECTOR_MAX_WIDTH);
-        assert_eq!(inspector_min_1280, UiMetrics::INSPECTOR_MIN_USABLE);
-        assert_eq!(list_min_1280, 755.0);
-        assert_eq!(list_max_1280, 955.0);
-
-        // 4. Large 1600px viewport (cap at 520px)
-        let (list_min_1600, list_max_1600) = compute_splitter_bounds(1600.0);
-        let inspector_max_1600 = 1600.0 - UiMetrics::SPLITTER_WIDTH - list_min_1600;
-        let inspector_min_1600 = 1600.0 - UiMetrics::SPLITTER_WIDTH - list_max_1600;
-        assert_eq!(inspector_max_1600, UiMetrics::INSPECTOR_MAX_WIDTH);
-        assert_eq!(inspector_min_1600, UiMetrics::INSPECTOR_MIN_USABLE);
-        assert_eq!(list_min_1600, 1075.0);
-        assert_eq!(list_max_1600, 1275.0);
+    fn the_nameplate_is_pulled_up_and_grows() {
+        // On tire vers le haut : la plaque grandit.
+        let grown = nameplate_height_after_drag(300.0, 500.0, 450.0, 900.0);
+        assert_eq!(grown, 350.0);
+        // On tire vers le bas : elle rétrécit.
+        let shrunk = nameplate_height_after_drag(300.0, 500.0, 550.0, 900.0);
+        assert_eq!(shrunk, 250.0);
     }
 
     #[test]
-    fn test_layout_mode_adaptation_at_boundary() {
-        assert_eq!(
-            WorkstationLayoutMode::from_content_width(700.0),
-            WorkstationLayoutMode::Stacked
-        );
-        assert_eq!(
-            WorkstationLayoutMode::from_content_width(746.0),
-            WorkstationLayoutMode::Stacked
-        );
-        assert_eq!(
-            WorkstationLayoutMode::from_content_width(
-                UiMetrics::HORIZONTAL_SPLIT_MIN_CONTENT_WIDTH
-            ),
-            WorkstationLayoutMode::Horizontal
-        );
-        assert_eq!(
-            WorkstationLayoutMode::from_content_width(800.0),
-            WorkstationLayoutMode::Horizontal
-        );
-        assert_eq!(
-            WorkstationLayoutMode::from_content_width(1280.0),
-            WorkstationLayoutMode::Horizontal
-        );
+    fn the_nameplate_never_swallows_the_readout() {
+        // Tirée vers le haut sans fin, elle s'arrête à sa part.
+        let content = 900.0;
+        let pulled = nameplate_height_after_drag(300.0, 800.0, 0.0, content);
+        assert_eq!(pulled, content * UiMetrics::NAMEPLATE_MAX_RATIO);
+        // Tirée vers le bas sans fin, elle s'arrête à son plancher.
+        let pushed = nameplate_height_after_drag(300.0, 0.0, 2000.0, content);
+        assert_eq!(pushed, UiMetrics::NAMEPLATE_MIN_HEIGHT);
     }
 
     #[test]
-    fn test_splitter_delta_forward() {
-        // At 1280px content_width, bounds are [755.0, 955.0]
-        let width = compute_splitter_width(800.0, 650.0, 700.0, 1280.0);
-        assert_eq!(width, 850.0);
-    }
-
-    #[test]
-    fn test_splitter_delta_reverse() {
-        // At 1280px content_width, bounds are [755.0, 955.0]
-        let width = compute_splitter_width(800.0, 650.0, 620.0, 1280.0);
-        assert_eq!(width, 770.0);
-    }
-
-    #[test]
-    fn test_splitter_clamp_minimum() {
-        // At 1280px, minimum list width is 755.0 so inspector does not exceed 520px
-        let width = compute_splitter_width(800.0, 650.0, 100.0, 1280.0);
-        assert_eq!(
-            width, 755.0,
-            "Must clamp to 755 minimum at 1280px content width"
-        );
-    }
-
-    #[test]
-    fn test_splitter_clamp_maximum() {
-        // At 1280px, maximum list width is 955.0 so inspector maintains at least 320px
-        let width = compute_splitter_width(800.0, 650.0, 1200.0, 1280.0);
-        assert_eq!(
-            width, 955.0,
-            "Must clamp to 955 maximum at 1280px content width"
-        );
-    }
-
-    #[test]
-    fn test_dual_usable_splitter_clamp_invariants() {
-        let (_list_min, list_max) = compute_splitter_bounds(900.0);
-        let width = compute_splitter_width(520.0, 650.0, 1000.0, 900.0);
-        assert_eq!(width, list_max);
-        assert!(width >= UiMetrics::LIST_MIN_USABLE);
-        let inspector_remains = 900.0 - UiMetrics::SPLITTER_WIDTH - width;
-        assert!(inspector_remains >= UiMetrics::INSPECTOR_MIN_USABLE);
-        assert!(inspector_remains <= 900.0 * UiMetrics::INSPECTOR_MAX_RATIO + 0.01);
-    }
-
-    #[test]
-    fn test_splitter_sidebar_offset_independence() {
-        // Sidebar collapsed (56px) vs expanded (190px)
-        let collapsed_start_x = 56.0 + 800.0;
-        let collapsed_current_x = 56.0 + 850.0;
-        let width_collapsed =
-            compute_splitter_width(800.0, collapsed_start_x, collapsed_current_x, 1280.0);
-
-        let expanded_start_x = 190.0 + 800.0;
-        let expanded_current_x = 190.0 + 850.0;
-        let width_expanded =
-            compute_splitter_width(800.0, expanded_start_x, expanded_current_x, 1280.0);
-
-        assert_eq!(width_collapsed, 850.0);
-        assert_eq!(width_expanded, 850.0);
-        assert_eq!(
-            width_collapsed, width_expanded,
-            "Splitter width calculation must be completely independent of sidebar width"
-        );
-    }
-
-    #[test]
-    fn test_splitter_guarantees_inspector_bounds_across_reference_viewports() {
-        for content_w in [750.0, 900.0, 1024.0, 1280.0, 1600.0, 1920.0] {
-            let (list_min, list_max) = compute_splitter_bounds(content_w);
-            let insp_at_min = content_w - UiMetrics::SPLITTER_WIDTH - list_min;
-            let insp_at_max = content_w - UiMetrics::SPLITTER_WIDTH - list_max;
-
-            // Inspector must never exceed min(520, content_w * 3/7)
-            let max_allowed =
-                (content_w * UiMetrics::INSPECTOR_MAX_RATIO).min(UiMetrics::INSPECTOR_MAX_WIDTH);
-            assert!(
-                insp_at_min <= max_allowed + 0.01,
-                "Inspector at min list ({insp_at_min}) must not exceed {max_allowed} at content_w={content_w}"
-            );
-
-            // Inspector must never drop below 320
-            assert!(
-                insp_at_max >= UiMetrics::INSPECTOR_MIN_USABLE - 0.01,
-                "Inspector at max list ({insp_at_max}) must be at least 320 at content_w={content_w}"
-            );
-        }
+    fn the_nameplate_is_bounded_in_a_short_window() {
+        // Une fenêtre basse : la part est calculée sur le contenu, pas sur la
+        // fenêtre entière, et le plancher tient toujours.
+        let content = 200.0;
+        let nameplate = nameplate_height(content, 1000.0);
+        assert_eq!(nameplate, UiMetrics::NAMEPLATE_MIN_HEIGHT);
+        let (min, max) = nameplate_bounds(content);
+        assert_eq!(min, UiMetrics::NAMEPLATE_MIN_HEIGHT);
+        assert_eq!(max, UiMetrics::NAMEPLATE_MIN_HEIGHT);
     }
 }
