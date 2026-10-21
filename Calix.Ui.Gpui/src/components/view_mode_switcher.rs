@@ -104,6 +104,10 @@ impl ViewModeSwitcher {
                 container.child(
                     div()
                         .id(element_id)
+                        // The handles the bench measures and clicks: the
+                        // harness reads the bounds of a cell under this name.
+                        // A noop outside the tests.
+                        .debug_selector(|| element_id.to_string())
                         .focusable()
                         .tab_stop(true)
                         .focus(move |s| s.border_1().border_color(focus_border))
@@ -171,6 +175,142 @@ mod tests {
 
         // Une marque sans départ reste immobile.
         assert_eq!(thumb_travel(1, 1, 0.42), 28.0);
+    }
+
+    /// Le clic, dans le banc : la porte de l'interaction.
+    ///
+    /// Depuis v0.2.5, les notes de version disaient que les clics n'étaient
+    /// pas prouvés — le pointeur synthétique n'atteignait pas le client
+    /// Wayland sur la machine où la preuve avait été prise. Le pointeur
+    /// synthétique se battait avec le compositeur : il volait le focus, et il
+    /// ne atterrissait jamais.
+    ///
+    /// Le banc, lui, n'a pas ce problème : il expédie l'événement *dans* la
+    /// fenêtre — un vrai test de collision, un vrai ordre de propagation, un
+    /// vrai gestionnaire. La preuve n'a pas besoin d'un bureau.
+    ///
+    /// Ce test est le premier de la série : un clic sur le vrai commutateur
+    /// de vue, et le mode qui change.
+    #[gpui::test]
+    fn a_click_on_the_switcher_changes_the_view(cx: &mut gpui::TestAppContext) {
+        use gpui::prelude::*;
+        use gpui::{div, point, px, size, Context, Render, Window};
+        use std::cell::Cell;
+        use std::rc::Rc;
+
+        struct Fixture {
+            theme: Theme,
+            chosen: Rc<Cell<Option<PackageViewMode>>>,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let theme = self.theme.clone();
+                let chosen = self.chosen.clone();
+                div().size_full().child(ViewModeSwitcher::render(
+                    ViewModeSwitcherProps {
+                        current_mode: PackageViewMode::Table,
+                        theme: &theme,
+                        reduce_motion: false,
+                        marker: None,
+                        on_select_mode: Rc::new(move |mode, _w, _cx| {
+                            chosen.set(Some(mode));
+                        }),
+                    },
+                ))
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let theme = Theme::dark();
+        let chosen = Rc::new(Cell::new(None));
+
+        let fixture = cx.new(|_| Fixture {
+            theme: theme.clone(),
+            chosen: chosen.clone(),
+        });
+
+        cx.draw(
+            point(px(0.0), px(0.0)),
+            size(px(400.0), px(200.0)),
+            |_window, _cx| fixture.clone(),
+        );
+
+        // The two cells, measured.
+        let cards = cx
+            .debug_bounds("view_mode_cards")
+            .expect("the cards cell is drawn");
+        let table = cx
+            .debug_bounds("view_mode_table")
+            .expect("the table cell is drawn");
+
+        // The click, on the cards cell: the handler must be reached.
+        cx.simulate_click(
+            point(
+                cards.origin.x + cards.size.width / 2.0,
+                cards.origin.y + cards.size.height / 2.0,
+            ),
+            gpui::Modifiers::default(),
+        );
+
+        assert_eq!(
+            chosen.get(),
+            Some(PackageViewMode::Cards),
+            "le clic sur la cellule des cartes a changé le mode"
+        );
+
+        // And the other cell, on its own: the two are distinct.
+        //
+        // The frame between the two clicks is not a formality: a click is a
+        // sequence of events separated by frames, exactly as it is for a
+        // user. The first click moves the focus; the focus changes the
+        // element's style; the window repaints; the *next* click is hit
+        // against the hitboxes of that repaint. Without the frame, the
+        // second click is dispatched against a stale frame and lands
+        // nowhere — which is the bench's protocol, not a defect of the
+        // application.
+        chosen.set(None);
+        let frame = |cx: &mut gpui::VisualTestContext| {
+            cx.draw(
+                point(px(0.0), px(0.0)),
+                size(px(400.0), px(200.0)),
+                |_window, _cx| fixture.clone(),
+            );
+        };
+        frame(cx);
+        cx.simulate_click(
+            point(
+                table.origin.x + table.size.width / 2.0,
+                table.origin.y + table.size.height / 2.0,
+            ),
+            gpui::Modifiers::default(),
+        );
+        assert_eq!(
+            chosen.get(),
+            Some(PackageViewMode::Table),
+            "et le clic sur la cellule du tableau a changé le mode"
+        );
+
+        // And the first one again: the two cells are distinct, and both
+        // answer.
+        chosen.set(None);
+        frame(cx);
+        cx.simulate_click(
+            point(
+                cards.origin.x + cards.size.width / 2.0,
+                cards.origin.y + cards.size.height / 2.0,
+            ),
+            gpui::Modifiers::default(),
+        );
+        assert_eq!(
+            chosen.get(),
+            Some(PackageViewMode::Cards),
+            "et le clic sur la cellule des cartes a changé le mode"
+        );
     }
 
     #[test]

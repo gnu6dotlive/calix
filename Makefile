@@ -38,7 +38,7 @@ export CALIX_BIN
 
 # ─── Cibles principales ───────────────────────────────────────────────────────
 
-.PHONY: run build check test zig clean package package-install install help
+.PHONY: run build check test dependencies dependencies-update zig clean package package-install install help
 
 ## Lance l'application en mode développement (cargo run)
 run: zig
@@ -59,6 +59,14 @@ check:
 ## Lance la suite de tests unitaires Rust
 test:
 	cd $(RUST_SRC) && cargo test
+
+## L'état des dépendances : ce qui est en retard, et les épingles connues
+dependencies:
+	@./scripts/dependencies
+
+## Met à jour le lockfile, repose les épingles, et laisse la porte décider
+dependencies-update:
+	@./scripts/dependencies --update
 
 ## Compile les binaires Zig
 zig:

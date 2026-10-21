@@ -1,0 +1,47 @@
+name: Dependency currency
+
+# The lockfile is the dependency truth of this repository: `cargo build
+# --locked` builds exactly what it names. This job asks one question — is
+# that truth still current? — and answers it on a schedule, so the answer is
+# a fact and not a habit.
+#
+# It is deliberately *not* part of the build gate. A gate that turns red
+# because someone else published a crate is noise; a scheduled job that
+# turns red is a signal.
+#
+# The known incompatibilities are pinned in `scripts/dependencies`, with
+# their reasons. The check ignores them: they are the pins, and the pins
+# are current by construction.
+
+on:
+  schedule:
+    # Mondays, early: the week starts with the truth about the week.
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "Calix.Ui.Gpui/Cargo.toml"
+      - "Calix.Ui.Gpui/Cargo.lock"
+      - "scripts/dependencies"
+
+# A pull request that touches the dependencies is checked, and a failure is
+# reported but does not block: the author may be mid-update.
+permissions:
+  contents: read
+
+jobs:
+  currency:
+    name: The lockfile is current
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check the lockfile's currency
+        run: ./scripts/dependencies --check
+
+      - name: Say what is behind, in full
+        if: always()
+        run: ./scripts/dependencies

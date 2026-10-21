@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+# The dependency currency of the repository: one command, one gate.
+#
+# A dependency update is not a chore, it is a *change*, and it deserves the
+# same discipline as any other: the update is applied, the known
+# incompatibilities are re-pinned, and the gate decides.
+#
+# This script is that discipline, written down. It exists because the
+# alternative is folklore: somebody runs `cargo update`, the build breaks
+# three crates deep in a dependency nobody remembers, and the fix is
+# rediscovered from scratch.
+#
+#   scripts/dependencies            # what is behind, and the pins
+#   scripts/dependencies --check    # the same, and it fails if anything is
+#   scripts/dependencies --update   # update, re-pin, and run the gate
+#
+# The pins below are *known incompatibilities*, each one with its reason.
+# They are not preferences: they are the crates whose newest version
+# breaks the build, and the gate is what proved it.
+set -euo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+CRATE="$ROOT/Calix.Ui.Gpui"
+
+# ── The pins ───────────────────────────────────────────────────────────────
+#
+# libc 0.2.191 removed `ENOATTR` (on Linux it is an alias of `ENODATA`).
+# The `xattr` crate — a transitive dependency — still names it, and the
+# build fails inside a crate that has nothing to do with Calix. Held at the
+# last version that compiles; the gate is the arbiter.
+declare -A PINS=(
+    [libc]=0.2.189
+)
+
+MODE=${1:-}
+case "$MODE" in
+    "") ;;
+    --check) ;;
+    --update) ;;
+    -h | --help)
+        sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'
+        exit 0
+        ;;
+    *)
+        echo "dependencies: unknown argument: $MODE" >&2
+        exit 2
+        ;;
+esac
+
+# The pinned Zig: the tree needs 0.16's build API, and the repository
+# carries that toolchain in vendor/. It is a *build* dependency, and it is
+# pinned by path, not by version.
+ZIG="$ROOT/vendor/zig-0.16/usr/bin/zig"
+[ -x "$ZIG" ] || ZIG=$(command -v zig || true)
+
+# ── What is behind ─────────────────────────────────────────────────────────
+# The dry run is the report: it says what the lockfile *could* move to,
+# without moving it.
+report() {
+    (cd "$CRATE" && cargo update --dry-run 2>&1) |
+        grep -E "^ +(Updating|Adding|Removing|Downgrading) " |
+        sed 's/^ *//' |
+        grep -vE "^Updating crates\.io index$" |
+        grep -vE "^((Downgrading|Updating) (libc) )" ||
+        true
+}
+
+apply_pins() {
+    for crate in "${!PINS[@]}"; do
+        local want="${PINS[$crate]}"
+        local have
+        have=$(cd "$CRATE" && cargo tree -p "$crate" --depth 0 2>/dev/null |
+            head -1 | awk '{print $2}' | tr -d 'v')
+        if [ "${have:-}" != "$want" ]; then
+            echo "dependencies: re-pinning $crate to $want"
+            (cd "$CRATE" && cargo update -p "$crate" --precise "$want")
+        fi
+    done
+}
+
+case "$MODE" in
+    --update)
+        echo "dependencies: updating the lockfile"
+        (cd "$CRATE" && cargo update)
+        apply_pins
+        echo "dependencies: the gate decides"
+        "$ROOT/scripts/verify"
+        echo "dependencies: the lockfile is current; the pins held"
+        exit 0
+        ;;
+esac
+
+# ── The report, and the check ──────────────────────────────────────────────
+behind=$(report)
+if [ -z "$behind" ]; then
+    echo "dependencies: the lockfile is current; the pins are:"
+    for crate in "${!PINS[@]}"; do
+        echo "  $crate = ${PINS[$crate]}  (known incompatibility)"
+    done
+    exit 0
+fi
+
+echo "dependencies: the lockfile is behind:"
+echo "$behind" | sed 's/^/  /'
+echo
+echo "dependencies: the pins are:"
+for crate in "${!PINS[@]}"; do
+    echo "  $crate = ${PINS[$crate]}  (known incompatibility)"
+done
+echo
+echo "dependencies: to update, run: scripts/dependencies --update"
+
+if [ "$MODE" = "--check" ]; then
+    echo "dependencies: FAILED — the lockfile is behind" >&2
+    exit 1
+fi

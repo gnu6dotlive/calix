@@ -463,6 +463,37 @@ backend you just built:
 | `make install` | Development install into `/usr/local` (no PKGBUILD; needs elevated privileges) |
 | `make clean` | Remove Rust and Zig build artefacts |
 
+### The dependencies
+
+The lockfile is the dependency truth: `cargo build --locked` builds exactly
+what it names. `scripts/dependencies` asks whether that truth is still
+current, and `scripts/dependencies --update` brings it forward — the update,
+the re-pinning of the known incompatibilities, and the gate, in one command.
+
+```bash
+scripts/dependencies            # what is behind, and the pins
+scripts/dependencies --check    # the same, and it fails if anything is
+scripts/dependencies --update   # update, re-pin, and let the gate decide
+```
+
+A scheduled job (`Dependency currency`, Mondays) asks the question on its
+own, so the answer is a fact and not a habit.
+
+The pins are **known incompatibilities**, each with its reason in the
+script — `libc` is held because its newest version removed `ENOATTR`, which a
+transitive dependency still names, and the build fails three crates deep in a
+dependency nobody remembers.
+
+Two dependencies are deliberately *not* moved by that command:
+
+- **`gpui` and `blade-graphics`** are the UI substrate. Moving them is a
+  *port*, not an update: the API the application uses is largely stable —
+  the test instrument included — but the numbers the spatial contract
+  measures are measurements *of that layout*, and they would have to be
+  measured again.
+- **the Zig dependencies** are vendored in-tree and pinned by hash. They
+  are reproducible by construction, and moving them is a deliberate act.
+
 ### The gate
 
 Every change is proven locally before it is pushed. There is no "try it on CI" step.
