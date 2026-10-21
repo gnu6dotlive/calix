@@ -1,0 +1,106 @@
+{
+  "run_id": "design-01-comptoir-20261020",
+  "kind": "design",
+  "status": "ok",
+  "started_at": "2026-10-20T20:05:00Z",
+  "finished_at": "2026-10-21T00:46:10Z",
+  "objective": "Design proposal 01 of 4: Le Comptoir, a package manager for Arch as a shop counter at night. One 1600x1000 dark desktop screen, the FigCraft source, and the rationale.",
+  "inputs": {
+    "brief": "evidence/design-proposals/00-BRIEFS.md, brief 1",
+    "tokens": "the design-system tokens taken as they are: anthracite #111418, shell white #F7F3ED, muted #A1A6AD, slate #667085, signal orange 100 #FFE5D2 / 300 #FF8E40 / base #FF6A00 / 700 #C95400, royal blue 300 #87A0F4 / base #4169E1",
+    "derivation_rule": "no hue outside the tokens was invented: warm dark wood is the anthracite ground with the signal-orange token composited over it at low alpha; blackened brass is signal orange 700 darkened toward the ground; the grain is a slate noise effect blended overlay"
+  },
+  "the_decision": {
+    "the_two_axes": "sources are the drawers of a permanent wall in the left column; the operations are the three positions of one brass lever on a milled aluminium channel in the right column",
+    "the_three_shelves": "search, installed and updates are the three shelves of the case: two stay pushed back in shadow, the third is pulled out onto the counter and its empty slot is left open and labelled",
+    "the_third_operation": "remove is a verb on a selected package, so it is a button on the detail board with the exact command, not a fourth shelf",
+    "the_mark": "a scallop shell of seven ribs in a metal cup on a brushed aluminium stem, 84px tall in the header, and engraved as a line drawing on the back panel of the case",
+    "the_compact_list": "shown as a possibility, not as a screen: the ROWS control draws both row shapes, and the open ALPM drawer holds a genuine compact list"
+  },
+  "what_was_built": {
+    "generator": "build.py (emits build.jsonl; every layer is a figcraft command)",
+    "commands": 422,
+    "layers": 422
+  },
+  "how": [
+    "cd evidence/design-proposals/build && ./build.sh",
+    "  python3 01-comptoir.py  ->  01-comptoir.jsonl (422 figcraft commands)",
+    "  figcraft-cli run 01-comptoir.jsonl --out ../01-comptoir.figcraft",
+    "  figcraft-cli export ../01-comptoir.figcraft -o ../01-comptoir.png --scale 1",
+    "the PNG was rendered and read back nine times: the noise effect paints grains at full strength (slate over wood, muted over aluminium, blended overlay); the shell's flanks were drawn on the wrong side of the hinge; the ribs overshot the scalloped margin; the cup was narrower than the fan and left a sliver of shell escaping; the till's lever sat on the channel instead of in it; the wood's first pass was opaque and let the front rail show the row behind it"
+  ],
+  "artefacts": [
+    {
+      "path": "evidence/design-proposals/01-comptoir.png",
+      "sha256": "a0b9cacea319bae7e052c8a7f3391e13fdcf100b4d7abd502a2a5bb8f1b649b3",
+      "size": "1600x1000"
+    },
+    {
+      "path": "evidence/design-proposals/01-comptoir.figcraft",
+      "sha256": "91671b01e4711156a2847481a1a6cc5aeb8e9bf54f3842b223fefd3b46d9a36e",
+      "note": "one frame, 422 nodes"
+    },
+    {
+      "path": "evidence/design-proposals/01-comptoir.md",
+      "sha256": "b5bb2b77a7d774671ca242e81230ee094b926c68f9cd04c4b0b24fb9c88fe79c",
+      "note": "the rationale: navigation, material, motion, and the second pass"
+    },
+    {
+      "path": "evidence/design-proposals/notes/01-comptoir.md",
+      "sha256": "3954a1e1fd397cac51708fd31961e2dac3fada07931e9cd5e10cafb26605ad06",
+      "note": "one question for the other three authors"
+    },
+    {
+      "path": "evidence/design-proposals/build/01-comptoir.py",
+      "sha256": "9e89805be1f22fd8576aa35f93e19a984c06cb87b8d8bf202eb9055b2219401e",
+      "note": "the generator, in the shared build directory"
+    },
+    {
+      "path": "evidence/design-proposals/build/01-comptoir.jsonl",
+      "sha256": "c6a10bfcd1f9c3700318716f1ee6041e1766d8408d61cb5e96389e3dac6c795e",
+      "note": "the figcraft command log, in the shared build directory"
+    },
+    {
+      "path": "evidence/design-proposals/build/build.sh",
+      "sha256": "574547786e8fa8cde173fac68268e0cbb9f048551eda55947f6b65e2cb6b9708",
+      "note": "build and export, one process per file"
+    },
+    {
+      "path": "evidence/runs/design-01-comptoir-20261020/build.jsonl",
+      "sha256": "c6a10bfcd1f9c3700318716f1ee6041e1766d8408d61cb5e96389e3dac6c795e",
+      "note": "the figcraft command log the .figcraft was built from"
+    },
+    {
+      "path": "evidence/runs/design-01-comptoir-20261020/build.py",
+      "sha256": "9e89805be1f22fd8576aa35f93e19a984c06cb87b8d8bf202eb9055b2219401e",
+      "note": "the generator"
+    },
+    {
+      "path": "evidence/runs/design-01-comptoir-20261020/build.sh",
+      "sha256": "d874d23a95e5d2f8d1c59214f21092f6f9c382d80f0c3ace6e91bc6f2d511815",
+      "note": "build and export from the run directory"
+    },
+    {
+      "path": "evidence/runs/design-01-comptoir-20261020/01-comptoir.png",
+      "sha256": "a0b9cacea319bae7e052c8a7f3391e13fdcf100b4d7abd502a2a5bb8f1b649b3",
+      "note": "the render, copied into the run record",
+      "size": "1600x1000"
+    },
+    {
+      "path": "evidence/runs/design-01-comptoir-20261020/01-comptoir@2x.png",
+      "sha256": "04fd23408c45e5770d061ce75e5b3231f190229d6656f3f0bf529d31abf7c182",
+      "note": "the 2x render, for inspection",
+      "size": "3200x2000"
+    }
+  ],
+  "rules_kept": [
+    "the Calix application code was not opened, the running application was not started, and no screenshot of it was looked for: the proposal comes from the brief alone",
+    "no GitHub Actions were used",
+    "no privileged commands were used"
+  ],
+  "known_gaps": [
+    "the fonts are system fonts (IBM Plex Sans, IBM Plex Sans Condensed, IBM Plex Mono); a render on a machine without them falls back",
+    "royal blue is not on this screen: it is the identity's alternative accent, and this direction is warm wood and blackened brass, so the screen carries one accent",
+    "the compact density is shown as a control and as a legend inside the open drawer, not as a drawn screen"
+  ]
+}

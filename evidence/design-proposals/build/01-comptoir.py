@@ -15,7 +15,8 @@ import os
 import re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT_JSONL = os.path.join(HERE, "01-comptoir.jsonl")
+# the command log is written beside this file, under this file's own name
+OUT_JSONL = os.path.join(HERE, os.path.splitext(os.path.basename(__file__))[0] + ".jsonl")
 
 # ---------------------------------------------------------------- tokens ----
 ANTH = "#111418"   # anthracite, the ground
@@ -462,9 +463,10 @@ def drawer(y, name, desc, count, key, pulled=False, dx=0):
     rtxt(key, x + w - 24, y + 34, 9.5, MONO,
          ORANGE if pulled else alpha(MUTED, 0x99), root)
     # the blackened-brass pull
-    rect(x + w - 16, y + 19, 9, 24, grad([O700, ANTH], [0, 0], [1, 0]), root,
+    rect(x + w - 16, y + 19, 8, 24, grad([alpha(O700, 0xD0), alpha(ANTH, 0xFF)],
+                                         [0, 0], [1, 0]), root,
          cornerRadius=4, effects=shadow("#000000A0", (1, 3), 5))
-    rect(x + w - 16, y + 19, 2, 24, [alpha(O300, 0x55)], root, cornerRadius=1)
+    rect(x + w - 16, y + 19, 1, 24, [alpha(O300, 0x40)], root, cornerRadius=1)
 
 
 # The pulled drawer shows its inside: the source's own compartments, one dense
@@ -475,7 +477,7 @@ for i, (name, desc, count, key) in enumerate(SOURCES[1:]):
 
 # the open box of the pulled drawer, seen from above
 vec("M 38.00 212.00 L 50.00 166.00 L 296.00 166.00 L 308.00 212.00 Z", root,
-    fills=grad([alpha(O700, 0x26), alpha(ANTH, 0xF0)], [0, 0], [0, 1]),
+    fills=grad([alpha(O700, 0x16), alpha(ANTH, 0xFF)], [0, 0], [0, 1]),
     name="drawer-interior")
 rect(50, 165, 246, 2, [alpha(O700, 0xAA)], root)
 rect(50, 167, 246, 1, [alpha(O100, 0x44)], root)
@@ -551,7 +553,7 @@ def dim_shelf(y, label):
     for dx, dw, dh in [(0, 128, 15), (140, 88, 11), (240, 104, 14), (356, 72, 9),
                        (440, 92, 12)]:
         rect(C_X + 22 + dx, y - 4 - dh, dw, dh, [alpha(ORANGE, 0x16)], root,
-             cornerRadius=2)
+             cornerRadius=2, effects=shadow("#00000088", (0, 5), 8))
         rect(C_X + 22 + dx, y - 4 - dh, dw, 1, [alpha(O300, 0x28)], root)
     rect(C_X, y, 560, 18, wood(0x28, 0x0A), root,
          effects=shadow("#000000A0", (0, 7), 14))
@@ -640,9 +642,10 @@ rect(C_X + C_W - 16 - 214, 824, 214, 26, [alpha(O700, 0x33)], root, cornerRadius
 txt("UPDATES", C_X + C_W - 202, 830, 11, COND_SB, O300, root, ls=1.8)
 txt("8 OF 812", C_X + C_W - 112, 831, 10.5, MONO, alpha(MUTED, 0xC0), root)
 txt("copy command  ⌘⌥C", C_X + 16, 831, 10, COND, alpha(MUTED, 0xAA), root)
-rect(C_X + C_W - 16 - 230, 828, 10, 22, grad([O700, ANTH], [0, 0], [1, 0]), root,
+rect(C_X + C_W - 16 - 230, 828, 9, 22, grad([alpha(O700, 0xD0), alpha(ANTH, 0xFF)],
+                                             [0, 0], [1, 0]), root,
      cornerRadius=4, effects=shadow("#000000A0", (1, 3), 5))
-rect(C_X + C_W - 16 - 230, 828, 2, 22, [alpha(O300, 0x77)], root, cornerRadius=1)
+rect(C_X + C_W - 16 - 230, 828, 1, 22, [alpha(O300, 0x40)], root, cornerRadius=1)
 
 # ================================================================= the till ==
 T_T, T_B = MAIN_T, 230

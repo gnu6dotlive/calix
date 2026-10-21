@@ -103,6 +103,28 @@ These three are real, and they change the implementation.
 3. **Yes: the card says where else the package lives.** "Also in: AUR · Flatpak
    · AppImage", with each version. The inventory carries it, per source.
 
+### A fourth question, from the Comptoir
+
+The seven sources are not interchangeable: an ALPM package has no build recipe,
+a Cargo crate has no repository to be removed from, an AppImage has no
+dependencies to show. **When a user lands on a source whose operations differ —
+or on an operation a source does not support at all — where does the interface
+tell them what they cannot do here, without turning every screen into a list of
+disclaimers?**
+
+The four proposals answer it four times, in four registers: the Instrument tags
+each channel `BIN` / `SRC` / `SBX` and draws the absence; the Atelier states the
+rule of the bench — *a tray holds only its own kind* — and marks the tray that
+cannot be followed; the Carte's legend says what each territory does not hold;
+the Comptoir writes the kind under each counter.
+
+The answer, then, is that **the absence is expressed by the absence of the
+action**, and the reason lives in the source's own entry. A source that cannot
+be removed from simply has no *Remove*; the reason is one line under the
+counter. The interface states a limit by *not offering the thing*, and the
+source's entry says why — which is the opposite of a disclaimer, and the reason
+it survives the four proposals.
+
 
 ## The reading, from here
 
