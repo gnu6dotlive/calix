@@ -10,6 +10,7 @@ use crate::components::search_input::SearchInputView;
 use crate::components::source_bank::{SourceBank, SourceBankProps, SourceRetryHandler};
 use crate::components::unified_search::UnifiedSearch;
 use crate::state::console::{ConsoleEvent, ConsoleModel};
+use crate::state::motion::{advance_marker, SelectionMarker};
 use crate::state::query::{PackageStateFilter, SortMode, SourceScope};
 use crate::state::{
     also_in, canonical_install_command, source_axis, AlsoIn, AppSession, NavScope, PackageKey,
@@ -119,47 +120,6 @@ pub fn scroll_step(pending: f32) -> (f32, f32) {
         (pending, 0.0)
     } else {
         (step, rest)
-    }
-}
-
-/// La barre du porteur : la sélection est un objet qui voyage d'une ligne à
-/// l'autre.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct SelectionMarker {
-    /// La ligne où la barre se pose.
-    pub index: usize,
-    /// La ligne d'où elle part, quand elle vient de quelque part.
-    pub from: Option<usize>,
-    /// Le numéro du voyage : il change à chaque sélection, et l'animation
-    /// recommence.
-    pub epoch: usize,
-}
-
-/// Le porteur après un changement de sélection.
-///
-/// Rien ne bouge quand la sélection ne change pas : la barre reste où elle
-/// est, et l'animation ne recommence pas à chaque rendu. Le porteur garde
-/// alors sa ligne de départ : un rendu au milieu du voyage — la fiche qui
-/// arrive, un survol — ne doit pas poser la barre d'un coup sur sa
-/// destination. Un premier choix n'a pas de ligne de départ : la barre
-/// s'allume sur place.
-pub fn advance_marker(
-    previous: Option<SelectionMarker>,
-    selected: Option<usize>,
-) -> (Option<SelectionMarker>, usize) {
-    let previous_epoch = previous.map(|marker| marker.epoch).unwrap_or(0);
-    match (previous, selected) {
-        (None, None) => (None, previous_epoch),
-        (Some(marker), Some(next)) if marker.index == next => (Some(marker), marker.epoch),
-        (previous, selected) => {
-            let epoch = previous_epoch + 1;
-            let marker = selected.map(|index| SelectionMarker {
-                index,
-                from: previous.map(|marker| marker.index),
-                epoch,
-            });
-            (marker, epoch)
-        }
     }
 }
 
@@ -1127,7 +1087,9 @@ impl Render for PackageWorkstationView {
         // waits reads as glass, not as a panel that failed to draw.
         // La barre du porteur : la sélection est un objet posé sur la ligne,
         // pas une bordure qui pousse le contenu. Elle voyage d'une ligne à
-        // l'autre — la courbe est la sortie de l'application.
+        // l'autre — et un voyage prend la courbe de l'aller-retour : la sortie
+        // partirait si vite que la barre paraîtrait sauter d'une ligne à
+        // l'autre, au lieu de s'y rendre.
         let row_height = if self.compact {
             UiMetrics::ROW_HEIGHT_COMPACT
         } else {
@@ -1156,7 +1118,7 @@ impl Render for PackageWorkstationView {
                 bar.with_animation(
                     ("readout_carrier", marker.epoch),
                     Animation::new(crate::state::MotionDurations::EMPHASIS)
-                        .with_easing(crate::state::motion::ease_out),
+                        .with_easing(crate::state::motion::ease_in_out),
                     move |bar, delta| {
                         let row =
                             crate::state::motion::carrier_travel(from, row, delta);
@@ -1750,65 +1712,6 @@ mod tests {
         let (min, max) = nameplate_bounds(content);
         assert_eq!(min, UiMetrics::NAMEPLATE_MIN_HEIGHT);
         assert_eq!(max, UiMetrics::NAMEPLATE_MIN_HEIGHT);
-    }
-
-    #[test]
-    fn the_first_selection_has_no_departure() {
-        // Le premier choix n'a pas de ligne quittée : la barre s'allume sur
-        // place, sans traverser la liste.
-        let (marker, epoch) = advance_marker(None, Some(4));
-        let marker = marker.expect("une sélection a un porteur");
-        assert_eq!(marker.index, 4);
-        assert_eq!(marker.from, None);
-        assert_eq!(epoch, 1);
-    }
-
-    #[test]
-    fn the_carrier_leaves_from_the_line_it_occupied() {
-        // La barre part de la ligne quittée : la sélection voyage, elle ne
-        // saute pas.
-        let (first, epoch) = advance_marker(None, Some(4));
-        let (marker, next_epoch) = advance_marker(first, Some(1));
-        let marker = marker.expect("la sélection reste");
-        assert_eq!(marker.index, 1);
-        assert_eq!(marker.from, Some(4));
-        assert!(next_epoch > epoch, "le voyage a son propre numéro");
-    }
-
-    #[test]
-    fn the_carrier_does_not_restart_when_nothing_changes() {
-        // Chaque rendu redemande le porteur : sans changement de sélection, le
-        // numéro du voyage ne bouge pas, et l'animation ne recommence pas.
-        let (first, epoch) = advance_marker(None, Some(2));
-        let (again, same_epoch) = advance_marker(first, Some(2));
-        assert_eq!(same_epoch, epoch);
-        assert_eq!(again.map(|marker| marker.index), Some(2));
-
-        // La sélection se referme : plus de porteur, et le changement a son
-        // numéro — la plaque au repos entre à son tour.
-        let (gone, closed) = advance_marker(again, None);
-        assert!(gone.is_none());
-        assert!(closed > same_epoch);
-    }
-
-    #[test]
-    fn a_repaint_does_not_throw_the_carrier_at_its_destination() {
-        // Le voyage dure 220 ms ; entre-temps, la fiche arrive et la scène se
-        // redessine. Le porteur doit garder sa ligne de départ, sinon le
-        // rendu suivant le pose d'un coup et le voyage n'existe jamais.
-        let (leaving, epoch) = advance_marker(None, Some(6));
-        let leaving = leaving.expect("une sélection a un porteur");
-        let (arriving, new_epoch) = advance_marker(Some(leaving), Some(2));
-        assert_eq!(new_epoch, epoch + 1);
-        let arriving = arriving.expect("la sélection reste");
-        assert_eq!(arriving.from, Some(6));
-
-        // Le rendu suivant, au milieu du voyage.
-        let (same, quieter_epoch) = advance_marker(Some(arriving), Some(2));
-        let same = same.expect("la sélection reste");
-        assert_eq!(quieter_epoch, new_epoch);
-        assert_eq!(same.from, Some(6), "la ligne de départ tient");
-        assert_eq!(same.index, 2);
     }
 
     #[test]

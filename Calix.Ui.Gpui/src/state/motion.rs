@@ -224,6 +224,52 @@ pub fn carrier_travel(from: f32, to: f32, delta: f32) -> f32 {
     from + (to - from) * ease_out(t)
 }
 
+
+/// La barre du porteur : la sélection est un objet qui voyage d'une ligne à
+/// l'autre.
+///
+/// Le porteur ne connaît ni la liste ni le rail : il connaît une rangée, la
+/// rangée quittée, et le numéro du voyage. C'est ce qui permet à deux surfaces
+/// — la liste et le rail — d'obéir à la même loi sans se connaître.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SelectionMarker {
+    /// La rangée où la barre se pose.
+    pub index: usize,
+    /// La rangée d'où elle part, quand elle vient de quelque part.
+    pub from: Option<usize>,
+    /// Le numéro du voyage : il change à chaque sélection, et l'animation
+    /// recommence.
+    pub epoch: usize,
+}
+
+/// Le porteur après un changement de sélection.
+///
+/// Rien ne bouge quand la sélection ne change pas : la barre reste où elle
+/// est, et l'animation ne recommence pas à chaque rendu. Le porteur garde
+/// alors sa rangée de départ : un rendu au milieu du voyage — la fiche qui
+/// arrive, un survol — ne doit pas poser la barre d'un coup sur sa
+/// destination. Un premier choix n'a pas de rangée de départ : la barre
+/// s'allume sur place.
+pub fn advance_marker(
+    previous: Option<SelectionMarker>,
+    selected: Option<usize>,
+) -> (Option<SelectionMarker>, usize) {
+    let previous_epoch = previous.map(|marker| marker.epoch).unwrap_or(0);
+    match (previous, selected) {
+        (None, None) => (None, previous_epoch),
+        (Some(marker), Some(next)) if marker.index == next => (Some(marker), marker.epoch),
+        (previous, selected) => {
+            let epoch = previous_epoch + 1;
+            let marker = selected.map(|index| SelectionMarker {
+                index,
+                from: previous.map(|marker| marker.index),
+                epoch,
+            });
+            (marker, epoch)
+        }
+    }
+}
+
 /// Le ressort : l'aiguille dépasse sa position et revient.
 ///
 /// Un instrument dépasse ; un commutateur, non. L'aiguille qui se jette sur
@@ -533,5 +579,64 @@ mod tests {
 
         // Une sélection sans ligne quittée reste immobile.
         assert_eq!(carrier_travel(5.0, 5.0, 0.42), 5.0);
+    }
+
+    #[test]
+    fn the_first_selection_has_no_departure() {
+        // Le premier choix n'a pas de ligne quittée : la barre s'allume sur
+        // place, sans traverser la liste.
+        let (marker, epoch) = advance_marker(None, Some(4));
+        let marker = marker.expect("une sélection a un porteur");
+        assert_eq!(marker.index, 4);
+        assert_eq!(marker.from, None);
+        assert_eq!(epoch, 1);
+    }
+
+    #[test]
+    fn the_carrier_leaves_from_the_line_it_occupied() {
+        // La barre part de la ligne quittée : la sélection voyage, elle ne
+        // saute pas.
+        let (first, epoch) = advance_marker(None, Some(4));
+        let (marker, next_epoch) = advance_marker(first, Some(1));
+        let marker = marker.expect("la sélection reste");
+        assert_eq!(marker.index, 1);
+        assert_eq!(marker.from, Some(4));
+        assert!(next_epoch > epoch, "le voyage a son propre numéro");
+    }
+
+    #[test]
+    fn the_carrier_does_not_restart_when_nothing_changes() {
+        // Chaque rendu redemande le porteur : sans changement de sélection, le
+        // numéro du voyage ne bouge pas, et l'animation ne recommence pas.
+        let (first, epoch) = advance_marker(None, Some(2));
+        let (again, same_epoch) = advance_marker(first, Some(2));
+        assert_eq!(same_epoch, epoch);
+        assert_eq!(again.map(|marker| marker.index), Some(2));
+
+        // La sélection se referme : plus de porteur, et le changement a son
+        // numéro — la plaque au repos entre à son tour.
+        let (gone, closed) = advance_marker(again, None);
+        assert!(gone.is_none());
+        assert!(closed > same_epoch);
+    }
+
+    #[test]
+    fn a_repaint_does_not_throw_the_carrier_at_its_destination() {
+        // Le voyage dure 220 ms ; entre-temps, la fiche arrive et la scène se
+        // redessine. Le porteur doit garder sa ligne de départ, sinon le
+        // rendu suivant le pose d'un coup et le voyage n'existe jamais.
+        let (leaving, epoch) = advance_marker(None, Some(6));
+        let leaving = leaving.expect("une sélection a un porteur");
+        let (arriving, new_epoch) = advance_marker(Some(leaving), Some(2));
+        assert_eq!(new_epoch, epoch + 1);
+        let arriving = arriving.expect("la sélection reste");
+        assert_eq!(arriving.from, Some(6));
+
+        // Le rendu suivant, au milieu du voyage.
+        let (same, quieter_epoch) = advance_marker(Some(arriving), Some(2));
+        let same = same.expect("la sélection reste");
+        assert_eq!(quieter_epoch, new_epoch);
+        assert_eq!(same.from, Some(6), "la ligne de départ tient");
+        assert_eq!(same.index, 2);
     }
 }

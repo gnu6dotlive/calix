@@ -28,6 +28,14 @@ impl UiMetrics {
     // ── Sidebar Geometry ─────────────────────────────────────────────────────
     pub const SIDEBAR_EXPANDED: f32 = 190.0;
     pub const SIDEBAR_COLLAPSED: f32 = 56.0;
+    /// La hauteur d'une entrée du rail. Égale pour toutes : le trait de la
+    /// sélection voyage d'une rangée à l'autre, et sa position se calcule au
+    /// lieu de se mesurer.
+    pub const RAIL_ROW_HEIGHT: f32 = 38.0;
+    /// L'écart entre deux entrées du rail.
+    pub const RAIL_ROW_GAP: f32 = 2.0;
+    /// Le vide au-dessus de la première entrée du rail.
+    pub const RAIL_TOP_PAD: f32 = 8.0;
 }
 
 #[cfg(test)]

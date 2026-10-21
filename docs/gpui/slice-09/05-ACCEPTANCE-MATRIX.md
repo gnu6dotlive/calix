@@ -48,13 +48,21 @@ the application now, and what it does:
 | The needle's throw | the needle passes its detent and comes back | the overshoot | `the_overshoot_passes_the_target_and_comes_back` |
 | The scope's change | the readout is a cut: the new scope's content lands displaced from the side the dial turned, and closes the distance | the cut, positional | `the_cut_lands_where_it_was_aimed`, `the_scope_dirties_the_side_of_the_cut`; the frames at 1080 × 935 |
 | The selection's move | the carrier leaves the row it marked and travels to the row chosen | the travelling marker | `the_carrier_leaves_from_the_line_it_occupied`, `a_repaint_does_not_throw_the_carrier_at_its_destination`, `the_carrier_sits_on_the_line_it_marks`; the frames |
+| The rail's mark | the accent bar leaves the entry it marked and travels to the entry chosen, while the fill lights the destination at once | the travelling marker — one law, two surfaces, one porteur | `the_carrier_leaves_from_the_line_it_occupied` (the same marker, moved into `state::motion`), `the_rail_mark_lands_on_the_row_it_marks`; `evidence/runs/slice-09-rail-mark-20261021/rail-travel.png` |
 | The plate's arrival | the nameplate's content lands 22 px low and rises into its band | the cut, positional | the frames |
 | The panel's switch | the outgoing panel accelerates, the cut lands mid-motion, the incoming panel continues in the same direction and decelerates, and it ignites at 35 % instead of fading in | the cut on the curve | `the_cut_entry_ignites_mid_path_and_keeps_the_direction` |
 | A value that changes | the count re-reads and flashes once; it does not glide into place | the instrument's readout | the eye |
 | The list's scroll | a wheel notch is a movement, not a jump | the eased hand | `the_wheel_moves_the_list_by_steps` |
 
+A travel takes `Curve::IN_OUT`; an entry takes `Curve::OUT`. The out curve is
+front-loaded — at a tenth of the time it has covered about half the distance —
+so a mark sent along it arrives before the eye has left the row it departed:
+it reads as a jump with a tail, not as a voyage. The carrier and the rail's
+mark both travel, and both take the aller-retour.
+
 The user can ask for less movement: `reduce_motion` snaps the needle, skips
-the bank's arrival, and leaves the scroll as it is.
+the bank's arrival, snaps the rail's mark onto its entry, and leaves the
+scroll as it is.
 
 ## The gaps of this run
 
@@ -68,6 +76,13 @@ the bank's arrival, and leaves the scroll as it is.
   minimum lowered with it — not resurrected from a branch that never ran.
   `Narrow` still shortens the sort label; that branch is unreachable too, and
   it is left for the pass that decides the window's floor.
+- The rail row's focus ring is the accent, as the mark is: a clicked entry
+  wears both, and its left edge is the two marks merged. During the 220 ms of a
+  travel the destination already wears the ring while the bar is still in
+  flight — two accent marks, briefly, on two rows. The ring leaves as soon as
+  focus moves to the list, and the bar is drawn over it: recorded rather than
+  differentiated, because gpui 0.2.2 has no `focus_visible`, and a ring that
+  only the keyboard raises would need its own interaction state.
 - The keyboard's state menu had never matched the drawn one: it believed four
   states while the menu drew `PackageStateFilter::options_for(scope)` — two in
   Installed, one in Updates. It now counts and activates the same list. The

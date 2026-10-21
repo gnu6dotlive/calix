@@ -1,0 +1,45 @@
+{
+  "run_id": "slice-09-rail-mark-20261021",
+  "kind": "implementation",
+  "status": "ok",
+  "objective": "The rail's selection is a mark that travels — the same law as the list's carrier, and the same porteur.",
+  "the_law": {
+    "one_marker_two_surfaces": "SelectionMarker and advance_marker left views/package_workstation.rs and now live in state/motion.rs, beside carrier_travel. The rail and the list do not know each other; they know a row, the row it came from, and the number of the voyage. The four tests that prove the marker moved with it, names unchanged.",
+    "the_rail_is_equal_rows": "The rail's entries have one height (38 px), one gap (2 px) and one top pad (8 px), named in UiMetrics. The mark's position is therefore a multiplication — rail_mark_top(index) — not a measurement of the layout, which is what lets an absolutely positioned 2 px bar sit exactly on the entry a row would occupy.",
+    "the_mark": "a 2 px accent bar, drawn after the rows, at the row's left edge (x = 6, where the entry's border used to be). The entry keeps its fill and its accent label; the border_l_2 that used to be the selection is gone."
+  },
+  "the_curve": {
+    "what_changed": "the rail's travel and the carrier's travel now take Curve::IN_OUT. They took Curve::OUT.",
+    "why": "the out curve is front-loaded: at a tenth of the time it has covered about half the distance. A mark sent along it arrives before the eye has left the row it departed — it reads as a jump with a tail. A travel leaves a place and arrives at another; both ends are watched. The out curve belongs to entries, where the element has no place to leave.",
+    "the_frames": "with the out curve, the rail's mark crossed four rows in ~2 captured frames (29 ms apart) and the rest of the 220 ms was a sub-pixel crawl. With the aller-retour the same four rows are crossed in 8–9 frames, symmetric: 71 → 75 → 121 → 182 → 225 → 231 (60 px strip, x = 6, window y), and 71 → 80 → 93 → 113 → 141 → 174 → 203 → 222 → 229 → 231 on a faster capture. The carrier, six rows apart: 327 → 338 → 353 → 376 → 407 → 444 → 476 → 497 → 505 → 507 (window y, x = 192)."
+  },
+  "what_was_seen": {
+    "the_rail": "the bar sits exactly on the selected entry: at rest it spans the entry's full height, 2 px wide, at the same x the border occupied (111..148 against a fill of 111..148).",
+    "the_destination": "the fill moves at once to the chosen entry; only the bar travels. That is the point: the fill is the row's state, the bar is the selection's place, and one of them is a fact the instant you click.",
+    "the_keyboard": "unchanged; the entries are still focusable and tab_stop, and the mark does not depend on focus.",
+    "reduce_motion": "the bar is rendered at its destination without an animation element, like the needle and the carrier."
+  },
+  "the_artefacts": [
+    {"path": "Calix.Ui.Gpui/src/state/motion.rs", "what": "SelectionMarker and advance_marker joined the motion vocabulary, with their four tests"},
+    {"path": "Calix.Ui.Gpui/src/components/sidebar.rs", "what": "the rail's rows are one height, the selection is a 2 px mark that travels, and rail_mark_top is tested"},
+    {"path": "Calix.Ui.Gpui/src/views/sidebar.rs", "what": "the rail's marker is advanced where the rail's selection is read"},
+    {"path": "Calix.Ui.Gpui/src/views/package_workstation.rs", "what": "the carrier takes the aller-retour; the definitions moved out"},
+    {"path": "Calix.Ui.Gpui/src/ui_metrics.rs", "what": "RAIL_ROW_HEIGHT, RAIL_ROW_GAP, RAIL_TOP_PAD"},
+    {"path": "docs/gpui/slice-09/05-ACCEPTANCE-MATRIX.md", "what": "the rail's mark row, the curve law, and the focus-ring gap"},
+    {"path": "evidence/runs/slice-09-rail-mark-20261021/rail-travel.png", "what": "six frames of the travel: 0 ms, ~50, ~120, ~180, ~230, landed"}
+  ],
+  "the_environment": {
+    "the_click": "a rail click needs cursor move → ~0.6 s → press (0x40) → ~0.12 s → release (0x80). Shorter settle times and a 0.05 s press gap produced dropped clicks in three separate runs: the app simply never saw the press. The frames that first 'proved' the mark was static were frames of a click that never happened.",
+    "the_capture": "grim on a 60 × 340 region takes ~29 ms; on 200 × 340 about 50 ms. A 220 ms travel is therefore 4–8 frames, and the burst must be started before the click — the click's own latency is longer than the animation."
+  },
+  "the_gates": {
+    "local": "scripts/verify — PASSED on a dirty tree, run local-verify-20261021T073916Z, 1386 package-manager tests, 236 UI tests",
+    "ci_replay": "scripts/ci-replay --worktree — PASSED inside archlinux:latest on a clean checkout, run local-verify-20261021T074231Z, 1388 package-manager tests, 236 UI tests",
+    "the_first_replay": "the first attempt died in provisioning, not in the code: archive.archlinux.org timed out on libedit, zlib-ng, gdb-common and pkgconf, and pacman refused the transaction. The second attempt fetched them and passed. The mirror is the only flake observed."
+  },
+  "the_gaps": [
+    "the rail row's focus ring is the accent, as the mark is: the clicked entry wears both, and the mark is drawn over the ring's left edge. Recorded in the matrix, not differentiated — gpui 0.2.2 has no focus_visible",
+    "the mark's travel is proven at 1080 × 935 with the sidebar expanded; the collapsed rail uses the same rows and the same mark, but was not captured in motion",
+    "the count in the Updates pill (10) and the bank's ALPM count (1884) still disagree with the header's readout (1914) — a pre-existing gap, untouched here"
+  ]
+}

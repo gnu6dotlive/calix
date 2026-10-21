@@ -1,7 +1,9 @@
 use crate::components::status_pill::StatusPill;
 use crate::icons::AppIcon;
-use crate::state::{NavScope, Place, RailEntry};
+use crate::state::motion::{carrier_travel, ease_in_out, SelectionMarker};
+use crate::state::{MotionDurations, NavScope, Place, RailEntry};
 use crate::theme::Theme;
+use crate::ui_metrics::UiMetrics;
 use crate::visual_style::paint::apply_surface_projection;
 use crate::visual_style::roles::SurfaceRole;
 use crate::visual_style::VisualStyleId;
@@ -22,9 +24,22 @@ pub struct SidebarProps<'a> {
     pub visual_style: VisualStyleId,
     pub on_select: RailSelectHandler,
     pub on_toggle_collapse: WindowActionHandler,
+    /// Le trait de la sélection : la rangée qu'il marque, celle qu'il quitte,
+    /// et le numéro du voyage.
+    pub marker: Option<SelectionMarker>,
+    pub reduce_motion: bool,
 }
 
 pub struct Sidebar;
+
+/// Le haut du trait de la sélection, dans le rail.
+///
+/// Les entrées du rail ont toutes la même hauteur et le même écart : la
+/// position du trait est une multiplication, pas une mesure. C'est ce qui
+/// permet au trait de voyager entre deux rangées sans mesurer la mise en page.
+pub fn rail_mark_top(index: f32) -> f32 {
+    UiMetrics::RAIL_TOP_PAD + index * (UiMetrics::RAIL_ROW_HEIGHT + UiMetrics::RAIL_ROW_GAP)
+}
 
 struct DestinationTooltip {
     label: &'static str,
@@ -80,7 +95,7 @@ impl Sidebar {
             .items_center()
             .gap(px(10.0))
             .px(if is_collapsed { px(12.0) } else { px(14.0) })
-            .py(px(8.0))
+            .h(px(UiMetrics::RAIL_ROW_HEIGHT))
             .mx(px(6.0))
             .rounded_md()
             .cursor_pointer()
@@ -91,8 +106,6 @@ impl Sidebar {
             base.bg(theme.bg_surface_active)
                 .text_color(theme.text_primary)
                 .font_weight(FontWeight::SEMIBOLD)
-                .border_l_2()
-                .border_color(theme.accent)
         } else {
             let hover_bg = theme.bg_surface_hover;
             base.bg(theme.bg_sidebar)
@@ -137,7 +150,11 @@ impl Sidebar {
         let is_collapsed = props.is_collapsed;
         let width = px(props.current_width);
 
-        let mut nav_items = div().flex().flex_col().gap(px(2.0)).py(px(8.0));
+        let mut nav_rows = div()
+            .flex()
+            .flex_col()
+            .gap(px(UiMetrics::RAIL_ROW_GAP))
+            .py(px(UiMetrics::RAIL_TOP_PAD));
 
         for entry in RailEntry::ALL {
             let badge = if entry.scope == Some(NavScope::Updates) {
@@ -146,7 +163,7 @@ impl Sidebar {
                 0
             };
 
-            nav_items = nav_items.child(Self::render_nav_item(
+            nav_rows = nav_rows.child(Self::render_nav_item(
                 *entry,
                 props.active_place,
                 props.active_scope,
@@ -156,6 +173,41 @@ impl Sidebar {
                 props.on_select.clone(),
             ));
         }
+
+        // Le trait de la sélection : il voyage d'une entrée à l'autre.
+        //
+        // La sélection n'est pas un allumage, c'est un déplacement : le trait
+        // part de l'entrée quittée et se pose sur l'entrée choisie. Un voyage
+        // prend la courbe de l'aller-retour, pas celle de l'entrée : la sortie
+        // partirait si vite que le trait paraîtrait sauter. Les rangées sont
+        // égales, donc la position du trait se calcule.
+        let mark = props.marker.map(|marker| {
+            let row = marker.index as f32;
+            let from = marker.from.map(|index| index as f32).unwrap_or(row);
+            let bar = div()
+                .id("sidebar_mark")
+                .absolute()
+                .left(px(6.0))
+                .top(px(rail_mark_top(row)))
+                .w(px(2.0))
+                .h(px(UiMetrics::RAIL_ROW_HEIGHT))
+                .rounded_full()
+                .bg(theme.accent);
+            if props.reduce_motion {
+                bar.into_any_element()
+            } else {
+                bar.with_animation(
+                    ("sidebar_mark", marker.epoch),
+                    Animation::new(MotionDurations::EMPHASIS).with_easing(ease_in_out),
+                    move |bar, delta| {
+                        bar.top(px(rail_mark_top(carrier_travel(from, row, delta))))
+                    },
+                )
+                .into_any_element()
+            }
+        });
+
+        let nav_items = div().relative().child(nav_rows).children(mark);
 
         let collapse_toggle = {
             let on_toggle = props.on_toggle_collapse.clone();
@@ -268,5 +320,27 @@ impl Sidebar {
                 .child(nav_items),
         )
         .child(collapse_toggle)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::rail_mark_top;
+    use crate::ui_metrics::UiMetrics;
+    use core::prelude::v1::test;
+
+    #[test]
+    fn the_rail_mark_lands_on_the_row_it_marks() {
+        // Les entrées du rail sont égales : le trait avance d'une rangée et
+        // d'un écart, exactement.
+        let pitch = UiMetrics::RAIL_ROW_HEIGHT + UiMetrics::RAIL_ROW_GAP;
+        assert_eq!(rail_mark_top(0.0), UiMetrics::RAIL_TOP_PAD);
+        assert_eq!(rail_mark_top(1.0), UiMetrics::RAIL_TOP_PAD + pitch);
+        assert_eq!(rail_mark_top(3.0), UiMetrics::RAIL_TOP_PAD + 3.0 * pitch);
+        // Entre deux rangées, quand il voyage.
+        assert_eq!(rail_mark_top(1.5), UiMetrics::RAIL_TOP_PAD + 1.5 * pitch);
+        // La rangée suivante commence sous celle-ci : le trait ne chevauche
+        // jamais la mise en page.
+        assert!(rail_mark_top(1.0) > rail_mark_top(0.0) + UiMetrics::RAIL_ROW_HEIGHT);
     }
 }

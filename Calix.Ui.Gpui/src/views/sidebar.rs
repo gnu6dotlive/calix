@@ -1,4 +1,5 @@
 use crate::components::sidebar::{Sidebar, SidebarProps};
+use crate::state::motion::{advance_marker, SelectionMarker};
 use crate::state::package_store::PackageStore;
 use crate::state::session::{AppSession, RailEntry, SessionEvent};
 use crate::state::{AnimatedScalar, MotionDurations};
@@ -16,6 +17,8 @@ pub struct SidebarView {
     pub session: Entity<AppSession>,
     pub store: Entity<PackageStore>,
     pub width_scalar: AnimatedScalar,
+    /// Le trait de la sélection : la rangée qu'il marque, celle qu'il quitte.
+    pub rail_marker: Option<SelectionMarker>,
     pub theme: Theme,
     pub visual_style: VisualStyleId,
     pub reduce_motion: bool,
@@ -60,6 +63,7 @@ impl SidebarView {
             session,
             store,
             width_scalar,
+            rail_marker: None,
             theme,
             visual_style,
             reduce_motion,
@@ -103,6 +107,15 @@ impl Render for SidebarView {
         };
         let updates_count = self.store.read(cx).updates_count;
 
+        // La sélection du rail est un objet qui voyage : quand le périmètre
+        // change, le trait part de l'entrée quittée et se pose sur l'entrée
+        // choisie. La même loi que le porteur de la liste, et le même porteur.
+        let selected = RailEntry::ALL
+            .iter()
+            .position(|entry| entry.is_active(place, scope));
+        let (rail_marker, _) = advance_marker(self.rail_marker, selected);
+        self.rail_marker = rail_marker;
+
         let session_dest = self.session.clone();
         let session_toggle = self.session.clone();
 
@@ -125,6 +138,8 @@ impl Render for SidebarView {
             on_toggle_collapse: Rc::new(move |_w, cx| {
                 session_toggle.update(cx, |s, cx| s.toggle_sidebar(cx));
             }),
+            marker: rail_marker,
+            reduce_motion: self.reduce_motion,
         })
     }
 }
