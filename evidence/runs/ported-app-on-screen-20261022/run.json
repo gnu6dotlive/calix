@@ -1,0 +1,42 @@
+{
+  "run_id": "ported-app-on-screen-20261022",
+  "kind": "installation",
+  "status": "ok",
+  "objective": "put the ported front-end on the operator's machine, and on their screen",
+  "what_was_installed": {
+    "the_package": "calix-gpui-git r4874.gaaa19992-1, built from the branch by scripts/install-machine --from-local",
+    "the_binary": "/usr/lib/calix/calix-gpui, on gpui-pre 0.3.9 — the port, not the old gpui 0.2.2 branch",
+    "the_framework": "the strings of the installed binary carry gpui-pre-0.3.9 and no gpui-0.2.2",
+    "the_services": "calix-daemon.service and calix-notify.service are running the new code"
+  },
+  "the_window": {
+    "title": "Calix — Universal Package Manager",
+    "class": "live.gnu6.calix",
+    "pid": 846888,
+    "the_binary_behind_it": "/usr/lib/calix/calix-gpui",
+    "native_wayland": "xwayland: 0 — a Wayland client, not an XWayland one",
+    "how_it_was_seen": "read passively from the compositor (hyprctl clients). The pointer was never moved and no input was sent; the operator's focus and pointer are the operator's."
+  },
+  "the_path_that_got_there": [
+    "the tree was already green; the packaging was what failed",
+    "the flags makepkg inherits were the cause: -flto=auto broke the link, -C opt-level=3 switched the measurements off, -C target-cpu=native made the binary machine-specific",
+    "the package now states its own flags, and the gate holds them (the 'build-flags' step)",
+    "scripts/install-machine --from-local built the package from the branch and installed it"
+  ],
+  "the_artifacts": [
+    {
+      "file": "logs/session.log",
+      "bytes": 771,
+      "sha256": "219fdc09e821df76fde5c4791de16d6b0e4f5d44911a63aec137fad0b0fe2602"
+    },
+    {
+      "file": ".ci-cache/pkg/calix-gpui-git-r4874.gaaa19992-1-x86_64.pkg.tar.zst",
+      "bytes": 14673831,
+      "sha256": "ea9679d2c07d9c884da4933f34a78412aa07cdd177a4cc04db9039b01e8d6a70"
+    }
+  ],
+  "the_limitations": [
+    "The window is up and the compositor knows it; nobody has yet said what it looks like. The audit's limitation — 'a human eye has not looked at the ported application' — is now the operator's to close.",
+    "The application was launched from a shell, not from the desktop entry, so the desktop integration (icon, file associations) was not exercised."
+  ]
+}

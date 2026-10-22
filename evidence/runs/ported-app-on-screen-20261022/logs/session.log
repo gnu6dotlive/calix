@@ -1,0 +1,32 @@
+=== the window, as the compositor sees it (passive read; the pointer was never touched)
+	class: live.gnu6.calix
+	title: Calix — Universal Package Manager
+	initialClass: live.gnu6.calix
+	initialTitle: Calix — Universal Package Manager
+	pid: 846888
+	xwayland: 0
+	pinned: 0
+	pinFullscreened: 0
+	fullscreen: 0
+	fullscreenClient: 0
+	fullscreenHandler: default
+	allowedOverFullscreen: 1
+	grouped: 0
+	tags: 
+	swallowing: 0
+
+=== the process behind the window
+    PID STAT     ELAPSED   RSS CMD
+ 846888 S<sl       01:09 249508 /usr/lib/calix/calix-gpui
+
+=== the installed package
+Version         : r4874.gaaa19992-1
+Packager        : Unknown Packager
+Install Date    : Thu 22 Oct 2026 06:16:18 AM EDT
+
+=== the binary's framework
+gpui-pre-0.3.9
+
+=== the services
+active
+active
