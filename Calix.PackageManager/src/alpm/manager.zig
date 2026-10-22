@@ -1154,6 +1154,18 @@ pub const Manager = struct {
     /// report is owned by the caller and must be deinitialized.
     pub fn sync_system_update(self: *Manager, flags: TransFlag) TransactionError!RestartReport {
         if (self.handle == null) return TransactionError.NoHandle;
+        // The databases are the precondition of a system update, checked
+        // before anything interactive: a manager that cannot name a sync
+        // database cannot update a system, however the distribution's update
+        // notice is answered — on any machine, with or without a network.
+        // This is the same database check syncDatabases() applies before it
+        // does anything; without it, the question is asked first, and a "no"
+        // answer reports an empty success instead of the failure the caller
+        // needs to distinguish. Measured by the test "valid managers without
+        // sync databases report SyncDbFailed for sync update APIs", whose
+        // failure the gate caught minutes after the mirror at
+        // iso-stats.cachyos.org began serving a live notice to the machine.
+        if (rawLibalpm.alpm_get_syncdbs(self.handle) == null) return TransactionError.SyncDbFailed;
         var operation_scope = OperationScope.init(self, .update, null);
         operation_scope.attach();
         defer operation_scope.finish(.success);

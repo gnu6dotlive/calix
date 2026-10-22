@@ -1,0 +1,45 @@
+The release gate failed at 15:02 on commit 748579ad with zero backend changes since the green run at 13:55. The diagnosis, measured:
+
+== 1. the failing test (raw log lines)
+error: 'alpm.manager_test.test.valid managers without sync databases report SyncDbFailed for sync update APIs' failed:
+       expected error.SyncDbFailed, found .{ .allocator = .{ .ptr = anyopaque@270fc80, .vtable = .{ .alloc = fn (*anyopaque, usize, mem.Alignment, usize) ?[*]u8@13b9050, .resize = fn (*anyopaque, []u8, mem.Alignment, usize, usize) bool@13b7f20, .remap = fn (*anyopaque, []u8, mem.Alignment, usize, usize) ?[*]u8@13b5c80, .free = fn (*anyopaque, []u8, mem.Alignment, usize) void@13ae9a0 } }, .running_kernel = null, .running_kernel_modules_present = null, .needs_reboot = false, .process_scan_complete = false, .skipped_processes = 0, .affected_processes = {  }, .affected_services = {  }, .restarted_services = {  }, .failures = {  } }
+       /home/tension_atoi/Projects/calix/Calix.PackageManager/src/alpm/manager_test.zig:3203:5: 0x24edd5e in test.valid managers without sync databases report SyncDbFailed for sync update APIs (root.zig)
+
+== 2. the scratch probe (the same setup, observed)
+   sync(false)                          -> SyncDbFailed
+   sync(true)                           -> SyncDbFailed
+   sync_system_update(.{dbonly=true})   -> SUCCESS (an empty report)
+   db/sync directory                    -> absent (nothing was ever fetched)
+
+== 3. the distribution notice, live on the machine
+   $HOME/.cache/calix/CACHY_UPDATE_NOTICE : absent (no saved answer)
+   https://iso-stats.cachyos.org/api/v2/last_update_notice :
+{"id":"2130f114-3924-46bc-858a-7bdf3e927e18","body":"Kernel 7.3.0-2 has issues with amdgpu particularly causing black screen on AMD dGPUs"}
+
+== 4. the mechanism
+   Manager.init sets detected_cachyos when the machine's own os-release
+   says CachyOS. sync_system_update() then consults the distribution's
+   update notice BEFORE its database precondition: check() fetches the
+   live notice, finds no saved answer in the operator's real cache, asks
+   through the dispatcher — in the test machine there is no witness to
+   answer "yes" — and the function returns RestartReport.empty. The test,
+   written to prove "no sync databases -> SyncDbFailed", receives a
+   success. Green at 08:35 and 13:55 while the fetch failed or the answer
+   saved; red at 15:02 when a live notice served. The gate flipped on the
+   internet, not on the tree. The replay in the Arch container never saw
+   it: there /etc/os-release is not CachyOS, so the hook was never loaded.
+
+== 5. the fix
+   The database precondition is raised above the notice check: a manager
+   with no sync databases cannot update a system, however the notice is
+   answered — on any machine, with or without a network — and must say so
+   before any interactive question. The same check syncDatabases() applies
+   (alpm_get_syncdbs == null), now applied first. The notice's intent ("ask
+   before downloading the database") is preserved: for a working
+   installation the question still comes before any download.
+   calix.Cli.Zig's install.zig:519 and upgrade.zig:635 consume the failure
+   the caller needs: a transaction failure, not an empty success.
+
+== 6. the numbers
+   before the fix : 1340 pass, 4 skip, 1 fail (1345)
+   after the fix  : 1341 pass, 4 skip, 0 fail — and the gate's threshold is 1380 in steps, the whole verify roster green
