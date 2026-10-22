@@ -1,0 +1,34 @@
+{
+  "run_id": "gate-gaps-20261022",
+  "kind": "gate-gap",
+  "status": "ok",
+  "objective": "two gate gaps, both of the same shape: the gate covered the paths that were easy to cover, and the paths that matter were outside it",
+  "the_gaps": [
+    {
+      "the_gap": "the lockfile's currency was behind, and nothing in the local gate said so",
+      "why": "the currency check is deliberately not part of the build gate — the workflow says: 'a gate that turns red because someone else published a crate is noise; a scheduled job that turns red is a signal'. It runs on a schedule and on pull requests that touch the dependency files, and on a pull request it does not block. What was missing is the other half: nothing ran it before a push.",
+      "the_fix": "the pre-push hook runs scripts/dependencies --check for a push that touches the dependencies, and only then — the same paths the scheduled job watches. And the check stops claiming what it cannot know: offline, cargo answers from the cached index, so the check now refuses with the reason instead of reporting the lockfile as current.",
+      "the_update": "scripts/dependencies --update moved the lockfile (icu_* 2.3.0 -> 2.4.0, icu_provider, open, tinystr, yoke, zerovec, zerovec-derive), re-applied the libc pin, and the gate decided: 1386 package-manager tests, 392 CLI tests, 265 UI tests."
+    },
+    {
+      "the_gap": "the package — the artifact that ships — was built only by the release path, so its own defects were outside the gate",
+      "why": "scripts/verify builds the Zig binaries and the Rust binaries. Nothing built the package, so a packaging defect surfaced only when the machine was asked to install it: the link failed with 'undefined symbol: wl_log_trampoline_to_rust_client'.",
+      "the_fix": "the operator's decision: check the metadata, not the build. A new step, 'package-metadata', runs the package's own package() function against the tree the gate has built, in a scratch directory — a source that is not there makes install fail, so the file list is proven rather than parsed — and then asks whether the dependencies bring the libraries the binaries link.",
+      "the_rule": "the libraries come from the binaries' NEEDED entries; the packages that provide them are looked for in the dependencies' closure, because a distribution may split a package (CachyOS splits libgcc_s out of gcc-libs) and the question is whether the package works on a machine that installed its dependencies — not whether the names match.",
+      "the_teeth": "taking 'pacman' out of the dependencies makes the step fail, naming pacman and libarchive — the library the CLI links, which came in through pacman."
+    }
+  ],
+  "the_measurements": {
+    "the_package_installs": "27 files",
+    "the_binaries_need": "libalpm, libarchive, libc, libxcb, libxkbcommon, libxkbcommon-x11, libgcc_s, libm",
+    "the_gate_local": "scripts/verify PASSED with the new step (5 s)",
+    "the_gate_container": "scripts/ci-replay PASSED with the new step (109 s — it builds the release binary there, which the later step then reuses)"
+  },
+  "artifacts": [
+    {
+      "file": "logs/package-metadata.log",
+      "bytes": 1175,
+      "sha256": "c15d9065853767e898c46fa2cbdafe2fd38284462ebcc60ae29d8491f5bb79ec"
+    }
+  ]
+}

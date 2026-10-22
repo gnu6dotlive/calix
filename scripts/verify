@@ -337,6 +337,124 @@ build_flags() {
     printf 'the package:     LDFLAGS=%s\n' "$pkg_ld"
 }
 
+# The package's *metadata* is part of the gate: the files it declares and
+# the dependencies it names are what the machine receives.
+#
+# The package itself is not built here — that is the release's business,
+# and it costs minutes. What is checked is what the package *says*: the
+# file list its package() function produces, and the libraries its
+# binaries actually need against the dependencies it declares. A package
+# that uses a library it does not declare installs, and then fails to
+# start, on a machine that lacks that library — and nothing else in the
+# gate would notice.
+#
+# The file list is produced by *running* package(), in a scratch
+# directory, against the tree this gate has built. A source that is not
+# there makes install fail, so the list is proven to exist rather than
+# parsed and hoped for.
+package_metadata() {
+    local scratch="$ROOT/.ci-cache/pkgmeta"
+    local pkgname
+    pkgname=$(cd "$ROOT" && bash -c 'source ./PKGBUILD-calix >/dev/null 2>&1; printf "%s" "$pkgname"') || {
+        echo "package-metadata: the PKGBUILD's name could not be read" >&2
+        return 1
+    }
+    rm -rf "$scratch"
+    mkdir -p "$scratch/pkg" || return 1
+    ln -s "$ROOT" "$scratch/$pkgname"
+
+    # Where cargo put the release binary. The package installs it from the
+    # tree's own target directory, so that path has to point at the
+    # artifact — the shared build directory is somewhere else, and the
+    # link lives inside the ignored target/, so the tree stays clean.
+    local exe want
+    exe=$(cd "$ROOT/Calix.Ui.Gpui" && cargo build --release --locked --message-format=json 2>/dev/null |
+        grep -o '"executable":"[^"]*"' | head -1 | cut -d'"' -f4)
+    want="$ROOT/Calix.Ui.Gpui/target/release/calix-gpui"
+    if [ -n "$exe" ] && [ -x "$exe" ] && [ ! -e "$want" ]; then
+        mkdir -p "$(dirname "$want")"
+        ln -s "$exe" "$want"
+    fi
+
+    if ! (cd "$ROOT" && bash -c '
+            set -euo pipefail
+            source ./PKGBUILD-calix >/dev/null 2>&1
+            srcdir="'"$scratch"'"
+            pkgdir="'"$scratch"'/pkg"
+            package
+        '); then
+        echo "package-metadata: package() did not run; a file it installs is missing" >&2
+        return 1
+    fi
+
+    local files
+    files=$(find "$scratch/pkg" -type f -o -type l | wc -l)
+    if [ "$files" -lt 10 ]; then
+        echo "package-metadata: the package installed $files files; that is not a package" >&2
+        return 1
+    fi
+
+    # The libraries the shipped binaries need, and the package that owns
+    # each. The binaries are the required part of the package; the
+    # Flatpak backend is the optional one, and its libraries belong to
+    # the optional dependency that switches it on.
+    local required optional
+    required=$(bash -c 'source ./PKGBUILD-calix >/dev/null 2>&1; printf "%s" "${depends[*]}"')
+    optional=$(bash -c 'source ./PKGBUILD-calix >/dev/null 2>&1; printf "%s" "${optdepends[*]}"')
+
+    # What a machine that installed the declared dependencies has. The
+    # question the check asks is not "do the names match" but "does the
+    # package work on such a machine" — and a distribution may split a
+    # package (this one splits libgcc_s out of gcc-libs), so the library
+    # is looked for in the dependencies' closure.
+    local satisfied
+    satisfied=$(for dep in $required; do
+        printf '%s\n' "$dep"
+        # The dependencies of the dependency: "Depends On", which is what
+        # the machine will have. The repository's metadata is used when
+        # the package is not installed here, so the closure is the same
+        # on a build machine and on the machine that installs it.
+        pacman -Qi "$dep" 2>/dev/null | sed -n 's/^Depends On *: *//p'
+        pacman -Si "$dep" 2>/dev/null | sed -n 's/^Depends On *: *//p'
+    done | tr ' ' '\n' | sed 's/[<>=].*//' | grep -v '^$' | sort -u | tr '\n' ' ')
+
+    local missing=0
+    local file lib owner
+    for file in "$scratch/pkg"/usr/lib/calix/*; do
+        [ -f "$file" ] || continue
+        # A shared library is the optional part: the CLI loads it at
+        # runtime, and the optional dependency names what it needs.
+        if [[ "$file" == *.so.* || "$file" == *.so ]]; then
+            continue
+        fi
+        while read -r lib; do
+            [ -n "$lib" ] || continue
+            owner=$(pacman -Qo "$lib" 2>/dev/null | sed 's/.* is owned by \([^ ]*\).*/\1/')
+            [ -n "$owner" ] || continue
+            case " $satisfied " in
+                *" $owner "*) ;;
+                *)
+                    echo "package-metadata: $(basename "$file") needs $owner, which the package's dependencies do not bring" >&2
+                    missing=1
+                    ;;
+            esac
+        done < <(readelf -d "$file" 2>/dev/null |
+            grep NEEDED | sed 's/.*\[\(.*\)\]/\1/' |
+            while read -r soname; do
+                for dir in /usr/lib /lib /usr/lib64 /lib64; do
+                    [ -e "$dir/$soname" ] && { echo "$dir/$soname"; break; }
+                done
+            done)
+    done
+    if [ "$missing" != 0 ]; then
+        echo "package-metadata: the dependencies are incomplete" >&2
+        return 1
+    fi
+
+    printf 'the package installs %s files; its dependencies bring what the binaries need\n' "$files"
+    printf 'the optional part: %s\n' "${optional:-<none>}"
+}
+
 # A released binary has to run on every x86_64 machine, not only on the one
 # that built it. Zig's native CPU model bakes the build machine's
 # instruction set into the binary, and Zig emits it without a runtime check:
@@ -405,6 +523,10 @@ step "cli-smoke" cli_smoke
 step "flatpak-backend-tests" flatpak_backend_tests
 step "flatpak-backend-release-build" flatpak_backend_release_build
 step "portable-binaries" portable_binaries
+# The package's metadata: the files it declares, and the dependencies it
+# names against the libraries its binaries need. The package itself is
+# the release's business; what it *says* is the gate's.
+step "package-metadata" package_metadata
 # The flags are checked before the Rust build, so a flag that would break
 # the build (or the binary) is named where it enters, instead of showing
 # up later as a linker error or as a fault on another machine.
