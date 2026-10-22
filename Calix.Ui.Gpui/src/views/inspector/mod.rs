@@ -37,6 +37,10 @@ pub struct PackageInspectorProps<'a> {
     pub pkgbuild: Option<&'a String>,
     pub is_loading_pkgbuild: bool,
     pub active_tab: InspectorTab,
+    /// La hauteur que la plaque a dans la bande. Elle décide de ce que la
+    /// plaque garde : son identité toujours, ses onglets et ses actions
+    /// quand la place les porte.
+    pub available_height: f32,
     pub theme: &'a Theme,
     pub is_busy: bool,
     pub copy_feedback: bool,
@@ -117,6 +121,7 @@ impl PackageInspectorView {
 
         let header = InspectorHeader::render(InspectorHeaderProps {
             package: pkg,
+            available_height: props.available_height,
             capabilities: &capabilities,
             active_tab: props.active_tab,
             theme,
@@ -278,6 +283,89 @@ mod tests {
     use crate::state::session::InspectorTab;
     use crate::theme::Theme;
 
+    /// La plaque, mesurée : ses parties, et jusqu'où elle peut céder.
+    ///
+    /// La plaque cède d'abord — c'est la surface contextuelle, et elle
+    /// rend sa place avant que le catalogue ne soit réduit. Pour savoir
+    /// jusqu'où, il faut mesurer ses parties : l'identité (le nom, la
+    /// version, la marque), les actions, et la bande des onglets.
+    #[gpui::test]
+    fn the_plate_is_measured_part_by_part(cx: &mut gpui::TestAppContext) {
+        use crate::components::inspector_header::{InspectorHeader, InspectorHeaderProps};
+        use crate::state::semantic::PackageCapabilities;
+        use gpui::prelude::*;
+        use gpui::{div, point, px, size, Context, Render, Window};
+
+        struct Fixture {
+            theme: Theme,
+            pkg: UnifiedPackage,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let theme = self.theme.clone();
+                let capabilities = PackageCapabilities::derive(&self.pkg, None);
+                div().size_full().child(InspectorHeader::render(
+                    InspectorHeaderProps {
+                        package: &self.pkg,
+                        available_height: crate::ui_metrics::UiMetrics::PLATE_CHROME_HEIGHT,
+                        capabilities: &capabilities,
+                        active_tab: InspectorTab::Overview,
+                        theme: &theme,
+                        is_busy: false,
+                        copy_feedback: false,
+                        on_select_tab: std::rc::Rc::new(|_, _, _| {}),
+                        on_install: None,
+                        on_remove: None,
+                        on_copy_install_cmd: None,
+                    },
+                ))
+            }
+        }
+
+        let cx = cx.add_empty_window();
+        let pkg = UnifiedPackage {
+                name: "ripgrep".into(),
+                version: "14.1.0-1".into(),
+                description: "fast search".into(),
+                source_type: "ALPM".into(),
+                repository_or_remote: "extra".into(),
+                is_installed: true,
+                has_update: false,
+                new_version: None,
+                inner: UnifiedPackageSource::Standard(AlpmPackage::default()),
+        };
+        let fixture = cx.new(|_| Fixture {
+            theme: Theme::dark(),
+            pkg,
+        });
+
+        cx.draw(
+            point(px(0.0), px(0.0)),
+            size(px(900.0), px(600.0)),
+            |_window, _cx| fixture.clone().into_element(),
+        );
+
+        let mut height = |selector: &'static str| -> f32 {
+            cx.debug_bounds(selector)
+                .map(|b| b.size.height.into())
+                .unwrap_or(0.0)
+        };
+        let identity = height("inspector_identity_row");
+        let actions = height("inspector_actions_row");
+        let tabs = height("inspector_tab_bar");
+        let root = height("inspector_header_root");
+        eprintln!(
+            "PROBE the plate: identity={identity} actions={actions} tabs={tabs} root={root}"
+        );
+        assert!(identity > 0.0, "the identity row is drawn");
+        assert!(root >= identity, "the chrome holds the identity");
+    }
+
     #[core::prelude::v1::test]
     fn test_inspector_empty_state_and_populated_render() {
         let theme = Theme::dark();
@@ -287,6 +375,7 @@ mod tests {
         // 1. Empty state
         let empty_props = PackageInspectorProps {
             package: None,
+            available_height: crate::ui_metrics::UiMetrics::PLATE_CHROME_HEIGHT,
             alpm_details: None,
             also_in: &[],
             detail_error: None,
@@ -326,6 +415,7 @@ mod tests {
 
         let populated_props = PackageInspectorProps {
             package: Some(&pkg),
+            available_height: crate::ui_metrics::UiMetrics::PLATE_CHROME_HEIGHT,
             alpm_details: None,
             also_in: &[],
             detail_error: Some("Simulated detail error"),
@@ -386,6 +476,7 @@ mod tests {
                     std::rc::Rc::new(|_, _, _| {});
                 let props = PackageInspectorProps {
                     package: Some(&self.pkg),
+                    available_height: crate::ui_metrics::UiMetrics::PLATE_CHROME_HEIGHT,
                     alpm_details: None,
                     also_in: &[],
                     detail_error: None,

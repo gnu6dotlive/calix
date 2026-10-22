@@ -14,6 +14,10 @@ pub type WindowActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 
 pub struct InspectorHeaderProps<'a> {
     pub package: &'a UnifiedPackage,
+    /// La hauteur que la plaque a. Elle décide de ce que la plaque garde :
+    /// son identité toujours, ses onglets quand la place les porte, ses
+    /// actions quand elles portent aussi.
+    pub available_height: f32,
     pub capabilities: &'a PackageCapabilities,
     pub active_tab: InspectorTab,
     pub theme: &'a Theme,
@@ -441,12 +445,44 @@ impl InspectorHeader {
             ));
 
         div()
+            .id("inspector_header_root")
+            // The handle the bench measures: the harness reads the bounds of
+            // the plate's chrome under this name. A noop outside the tests.
+            .debug_selector(|| "inspector_header_root".to_string())
             .flex()
             .flex_col()
             .w_full()
-            .child(identity_row)
-            .child(actions_row)
-            .child(tab_bar)
+            .child(
+                identity_row
+                    .id("inspector_identity_row")
+                    .debug_selector(|| "inspector_identity_row".to_string()),
+            )
+            // La plaque cède d'abord : ses actions, puis ses onglets. Son
+            // identité reste — sans elle, elle ne dit plus quel paquet est
+            // sélectionné.
+            .when(
+                props.available_height
+                    >= crate::ui_metrics::UiMetrics::PLATE_CHROME_HEIGHT,
+                |element| {
+                    element.child(
+                        actions_row
+                            .id("inspector_actions_row")
+                            .debug_selector(|| "inspector_actions_row".to_string()),
+                    )
+                },
+            )
+            .when(
+                props.available_height
+                    >= crate::ui_metrics::UiMetrics::PLATE_IDENTITY_HEIGHT
+                        + crate::ui_metrics::UiMetrics::PLATE_TABS_HEIGHT,
+                |element| {
+                    element.child(
+                        tab_bar
+                            .id("inspector_tab_bar")
+                            .debug_selector(|| "inspector_tab_bar".to_string()),
+                    )
+                },
+            )
     }
 }
 

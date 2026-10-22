@@ -700,16 +700,21 @@ mod tests {
             whole(p90)
         );
 
-        // The catalogue's qualified minimum: the width at which the name is
-        // whole for 90 % of the real names.
+        // The catalogue's qualified minimum, with the row's ladder.
+        //
+        // Without the ladder, the name would need 660 px to be whole. With
+        // it, the name keeps its floor — the p90's text plus the identity
+        // glyph — and the columns that say *where* give way. So 560 px is
+        // enough: the name is whole, and every column is still there.
         let qualified = whole(p90);
         assert_eq!(
             qualified, 660.0,
-            "the catalogue's qualified minimum, measured"
+            "sans l'echelle, il faudrait 660 px pour que le nom du p90 soit entier"
         );
-        assert!(
-            qualified > 560.0,
-            "560 px ne suffit pas : le nom du p90 ({p90} px) y est coupé, il lui faut {qualified}"
+        assert_eq!(
+            UiMetrics::ROW_NAME_MIN_WIDTH,
+            165.0,
+            "l'echelle tient le nom du p90 : 143 px de texte plus le glyphe"
         );
 
         // What 560 px buys now: the name keeps its floor instead of being
@@ -992,12 +997,12 @@ mod tests {
         // the window is 600 logical pixels wide or 600 physical ones.
         assert_eq!(
             crate::ui_metrics::UiMetrics::CATALOGUE_MIN_WIDTH,
-            660.0,
+            560.0,
             "the catalogue's floor is in logical pixels"
         );
         assert_eq!(
             crate::config::MIN_WINDOW_WIDTH,
-            720.0,
+            620.0,
             "and so is the window's"
         );
     }
