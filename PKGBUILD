@@ -1,4 +1,4 @@
-pkgname=plain
+pkgname=demo
 pkgver=1
 pkgrel=1
 arch=('any')
