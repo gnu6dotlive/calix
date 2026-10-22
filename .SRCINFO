@@ -1,6 +1,5 @@
-pkgbase = skip-suite
+pkgbase = optional-two
 	pkgver = 1
 	pkgrel = 1
 	arch = any
-pkgname = skip-suite
-pkgname = skip-addon
+pkgname = optional-two

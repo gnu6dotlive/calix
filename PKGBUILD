@@ -1,6 +1,5 @@
-pkgname=('skip-suite' 'skip-addon' )
+pkgname=optional-two
 pkgver=1
 pkgrel=1
 arch=('any')
-package_skip-suite() { :; }
-package_skip-addon() { :; }
+package() { :; }
