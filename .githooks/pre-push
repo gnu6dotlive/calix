@@ -4,5 +4,41 @@
 # This runs the same script CI runs, so the claim is checked before it costs
 # anything. `git push --no-verify` bypasses it; that is a deliberate act, and
 # it should be a rare one.
+#
+# A push that touches the dependencies carries a second claim: that the
+# lockfile it commits is the one cargo resolves for that manifest. The
+# currency check is deliberately *not* part of the build gate — a gate that
+# turns red because somebody else published a crate is noise, and the weekly
+# job is where that belongs. But the author who changes the dependencies is
+# responsible for the lockfile they commit, and that check is theirs to run
+# before the push, not after. The same paths the scheduled job watches.
 root=$(git rev-parse --show-toplevel) || exit 1
+
+# The refs the push would send: "<local ref> <local sha> <remote ref>
+# <remote sha>" per ref, on stdin.
+touches_dependencies=0
+while read -r _local_ref local_sha _remote_ref remote_sha
+do
+    if [ "$remote_sha" = "0000000000000000000000000000000000000000" ]
+    then
+        # A new branch: everything in it is being pushed.
+        range="$local_sha"
+    else
+        range="$remote_sha..$local_sha"
+    fi
+    if git diff --name-only "$range" 2>/dev/null |
+        grep -qE '^(Calix\.Ui\.Gpui/Cargo\.(toml|lock)|scripts/dependencies)$'
+    then
+        touches_dependencies=1
+    fi
+done
+
+if [ "$touches_dependencies" = 1 ]; then
+    echo "pre-push: the push touches the dependencies; the lockfile's currency is checked"
+    "$root/scripts/dependencies" --check || {
+        echo "pre-push: the lockfile is behind. Run: scripts/dependencies --update" >&2
+        exit 1
+    }
+fi
+
 exec "$root/scripts/verify"
