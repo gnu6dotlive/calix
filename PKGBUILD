@@ -1,4 +1,4 @@
-pkgname=needs-two
+pkgname=also-needs-two
 pkgver=1
 pkgrel=1
 arch=('any')
