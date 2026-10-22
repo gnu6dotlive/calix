@@ -1,6 +1,6 @@
 # CONTRACT 01 — The spatial contract of Calix
 
-**Version 1.2 — 2026-10-21 — status: ratified (decisions 1–4), the catalogue's minimum qualified**
+**Version 1.3 — 2026-10-22 — status: ratified (decisions 1–4), the catalogue's minimum qualified, and the row's ladder**
 
 Calix is a product. It is not a GPUI experiment that happens to have a
 package manager in it. The rules that decide where things are, what gives way
@@ -27,6 +27,20 @@ minimum was tried at 560 px and **does not hold** — the row's fixed columns
 cost 495 px, and at 560 the name shows six characters. The qualified
 minimum is **660 px**, measured from the real row and the real names, and
 the window's floor is re-derived from it so that the budget adds up.
+
+**Version 1.3** records the *ladder*, and the answer it gives is the
+operator's target. The row does not have to spend its fixed columns before
+it spends the name: the columns that say **where** — the source, the
+measurement — give way first, in that order, and the name keeps its floor
+(165 px of cell: the p90's 143 px of text and the identity glyph). So at
+560 px the name is **whole** — measured, on the real row, by
+`the_row_is_measured_at_and_around_the_catalogue_minimum` — and the
+catalogue's minimum is **560 px** after all. The 660 px of version 1.2 is
+kept: it is what the row costs *without* the ladder, and the ladder is what
+the row has. The window's floor is re-derived from 560: the catalogue (560)
+and the spine (56) → **620 × 520**, measured at the floor by
+`the_composition_at_the_window_floor_is_measured`: the catalogue 223 px (six
+rows) and the plate at its identity (48 px).
 
 The companion audit confronts this contract with the repository as it stands.
 Where the repository disagrees with this document, the audit says so, with the
@@ -103,8 +117,10 @@ shape (§4.4) rather than squeezing the catalogue.
 
 The body's floor is **measured on the row itself**, not estimated: the row's
 fixed columns, the row's padding, and the name the real packages carry.
-See the audit, §4.7 — the number is 660 px, and it is qualified by a test
-that reads the bounds the window drew.
+See the audit, §4.7 — the number is **560 px**, and it is qualified by a test
+that reads the bounds the window drew. The row's *ladder* is what makes it
+hold: the name keeps its floor of 165 px (the p90's 143 px of text and the
+identity glyph), and the columns that say *where* give way before it does.
 
 ### 4.3 The vertical budget
 

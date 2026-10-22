@@ -1,0 +1,48 @@
+{
+  "run_id": "row-ladder-20261022",
+  "kind": "qualification",
+  "status": "ok",
+  "objective": "§5.7 asked whether the measurement bar is worth 96 px of the name. The measurement shows the premise is void: the name is whole at 560, and the bar costs the source and the version.",
+  "the_finding": {
+    "the_audit_measured": "the row without its ladder: the name's cell is what the fixed columns leave — 0 px at 495, 65 px at 560 (43 px of text, six characters) — and the qualified minimum was 660 px",
+    "the_row_actually_is": "the ladder gives the name its floor (165 px of cell: the p90's 143 px of text and the identity glyph) and the columns that say *where* give way first — the source (weight 4), then the measurement (2), then the version (1); the size and the status never shrink",
+    "the_measured_truth": "at every width from 400 up the name's cell is 165 px and its text 143 px — the p90 whole. The name starts growing at 720 px (225/203), when the fixed columns are whole themselves.",
+    "the_consequence": "the catalogue's minimum is 560 px — the operator's target — and the window's floor is re-derived from it: 560 + 56 = 616 → 620, and the height 520 (the band 389 + the header 88 + the drawer 36 = 513). Measured at the floor: the catalogue 223 px (six rows), the plate 48 px."
+  },
+  "the_two_shapes_measured": {
+    "with_the_bar_at_560": {
+      "name_cell": 165,
+      "name_text": 143,
+      "version": 90,
+      "source": 45,
+      "measurement": 71,
+      "size": 80,
+      "status": 85
+    },
+    "without_the_bar_at_560": {
+      "name_cell": 165,
+      "name_text": 143,
+      "version": 104,
+      "source": 102,
+      "measurement": null,
+      "size": 80,
+      "status": 85
+    },
+    "the_name_is_identical": "the bar costs the name nothing at any width — the ladder gives the name its floor either way",
+    "the_bar_degrades": "its track is MEASURE_WIDTH (96) wide inside a cell the ladder narrows, right-justified and clipped: below 660 px the bar's *length* no longer encodes the size, and below 480 px the cell is 0 and the bar is gone"
+  },
+  "the_question_left_to_the_product": "a bar whose length stops encoding below 660 px — is that reading worth the source and the version it squeezes? The size column, which never shrinks, shows the same number in bytes.",
+  "the_measurements": {
+    "the_row_alone": "the same numbers as the list — the ladder is the row's, proved in both",
+    "the_list": "the catalogue's real list, at the catalogue's real height (36 px), at 400/480/495/520/560/660/720/800 — the name's cell 165 px from 400 up",
+    "the_composition_at_the_floor": "620 × 520: the catalogue 223 px (six rows), the plate 48 px",
+    "the_gates": "scripts/verify PASSED — 264 UI tests, the layout unchanged"
+  },
+  "artifacts": [
+    {
+      "file": "logs/row-ladder.log",
+      "bytes": 2353,
+      "sha256": "6b4bb162e221cab1cf23f78569b51b0551af4bd503a8f609300c5bf7af3b3fa0"
+    }
+  ]
+}
