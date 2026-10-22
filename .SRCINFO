@@ -1,6 +1,7 @@
-pkgbase = demo-suite
-	pkgver = 1
-	pkgrel = 1
+pkgbase = demo
+	pkgdesc = review fixture
+	pkgver = 1-1
 	arch = any
-pkgname = demo-cli
-pkgname = demo-docs
+	source = helper.sh
+	sha256sums = SKIP
+pkgname = demo
