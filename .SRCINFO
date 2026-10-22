@@ -1,5 +1,5 @@
-pkgbase = optional-two
+pkgbase = failure-one
 	pkgver = 1
 	pkgrel = 1
 	arch = any
-pkgname = optional-two
+pkgname = failure-one
