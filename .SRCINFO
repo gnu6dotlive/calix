@@ -1,6 +1,5 @@
-pkgbase = suite
+pkgbase = implementation
 	pkgver = 1
 	pkgrel = 1
 	arch = any
-pkgname = demo-cli
-pkgname = demo-docs
+pkgname = implementation
