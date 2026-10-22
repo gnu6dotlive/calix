@@ -1,5 +1,6 @@
-pkgbase = demo
+pkgbase = demo-suite
 	pkgver = 1
 	pkgrel = 1
 	arch = any
-pkgname = demo
+pkgname = demo-cli
+pkgname = demo-docs
