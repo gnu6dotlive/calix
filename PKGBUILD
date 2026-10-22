@@ -1,4 +1,4 @@
-pkgname=failure-two
+pkgname=valid-after-invalid
 pkgver=1
 pkgrel=1
 arch=('any')
