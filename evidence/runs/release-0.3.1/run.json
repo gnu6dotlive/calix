@@ -1,0 +1,23 @@
+{
+  "run_id": "release-0.3.1",
+  "kind": "release",
+  "status": "ok",
+  "version": "0.3.1",
+  "tag": "v0.3.1",
+  "commit": "85f853f8f22d99a24b3b76b1281d24fb39e37bfa",
+  "repository": "gnu6dotlive/calix",
+  "hosted_run": "39837819006",
+  "hosted_conclusion": "success",
+  "the_checks": [
+    "the working tree was clean, on main, and in step with the remote",
+    "the version was free: no tag, no release",
+    "the notes' title named this version",
+    "the local gate was green on this exact commit",
+    "the hosted workflow was watched to a green conclusion",
+    "the release carries the binary tarball, and the tag names this commit"
+  ],
+  "the_artefacts": [
+    {"path": "docs/release-notes.md", "what": "the release body"},
+    {"path": "evidence/runs/release-0.3.1/run.json", "what": "this record"}
+  ]
+}
