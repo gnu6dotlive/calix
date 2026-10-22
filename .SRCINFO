@@ -1,5 +1,5 @@
-pkgbase = implementation
+pkgbase = removed-git
 	pkgver = 1
 	pkgrel = 1
 	arch = any
-pkgname = implementation
+pkgname = removed-git
