@@ -7,6 +7,16 @@ description = "High-performance GPU-accelerated package manager frontend for Cal
 license = "GPL-3.0-only"
 
 [dependencies]
+# The Wayland backend's `log` feature compiles the C shim that provides
+# `wl_log_trampoline_to_rust_client` — the symbol the backend references
+# when it hands the log handler to the Rust client. Without the shim, the
+# link expects the *system* libwayland to export that symbol, and Arch's
+# does not (it is the Rust-client support, not the library version).
+#
+# Cargo 1.98 turns the feature on by itself, through gpui-pre-linux; 1.97
+# does not. The feature is declared here so that the build does not depend
+# on the resolver's mood.
+wayland-backend = { version = "0.3", features = ["log"] }
 gpui-pre = "0.3.9"
 gpui-pre-platform = "0.3.9"
 gpui-pre-linux = "0.3.9"

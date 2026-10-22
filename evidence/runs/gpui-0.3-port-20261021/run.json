@@ -31,6 +31,21 @@
     "the_consequence": "The UI tests run in the *debug* profile, and the release build is still made for the artefact it ships. This is not a preference: it is the upstream's own condition.",
     "the_cost": "A second build tree in the gate: 65 s of tests against 102 s of release build, in the runner's container, with the caches the lockfile keys."
   },
+  "the_finding_that_stopped_the_packaging": {
+    "what": "The ported tree could not be packaged: inside makepkg the link failed with `undefined symbol: wl_log_trampoline_to_rust_client`, and by hand it linked. The difference was the build machine's flags, not the tree.",
+    "the_three_flags": {
+      "-flto=auto (CFLAGS/CXXFLAGS/LDFLAGS)": "reaches the C shim that wayland-backend's build script compiles; the object carries .gnu.lto_* bytecode instead of code, and rust-lld cannot read it. The link fails.",
+      "-C opt-level=3 (RUSTFLAGS)": "rustc enables cfg(debug_assertions) only when opt-level is 0, so the flag switches the debug assertions off — in the test profile too. The same eighteen measuring tests fail that fail under a release test run.",
+      "-C target-cpu=native (RUSTFLAGS)": "builds the binary for the machine that builds the package. A package is downloaded by machines that are not this one, and a binary tuned for the builder's CPU faults on an older CPU, where the instructions are absent."
+    },
+    "the_measurements": {
+      "link": "without -flto the package builds; with it the link fails (1 undefined symbol). The shim object: real code without it, .gnu.lto_* sections with it.",
+      "the_tests": "-C opt-level=3 alone: 247 passed / 18 failed. The same flag with -C debug-assertions=on: 265 passed / 0 failed. -C target-cpu=x86-64 alone: 265 passed / 0 failed.",
+      "the_cpu": "the same tree, built twice: -C target-cpu=native makes LLVM vectorise 100x more (233908 AVX2 instructions against 2238), in the widest width the builder's CPU has; on a CPU that lacks it, the binary faults with SIGILL. The 26 AVX-512 instructions present in both builds are aws-lc-sys's and the aes crate's own assembly, guarded by their runtime capability checks — not ours."
+    },
+    "the_fix": "PKGBUILD-calix states its own flags: CFLAGS without -flto, RUSTFLAGS without -C opt-level=3 and without -C target-cpu=native, and the package's tests run in the debug profile, where the measurements exist.",
+    "the_detail": "evidence/runs/pkgbuild-flags-20261021/"
+  },
   "the_result": {
     "the_tests": "263 UI tests, green — including every measurement test, unchanged",
     "the_layout_is_identical": "The measurements did not move by a pixel: the row's 495 px floor, the catalogue's 660 px minimum, the 165 px name cell, the bank's 100.5 px, the plate's 96 px, the 143 px p90 name — all the same. The contract's numbers are properties of the *composition*, not of gpui's version, and the port confirms it.",
@@ -43,6 +58,7 @@
   "the_limitations": [
     "The port is green in the *bench*; the application has not been run on a screen since the port. The interaction gate and the measurements are the witnesses, but a human eye has not looked at the ported application.",
     "The platform crates (gpui-pre-platform, gpui-pre-linux) are new dependencies: they are published in lockstep with gpui-pre, and the same question applies to them — they will move too.",
-    "The debug assertions of the *test* build are the price of the measurements; the shipped binary keeps its assertions off, and the release build is still made for the artefact."
+    "The debug assertions of the *test* build are the price of the measurements; the shipped binary keeps its assertions off, and the release build is still made for the artefact.",
+    "The packaging was qualified on this machine, whose makepkg.conf carries `lto` in the global OPTIONS and `target-cpu=native` in RUSTFLAGS. A builder whose configuration differs would exercise a different path — the package now states its own flags, so it does not depend on that, but the *link* was proved here, not everywhere."
   ]
 }

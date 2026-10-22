@@ -5,7 +5,11 @@
 # previous one, the services must serve the *new* code rather than the old
 # one still in memory, and the result must be checked — not assumed.
 #
-#   scripts/install-machine            # build, install, restart, verify
+#   scripts/install-machine            # build from main, install, restart, verify
+#   scripts/install-machine --from-local
+#                                       # build from *this* tree — the way a
+#                                       # change is tried on the machine
+#                                       # before it is merged
 #   scripts/install-machine --dry-run  # everything but the installation
 #
 # The steps, in order:
@@ -26,13 +30,15 @@ ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 cd "$ROOT"
 
 DRY_RUN=0
+FROM_LOCAL=0
 PKGDIR="$ROOT/.ci-cache/pkg"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --dry-run) DRY_RUN=1 ;;
+        --from-local) FROM_LOCAL=1 ;;
         -h | --help)
-            sed -n '2,26p' "$0" | sed 's/^# \{0,1\}//'
+            sed -n '2,30p' "$0" | sed 's/^# \{0,1\}//'
             exit 0
             ;;
         *)
@@ -58,21 +64,69 @@ step "The tree"
 if [[ -n "$(git status --porcelain)" ]]; then
     fail "the working tree is dirty — commit or stash first"
 fi
-[[ "$(git branch --show-current)" == "main" ]] || fail "the installation comes from main"
+BRANCH=$(git branch --show-current)
+if [[ $FROM_LOCAL -eq 0 && "$BRANCH" != "main" ]]; then
+    fail "the installation comes from main (on '${BRANCH}'); --from-local installs this tree"
+fi
+if [[ $FROM_LOCAL -eq 1 && "$BRANCH" == "main" ]]; then
+    echo "install-machine: --from-local on main is the same as the published path"
+fi
 git fetch --quiet origin
 LOCAL=$(git rev-parse HEAD)
-[[ "$LOCAL" == "$(git rev-parse origin/main)" ]] || fail "main is not in step with the remote"
+# The branch is compared with *its* remote counterpart: the local path
+# installs a branch before it is merged, and the published path installs
+# main.
+REMOTE_REF="origin/$BRANCH"
+[[ "$BRANCH" == "main" ]] && REMOTE_REF="origin/main"
+[[ "$LOCAL" == "$(git rev-parse "$REMOTE_REF")" ]] || fail "the branch is not in step with the remote (${LOCAL} vs ${REMOTE_REF})"
 echo "  main is at ${LOCAL}"
 
 # ── 2. The package ─────────────────────────────────────────────────────────
 step "The package"
-if [[ $DRY_RUN -eq 1 ]]; then
-    echo "  would build the package from PKGBUILD-calix in ${PKGDIR}"
+if [[ $FROM_LOCAL -eq 1 ]]; then
+    # The package is built from *this* tree, not from the published branch:
+    # it is how a change is tried on the machine before it is merged. The
+    # PKGBUILD is copied into the repository's scratch, and its source
+    # points at the local checkout.
+    if [[ $DRY_RUN -eq 1 ]]; then
+        echo "  would build the package from the local tree, in ${PKGDIR}"
+    else
+        rm -rf "${PKGDIR}"
+        mkdir -p "${PKGDIR}"
+        cp "$ROOT/PKGBUILD-calix" "${PKGDIR}/PKGBUILD"
+        python3 - "$ROOT" "${PKGDIR}/PKGBUILD" "$(git branch --show-current)" <<'PY'
+import re
+import sys
+
+root, target, branch = sys.argv[1], sys.argv[2], sys.argv[3]
+with open(target) as handle:
+    text = handle.read()
+local = "git+file://{}#branch={}".format(root, branch)
+text = re.sub(
+    r'source=\("\$\{pkgname\}::git\+[^"]*"\)',
+    'source=("${pkgname}::' + local + '")',
+    text,
+)
+with open(target, "w") as handle:
+    handle.write(text)
+PY
+        # The tree needs Zig 0.16 — the system's is 0.17 — and the
+        # repository carries that toolchain in vendor/. The PKGBUILD honours
+        # the ZIG override for exactly this.
+        (cd "${PKGDIR}" && ZIG="$ROOT/vendor/zig-0.16/usr/bin/zig" makepkg --noconfirm) >/dev/null
+        PACKAGE=$(ls -t "${PKGDIR}"/*.pkg.tar.zst 2>/dev/null | head -1)
+        [[ -n "$PACKAGE" ]] || fail "the package was not built"
+        echo "  built $(basename "$PACKAGE") from the local tree"
+    fi
 else
-    make package
-    PACKAGE=$(ls -t "${PKGDIR}"/*.pkg.tar.zst 2>/dev/null | head -1)
-    [[ -n "$PACKAGE" ]] || fail "the package was not built"
-    echo "  built $(basename "$PACKAGE")"
+    if [[ $DRY_RUN -eq 1 ]]; then
+        echo "  would build the package from PKGBUILD-calix in ${PKGDIR}"
+    else
+        make package
+        PACKAGE=$(ls -t "${PKGDIR}"/*.pkg.tar.zst 2>/dev/null | head -1)
+        [[ -n "$PACKAGE" ]] || fail "the package was not built"
+        echo "  built $(basename "$PACKAGE")"
+    fi
 fi
 
 # ── 3. The installation ─────────────────────────────────────────────────────

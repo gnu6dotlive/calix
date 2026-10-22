@@ -1,0 +1,122 @@
+{
+  "run": "pkgbuild-flags-20261021",
+  "subject": "the ported frontend could not be packaged; the build machine's flags were the cause",
+  "commit": "660a7603",
+  "status": "ok",
+  "question": "why does the ported tree fail to link inside makepkg while it links by hand?",
+  "answer": "three flags that makepkg inherits from the build machine, each measured",
+  "findings": [
+    {
+      "id": "lto",
+      "flag": "-flto=auto (CFLAGS/CXXFLAGS/LDFLAGS, from makepkg's global OPTIONS=(... lto ...))",
+      "mechanism": "reaches the C shim that wayland-backend's build script compiles; the object carries .gnu.lto_* bytecode instead of code, which rust-lld cannot read",
+      "symptom": "link error: undefined symbol: wl_log_trampoline_to_rust_client",
+      "measurement": {
+        "without_lto": "247 passed; 18 failed; link ok",
+        "with_lto": "link fails: undefined symbol (1)",
+        "shim_object_sections_failing": ".gnu.lto_* present",
+        "shim_object_sections_passing": "no .gnu.lto_* sections"
+      }
+    },
+    {
+      "id": "opt-level",
+      "flag": "-C opt-level=3 (RUSTFLAGS, from /etc/makepkg.conf.d/rust.conf)",
+      "mechanism": "rustc enables cfg(debug_assertions) only when opt-level is 0; the flag therefore switches the debug assertions off in the test profile too",
+      "symptom": "the eighteen measuring tests fail: gpui records element bounds only under all(debug_assertions, feature = \"test-support\")",
+      "measurement": {
+        "opt_level_3": "247 passed; 18 failed",
+        "opt_level_3_plus_debug_assertions_on": "265 passed; 0 failed",
+        "opt_level_3_plus_debug_assertions_off": "247 passed; 18 failed",
+        "target_cpu_x86_64_only": "265 passed; 0 failed",
+        "force_frame_pointers_only": "265 passed; 0 failed"
+      }
+    },
+    {
+      "id": "target-cpu",
+      "flag": "-C target-cpu=native (RUSTFLAGS, from /etc/makepkg.conf.d/rust.conf)",
+      "mechanism": "a distributed package is downloaded by machines that are not the builder; a binary tuned for the builder's CPU faults on an older CPU, where the instructions are absent",
+      "measurement": {
+        "the_comparison": "the SAME tree, built twice — the only difference is the flag",
+        "target_features_native": 33,
+        "target_features_x86_64": 3,
+        "avx2_instructions_baseline": 2238,
+        "avx2_instructions_native": 233908,
+        "avx512_instructions_baseline": 26,
+        "avx512_instructions_native": 52,
+        "reading": "-C target-cpu=native makes LLVM vectorise 100x more, in the widest width the builder's CPU has. On a CPU that lacks it, the binary faults with SIGILL. The 26 AVX-512 instructions present in both are aws-lc-sys's and the aes crate's own hand-written assembly, guarded by their runtime capability checks — not ours."
+      }
+    }
+  ],
+  "fix": "PKGBUILD-calix states its own flags: CFLAGS without -flto, RUSTFLAGS without -C opt-level=3 and without -C target-cpu=native; the tests run in the debug profile, where the measurements exist",
+  "verification": {
+    "package_build": "makepkg --noconfirm, from the branch, with the machine's own makepkg.conf: exit 0",
+    "tests_inside_the_package_build": "265 passed; 0 failed",
+    "package": "calix-gpui-git r4871.gf690fb9e-1",
+    "shim_object": "real code, no .gnu.lto_* sections"
+  },
+  "artifacts": [
+    {
+      "file": "logs/ab-plain.log",
+      "bytes": 38078,
+      "sha256": "80ba5fae36497d6dc7b5823b01393ddf19d311880fe455ea85284b6dc2fe7dc8"
+    },
+    {
+      "file": "logs/ab-rustflags.log",
+      "bytes": 44695,
+      "sha256": "cc4043bb3ae0abb5987aeccb7ecfb9bb70e0ad442098a1c2e32f1a0acd6d9bbf"
+    },
+    {
+      "file": "logs/ab-with-lto.log",
+      "bytes": 17726,
+      "sha256": "7e7d850956128d4746ebcffa621d84a88a700fcc19615b8302638bf63b23ac96"
+    },
+    {
+      "file": "logs/ab-without-lto.log",
+      "bytes": 16046,
+      "sha256": "418d119b65708a3ae1f4ef0846f8cc0e9a31e489fc2b077e5672868b5de2a332"
+    },
+    {
+      "file": "logs/env-makepkg.log",
+      "bytes": 5183,
+      "sha256": "7af084001d5304167e1899ae39e7169bb1098e2396327547aa9049ffb27719d4"
+    },
+    {
+      "file": "logs/env-manual.log",
+      "bytes": 4102,
+      "sha256": "04801fe8575617c929b2f8215d71c2014a8081f148dfaf1251f2fb713ad988a4"
+    },
+    {
+      "file": "logs/makepkg-failing.log",
+      "bytes": 18782,
+      "sha256": "3584eef8349ef91f58714c8177610298f8cddb8c14a6ef6da2b52e77a918353b"
+    },
+    {
+      "file": "logs/makepkg-package.log",
+      "bytes": 55670,
+      "sha256": "79c4a08cf382bc7e6f712fc77bc014ef3352f7dbe199011569180c413460d89c"
+    },
+    {
+      "file": ".ci-cache/pkg/calix-gpui-git-r4871.gf690fb9e-1-x86_64.pkg.tar.zst",
+      "bytes": 14673814,
+      "sha256": "fe7f69357edce49bee2968a9ec209c80001adcd84e996271caf9bb95aa9ce997"
+    }
+  ],
+  "the_gate_now_holds_it": {
+    "decision": "the operator chose: prove the cause, not the symptom",
+    "what": "a new gate step, 'build-flags', checks the flags where they enter — the environment the build inherits, and the package's own declaration, asked of the PKGBUILD itself — before the build, so a flag that would break the build or the binary is named where it enters",
+    "the_three_it_refuses": [
+      "-C target-cpu=native: a distributed package is built for the architecture's baseline, not for the machine that builds it",
+      "-C opt-level=: rustc enables cfg(debug_assertions) only when opt-level is 0, so this switches the measurements off",
+      "-flto in CFLAGS/CXXFLAGS/LDFLAGS: the C shim that wayland-backend compiles would become LTO bytecode, which rust-lld cannot read"
+    ],
+    "the_measurements": {
+      "environment_target_cpu_native": "refused, with the reason",
+      "environment_opt_level_3": "refused, with the reason",
+      "environment_lto_in_cflags": "refused, with the reason",
+      "environment_lto_in_ldflags": "refused, with the reason",
+      "the_packages_declaration_regressed_to_target_cpu_native": "refused, with the reason",
+      "a_clean_environment": "passes, and reports both sets of flags"
+    },
+    "why_not_the_symptom": "checking the packaged binary's instructions would have to carve out the aws-lc-sys and aes crates' own runtime-guarded assembly, and a carve-out is where such a check rots. The cause is one line of configuration, so the cause is what is checked."
+  }
+}

@@ -25,7 +25,22 @@ impl UiMetrics {
     // context surface — it is the first to give way — and its floor is the
     // height at which it still shows its tabs.
     pub const SPLITTER_THICKNESS: f32 = 5.0;
-    pub const NAMEPLATE_MIN_HEIGHT: f32 = 96.0;
+    /// Le chrome de la plaque, mesuré : l'identité, les actions, les onglets.
+    ///
+    /// Ce n'est pas une estimation : ce sont les hauteurs que le banc a
+    /// mesurées sur la vraie plaque (identity 47.5, actions 29.5, tabs
+    /// 34.5). Le chrome complet fait 131.5 px.
+    pub const PLATE_IDENTITY_HEIGHT: f32 = 47.5;
+    pub const PLATE_ACTIONS_HEIGHT: f32 = 29.5;
+    pub const PLATE_TABS_HEIGHT: f32 = 34.5;
+    pub const PLATE_CHROME_HEIGHT: f32 = 131.5;
+    /// Le plancher de la plaque : l'identité seule.
+    ///
+    /// La plaque cède d'abord — elle rend sa place avant que le catalogue
+    /// ne soit réduit. Son corps se réduit d'abord, puis ses actions, puis
+    /// ses onglets ; l'identité reste, parce qu'elle dit *quel* paquet est
+    /// sélectionné, et que sans elle la plaque ne dit plus rien.
+    pub const NAMEPLATE_MIN_HEIGHT: f32 = 48.0;
     pub const NAMEPLATE_MAX_RATIO: f32 = 0.55;
 
     // ── Workbench Dimensions ─────────────────────────────────────────────────
@@ -80,7 +95,7 @@ impl UiMetrics {
     /// (components/package_table.rs), and the 560 px that was tried first is
     /// kept in the record as the case that failed: at 560, the name shows
     /// 43 px of text — six characters.
-    pub const CATALOGUE_MIN_WIDTH: f32 = 660.0;
+    pub const CATALOGUE_MIN_WIDTH: f32 = 560.0;
 
     // ── The row's own ladder ────────────────────────────────────────────────
     //

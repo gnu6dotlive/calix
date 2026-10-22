@@ -1,0 +1,29 @@
+{
+  "run_id": "dependency-currency-20261022",
+  "kind": "gate-gap",
+  "status": "ok",
+  "objective": "the lockfile's currency was behind, and nothing in the local gate said so",
+  "the_finding": {
+    "what": "scripts/dependencies --check reported the lockfile behind (icu_* 2.3.0 -> 2.4.0, open 5.4.4 -> 5.4.5, tinystr, yoke, zerovec, zerovec-derive) while scripts/verify and scripts/ci-replay were green",
+    "why_nothing_caught_it": "the currency check is deliberately not part of the build gate — the workflow says so: 'a gate that turns red because someone else published a crate is noise; a scheduled job that turns red is a signal'. It runs on a schedule and on pull requests that touch the dependency files, and on a pull request it does not block.",
+    "the_hole": "nothing ran it *before a push*. The author who changes the dependencies is responsible for the lockfile they commit, and that check was theirs to run and was not run.",
+    "the_lesson": "the same class as the packaging gap: the gate covered the paths that were easy to cover, and the paths that matter — the artifact that ships, and the lockfile that names it — were outside it."
+  },
+  "the_fix": {
+    "the_pre_push_hook": "a push that touches Calix.Ui.Gpui/Cargo.toml, Calix.Ui.Gpui/Cargo.lock or scripts/dependencies now runs scripts/dependencies --check before the gate. The same paths the scheduled job watches, and the same condition the pull-request job uses. A push that touches none of them is not charged for a stranger's publish.",
+    "the_check_itself": "a check that checks nothing must not pass: if cargo cannot reach the registry, or if the registry was not consulted because the run was offline, the check now fails with the reason instead of claiming the lockfile is current"
+  },
+  "the_update": {
+    "what": "scripts/dependencies --update: the lockfile moved, the pins were re-applied, and the gate decided",
+    "the_moves": "icu_* 2.3.0 -> 2.4.0, icu_provider 2.3.1 -> 2.4.0, open 5.4.4 -> 5.4.5, tinystr 0.8.4 -> 0.8.5, yoke 0.8.3 -> 0.8.4, zerovec 0.11.8 -> 0.11.9, zerovec-derive 0.11.6 -> 0.11.7",
+    "the_pin": "libc 0.2.189 — re-pinned, and held (0.2.191 removed ENOATTR)",
+    "the_gate_after": "scripts/verify PASSED: 1386 package-manager tests, 392 CLI tests, 265 UI tests"
+  },
+  "artifacts": [
+    {
+      "file": "logs/currency.log",
+      "bytes": 813,
+      "sha256": "e6a08fc51a9464bcef89309237baecd8e3b218fc61a9a87334060fea87802416"
+    }
+  ]
+}

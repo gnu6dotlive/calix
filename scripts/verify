@@ -251,6 +251,92 @@ flatpak_backend_release_build() {
     test -f Calix.Flatpak.Backend/zig-out/lib/libcalix-flatpak-backend.so.1
 }
 
+# The flags a build inherits decide what the binary *is*, and three of the
+# flags that reach a build by default are wrong for a distributed package.
+# Each of them fails in a way that hides its own cause, which is why they
+# are checked where they enter — before the build — rather than read out of
+# a linker error afterwards:
+#
+#   -flto=auto (CFLAGS/CXXFLAGS/LDFLAGS, which makepkg's global `lto`
+#   option adds) reaches the C shim that wayland-backend's build script
+#   compiles. The object then carries LTO bytecode instead of code, and
+#   rust-lld cannot read it: the link fails with
+#     undefined symbol: wl_log_trampoline_to_rust_client
+#
+#   -C opt-level=3 (RUSTFLAGS) is not merely redundant: rustc enables
+#   cfg(debug_assertions) only when opt-level is 0, so the flag switches
+#   the debug assertions off — in the test profile too. gpui records the
+#   bounds of an element only under
+#   all(debug_assertions, feature = "test-support"), so the measurements
+#   the visual bench reads vanish and the tests that read them fail.
+#
+#   -C target-cpu=native (RUSTFLAGS) builds the binary for the machine
+#   that builds it: LLVM then vectorises a hundred times more, in the
+#   widest width that machine has. A package is downloaded by machines
+#   that are not this one, and the binary faults with SIGILL where the
+#   instructions are absent.
+#
+# The flags enter a build from two places: the environment, and the
+# package's own declaration. Both are checked. The package's declaration
+# is asked of the PKGBUILD itself, so the check cannot drift from what
+# the package does.
+build_flags() {
+    local pkg_rust pkg_c pkg_cxx pkg_ld
+    local rust_flags="${RUSTFLAGS:-}" c_flags="${CFLAGS:-}"
+    local cxx_flags="${CXXFLAGS:-}" ld_flags="${LDFLAGS:-}"
+
+    if ! pkg_rust=$(cd "$ROOT" && bash -c 'source ./PKGBUILD-calix >/dev/null 2>&1 || exit 1
+        package_build_flags || exit 1
+        printf "%s\n" "$RUSTFLAGS"') || [ -z "$pkg_rust" ]; then
+        echo "build-flags: the package's flags could not be read from PKGBUILD-calix" >&2
+        return 1
+    fi
+    pkg_c=$(cd "$ROOT" && bash -c 'source ./PKGBUILD-calix >/dev/null 2>&1
+        package_build_flags; printf "%s\n" "$CFLAGS"')
+    pkg_cxx=$(cd "$ROOT" && bash -c 'source ./PKGBUILD-calix >/dev/null 2>&1
+        package_build_flags; printf "%s\n" "$CXXFLAGS"')
+    pkg_ld=$(cd "$ROOT" && bash -c 'source ./PKGBUILD-calix >/dev/null 2>&1
+        package_build_flags; printf "%s\n" "$LDFLAGS"')
+
+    local failed=0
+    # where the flags come from, the flags, and the message
+    check_one_flag() {
+        local where="$1" name="$2" value="$3" pattern="$4" why="$5"
+        if printf '%s' "$value" | grep -qE "$pattern"; then
+            echo "build-flags: $where carries $name" >&2
+            echo "             $why" >&2
+            failed=1
+        fi
+    }
+
+    local native='target-cpu=native'
+    local optlevel='(^|[[:space:]])-C[[:space:]]*opt-level='
+    local lto='(^|[[:space:]])-flto'
+
+    for where in "the environment" "the package's declaration"; do
+        local r="$rust_flags" c="$c_flags" x="$cxx_flags" l="$ld_flags"
+        if [ "$where" = "the package's declaration" ]; then
+            r="$pkg_rust"; c="$pkg_c"; x="$pkg_cxx"; l="$pkg_ld"
+        fi
+        check_one_flag "$where" "-C target-cpu=native" "$r" "$native" \
+            "a distributed package is built for the architecture's baseline, not for the machine that builds it"
+        check_one_flag "$where" "-C opt-level=" "$r" "$optlevel" \
+            "rustc enables cfg(debug_assertions) only when opt-level is 0, so this switches the measurements off"
+        check_one_flag "$where" "-flto" "$c $x $l" "$lto" \
+            "the C shim that wayland-backend compiles would become LTO bytecode, which rust-lld cannot read"
+    done
+
+    if [ "$failed" != 0 ]; then
+        echo "build-flags: the build is refused; the package's own flags are in PKGBUILD-calix" >&2
+        return 1
+    fi
+
+    printf 'the environment: RUSTFLAGS=%s\n' "${rust_flags:-<none>}"
+    printf 'the package:     RUSTFLAGS=%s\n' "$pkg_rust"
+    printf 'the package:     CFLAGS=%s\n' "$pkg_c"
+    printf 'the package:     LDFLAGS=%s\n' "$pkg_ld"
+}
+
 # A released binary has to run on every x86_64 machine, not only on the one
 # that built it. Zig's native CPU model bakes the build machine's
 # instruction set into the binary, and Zig emits it without a runtime check:
@@ -319,6 +405,10 @@ step "cli-smoke" cli_smoke
 step "flatpak-backend-tests" flatpak_backend_tests
 step "flatpak-backend-release-build" flatpak_backend_release_build
 step "portable-binaries" portable_binaries
+# The flags are checked before the Rust build, so a flag that would break
+# the build (or the binary) is named where it enters, instead of showing
+# up later as a linker error or as a fault on another machine.
+step "build-flags" build_flags
 # The UI resolves the CLI at runtime, so the tests that launch it need to be
 # pointed at the binary this run just built rather than one on PATH.
 export CALIX_BIN="$ROOT/Calix.Cli.Zig/zig-out/bin/calix"

@@ -1,0 +1,16 @@
+{
+  "run_id": "install-20261022T101624Z",
+  "kind": "installation",
+  "status": "ok",
+  "commit": "aaa199929a02a5d07c637f1a9e75a7b8dffd89c2",
+  "package": "calix-gpui-git-r4874.gaaa19992-1-x86_64.pkg.tar.zst",
+  "the_checks": [
+    "the working tree was clean, on main, and in step with the remote",
+    "the package was built by the repository's own PKGBUILD",
+    "the package replaced the previous one, through polkit",
+    "the user services were restarted, so that they serve the new code",
+    "no file of the package differs from the package's",
+    "the binaries and the daemon answer",
+    "the services run"
+  ]
+}

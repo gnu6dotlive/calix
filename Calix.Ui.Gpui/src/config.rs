@@ -95,12 +95,10 @@ pub struct GpuiUiConfig {
 /// Le budget, mesuré, et il s'additionne :
 ///
 /// ```
-/// 495  la ligne du catalogue : ses cinq colonnes fixes et son padding
-/// + 22 le glyphe d'identité, son écart, et le nom du p90 des paquets réels
-/// + 143 le nom, pour 90 % des paquets de la machine (143 px de texte)
-/// = 660 le contenu que le catalogue garde
-/// + 56  la colonne de navigation, repliée
-/// = 716  arrondi à 720
+/// 560  le catalogue : son plancher qualifie, mesure sur la ligne reelle
+///       (a l'echelle de la ligne, le nom du p90 y est entier)
+/// + 56  la colonne de navigation, repliee
+/// = 616  arrondi a 620
 /// ```
 ///
 /// La colonne de navigation se replie d'elle-même quand la place manque
@@ -110,8 +108,26 @@ pub struct GpuiUiConfig {
 /// Un plancher est une *demande* : un compositeur à tuiles peut accorder
 /// moins. La composition doit donc tenir aussi en dessous, et c'est ce que
 /// le banc mesure.
-pub const MIN_WINDOW_WIDTH: f32 = 720.0;
-pub const MIN_WINDOW_HEIGHT: f32 = 480.0;
+pub const MIN_WINDOW_WIDTH: f32 = 620.0;
+/// Le plancher de la fenêtre en hauteur : 520 px.
+///
+/// Il est *dérivé*, comme la largeur, et il s'additionne :
+///
+/// ```
+/// 120  la banque des sources, dans sa bande la plus haute (mesurée)
+/// +  5  l'arête
+/// + 216  le catalogue : son plancher de six lignes
+/// + 48  la plaque : son plancher, l'identité seule
+/// = 389  la bande que la station doit avoir
+/// + 88  l'en-tête
+/// + 36  le bandeau du tiroir
+/// = 513  arrondi à 520
+/// ```
+///
+/// À 480 px de haut, la mesure est nette : le catalogue recevait 183 px —
+/// cinq lignes au lieu de six. La hauteur est donc ce que la composition
+/// demande, et non un chiffre posé à côté.
+pub const MIN_WINDOW_HEIGHT: f32 = 520.0;
 
 fn default_dark_theme() -> bool {
     true
@@ -734,8 +750,8 @@ mod tests {
         // Boundary test at exact minimums
         let (w_min, h_min) =
             ConfigManager::sanitize_window_size(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT);
-        assert_eq!(w_min, 720.0);
-        assert_eq!(h_min, 480.0);
+        assert_eq!(w_min, 620.0);
+        assert_eq!(h_min, 520.0);
     }
 
     #[test]

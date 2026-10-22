@@ -84,22 +84,6 @@ pub fn nameplate_height_after_drag(
     nameplate_height(content_height, drag_start_height - delta_y)
 }
 
-/// La plaque reste-t-elle dans le flux ?
-///
-/// Elle y reste tant que la bande peut porter la banque, l'arête, le
-/// plancher du catalogue *et* le chrome de la plaque. Sinon elle **quitte
-/// le flux** : elle vient par-dessus le catalogue, comme le tiroir quand il
-/// n'a pas la place d'être un tiroir.
-///
-/// C'est l'échelle du contrat, appliquée à la bande : la surface
-/// contextuelle cède *entièrement* avant que le catalogue soit réduit.
-pub fn plate_stays_in_the_flow(band_height: f32) -> bool {
-    band_height
-        >= UiMetrics::BANK_HEIGHT
-            + UiMetrics::SPLITTER_THICKNESS
-            + UiMetrics::CATALOGUE_MIN_HEIGHT
-            + UiMetrics::NAMEPLATE_MIN_HEIGHT
-}
 
 /// La largeur de la zone de contenu : la largeur *mappée* de la fenêtre, moins le rail.
 ///
@@ -742,7 +726,10 @@ impl Render for PackageWorkstationView {
         // chrome, the plate leaves the flow: it comes over the catalogue,
         // summoned by the same edge. The catalogue is never reduced below
         // its floor for the sake of a caption.
-        let plate_overlays = !plate_stays_in_the_flow(window_height);
+        // La plaque cède d'abord : elle se réduit, et le catalogue garde sa
+        // place. Elle ne passe jamais par-dessus — on sait toujours quel
+        // paquet est sélectionné.
+        let plate_overlays = false;
         let effective_nameplate_height = if plate_overlays {
             self.nameplate_height
         } else {
@@ -1490,6 +1477,7 @@ impl Render for PackageWorkstationView {
         let inspector_element = PackageInspectorView::render_with_motion(
             PackageInspectorProps {
                 package: selected_pkg.as_ref(),
+                available_height: effective_nameplate_height,
                 quiet,
                 alpm_details: alpm_details.as_ref(),
                 also_in: &also_in,
@@ -1891,21 +1879,25 @@ mod tests {
     /// Donnerait pas au texte, et que le texte prend.
     #[test]
     fn the_window_floor_budget_adds_up() {
-        let row = 495.0_f32; // the row's fixed columns and its padding
-        let name = 22.0 + 143.0; // the glyph, its gap, and the p90 name
-        let catalogue = row + name;
+        // The catalogue's qualified minimum: 560 px, measured on the real
+        // row with the ladder — the name keeps its floor, and the columns
+        // that say *where* give way.
+        let catalogue = 560.0_f32;
         let spine = UiMetrics::SIDEBAR_COLLAPSED;
 
-        assert_eq!(catalogue, 660.0, "the catalogue's qualified minimum");
+        assert_eq!(
+            catalogue, UiMetrics::CATALOGUE_MIN_WIDTH,
+            "the catalogue's qualified minimum"
+        );
         assert_eq!(
             catalogue + spine,
-            716.0,
+            616.0,
             "the budget of the floor, before the rounding"
         );
         assert_eq!(
             crate::config::MIN_WINDOW_WIDTH,
-            720.0,
-            "and the window asks for 720 — the budget, rounded up"
+            620.0,
+            "and the window asks for 620 — the budget, rounded up"
         );
         assert!(
             crate::config::MIN_WINDOW_WIDTH >= catalogue + spine,
@@ -2194,14 +2186,10 @@ mod tests {
 
         // ── The station in the band the log drawer leaves it.
         //
-        // 372 px cannot hold the bank, the edge, the catalogue's six rows and
-        // the plate's chrome: 417.5 px would be needed. The plate therefore
-        // leaves the flow, and the catalogue takes the band whole.
+        // 372 px: the band cannot hold the bank, the edge, the catalogue's
+        // six rows *and* the plate's chrome. The plate yields first — it
+        // keeps its identity (48 px) and the catalogue keeps the rest.
         let band_height = 372.0;
-        assert!(
-            !plate_stays_in_the_flow(band_height),
-            "à 372 px, la plaque ne peut pas rester dans le flux"
-        );
         fixture.update(cx, |fixture, _cx| fixture.band = Some(band_height));
         station.update(cx, |station, cx| {
             station.set_assigned_height(band_height, cx);
@@ -2211,20 +2199,23 @@ mod tests {
             .debug_bounds("workstation_readout")
             .expect("the readout is drawn");
 
-        // The plate is over the catalogue, not in its way: it is not a band
-        // of the flow any more.
+        // The plate stays in the flow — it yields, it does not leave: one
+        // always knows which package is selected.
         assert!(
-            cx.debug_bounds("workstation_nameplate").is_none(),
-            "la plaque n'est plus une bande du flux"
+            cx.debug_bounds("workstation_nameplate").is_some(),
+            "la plaque reste une bande du flux"
         );
 
-        // And the catalogue takes the whole band below the bank: the plate
-        // is no longer a band of the flow, so it costs the catalogue
-        // nothing.
+        // And the catalogue takes the band below the bank, less the plate's
+        // floor: the plate yields, it does not leave, and the catalogue
+        // keeps its floor.
         assert_eq!(
             squeezed_readout.size.height,
-            px(band_height - UiMetrics::BANK_HEIGHT),
-            "le catalogue prend toute la bande sous la banque : {}",
+            px(band_height
+                - UiMetrics::BANK_HEIGHT
+                - UiMetrics::SPLITTER_THICKNESS
+                - UiMetrics::NAMEPLATE_MIN_HEIGHT),
+            "le catalogue garde son plancher, la plaque son identité : {}",
             squeezed_readout.size.height
         );
         assert!(
@@ -2386,35 +2377,134 @@ mod tests {
         );
     }
 
-    /// L'échelle de la plaque : elle reste dans le flux tant que la bande
-    /// peut porter le catalogue *et* son chrome ; sinon elle vient par-dessus
-    /// le catalogue.
+    /// La composition au plancher de la fenêtre, mesurée.
     ///
-    /// C'est la règle de l'échelle en une fonction, et elle est mesurée : la
-    /// bande qu'il faut pour que les deux tiennent est 417,5 px, et la bande
-    /// minimale de l'espace de travail en donne 320.
+    /// 620 × 480 : la bande que l'espace de travail laisse à la station est
+    /// 480 − 88 (l'en-tête) − 36 (le bandeau du tiroir) = 356 px. La question
+    /// est alors une seule : le catalogue garde-t-il ses six lignes, et la
+    /// plaque son identité ?
+    #[gpui::test]
+    fn the_composition_at_the_window_floor_is_measured(cx: &mut gpui::TestAppContext) {
+        use gpui::prelude::*;
+        use gpui::{div, point, px, size, Context, Render, Window};
+
+        struct Fixture {
+            station: Entity<PackageWorkstationView>,
+            band: f32,
+        }
+
+        impl Render for Fixture {
+            fn render(
+                &mut self,
+                _window: &mut Window,
+                _cx: &mut Context<Self>,
+            ) -> impl IntoElement {
+                let station = self.station.clone();
+                // The band the station really gets: the window's height, less
+                // the header's band and the drawer's.
+                div().h(px(self.band)).w_full().child(station)
+            }
+        }
+
+        let session = cx.new(|_| AppSession::new());
+        let store = cx.new(|_| PackageStore::new(crate::backend::client::CalixClient::default()));
+        let console = cx.new(|_| ConsoleModel::new());
+        let toast_center = cx.new(|_| ToastCenter::new());
+        let station = cx.new(|cx| {
+            PackageWorkstationView::new(
+                session.clone(),
+                store.clone(),
+                console.clone(),
+                toast_center.clone(),
+                PackageWorkstationConfig {
+                    theme: Theme::dark(),
+                    reduce_motion: false,
+                    compact: false,
+                    visual_style: VisualStyleId::default(),
+                },
+                cx,
+            )
+        });
+
+        let window = (px(620.0), px(520.0));
+        let cx = cx.add_empty_window();
+        let band = 520.0 - UiMetrics::CONTEXT_HEADER_HEIGHT - UiMetrics::DRAWER_HEADER_HEIGHT;
+        let fixture = cx.new(|_| Fixture {
+            station: station.clone(),
+            band,
+        });
+        station.update(cx, |station, cx| {
+            station.set_assigned_height(band, cx);
+        });
+        cx.draw(
+            point(px(0.0), px(0.0)),
+            size(window.0, window.1),
+            |_window, _cx| fixture.clone().into_element(),
+        );
+
+        let readout = cx
+            .debug_bounds("workstation_readout")
+            .expect("the readout is drawn");
+        let plate = cx
+            .debug_bounds("workstation_nameplate")
+            .expect("the plate is drawn");
+        let catalogue: f32 = readout.size.height.into();
+        let plate_height: f32 = plate.size.height.into();
+
+        eprintln!(
+            "PROBE at the floor: the catalogue {catalogue} px ({} rows), the plate {plate_height} px",
+            (catalogue / UiMetrics::ROW_HEIGHT_NORMAL) as i32
+        );
+
+        // The catalogue keeps its floor: six rows.
+        assert!(
+            catalogue >= UiMetrics::CATALOGUE_MIN_HEIGHT - 0.5,
+            "le catalogue garde son plancher : {catalogue} pour {}",
+            UiMetrics::CATALOGUE_MIN_HEIGHT
+        );
+        // And the plate keeps its identity: it is still there.
+        assert!(
+            plate_height >= UiMetrics::NAMEPLATE_MIN_HEIGHT - 0.5,
+            "la plaque garde son identité : {plate_height}"
+        );
+    }
+
+    /// L'échelle de la plaque : elle cède d'abord, et elle ne cède jamais
+    /// sous son identité.
+    ///
+    /// La décision de l'opérateur : la plaque reste visible — on sait
+    /// toujours quel paquet est sélectionné — et c'est elle qui se réduit,
+    /// avant que le catalogue ne soit réduit. Sa hauteur est donc bornée
+    /// par ce que le catalogue garde, et son chrome se réduit partie par
+    /// partie : le corps, puis les actions, puis les onglets.
     #[test]
-    fn the_plate_leaves_the_flow_before_the_catalogue_is_reduced() {
-        let needed = UiMetrics::BANK_HEIGHT
-            + UiMetrics::SPLITTER_THICKNESS
-            + UiMetrics::CATALOGUE_MIN_HEIGHT
-            + UiMetrics::NAMEPLATE_MIN_HEIGHT;
-        assert_eq!(
-            needed, 417.5,
-            "la bande qu'il faut pour le catalogue et la plaque"
+    fn the_plate_yields_before_the_catalogue_is_reduced() {
+        // The plate's ceiling: what is left once the catalogue has kept its
+        // rows. The plate never takes more than that.
+        for band in [320.0_f32, 356.0, 420.0, 680.0] {
+            let (_, max) = nameplate_bounds(band);
+            let catalogue = band
+                - UiMetrics::BANK_HEIGHT
+                - UiMetrics::SPLITTER_THICKNESS
+                - nameplate_height(band, 1000.0);
+            assert!(
+                catalogue >= UiMetrics::CATALOGUE_MIN_HEIGHT - 0.5
+                    || max <= UiMetrics::NAMEPLATE_MIN_HEIGHT + 0.5,
+                "at {band} px, the catalogue keeps {catalogue} and the plate takes {max}"
+            );
+        }
+
+        // The plate's floor is its identity: 48 px, measured.
+        assert_eq!(UiMetrics::NAMEPLATE_MIN_HEIGHT, 48.0);
+        assert!(
+            UiMetrics::NAMEPLATE_MIN_HEIGHT
+                < UiMetrics::PLATE_IDENTITY_HEIGHT + UiMetrics::PLATE_TABS_HEIGHT,
+            "sous l'identité seule, les onglets cèdent"
         );
         assert!(
-            plate_stays_in_the_flow(needed),
-            "à la bande juste suffisante, la plaque reste"
-        );
-        assert!(
-            !plate_stays_in_the_flow(needed - 0.5),
-            "un pixel de moins, et elle vient par-dessus"
-        );
-        // Et la bande minimale de l'espace de travail est de ce côté.
-        assert!(
-            !plate_stays_in_the_flow(320.0),
-            "dans la bande minimale, la plaque est par-dessus le catalogue"
+            UiMetrics::PLATE_IDENTITY_HEIGHT + UiMetrics::PLATE_TABS_HEIGHT
+                < UiMetrics::PLATE_CHROME_HEIGHT,
+            "et les actions cèdent avant les onglets"
         );
     }
 }
