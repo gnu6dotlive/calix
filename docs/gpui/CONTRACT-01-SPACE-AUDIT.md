@@ -1,6 +1,6 @@
 # CONTRACT 01 — The audit of the spatial contract
 
-**Audit 1.4 — 2026-10-22 — against `feat/gpui-0.3-port` (the port, merged
+**Audit 1.5 — 2026-10-22 — against `feat/gpui-0.3-port` (the port, merged
 into `main` as `04afdca3`)**
 
 *Version 1.0 was the audit of the state before the decisions. Version 1.1
@@ -19,6 +19,18 @@ one always knows which package is selected. The code carried the decision
 (and the reason) while the audit carried the alternative. The audit now
 says what the code does, cites the tests that exist, and the overlay's
 machinery — dead since the decision — is gone from the view.*
+
+*Version 1.5 corrects the **row**, in the same way and for the same reason:
+§4.7 and §4.8 measured the row **without** the ladder, so the audit
+carried the catalogue's minimum at 660 px and the window's floor at
+720 × 480, while the code has implemented 560 and 620 × 520 — the
+operator's target, proven by the ladder. The name's floor is 165 px (the
+p90's 143 px of text and the identity glyph), and the columns that say
+*where* give way before it does, so at 560 the name is whole. The
+historical numbers are kept: 660 px and 720 × 480 are what the row and the
+window cost without the ladder. §5.7 is restated, because the question it
+asked ("is the bar worth 96 px of the name?") is void: the name is not what
+the bar costs.*
 
 This audit confronts [`CONTRACT-01-SPACE.md`](CONTRACT-01-SPACE.md) with the
 repository as it stands. It does not propose new primitives: it inventories
@@ -50,9 +62,9 @@ catalogue itself (its measured layout never resolves there). Every band
 
 | Invariant | Verdict | The evidence |
 |---|---|---|
-| Window: the floors are coherent with what the application can compose | **held** | the floor (720 × 480) is derived and the budget adds up: the row's floor (495) + the name's share (165) + the folded spine (56) = 716 → 720. Tested: `the_window_floor_is_derived_from_the_catalogue_and_the_spine`, `the_window_floor_budget_adds_up` |
+| Window: the floors are coherent with what the application can compose | **held** | the floor (**620 × 520**) is derived and the budget adds up: the catalogue's minimum (560) + the folded spine (56) → 620; and the height: the band (the bank 100.5, the edge 5, the catalogue's six rows 216, the plate's identity 48) = 389, plus the header (88) and the drawer (36) = 513 → 520. Measured at the floor: the catalogue 223 px (six rows), the plate 48 px. Tested: `the_window_floor_is_derived_from_the_catalogue_and_the_spine`, `the_window_floor_budget_adds_up`, `the_composition_at_the_window_floor_is_measured` |
 | Spine: a stable presence, it narrows but never vanishes | **held by a rule** | the spine folds itself when the catalogue would lose its room, and takes back the user's shape when the window gives it room. Tested: `the_spine_folds_when_the_catalogue_needs_the_room` |
-| Body: the catalogue keeps a usable width and stays dominant | **held, and qualified against the row and the list** | the catalogue's minimum is 660 px, measured on the real row and the real names (§4.7), and the list that holds the rows draws them at every width (§4.8); at the window's floor the catalogue has 664 px; the three toolbar forms are measured |
+| Body: the catalogue keeps a usable width and stays dominant | **held, and qualified against the row and the list** | the catalogue's minimum is **560 px**, measured on the real row and the real names (§4.7) — the row's *ladder* gives the name its floor of 165 px and the columns that say *where* give way first; the list that holds the rows draws them at every width (§4.8); the three toolbar forms are measured |
 | Context surfaces: opening one never reduces the body below its floor | **held** | the drawer cannot take the workspace's 320 px whatever the request, and below 120 px it overlays instead of squeezing. The plate yields first — it gives way band by band, down to its identity (48 px, measured), and it never comes over the catalogue: one always knows which package is selected (§4.10). Tested: `the_drawer_never_takes_the_workspace_floor`, `the_plate_yields_before_the_catalogue_is_reduced`, `the_composition_is_measured_in_a_real_window` |
 | Portrait and landscape: the composition adapts to the space, not to a declared orientation | **held, by not answering it** | no code reads the orientation; the composition is expressed in logical pixels and adapts by growing or shrinking the bands |
 | Zoom: at every scale the content stays accessible | **held, and qualified as far as the harness allows** | the layout is in logical pixels and the scale factor does not leak into the geometry — measured at the bench's fixed 2.0 factor (§4.5). A real 150 % window is not measured: the harness cannot be set to it |
@@ -131,19 +143,31 @@ The window's floor is no longer a chosen number. It is derived from the
 composition's own floors:
 
 ```
-min_window_width  = the row's floor (495) + the name's share (165) + the folded spine (56)
-                  = 660 + 56 = 716 → 720
-min_window_height = the height at which the band still holds the bands   = 480
+min_window_width  = the catalogue's minimum (560) + the folded spine (56)
+                  = 616 → 620
+min_window_height = the height at which the band still holds the bands   = 520
 ```
 
-The name's share is 165 px: the identity glyph (14), its gap (8), and the
-p90 name of the real packages (143). **This is the correction of the
-reconciliation the operator asked for**: the earlier derivation
-(`720 = 560 + 56`) was wrong on both terms — it did not add up (616 ≠ 720),
-and the 104 px it left over had no name. The corrected budget has no
-leftover: the 104 px were the name — the space the row does not give to
-its text, and that the text takes. The test
+The catalogue's minimum is 560 px, and the name's share is 165 px: the
+identity glyph (14), its gap (8), and the p90 name of the real packages
+(143). **This is the reconciliation the operator asked for**, and the
+ladder is what makes it add up: the row's *own* floor (495) is the price of
+its fixed columns, but the name does not have to be paid for out of them —
+the columns that say *where* give way first (§4.7), and the name keeps its
+165 px. The earlier derivation (`720 = 560 + 56`) was wrong on both terms —
+it did not add up (616 ≠ 720), and the 104 px it left over had no name;
+and the intermediate answer (660 + 56 → 720) was right about the name's
+share but described the row *without* the ladder. The test
 `the_window_floor_budget_adds_up` checks the sum.
+
+**The height, derived.** The band must hold the bank (100.5), the edge (5),
+the catalogue's six rows (216) and the plate's identity (48) = 389; with
+the header's band (88) and the drawer's (36) that is 513 → **520**. The
+720 × 480 of the earlier versions was the floor before the catalogue had a
+*height* floor of its own (§4.10): at 480 the band held only five rows.
+
+**Measured at the floor** (`the_composition_at_the_window_floor_is_measured`):
+the catalogue 223 px — six rows — and the plate at its identity, 48 px.
 
 The contract's §4.1 asks for `min_window_width ≥ spine_floor + body_floor`;
 the repository now has exactly that relation, and it is tested
@@ -264,7 +288,7 @@ at 100 %, in a physically larger window.
 **And that is now measured** (`the_composition_is_in_logical_pixels`): at the
 bench's 2.0 factor, the row is 600 × 36 — the logical numbers, exactly. The
 scale factor does not leak into the geometry, and the contract's floors are
-logical (660, 720, 480) in the same way.
+logical (560, 620, 520) in the same way.
 
 So the zoom is qualified *as far as the instrument allows*: the layout is
 scale-independent, and the floors are logical. What is **not** measured is a
@@ -282,10 +306,10 @@ why the contract (§4.1) asks for the two levels to be tested separately.
 **Decision 1 — the failing case is retained.**
 
 A compositor that grants 600 × 480 — less than the requested floor of
-720 × 480 — produces a content width of 544 px (the spine folded): **116 px
-below the catalogue's qualified minimum of 660**. The composition cannot
-honour its promise there: the row's floor is 495 px, and the name would
-have 27 px. The bench keeps the case
+620 × 520 — produces a content width of 544 px (the spine folded): **16 px
+below the catalogue's minimum of 560**. The composition cannot honour its
+promise there: the row's own floor is 495 px, and the name would have
+27 px. The bench keeps the case
 (`the_spine_folds_when_the_catalogue_needs_the_room`) rather than hiding it.
 
 ### 4.7 The row, qualified — the catalogue's minimum, measured
@@ -314,8 +338,9 @@ Below 495 px the name is gone *and* the row's right end is cut: the fixed
 columns do not shrink, so the row overflows and the status is the first
 thing to disappear.
 
-**The name's share** — the cell is what the fixed columns leave, and the
-name's text is 22 px less (the identity glyph and its gap):
+**The name's share, without the ladder** — the cell is what the fixed
+columns leave, and the name's text is 22 px less (the identity glyph and its
+gap). This is what the row would cost if the fixed columns never gave way:
 
 | The content | the name's cell | the name's text |
 |---|---|---|
@@ -325,6 +350,27 @@ name's text is 22 px less (the identity glyph and its gap):
 | 600 px | 105 px | 83 px |
 | 640 px | 145 px | 123 px |
 | 720 px | 225 px | 203 px |
+
+**The name's share, with the ladder — and this is the row.** The row does
+not spend its fixed columns before it spends the name: the columns that say
+*where* — the source, then the measurement — give way first, and the name
+keeps its floor. Measured on the real row
+(`the_row_is_measured_at_and_around_the_catalogue_minimum`):
+
+| The content | the name's cell | the name's text | version | source | measurement |
+|---|---|---|---|---|---|
+| 495 px | **165 px** | **143 px** | 80.5 | 6 | 54.5 |
+| **560 px** | **165 px** | **143 px** | 90 | 45 | 71 |
+| 620 px | 165 px | 143 px | 99 | 81 | 86 |
+| 660 px | 165 px | 143 px | 105 | 105 | 96 |
+| 720 px | 225 px | 203 px | 105 | 105 | 96 |
+| 800 px | 305 px | 283 px | 105 | 105 | 96 |
+
+**The name's text is 143 px from 400 px of content up** — the p90's name
+whole — and it only starts to grow when the fixed columns are whole
+themselves (720 px). Below 495 px the source and the measurement reach zero
+and the version gives way last. The size and the status never shrink: they
+say *what* the package is, and the name says *which*.
 
 **The names are the real ones.** The sample is drawn from the inventory of
 the machine the measurement was taken on — 1884 installed packages — sampled
@@ -346,17 +392,23 @@ its extreme, and measured in pixels:
 | `networkmanager-vpn-plugin-openvpn` | 278 px |
 | `intel-oneapi-compiler-dpcpp-cpp-runtime-libs` (the longest) | 370 px |
 
-**The qualification.** The name is whole when the content is
-`495 + 22 + the name's width`:
+**The qualification, without the ladder.** The name is whole when the
+content is `495 + 22 + the name's width`:
 
 - for the p80 (127 px): **644 px**;
 - for the p90 (143 px): **660 px**;
 - for the longest (370 px): 887 px.
 
-**The catalogue's qualified minimum is therefore 660 px**, and the 560 px
-that was tried first **does not hold**: at 560 the name shows 43 px of text
-— six characters — and the row becomes a list of truncated names. The
-failing case is kept in the test
+**With the ladder, the name is whole at 560** — the name's floor *is* the
+p90's text (143 px) plus the identity glyph (22 px) = 165 px, and the
+columns that say *where* give way so that the name can have it. So the
+catalogue's qualified minimum is **560 px**, which is the operator's target,
+and the 660 px above is kept: it is what the row costs *without* the ladder.
+
+**What 660 px buys, then, is not the name — it is the columns.** At 560 the
+source has 45 px of its 105 and the measurement 71 of its 96, while the
+name is whole; at 660 every column is whole and the name still has its
+floor. The failing case is kept in the test
 (`the_row_is_measured_at_and_around_the_catalogue_minimum`), not hidden.
 
 ### 4.8 The catalogue's list, qualified — and the bench's blind spot, named
@@ -365,20 +417,22 @@ failing case is kept in the test
 real row — draws its rows in the bench, and the bench reads their bounds
 (`the_catalogue_list_draws_its_rows_at_every_width`):
 
-| the content | the row the list drew | the name's cell |
-|---|---|---|
-| 400 px | 400 × 36 | 0 px |
-| 480 px | 480 × 36 | 0 px |
-| 495 px | 495 × 36 | 0 px |
-| 520 px | 520 × 36 | 25 px |
-| 560 px | 560 × 36 | 65 px |
-| **660 px** | **660 × 36** | **165 px** |
-| 720 px | 720 × 36 | 225 px |
-| 800 px | 800 × 36 | 305 px |
+| the content | the row the list drew | the name's cell | version | source | measurement |
+|---|---|---|---|---|---|
+| 400 px | 400 × 36 | **165 px** | 60 | 0 | 0 |
+| 480 px | 480 × 36 | **165 px** | 77 | 0 | 49 |
+| 495 px | 495 × 36 | **165 px** | 80.5 | 6 | 54.5 |
+| 520 px | 520 × 36 | **165 px** | 84 | 21 | 61 |
+| **560 px** | **560 × 36** | **165 px** | 90 | 45 | 71 |
+| 660 px | 660 × 36 | 165 px | 105 | 105 | 96 |
+| 720 px | 720 × 36 | 225 px | 105 | 105 | 96 |
+| 800 px | 800 × 36 | 305 px | 105 | 105 | 96 |
 
 The row is the catalogue's real row, at the catalogue's real height (36 px),
-taking the list's width, and the name's cell is exactly what the fixed
-columns leave — the same rule as the row alone, now proved *in the list*.
+taking the list's width, and the ladder is the same one the row alone has:
+the name's cell is 165 px — the p90 whole — from 400 px of content up, and
+the columns that say *where* give way before it does. The rule is now proved
+*in the list*, and it is the same rule as the row's.
 
 **What the earlier probe missed, and why.** The first probe found a list
 whose viewport resolved (600 × 400) but whose items never appeared. The
@@ -461,7 +515,7 @@ the bar are the ones that shorten.
 ### 4.10 The plate, the catalogue, and the band that is too short
 
 **The catalogue's vertical floor was missing.** The audit noted it as an open
-item: the body had a *width* floor (660) but no *height* floor, and the
+item: the body had a *width* floor but no *height* floor, and the
 height it had (72 px) was two rows — a strip, not a catalogue. Six rows
 (216 px) is a catalogue you can scan.
 
@@ -504,13 +558,16 @@ measurement proves the composition, not the motion's quality.
 These are decisions, not findings. The audit states the facts; the product
 decides.
 
-1. ~~The window's floor~~ — **decided** (decision 1): derived, 720 × 480 as
-   the qualification target, the narrow layout authored (the spine folds,
-   the three toolbar forms exist and are measured).
+1. ~~The window's floor~~ — **decided** (decision 1): derived, and the
+   derivation is now the *ladder's*: **620 × 520**, measured at the floor
+   (the catalogue 223 px — six rows — and the plate at its identity), with
+   the narrow layout authored (the spine folds, the three toolbar forms
+   exist and are measured).
 2. **The body's floor** — **decided and qualified** (decision 2): the target
-   of 560 px **did not hold** when measured against the real row (§4.7); the
-   qualified minimum is **660 px**, measured from the row's fixed columns
-   and the real names.
+   of 560 px **does hold**, once the row's ladder is measured (§4.7): the
+   name keeps its floor of 165 px and the columns that say *where* give way
+   first. The qualified minimum is **560 px**. The 660 px of the earlier
+   qualification is kept as what the row costs *without* the ladder.
 3. ~~The vertical budget's owner~~ — **decided** (decision 3): the workspace.
 4. ~~The drawer's ceiling~~ — **decided** (decision 4): a share of the
    budget, and the overlay below 120 px.
@@ -518,18 +575,37 @@ decides.
 What is left to decide, after the measurements:
 
 5. **~~The catalogue's minimum against its rows.~~** **Done** (§4.7): the row
-   was extracted, measured, and the minimum corrected from 560 to **660** —
-   the value the measurement supports. What remains open is the *list*
-   (§4.8), not the row.
+   was extracted and measured — first without the ladder (660 px), then with
+   it (560 px, the operator's target, and the value the measurement
+   supports). What remains open is the *list* (§4.8), not the row.
 6. **~~The plate at a small band.~~** **Decided** (§4.10): the plate yields
    first, band by band, down to its identity (48 px, measured), and it
    never comes over the catalogue — one always knows which package is
    selected. The alternative (the plate as an overlay, like the drawer) was
    considered and declined; its machinery is gone from the view.
-7. **The row at a narrow width.** The measurement names the concession
-   exactly: without the measurement bar (96 px, measured), 560 px would hold
-   the p90 name whole. Whether the instrument's reading is worth 96 px of
-   the name is a product decision, and it is not taken here.
+7. **The measurement bar at the catalogue's minimum.** The premise of the
+   question has changed: the name is **whole** at 560 (§4.7) — the ladder
+   gives it its floor of 165 px and the columns that say *where* give way
+   first. So the 96 px is not spent on the name; it is spent on the *bar*,
+   and what the bar costs is the *source* and the *version*:
+
+   | at 560 px | with the bar | without it |
+   |---|---|---|
+   | the name's cell / text | 165 / 143 px | 165 / 143 px |
+   | the source | 45 px (of 105) | 102 px |
+   | the version | 90 px (of 105) | 104 px |
+   | the measurement | 71 px (of 96) | — |
+   | the name starts growing at | 720 px | 600 px |
+
+   And the bar's own reading degrades as it is squeezed: its track is 96 px
+   wide inside a cell that the ladder has narrowed, right-justified and
+   clipped — so below 660 px its *length* no longer encodes the size, and
+   below 480 px it is gone altogether. The question is therefore not
+   "96 px of the name" but: **a bar whose length stops encoding below
+   660 px — is that reading worth the source and the version it squeezes?**
+   The size column, which never shrinks, shows the same number in bytes.
+
+   The decision is not taken here.
 
 ## 6. The test plan this audit implies
 

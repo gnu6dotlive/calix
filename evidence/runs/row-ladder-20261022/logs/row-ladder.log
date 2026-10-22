@@ -1,0 +1,30 @@
+=== the row as it is, measured on the real row (the ladder at work)
+LADDER at 400: name_cell=165 name_text=143 version=60  source=0   measurement=0   size=80 status=85
+LADDER at 480: name_cell=165 name_text=143 version=77  source=0   measurement=49  size=80 status=85
+LADDER at 495: name_cell=165 name_text=143 version=80.5 source=6  measurement=54.5 size=80 status=85
+LADDER at 520: name_cell=165 name_text=143 version=84  source=21  measurement=61  size=80 status=85
+LADDER at 560: name_cell=165 name_text=143 version=90  source=45  measurement=71  size=80 status=85
+LADDER at 600: name_cell=165 name_text=143 version=96  source=69  measurement=81  size=80 status=85
+LADDER at 620: name_cell=165 name_text=143 version=99  source=81  measurement=86  size=80 status=85
+LADDER at 660: name_cell=165 name_text=143 version=105 source=105 measurement=96  size=80 status=85
+LADDER at 720: name_cell=225 name_text=203 version=105 source=105 measurement=96  size=80 status=85
+LADDER at 800: name_cell=305 name_text=283 version=105 source=105 measurement=96  size=80 status=85
+
+=== the same row WITHOUT the measurement bar (the alternative shape)
+LADDER at 400: name_cell=165 name_text=143 version=60  source=0   measurement=-   size=80 status=85
+LADDER at 480: name_cell=165 name_text=143 version=88  source=38  measurement=-   size=80 status=85
+LADDER at 495: name_cell=165 name_text=143 version=91  source=50  measurement=-   size=80 status=85
+LADDER at 520: name_cell=165 name_text=143 version=96  source=70  measurement=-   size=80 status=85
+LADDER at 560: name_cell=165 name_text=143 version=104 source=102 measurement=-   size=80 status=85
+LADDER at 600: name_cell=201 name_text=179 version=105 source=105 measurement=-   size=80 status=85
+LADDER at 620: name_cell=221 name_text=199 version=105 source=105 measurement=-   size=80 status=85
+LADDER at 660: name_cell=261 name_text=239 version=105 source=105 measurement=-   size=80 status=85
+
+=== the bar's construction, from the code
+10:pub const MEASURE_WIDTH: f32 = 96.0;
+38:            .w(px(MEASURE_WIDTH))
+49:                    .w(px(MEASURE_WIDTH * ratio))
+60:                    .left(px((MEASURE_WIDTH * ratio - 1.0).max(0.0)))
+169:                    .w(px(MEASURE_WIDTH))
+330:            .w(px(MEASURE_WIDTH))
+  the track is MEASURE_WIDTH wide; the cell is justify_end + overflow_hidden + pr_2
