@@ -59,7 +59,41 @@ prepare() {
     cargo fetch --locked
 }
 
+# The build flags a package is given are the build machine's, and three of
+# them are wrong for a *distributed* package:
+#
+#   -flto=auto (in CFLAGS/CXXFLAGS/LDFLAGS, injected by makepkg's global
+# `lto` option) reaches the C shim that wayland-backend's build script
+# compiles. The object then carries LTO bytecode instead of code, and
+# rust-lld cannot read it: the link fails with
+#   undefined symbol: wl_log_trampoline_to_rust_client
+# The Rust code carries its own LTO (the crate's release profile), which
+# is the LTO that belongs to this build.
+#
+#   -C opt-level=3 (in RUSTFLAGS) is not merely redundant: rustc turns
+# `cfg(debug_assertions)` on only when opt-level is 0, so this flag
+# silently switches the debug assertions off — in the *test* profile too.
+# gpui records the bounds of an element (what the visual bench measures)
+# only under `all(debug_assertions, feature = "test-support")`, so the
+# measurements vanish and the tests that read them fail. The release
+# profile of the crate already asks for opt-level 3.
+#
+#   -C target-cpu=native (in RUSTFLAGS) builds the binary for the machine
+# that happens to build the package. A package is downloaded by machines
+# that are not this one; a binary tuned for the builder's CPU faults on
+# an older CPU (the instructions are simply absent).
+#
+# So the package states its own flags: the architecture's baseline, no
+# builder-specific tuning, and no C-level LTO to poison the C shim.
+package_build_flags() {
+    export CFLAGS="-O2 -pipe -fno-plt -fexceptions -fstack-clash-protection -fcf-protection"
+    export CXXFLAGS="${CFLAGS} -Wp,-D_GLIBCXX_ASSERTIONS"
+    export LDFLAGS="-Wl,-O1 -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,-z,pack-relative-relocs"
+    export RUSTFLAGS="-C target-cpu=x86-64 -C force-frame-pointers=yes"
+}
+
 build() {
+    package_build_flags
     cd "${srcdir}/${pkgname}"
 
     # 1. Compile the Zig CLI backend
@@ -104,8 +138,14 @@ build() {
 check() {
     cd "${srcdir}/${pkgname}/Calix.Ui.Gpui"
     export CARGO_TARGET_DIR="target"
+    package_build_flags
+    # The layout tests measure the real views, and gpui records element
+    # bounds only under `all(debug_assertions, feature = "test-support")`.
+    # A release test run has no debug assertions, so the measurements are
+    # simply absent and the tests that read them fail. The tests run in
+    # the debug profile; the *artifact* is the release build above.
     CALIX_BIN="${srcdir}/${pkgname}/Calix.Cli.Zig/zig-out/bin/calix" \
-        cargo test --release --locked
+        cargo test --locked
 }
 
 package() {
