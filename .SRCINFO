@@ -1,7 +1,5 @@
-pkgbase = demo
-	pkgdesc = review fixture
-	pkgver = 1-1
+pkgbase = review-one
+	pkgver = 1
+	pkgrel = 1
 	arch = any
-	source = helper.sh
-	sha256sums = SKIP
-pkgname = demo
+pkgname = review-one
