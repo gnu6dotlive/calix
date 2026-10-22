@@ -10,7 +10,7 @@ use crate::components::search_input::SearchInputView;
 use crate::components::source_bank::{SourceBank, SourceBankProps, SourceRetryHandler};
 use crate::components::unified_search::UnifiedSearch;
 use crate::state::console::{ConsoleEvent, ConsoleModel};
-use crate::state::motion::{advance_marker, AnimatedScalar, SelectionMarker};
+use crate::state::motion::{advance_marker, SelectionMarker};
 use crate::state::query::{PackageStateFilter, SortMode, SourceScope};
 use crate::state::{
     also_in, canonical_install_command, source_axis, AlsoIn, AppSession, InspectorTab, NavScope,
@@ -25,7 +25,6 @@ use gpui::*;
 use gpui::{uniform_list, UniformListScrollHandle};
 use std::rc::Rc;
 use std::time::Duration;
-use std::time::Instant;
 
 pub type PackageMutationHandler =
     Rc<dyn Fn(&UnifiedPackage, bool /* is_install */, &mut Window, &mut App) + 'static>;
@@ -38,9 +37,6 @@ pub type DetailsRetryHandler = Rc<dyn Fn(&PackageKey, &mut Window, &mut App) + '
 pub struct NameplateDragState {
     pub start_height: f32,
     pub start_pointer_y: f32,
-    /// La plaque est par-dessus le catalogue : le geste la lève au lieu de
-    /// la redimensionner.
-    pub overlays: bool,
 }
 
 /// The nameplate's bounds: it never swallows the readout, never disappears.
@@ -205,11 +201,6 @@ pub struct PackageWorkstationView {
     /// keep the distance here, and give it back eased, frame by frame: a notch
     /// becomes a movement, not a step.
     pub scroll_pending: f32,
-    /// La hauteur de la plaque quand elle vient par-dessus le catalogue.
-    ///
-    /// Zéro, c'est cachée. Le geste est le même — l'arête — mais il lève la
-    /// plaque au lieu de la redimensionner.
-    pub plate_overlay: AnimatedScalar,
     /// La sélection est un objet qui voyage : la barre du porteur glisse d'une
     /// ligne à l'autre au lieu de sauter.
     pub marker: Option<SelectionMarker>,
@@ -356,7 +347,6 @@ impl PackageWorkstationView {
             visual_style: config.visual_style,
             compact: config.compact,
             search_input,
-            plate_overlay: AnimatedScalar::new(0.0),
             marker: None,
             view_marker: None,
             assigned_height: 0.0,
@@ -607,19 +597,6 @@ impl PackageWorkstationView {
     ) {
         if let Some(drag) = self.nameplate_drag {
             let current_y = event.position.y.to_f64() as f32;
-            // Quand la plaque est par-dessus le catalogue, le même geste la
-            // lève au lieu de la redimensionner : l'arête suit le pointeur,
-            // et la plaque grandit avec lui. C'est le tiroir, qui vient du
-            // bas.
-            if drag.overlays {
-                let wanted = drag.start_height + (drag.start_pointer_y - current_y);
-                let bounded = wanted.clamp(0.0, content_height);
-                if (bounded - self.plate_overlay.current).abs() >= 1.0 {
-                    self.plate_overlay.snap(bounded);
-                    cx.notify();
-                }
-                return;
-            }
             let new_height = nameplate_height_after_drag(
                 drag.start_height,
                 drag.start_pointer_y,
@@ -722,25 +699,13 @@ impl Render for PackageWorkstationView {
         // bank, the readout, the nameplate. The band we were given is what
         // the nameplate is bounded against — not the window.
         //
-        // And when the band cannot hold the catalogue *and* the plate's
-        // chrome, the plate leaves the flow: it comes over the catalogue,
-        // summoned by the same edge. The catalogue is never reduced below
-        // its floor for the sake of a caption.
         // La plaque cède d'abord : elle se réduit, et le catalogue garde sa
         // place. Elle ne passe jamais par-dessus — on sait toujours quel
-        // paquet est sélectionné.
-        let plate_overlays = false;
-        let effective_nameplate_height = if plate_overlays {
-            self.nameplate_height
-        } else {
-            nameplate_height(window_height, self.nameplate_height)
-        };
+        // paquet est sélectionné. Le plancher du catalogue n'est jamais
+        // abaissé pour une légende.
+        let effective_nameplate_height =
+            nameplate_height(window_height, self.nameplate_height);
         self.nameplate_height = effective_nameplate_height;
-
-        // The overlay's own height: it follows the pointer while it is being
-        // summoned, and it stays where it was left.
-        self.plate_overlay.update(Instant::now());
-        let overlay_height = self.plate_overlay.current;
 
         let active_list_width = content_width;
 
@@ -1387,26 +1352,16 @@ impl Render for PackageWorkstationView {
                 })
                 .on_mouse_down(MouseButton::Left, move |event, _window, cx| {
                     let pointer_y = event.position.y.to_f64() as f32;
-                    let overlays = plate_overlays;
                     entity_split.update(cx, |view, cx| {
                         view.nameplate_drag = Some(NameplateDragState {
-                            start_height: if overlays {
-                                view.plate_overlay.current
-                            } else {
-                                view.nameplate_height
-                            },
+                            start_height: view.nameplate_height,
                             start_pointer_y: pointer_y,
-                            overlays,
                         });
                         cx.notify();
                     });
                 })
         };
-        let splitter = if plate_overlays {
-            edge_style(div().absolute().bottom(px(overlay_height)))
-        } else {
-            edge_style(div().flex_shrink_0())
-        };
+        let splitter = edge_style(div().flex_shrink_0());
 
         // ── 4. Panneau d'inspection sémantique ──────────────────────────────
         let alpm_details = selected_key
@@ -1599,37 +1554,19 @@ impl Render for PackageWorkstationView {
 
         // The nameplate: the caption of the readout, in full width, under it.
         //
-        // In the flow, it is a band under the catalogue. Over the catalogue,
-        // it is a sheet that comes from the bottom — summoned by the same
-        // edge, dismissed by pulling it back down. Either way the catalogue
-        // keeps its floor.
-        let nameplate = if plate_overlays {
-            div()
-                .id("workstation_nameplate_overlay")
-                // The handle the audit measures: the harness reads the bounds
-                // of the sheet under this name. A noop outside the tests.
-                .debug_selector(|| "workstation_nameplate_overlay".to_string())
-                .absolute()
-                .bottom(px(0.0))
-                .left(px(0.0))
-                .right(px(0.0))
-                .h(px(overlay_height))
-                .overflow_hidden()
-                .child(inspector_element)
-                .into_any_element()
-        } else {
-            div()
-                .id("workstation_nameplate")
-                // The handle the audit measures: the harness reads the bounds
-                // of the band under this name. A noop outside the tests.
-                .debug_selector(|| "workstation_nameplate".to_string())
-                .w_full()
-                .h(px(effective_nameplate_height))
-                .flex_shrink_0()
-                .overflow_hidden()
-                .child(inspector_element)
-                .into_any_element()
-        };
+        // It is a band under the catalogue, and it yields before the
+        // catalogue is reduced: one always knows which package is selected.
+        let nameplate = div()
+            .id("workstation_nameplate")
+            // The handle the audit measures: the harness reads the bounds
+            // of the band under this name. A noop outside the tests.
+            .debug_selector(|| "workstation_nameplate".to_string())
+            .w_full()
+            .h(px(effective_nameplate_height))
+            .flex_shrink_0()
+            .overflow_hidden()
+            .child(inspector_element)
+            .into_any_element();
 
         // ── 5. Conteneur racine de la station de travail absorbant les moves ──
         div()
@@ -1637,8 +1574,6 @@ impl Render for PackageWorkstationView {
             .flex()
             .flex_col()
             .size_full()
-            // The plate, when it comes over the catalogue, is placed against
-            // this root.
             .relative()
             .overflow_hidden()
             .on_mouse_move(move |event, window, cx| {
@@ -2235,29 +2170,6 @@ mod tests {
             "dans le flux, la plaque prend son chrome et le catalogue le reste : {}",
             readout.size.height
         );
-    }
-
-    /// Le geste de l'arête : quand la plaque est par-dessus le catalogue, la
-    /// même arête la lève — et elle ne descend pas plus bas que la bande.
-    ///
-    /// C'est le tiroir, qui vient du bas : la plaque monte avec le pointeur
-    /// et redescend quand on la ramène.
-    #[test]
-    fn the_edge_lifts_the_plate_when_it_overlays() {
-        // Le geste : la hauteur de la plaque suit le pointeur, et elle est
-        // bornée par la bande.
-        let band = 320.0_f32;
-        let drag = NameplateDragState {
-            start_height: 0.0,
-            start_pointer_y: 900.0,
-            overlays: true,
-        };
-        // The pointer rises by 120 px: the plate rises by 120.
-        let wanted = drag.start_height + (drag.start_pointer_y - (drag.start_pointer_y - 120.0));
-        assert_eq!(wanted, 120.0, "la plaque suit le pointeur");
-        // And it never grows past the band.
-        let too_far = drag.start_height + (drag.start_pointer_y - (drag.start_pointer_y - 900.0));
-        assert_eq!(too_far.clamp(0.0, band), band, "et jamais plus que la bande");
     }
 
     /// La porte de l'interaction : un clic sur une ligne du catalogue

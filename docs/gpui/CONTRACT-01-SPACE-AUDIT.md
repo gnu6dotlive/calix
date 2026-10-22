@@ -1,7 +1,7 @@
 # CONTRACT 01 — The audit of the spatial contract
 
-**Audit 1.3 — 2026-10-21 — against `feat/contract-01-row-qualification`
-(merged into `main` as `c2b8d6b7`)**
+**Audit 1.4 — 2026-10-22 — against `feat/gpui-0.3-port` (the port, merged
+into `main` as `04afdca3`)**
 
 *Version 1.0 was the audit of the state before the decisions. Version 1.1
 records the implementation of the four decisions. Version 1.2 adds the
@@ -10,6 +10,15 @@ minimum from 560 to 660, and the reconciliation of the window's floor that
 the operator asked for. Version 1.3 adds the qualification of the **list**
 that holds the rows — and the bench's blind spot, named: a list whose height
 is not given is laid out at zero, and draws nothing.*
+
+*Version 1.4 corrects the **plate**. Version 1.3 still described the plate
+as leaving the flow and coming over the catalogue, and cited a test that
+does not exist. The decision is the opposite, and it was the operator's: the
+plate yields first, band by band, and it never comes over the catalogue —
+one always knows which package is selected. The code carried the decision
+(and the reason) while the audit carried the alternative. The audit now
+says what the code does, cites the tests that exist, and the overlay's
+machinery — dead since the decision — is gone from the view.*
 
 This audit confronts [`CONTRACT-01-SPACE.md`](CONTRACT-01-SPACE.md) with the
 repository as it stands. It does not propose new primitives: it inventories
@@ -44,7 +53,7 @@ catalogue itself (its measured layout never resolves there). Every band
 | Window: the floors are coherent with what the application can compose | **held** | the floor (720 × 480) is derived and the budget adds up: the row's floor (495) + the name's share (165) + the folded spine (56) = 716 → 720. Tested: `the_window_floor_is_derived_from_the_catalogue_and_the_spine`, `the_window_floor_budget_adds_up` |
 | Spine: a stable presence, it narrows but never vanishes | **held by a rule** | the spine folds itself when the catalogue would lose its room, and takes back the user's shape when the window gives it room. Tested: `the_spine_folds_when_the_catalogue_needs_the_room` |
 | Body: the catalogue keeps a usable width and stays dominant | **held, and qualified against the row and the list** | the catalogue's minimum is 660 px, measured on the real row and the real names (§4.7), and the list that holds the rows draws them at every width (§4.8); at the window's floor the catalogue has 664 px; the three toolbar forms are measured |
-| Context surfaces: opening one never reduces the body below its floor | **held** | the drawer cannot take the workspace's 320 px whatever the request, and below 120 px it overlays instead of squeezing. The plate yields first — and when the band cannot hold the catalogue's six rows *and* the plate's chrome, it leaves the flow entirely and comes over the catalogue, summoned by the same edge (§4.10). Tested: `the_drawer_never_takes_the_workspace_floor`, `the_plate_leaves_the_flow_before_the_catalogue_is_reduced`, `the_composition_is_measured_in_a_real_window` |
+| Context surfaces: opening one never reduces the body below its floor | **held** | the drawer cannot take the workspace's 320 px whatever the request, and below 120 px it overlays instead of squeezing. The plate yields first — it gives way band by band, down to its identity (48 px, measured), and it never comes over the catalogue: one always knows which package is selected (§4.10). Tested: `the_drawer_never_takes_the_workspace_floor`, `the_plate_yields_before_the_catalogue_is_reduced`, `the_composition_is_measured_in_a_real_window` |
 | Portrait and landscape: the composition adapts to the space, not to a declared orientation | **held, by not answering it** | no code reads the orientation; the composition is expressed in logical pixels and adapts by growing or shrinking the bands |
 | Zoom: at every scale the content stays accessible | **held, and qualified as far as the harness allows** | the layout is in logical pixels and the scale factor does not leak into the geometry — measured at the bench's fixed 2.0 factor (§4.5). A real 150 % window is not measured: the harness cannot be set to it |
 | Transitions: a change of width preserves the continuity | **held** | the vertical budget has one owner, so a change of height is a re-budget, not a re-landing; the spine's fold is animated like a travel, not a jump |
@@ -461,25 +470,33 @@ With that floor, the arithmetic changes shape: the band that holds the bank
 **417.5 px** — and the workspace's minimum band is 320. The plate and the
 catalogue cannot both stay in the flow.
 
-**So the plate leaves the flow.** It comes *over* the catalogue, summoned by
-the same edge that resized it — the same gesture, but it lifts the sheet
-instead of resizing it, and pulls it back down to dismiss it. The catalogue
-takes the band whole.
+**So the plate yields.** It is a band in the flow, and it gives way before
+the catalogue is reduced: its body goes first, then its actions, then its
+tabs, and what remains is its identity — 48 px, measured. The catalogue
+keeps its floor of six rows. The plate never comes *over* the catalogue:
+one always knows which package is selected.
 
 | the window | the band | the plate | the catalogue |
 |---|---|---|---|
-| 480 (the minimum) | 356 | **over the catalogue**, summoned | 250.5 px — 6 rows |
+| 480 (the minimum) | 356 | in the flow, at its identity (48 px) | 211.5 px — 6 rows |
 | 560 | 436 | in the flow, at its chrome | 234.5 px — 6 rows |
 | 680 | 556 | in the flow | 359.5 px — 9 rows |
 
 This is the contract's ladder, applied to the band: the context surface
-yields *entirely* before the body is reduced — and the body's floor is now
-written down.
+yields *before* the body is reduced — and the body's floor is now written
+down.
+
+**What was decided, and what it replaced.** The alternative — the plate as
+an overlay, summoned by the same edge, lifted instead of resized — was
+considered and *declined*: the plate stays in the flow, because a caption
+that floats over the catalogue hides which package is selected. The
+overlay's machinery has been removed from the view; what remains is the
+yielding, and the reasoning is in the code where the decision lives.
 
 **The risk, stated.** The gesture is the existing one (the edge drag), and
-the layout is measured; but the *feel* of a sheet that comes from the bottom
-cannot be verified by the bench, which has no pointer. The measurement proves
-the composition, not the motion's quality.
+the layout is measured; but the *feel* of a band that shrinks under the
+pointer cannot be verified by the bench, which has no pointer. The
+measurement proves the composition, not the motion's quality.
 
 
 ## 5. What the audit leaves to the product
@@ -504,9 +521,11 @@ What is left to decide, after the measurements:
    was extracted, measured, and the minimum corrected from 560 to **660** —
    the value the measurement supports. What remains open is the *list*
    (§4.8), not the row.
-6. **The plate at a small band.** The plate yields first (§4.2), which means
-   that at the workspace's minimum it shows its chrome and a thin body. The
-   alternative — the plate as an overlay, like the drawer — is not decided.
+6. **~~The plate at a small band.~~** **Decided** (§4.10): the plate yields
+   first, band by band, down to its identity (48 px, measured), and it
+   never comes over the catalogue — one always knows which package is
+   selected. The alternative (the plate as an overlay, like the drawer) was
+   considered and declined; its machinery is gone from the view.
 7. **The row at a narrow width.** The measurement names the concession
    exactly: without the measurement bar (96 px, measured), 560 px would hold
    the p90 name whole. Whether the instrument's reading is worth 96 px of
@@ -526,7 +545,7 @@ What is left to decide, after the measurements:
 | the row's ladder: the name is never cut, the state and the size never shrink | `the_catalogue_list_draws_its_rows_at_every_width` | **done** |
 | the list draws only the rows it shows, and recycles them | `the_list_draws_only_the_rows_it_shows` | **done** |
 | the composition is in logical pixels, whatever the scale | `the_composition_is_in_logical_pixels` | **done** (the harness's scale factor is fixed at 2.0) |
-| the plate leaves the flow before the catalogue is reduced | `the_plate_leaves_the_flow_before_the_catalogue_is_reduced`, `the_composition_is_measured_in_a_real_window` | **done** |
+| the plate yields before the catalogue is reduced, and it never comes over it | `the_plate_yields_before_the_catalogue_is_reduced`, `the_composition_is_measured_in_a_real_window` | **done** |
 | the catalogue's minimum is the measured one, and the budget adds up | `the_window_floor_budget_adds_up` | **done** |
 | the catalogue's rows are drawn by the list, at every width | `the_catalogue_list_draws_its_rows_at_every_width` | **done** |
 | a click on the view commutateur changes the view | `a_click_on_the_switcher_changes_the_view` | **done** |
@@ -576,16 +595,18 @@ because the session's default scope is the *results* — which were empty.
 - **The 150 % scale is qualified as far as the harness allows** (§4.5): the
   layout is scale-independent and the floors are logical, but the harness's
   scale factor is fixed at 2.0 and a real 150 % window is not measured.
-- **The plate's sheet cannot be felt by the bench.** The composition when it
-  overlays is measured (§4.10); the *gesture* — the edge lifting it, and
-  pulling it back down — is the existing drag, but the bench has no pointer
+- **The plate's yielding cannot be felt by the bench.** The composition when
+  it has yielded is measured (§4.10); the *gesture* — the edge shrinking it
+  under the pointer — is the existing drag, but the bench has no pointer
   and the motion's quality is not verified.
 - **The zoom was not measured at 150 %.** The layout is in logical pixels
   and the floor is too, so the reasoning holds; but the *measurement* of a
   150 % window is not in the bench yet, for the same reason as the rows.
-- **The plate's overlay alternative was not built.** The plate yields first
-  instead (§4.2), which is the contract's ladder; the alternative — the plate
-  as an overlay — is a decision left open (§5.6).
+- **The plate's overlay was not built, and that was the decision.** The plate
+  yields first instead (§4.2), which is the contract's ladder; the
+  alternative — the plate as an overlay — was considered and declined
+  (§5.6). Its machinery is gone from the view: a decision that is not
+  taken leaves no code behind.
 - **No screenshot was taken.** The desktop was not touched during this
   work: the evidence is the bench's measurements, which are reproducible and
   do not need a pointer.
