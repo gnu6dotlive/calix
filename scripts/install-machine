@@ -64,7 +64,13 @@ step "The tree"
 if [[ -n "$(git status --porcelain)" ]]; then
     fail "the working tree is dirty — commit or stash first"
 fi
-[[ "$(git branch --show-current)" == "main" ]] || fail "the installation comes from main"
+BRANCH=$(git branch --show-current)
+if [[ $FROM_LOCAL -eq 0 && "$BRANCH" != "main" ]]; then
+    fail "the installation comes from main (on '${BRANCH}'); --from-local installs this tree"
+fi
+if [[ $FROM_LOCAL -eq 1 && "$BRANCH" == "main" ]]; then
+    echo "install-machine: --from-local on main is the same as the published path"
+fi
 git fetch --quiet origin
 LOCAL=$(git rev-parse HEAD)
 [[ "$LOCAL" == "$(git rev-parse origin/main)" ]] || fail "main is not in step with the remote"
