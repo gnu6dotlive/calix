@@ -1,0 +1,25 @@
+=== the metadata step, as it ran
+the package installs 27 files; its dependencies bring what the binaries need
+the optional part: flatpak: support des applications Flatpak paru: support AUR via Calix yay: support AUR alternatif
+exit: 0
+
+=== the step with 'pacman' removed from the dependencies (the check has teeth)
+package-metadata: calix needs pacman, which the package's dependencies do not bring
+package-metadata: calix needs libarchive, which the package's dependencies do not bring
+package-metadata: calix-daemon needs pacman, which the package's dependencies do not bring
+package-metadata: the dependencies are incomplete
+exit: 1
+
+=== the libraries the binaries need, and who owns them
+  /lib64/ld-linux-x86-64.so.2  glibc
+  /usr/lib64/ld-linux-x86-64.so.2 glibc
+  /usr/lib/libaccountsservice.so.1 accountsservice
+  /usr/lib/libacl.so.1         acl
+  /usr/lib/libalpm.so.16       pacman
+  /usr/lib/libarchive.so.13    libarchive
+  /usr/lib/libassuan.so.9      libassuan
+  /usr/lib/libavahi-client.so.3 avahi
+  /usr/lib/libavahi-common.so.3 avahi
+  /usr/lib/libavahi-glib.so.1  avahi
+  /usr/lib/libblkid.so.1       util-linux-libs
+  /usr/lib/libbrotlicommon.so.1 brotli
