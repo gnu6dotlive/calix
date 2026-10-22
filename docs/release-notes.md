@@ -1,3 +1,107 @@
+# Calix v0.3.1
+
+Calix v0.3.1 is the release that **runs on the machine**. The front-end is
+ported to the toolkit's current generation, the package states the build flags
+it needs instead of inheriting them, and the gate now proves the package's
+metadata rather than assuming it. The spatial numbers did not move: where the
+documents disagreed with the code, the documents were corrected.
+
+## The port
+
+The front-end now builds on `gpui-pre 0.3.9` — the toolkit's current
+generation — with `gpui-pre-platform`, `gpui-pre-linux` and `blade-graphics
+0.6`. Twenty-four compilation errors, down to zero, and **no layout
+measurement moved**: every number in the bench (the catalogue, the plate, the
+row, the compositions) is the number it was before the port.
+
+## The package states its own build flags
+
+`PKGBUILD-calix` inherited three flags from the machine's `makepkg`
+configuration, and each one was breaking something. Each was proved by A/B,
+not guessed:
+
+- **`-flto=auto`** turned the shim handed to the linker into LTO bytecode:
+  `undefined symbol: wl_log_trampoline_to_rust_client`.
+- **`-C opt-level=3`** silently disables `debug_assertions`, and the bench
+  records bounds only when they are on: 18 of 265 UI tests failed under a
+  release profile. With `-C debug-assertions=on`, 265 of 265 pass.
+- **`-C target-cpu=native`** rebuilt the same tree with 233 908 AVX2
+  instructions where the portable build has 2 238.
+
+The package now declares its own `CFLAGS`/`CXXFLAGS`/`LDFLAGS`/`RUSTFLAGS`,
+and the gate refuses all three hazards, from the environment *and* from a
+regressed `PKGBUILD` — checked where the flags enter, not by disassembling a
+binary afterwards.
+
+## The gate proves the package's metadata
+
+`scripts/verify` used to build the crate and nothing else, while the one path
+that ran `makepkg` was the release itself. A packaging defect could therefore
+reach a tag without the gate seeing it. The gate now runs `package()` in a
+scratch directory and checks the dependency closure — no `makepkg`, no root,
+no privilege — and the lockfile's currency is a check before any push that
+touches `Cargo.toml`, `Cargo.lock` or the dependency script.
+
+## The plate yields, and never leaves the flow
+
+The plate never comes over the catalogue. When the band is too short it
+**yields first**, band by band — body, then actions, then tabs, then the
+identity — and it always stays in the flow, so the selection is always
+readable. (v0.3.0's notes described the alternative that was declined, an
+overlay; the audit had carried it too. Both are corrected.)
+
+## The numbers the documents had missed
+
+The code has implemented a catalogue minimum of **560 px** — the operator's
+target — and a window floor of **620 × 520**, since the row's ladder was
+built. The contract and the audit still carried the pre-ladder **660 px** and
+**720 × 480**, so the two documents that exist to fix the numbers disagreed
+with the code. Measured on the real row, in the bench:
+
+| the content | the name's cell | the name's text | version | source | measurement |
+|---|---|---|---|---|---|
+| 495 px | 165 px | 143 px | 80.5 | 6 | 54.5 |
+| **560 px** | **165 px** | **143 px** | 90 | 45 | 71 |
+| 620 px | 165 px | 143 px | 99 | 81 | 86 |
+| 660 px | 165 px | 143 px | 105 | 105 | 96 |
+
+The name's text is 143 px — the p90 of 1884 installed packages, whole — at
+every width from 400 px up: the ladder gives the name its floor, and the
+columns that say *where* give way first. The historical numbers are kept, and
+so is the case that fails. The contract is now version 1.3 and the audit
+version 1.5.
+
+## On the machine
+
+The ported application is installed as the system package
+(`calix-gpui-git r4874.gaaa19992-1`, `/usr/lib/calix/calix-gpui`) on native
+Wayland, with the daemon and the notifier active — and the operator has seen
+it running. That was the last limitation the audit carried about this
+release.
+
+## What is not proved
+
+- **The measurement bar at the catalogue's minimum.** Its track is 96 px wide
+  inside a cell the ladder narrows, right-justified and clipped: below 660 px
+  its *length* no longer encodes the size. At 560 the bar costs the source
+  (45 px of 105) and the version (90 of 105) — without it, both are whole and
+  the name starts growing at 600 instead of 720. The trade is a product
+  decision, and it is open.
+- **A 150 % interface scale** is reasoned, not measured: the geometry is
+  logical and the scale factor does not leak into it — which *is* measured —
+  but the test platform's scale factor is fixed at 2.0.
+- **The plate's sheet**, and any gesture that needs a pointer: the bench has
+  no pointer. Composition is measured; feel is not.
+
+## What v0.3.0 brought
+
+Calix v0.3.0 was the spatial release: the written contract, the audit that
+confronts it with the repository, the workspace owning the vertical budget,
+the narrow window authored, the movement measured on the bounds the window
+actually draws.
+
+---
+
 # Calix v0.3.0
 
 Calix v0.3.0 is the **spatial** release. The application now has a written
@@ -46,6 +150,11 @@ row and on the real package names — the p90 of 1884 installed packages is 143
 pixels of text. The 560 that was tried first does not hold: at 560 the name
 showed six characters. The failing case is kept in the test, not hidden.
 
+*Corrected in v0.3.1: this paragraph measured the row without its ladder. With
+the ladder the name is whole at 560, so the catalogue's minimum is 560 and the
+window's floor, re-derived from it, is 620 × 520 — see “The numbers the
+documents had missed” above.*
+
 ## The narrow window, authored
 
 The toolbar's three forms are now three *different* layouts, each measured:
@@ -71,6 +180,10 @@ Six rows are a catalogue; two are a strip. The catalogue's vertical floor is
 written down, and when the band cannot hold the catalogue *and* the plate's
 chrome, the plate leaves the flow and comes **over** the catalogue, summoned
 by the same edge that used to resize it. The catalogue takes the band whole.
+
+*Corrected in v0.3.1: this described the alternative that was declined. The
+decision is that the plate yields first, band by band, and never comes over
+the catalogue.*
 
 ## The movement, and how it is measured
 
