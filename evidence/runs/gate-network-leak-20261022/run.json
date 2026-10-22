@@ -1,0 +1,39 @@
+{
+  "run_id": "gate-network-leak-20261022",
+  "kind": "gate_defect",
+  "status": "ok",
+  "failing_commit": "748579ad (the v0.3.1 notes merge — docs only, zero backend changes)",
+  "objective": "The release gate failed with no code change since the green run. Root cause must be proven, not guessed, before any release.",
+  "the_defect": {
+    "what": "sync_system_update consulted the CachyOS update notice BEFORE its database precondition. The notice check is interactive and networked: it fetches iso-stats.cachyos.org live, reads the operator's real ~/.cache/calix cache, and asks a question no test can answer with 'yes'. A declined or unanswerable notice short-circuited the function to an empty success — before any database check.",
+    "why_the_gate_flipped": "Green all day while the fetch failed (catch -> proceed -> sync(true) -> SyncDbFailed). Red at 15:02 when the live notice finally served (the amdgpu/Kernel 7.3.0-2 warning, id 2130f114) and no saved answer existed.",
+    "why_the_container_stayed_green": "The Arch replay's os-release is not CachyOS, so the hook never loaded."
+  },
+  "the_probe": {
+    "method": "a scratch test printed the same setup's actual outcomes",
+    "sync_false": "SyncDbFailed",
+    "sync_true": "SyncDbFailed",
+    "sync_system_update_dbonly": "SUCCESS (empty report) — the notice path decided, the databases were never reached",
+    "db_sync_directory": "absent — nothing was ever downloaded"
+  },
+  "the_fix": {
+    "what": "the database precondition (alpm_get_syncdbs == null, the same check syncDatabases applies) is verified before the notice check",
+    "property": "a manager that cannot name a sync database must report SyncDbFailed however the notice is answered: on any machine, with or without a network",
+    "intent_preserved": "for a working installation, the notice is still asked before any database download",
+    "production_consumers": [
+      "Calix.Cli.Zig/src/commands/install.zig:519",
+      "Calix.Cli.Zig/src/commands/upgrade.zig:635"
+    ]
+  },
+  "the_measurements": {
+    "tests_before": "1340 pass, 4 skip, 1 fail (1345)",
+    "tests_after": "1341 pass, 4 skip, 0 fail",
+    "gate_after": "the full verify roster green on the dirty checkout (local-verify-20261022T151353Z)"
+  },
+  "artifacts": [
+    {
+      "file": "mechanism.txt",
+      "what": "the failing log lines, the probe, the live notice payload, the mechanism, the numbers"
+    }
+  ]
+}
