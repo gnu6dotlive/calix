@@ -1,6 +1,6 @@
 # CONTRACT 01 — The spatial contract of Calix
 
-**Version 1.3 — 2026-10-22 — status: ratified (decisions 1–4), the catalogue's minimum qualified, and the row's ladder**
+**Version 1.4 — 2026-10-22 — status: ratified (decisions 1–4), the catalogue's minimum qualified, the row's ladder, and §5.7 decided: the measurement bar lives in the size column**
 
 Calix is a product. It is not a GPUI experiment that happens to have a
 package manager in it. The rules that decide where things are, what gives way
@@ -41,6 +41,16 @@ the row has. The window's floor is re-derived from 560: the catalogue (560)
 and the spine (56) → **620 × 520**, measured at the floor by
 `the_composition_at_the_window_floor_is_measured`: the catalogue 223 px (six
 rows) and the plate at its identity (48 px).
+
+**Version 1.4** records the decision of §5.7 of the audit: the measurement
+bar is **integrated into the "Taille" column** — the bytes above, the bar
+(6 px) below, in the 80 px cell that never shrinks. Its track is 68 px
+(the cell's 80 px less the 12 px right padding) and it is never narrowed by
+the ladder, so the fill (`track × ratio`) encodes the size at every width
+of the row. The ladder is consequently reduced to two rungs: the source
+(4), then the version (1); the size and the state never shrink, and the
+name keeps its floor of 165 px. The row's fixed cost is 399 px, and the
+catalogue's minimum stays 560 px with the name whole.
 
 The companion audit confronts this contract with the repository as it stands.
 Where the repository disagrees with this document, the audit says so, with the
@@ -151,10 +161,11 @@ The spine and the body's floor are **not** on the ladder: they are what the
 ladder protects.
 
 The ladder applies to the body's *own* content as well. A row that does not
-fit gives way in a stated order too — the source, then the instrument's
-reading, then the version — and the name, the state and the size never
-shrink. A row that is too narrow is a row with a short source, not a row with
-a truncated name.
+fit gives way in a stated order too — the source, then the version — and
+the name, the state and the size never shrink. The measurement bar no longer
+has a rung of its own: since §5.7 it lives in the size column, which never
+shrinks, so its track (68 px) is never narrowed by the ladder. A row that is
+too narrow is a row with a short source, not a row with a truncated name.
 
 ### 4.5 Portrait, landscape, zoom
 
