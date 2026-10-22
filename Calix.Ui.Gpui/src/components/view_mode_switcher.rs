@@ -237,7 +237,7 @@ mod tests {
         cx.draw(
             point(px(0.0), px(0.0)),
             size(px(400.0), px(200.0)),
-            |_window, _cx| fixture.clone(),
+            |_window, _cx| fixture.clone().into_element(),
         );
 
         // The two cells, measured.
@@ -278,7 +278,7 @@ mod tests {
             cx.draw(
                 point(px(0.0), px(0.0)),
                 size(px(400.0), px(200.0)),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
         };
         frame(cx);
@@ -377,7 +377,7 @@ mod tests {
             cx.draw(
                 point(px(0.0), px(0.0)),
                 size(px(400.0), px(120.0)),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
         };
 

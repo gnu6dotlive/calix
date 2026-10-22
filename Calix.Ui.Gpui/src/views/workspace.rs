@@ -2035,7 +2035,9 @@ impl WorkspaceView {
 
         let entity = cx.entity();
         self.cheatsheet_hold = Some(cx.spawn(async move |this, cx| {
-            gpui::Timer::after(crate::state::keys::HELP_HOLD).await;
+            cx.background_executor()
+                .timer(crate::state::keys::HELP_HOLD)
+                .await;
             this.update(cx, |view, cx| {
                 view.cheatsheet_hold = None;
                 view.cheatsheet_visible = true;
@@ -2112,7 +2114,7 @@ impl WorkspaceView {
                 }
                 "search.focus" => {
                     let search_input = self.workstation.read(cx).search_input.clone();
-                    search_input.update(cx, |si, _cx| si.focus(window));
+                    search_input.update(cx, |si, cx| si.focus(window, cx));
                 }
                 "console.toggle" => {
                     self.console.update(cx, |c, cx| c.toggle_drawer(cx));
@@ -2138,7 +2140,7 @@ impl WorkspaceView {
                     let search_input = self.workstation.read(cx).search_input.clone();
                     let is_focused = search_input.read(cx).is_focused(window);
                     if !is_focused {
-                        search_input.update(cx, |si, _cx| si.focus(window));
+                        search_input.update(cx, |si, cx| si.focus(window, cx));
                     }
                 }
                 "list.clear" => {
@@ -2171,9 +2173,9 @@ impl WorkspaceView {
 
         if key == "tab" {
             if event.keystroke.modifiers.shift {
-                window.focus_prev();
+                window.focus_prev(cx);
             } else {
-                window.focus_next();
+                window.focus_next(cx);
             }
             return;
         }

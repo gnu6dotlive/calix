@@ -97,7 +97,7 @@ fn main() {
     let initial_calix_settings = calix_settings.clone();
     let initial_gpui_config = gpui_config.clone();
 
-    Application::new()
+    Application::with_platform(gpui_linux::current_platform(false))
         .with_assets(crate::icons::AppIcons::new())
         .run(move |cx: &mut App| {
             cx.bind_keys([

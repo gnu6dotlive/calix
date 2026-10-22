@@ -293,7 +293,14 @@ cli_smoke() {
 # debug check/test pair compiled the dependency graph once, then the release
 # build compiled it again; that duplicate work was most of a cold CI run.
 rust_tests() {
-    (cd Calix.Ui.Gpui && cargo test --release --locked --quiet)
+    # The tests run in the *debug* profile, and this is not a preference:
+    # gpui 0.3 records the bounds of an element — what the visual bench
+    # measures — only under `all(debug_assertions, feature = "test-support")`.
+    # A release build has no debug assertions, so the measurements would
+    # silently find nothing and the tests that read them would fail.
+    #
+    # The release build is still made, for the artefact it ships.
+    (cd Calix.Ui.Gpui && cargo test --locked --quiet)
 }
 
 rust_release_build() {

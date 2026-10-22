@@ -583,7 +583,7 @@ mod tests {
             cx.draw(
                 point(px(0.0), px(0.0)),
                 size(px(width.max(200.0)), px(200.0)),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
         };
         let draw_natural = |cx: &mut gpui::VisualTestContext, pkg: UnifiedPackage| {
@@ -596,7 +596,7 @@ mod tests {
             cx.draw(
                 point(px(0.0), px(0.0)),
                 size(px(2000.0), px(200.0)),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
         };
 
@@ -835,7 +835,7 @@ mod tests {
             cx.draw(
                 point(px(0.0), px(0.0)),
                 size(px(width.max(200.0)), px(400.0)),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
 
             // The row the list drew: its own bounds.
@@ -971,7 +971,7 @@ mod tests {
         cx.draw(
             point(px(0.0), px(0.0)),
             size(px(600.0), px(200.0)),
-            |_window, _cx| fixture.clone(),
+            |_window, _cx| fixture.clone().into_element(),
         );
 
         let row = cx
@@ -1040,7 +1040,7 @@ mod tests {
                                     })
                                     .collect::<Vec<_>>()
                             })
-                            .track_scroll(self.handle.clone())
+                            .track_scroll(&self.handle)
                             .h_full(),
                         ),
                 )
@@ -1056,7 +1056,7 @@ mod tests {
             cx.draw(
                 point(px(0.0), px(0.0)),
                 size(px(600.0), px(400.0)),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
         };
 

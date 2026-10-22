@@ -641,6 +641,7 @@ fn compile_rect_element(node: &RecipeNode, child_elements: Vec<AnyElement>) -> A
                     offset: point(px(s.offset_x), px(s.offset_y)),
                     blur_radius: px(s.blur_radius),
                     spread_radius: px(s.spread_radius),
+                    inset: false,
                 })
                 .collect();
             div = div.shadow(gpui_shadows);

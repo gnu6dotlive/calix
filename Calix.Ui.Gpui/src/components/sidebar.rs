@@ -415,7 +415,7 @@ mod tests {
             cx.draw(
                 point(px(0.0), px(0.0)),
                 size(px(240.0), px(400.0)),
-                |_window, _cx| fixture.clone(),
+                |_window, _cx| fixture.clone().into_element(),
             );
         };
         // The frame comes *before* the lookup: the bounds are the ones the
