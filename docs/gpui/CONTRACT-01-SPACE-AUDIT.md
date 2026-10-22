@@ -1,6 +1,6 @@
 # CONTRACT 01 — The audit of the spatial contract
 
-**Audit 1.5 — 2026-10-22 — against `feat/gpui-0.3-port` (the port, merged
+**Audit 1.6 — 2026-10-22 — against `feat/gpui-0.3-port` (the port, merged
 into `main` as `04afdca3`)**
 
 *Version 1.0 was the audit of the state before the decisions. Version 1.1
@@ -31,6 +31,15 @@ historical numbers are kept: 660 px and 720 × 480 are what the row and the
 window cost without the ladder. §5.7 is restated, because the question it
 asked ("is the bar worth 96 px of the name?") is void: the name is not what
 the bar costs.*
+
+*Version 1.6 settles §5.7: the measurement bar is **integrated into the
+"Taille" column**. The bytes sit above, the bar (6 px) below, in the 80 px
+cell that never shrinks; its track is 68 px (the cell less the 12 px right
+padding) and is never narrowed by the ladder, so the fill (`track × ratio`)
+encodes the size at every width. The ladder loses its middle rung — the
+source (4), then the version (1) — and the row's fixed cost is 399 px.
+The catalogue's minimum stays 560 px with the name whole. The bar's former
+clip zone (a 96 px track right-justified in a squeezed cell) is gone.*
 
 This audit confronts [`CONTRACT-01-SPACE.md`](CONTRACT-01-SPACE.md) with the
 repository as it stands. It does not propose new primitives: it inventories
@@ -486,10 +495,15 @@ numbers *are* the order:
 | the cell | gives way | why |
 |---|---|---|
 | the source | 4 | the most droppable: the name almost always says it, and the inspector gives it in full |
-| the measurement | 2 | the instrument's reading — the size's exact figure has its own column |
 | the version | 1 | the last of the secondary columns |
 | the size, the state | 0 | the figure, and the state of the package: they never shrink |
 | **the name** | — | the key: it never shrinks, and it has a floor of 165 px of cell (the p90 of the real names, 143 px of text, plus the identity glyph and its gap) |
+
+The measurement bar had a rung of 2 in this ladder. Since §5.7 it has none:
+it lives in the size column, which never shrinks, so its track (68 px) is
+never narrowed by the ladder. The measured table below keeps the bar's
+column for the historical record — it is the reading the row had when the
+bar still had a rung of its own.
 
 Measured, in the list, at every width:
 
@@ -583,29 +597,20 @@ What is left to decide, after the measurements:
    never comes over the catalogue — one always knows which package is
    selected. The alternative (the plate as an overlay, like the drawer) was
    considered and declined; its machinery is gone from the view.
-7. **The measurement bar at the catalogue's minimum.** The premise of the
-   question has changed: the name is **whole** at 560 (§4.7) — the ladder
-   gives it its floor of 165 px and the columns that say *where* give way
-   first. So the 96 px is not spent on the name; it is spent on the *bar*,
-   and what the bar costs is the *source* and the *version*:
-
-   | at 560 px | with the bar | without it |
-   |---|---|---|
-   | the name's cell / text | 165 / 143 px | 165 / 143 px |
-   | the source | 45 px (of 105) | 102 px |
-   | the version | 90 px (of 105) | 104 px |
-   | the measurement | 71 px (of 96) | — |
-   | the name starts growing at | 720 px | 600 px |
-
-   And the bar's own reading degrades as it is squeezed: its track is 96 px
-   wide inside a cell that the ladder has narrowed, right-justified and
-   clipped — so below 660 px its *length* no longer encodes the size, and
-   below 480 px it is gone altogether. The question is therefore not
-   "96 px of the name" but: **a bar whose length stops encoding below
-   660 px — is that reading worth the source and the version it squeezes?**
-   The size column, which never shrinks, shows the same number in bytes.
-
-   The decision is not taken here.
+7. **~~The measurement bar at the catalogue's minimum.~~** **Decided**
+   (§5.7): the bar is **integrated into the "Taille" column**. The bytes sit
+   above, the bar (6 px) below, in the 80 px cell that never shrinks, so
+   its track (68 px, the cell less the 12 px right padding) is never
+   narrowed by the ladder: the fill (`track × ratio`) encodes the size at
+   every width of the row, and the former clip zone (a 96 px track
+   right-justified in a squeezed cell) is gone. The ladder is reduced to
+   two rungs — the source (4), then the version (1) — and the row's fixed
+   cost is 399 px. The catalogue's minimum stays 560 px with the name
+   whole; the size column, which never shrinks, shows the same number in
+   bytes beneath the bar. The failing case is kept in the bench:
+   `the_row_is_measured_at_and_around_the_catalogue_minimum`,
+   `the_bar_fill_is_track_times_ratio`,
+   `the_header_holds_the_scale_caption_at_the_floor`.
 
 ## 6. The test plan this audit implies
 
