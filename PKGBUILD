@@ -1,4 +1,4 @@
-pkgname=removed-git
+pkgname=dynamic-deps
 pkgver=1
 pkgrel=1
 arch=('any')
