@@ -1,5 +1,5 @@
-pkgbase = valid-after-invalid
+pkgbase = invalid-metadata
 	pkgver = 1
 	pkgrel = 1
 	arch = any
-pkgname = valid-after-invalid
+pkgname = invalid-metadata
