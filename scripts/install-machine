@@ -73,7 +73,12 @@ if [[ $FROM_LOCAL -eq 1 && "$BRANCH" == "main" ]]; then
 fi
 git fetch --quiet origin
 LOCAL=$(git rev-parse HEAD)
-[[ "$LOCAL" == "$(git rev-parse origin/main)" ]] || fail "main is not in step with the remote"
+# The branch is compared with *its* remote counterpart: the local path
+# installs a branch before it is merged, and the published path installs
+# main.
+REMOTE_REF="origin/$BRANCH"
+[[ "$BRANCH" == "main" ]] && REMOTE_REF="origin/main"
+[[ "$LOCAL" == "$(git rev-parse "$REMOTE_REF")" ]] || fail "the branch is not in step with the remote (${LOCAL} vs ${REMOTE_REF})"
 echo "  main is at ${LOCAL}"
 
 # ── 2. The package ─────────────────────────────────────────────────────────
