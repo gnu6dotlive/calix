@@ -1,5 +1,6 @@
-pkgbase = review-one
+pkgbase = review-two
 	pkgver = 1
 	pkgrel = 1
 	arch = any
-pkgname = review-one
+	depends = review-dependency-git
+pkgname = review-two
