@@ -41,7 +41,7 @@
     "the_measurements": {
       "link": "without -flto the package builds; with it the link fails (1 undefined symbol). The shim object: real code without it, .gnu.lto_* sections with it.",
       "the_tests": "-C opt-level=3 alone: 247 passed / 18 failed. The same flag with -C debug-assertions=on: 265 passed / 0 failed. -C target-cpu=x86-64 alone: 265 passed / 0 failed.",
-      "the_cpu": "target features: 33 under native, 3 under the x86-64 baseline. The native-built binary carries 12 AVX-512 instructions; the packaged one carries 4, and those 4 are aws-lc-sys's (BoringSSL) own hand-written assembly, guarded by its OPENSSL_ia32cap runtime check — not produced by our flags."
+      "the_cpu": "the same tree, built twice: -C target-cpu=native makes LLVM vectorise 100x more (233908 AVX2 instructions against 2238), in the widest width the builder's CPU has; on a CPU that lacks it, the binary faults with SIGILL. The 26 AVX-512 instructions present in both builds are aws-lc-sys's and the aes crate's own assembly, guarded by their runtime capability checks — not ours."
     },
     "the_fix": "PKGBUILD-calix states its own flags: CFLAGS without -flto, RUSTFLAGS without -C opt-level=3 and without -C target-cpu=native, and the package's tests run in the debug profile, where the measurements exist.",
     "the_detail": "evidence/runs/pkgbuild-flags-20261021/"

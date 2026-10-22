@@ -36,11 +36,14 @@
       "flag": "-C target-cpu=native (RUSTFLAGS, from /etc/makepkg.conf.d/rust.conf)",
       "mechanism": "a distributed package is downloaded by machines that are not the builder; a binary tuned for the builder's CPU faults on an older CPU, where the instructions are absent",
       "measurement": {
+        "the_comparison": "the SAME tree, built twice — the only difference is the flag",
         "target_features_native": 33,
         "target_features_x86_64": 3,
-        "avx512_instructions_old_native_built_binary": 12,
-        "avx512_instructions_new_packaged_binary": 4,
-        "the_remainder_is": "aws-lc-sys (BoringSSL) hand-written assembly, guarded by its own OPENSSL_ia32cap runtime check — not produced by our flags"
+        "avx2_instructions_baseline": 2238,
+        "avx2_instructions_native": 233908,
+        "avx512_instructions_baseline": 26,
+        "avx512_instructions_native": 52,
+        "reading": "-C target-cpu=native makes LLVM vectorise 100x more, in the widest width the builder's CPU has. On a CPU that lacks it, the binary faults with SIGILL. The 26 AVX-512 instructions present in both are aws-lc-sys's and the aes crate's own hand-written assembly, guarded by their runtime capability checks — not ours."
       }
     }
   ],
@@ -97,5 +100,23 @@
       "bytes": 14673814,
       "sha256": "fe7f69357edce49bee2968a9ec209c80001adcd84e996271caf9bb95aa9ce997"
     }
-  ]
+  ],
+  "the_gate_now_holds_it": {
+    "decision": "the operator chose: prove the cause, not the symptom",
+    "what": "a new gate step, 'build-flags', checks the flags where they enter — the environment the build inherits, and the package's own declaration, asked of the PKGBUILD itself — before the build, so a flag that would break the build or the binary is named where it enters",
+    "the_three_it_refuses": [
+      "-C target-cpu=native: a distributed package is built for the architecture's baseline, not for the machine that builds it",
+      "-C opt-level=: rustc enables cfg(debug_assertions) only when opt-level is 0, so this switches the measurements off",
+      "-flto in CFLAGS/CXXFLAGS/LDFLAGS: the C shim that wayland-backend compiles would become LTO bytecode, which rust-lld cannot read"
+    ],
+    "the_measurements": {
+      "environment_target_cpu_native": "refused, with the reason",
+      "environment_opt_level_3": "refused, with the reason",
+      "environment_lto_in_cflags": "refused, with the reason",
+      "environment_lto_in_ldflags": "refused, with the reason",
+      "the_packages_declaration_regressed_to_target_cpu_native": "refused, with the reason",
+      "a_clean_environment": "passes, and reports both sets of flags"
+    },
+    "why_not_the_symptom": "checking the packaged binary's instructions would have to carve out the aws-lc-sys and aes crates' own runtime-guarded assembly, and a carve-out is where such a check rots. The cause is one line of configuration, so the cause is what is checked."
+  }
 }
