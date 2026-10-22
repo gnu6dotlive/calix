@@ -110,7 +110,10 @@ text = re.sub(
 with open(target, "w") as handle:
     handle.write(text)
 PY
-        (cd "${PKGDIR}" && makepkg --noconfirm) >/dev/null
+        # The tree needs Zig 0.16 — the system's is 0.17 — and the
+        # repository carries that toolchain in vendor/. The PKGBUILD honours
+        # the ZIG override for exactly this.
+        (cd "${PKGDIR}" && ZIG="$ROOT/vendor/zig-0.16/usr/bin/zig" makepkg --noconfirm) >/dev/null
         PACKAGE=$(ls -t "${PKGDIR}"/*.pkg.tar.zst 2>/dev/null | head -1)
         [[ -n "$PACKAGE" ]] || fail "the package was not built"
         echo "  built $(basename "$PACKAGE") from the local tree"
