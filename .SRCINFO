@@ -1,5 +1,6 @@
-pkgbase = skip-three
+pkgbase = needs-two
 	pkgver = 1
 	pkgrel = 1
 	arch = any
-pkgname = skip-three
+	depends = skip-two>=1
+pkgname = needs-two
