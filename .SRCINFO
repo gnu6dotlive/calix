@@ -1,5 +1,5 @@
-pkgbase = failure-two
+pkgbase = valid-after-invalid
 	pkgver = 1
 	pkgrel = 1
 	arch = any
-pkgname = failure-two
+pkgname = valid-after-invalid
