@@ -1,0 +1,30 @@
+{
+  "run_id": "plate-yields-20261022",
+  "kind": "audit-correction",
+  "status": "ok",
+  "objective": "the audit described a behaviour the operator had decided away, and cited a test that did not exist",
+  "the_finding": {
+    "the_audit_claimed": "the plate leaves the flow and comes over the catalogue, summoned by the same edge",
+    "the_cited_test": "the_plate_leaves_the_flow_before_the_catalogue_is_reduced — absent from the source",
+    "the_code_did": "the opposite: plate_overlays was false, with the operator's own reason in the view — 'La plaque cède d'abord : elle se réduit, et le catalogue garde sa place. Elle ne passe jamais par-dessus — on sait toujours quel paquet est sélectionné.'",
+    "the_evidence_the_code_carried": "the_composition_is_measured_in_a_real_window measures the plate in the flow and the catalogue keeping its floor; the_plate_yields_before_the_catalogue_is_reduced bounds the plate's ceiling",
+    "the_systematic_check": "the audit cites 17 test names; 16 existed. The one that did not was exactly the claim in the verdict row. After the correction, all 17 exist."
+  },
+  "what_changed": {
+    "the_audit": "version 1.4: §2's verdict row, §4.10's table and text, §5.6's open decision, §6's test plan and §7's limitations now say what the code does, and cite the tests that exist",
+    "the_code": "the dead scaffolding of the removed overlay is gone: four render branches behind a constant that was false, the animated height only the dead branch wrote, the drag flag only the dead branch read, the import they needed, and the test that pinned the removed behaviour",
+    "the_gesture_that_remains": "the edge drag resizes the plate, covered by the_nameplate_is_pulled_up_and_grows"
+  },
+  "the_measurements": {
+    "tests_after": "264 passed, 0 failed (the deleted test accounted for the difference)",
+    "the_composition": "unchanged: the plate in the flow at its identity, the catalogue keeping its floor of six rows",
+    "the_gates": "scripts/verify PASSED; scripts/ci-replay PASSED (1388 package-manager, 392 CLI, 264 UI)"
+  },
+  "artifacts": [
+    {
+      "file": "logs/plate.log",
+      "bytes": 26672,
+      "sha256": "ced79ac85b68fb8aa466fca1ed7e489c7f0e7bff511aecab90775581091a6c1c"
+    }
+  ]
+}

@@ -1,0 +1,701 @@
+=== the audit's cited tests
+before: 17 cited, 16 existed — the absent one was the plate's own claim
+after:  17 cited, 17 exist (the claim now cites the tests that do)
+
+=== the decision, as the code carried it (before)
+        // And when the band cannot hold the catalogue *and* the plate's
+        // chrome, the plate leaves the flow: it comes over the catalogue,
+        // summoned by the same edge. The catalogue is never reduced below
+        // its floor for the sake of a caption.
+        // La plaque cède d'abord : elle se réduit, et le catalogue garde sa
+        // place. Elle ne passe jamais par-dessus — on sait toujours quel
+        // paquet est sélectionné.
+        let plate_overlays = false;
+
+=== the decision, as the code carries it (after)
+/// The plate is read from the top down in full-width bands. The nameplate is
+/// the caption of the readout: below it, always, between a floor and a
+/// share.
+///
+/// The band is the space the station really has — not the window. The plate
+/// takes what the user asks for, up to a ceiling computed *after* the bank
+/// and the catalogue's own floor: the catalogue keeps its rows, the plate
+/// takes the rest.
+pub fn nameplate_bounds(band_height: f32) -> (f32, f32) {
+    let min = UiMetrics::NAMEPLATE_MIN_HEIGHT;
+    let after_the_catalogue = band_height
+        - UiMetrics::BANK_HEIGHT
+        - UiMetrics::SPLITTER_THICKNESS
+        - UiMetrics::CATALOGUE_MIN_HEIGHT;
+    // Two ceilings: the space that is left once the catalogue has kept its
+    // rows, and the share of the band a context surface may take.
+    let max = after_the_catalogue
+        .min(band_height * UiMetrics::NAMEPLATE_MAX_RATIO)
+        .max(min);
+    (min, max)
+}
+
+/// The height of the nameplate, bounded.
+pub fn nameplate_height(band_height: f32, requested: f32) -> f32 {
+    let (min, max) = nameplate_bounds(band_height);
+    requested.clamp(min, max)
+}
+
+/// The height of the nameplate after a drag: pulling up makes it grow.
+pub fn nameplate_height_after_drag(
+    drag_start_height: f32,
+    drag_start_pointer_y: f32,
+    current_pointer_y: f32,
+    content_height: f32,
+) -> f32 {
+    let delta_y = current_pointer_y - drag_start_pointer_y;
+    nameplate_height(content_height, drag_start_height - delta_y)
+}
+
+
+/// La largeur de la zone de contenu : la largeur *mappée* de la fenêtre, moins le rail.
+///
+/// La largeur que l'application a *demandée* (`window.window_bounds()`) n'est pas
+/// celle que le compositeur lui accorde : un compositeur à tuiles redimensionne la
+/// fenêtre quand le focus change, et la demande reste celle du lancement. Mesurer
+/// sur la demande faisait tenir l'inspecteur à $137px$ — sous son plancher de
+/// $320px$ — dans une fenêtre de $1056px$, puis à $1622px$ — au-dessus de son
+/// plafond de $520px$ — dans une fenêtre de $2542px$. C'est la taille mappée,
+/// `viewport_size()`, qui fait foi.
+pub fn content_width(viewport_width: f32, sidebar_width: f32) -> f32 {
+    (viewport_width - sidebar_width).max(0.0)
+}
+
+/// La colonne de navigation se replie-t-elle ?
+///
+/// Elle se replie quand le catalogue n'a plus la place qu'il doit garder :
+/// la colonne est la première surface qui peut rétrécir, et elle ne
+/// disparaît jamais — elle garde ses cinq destinations.
+///
+/// C'est une règle de l'échelle, pas un état : quand la fenêtre reprend de
+/// la place, la colonne reprend la forme que l'utilisateur lui avait
+/// donnée.
+pub fn spine_is_forced_collapsed(viewport_width: f32) -> bool {
+    content_width(viewport_width, UiMetrics::SIDEBAR_EXPANDED) < UiMetrics::CATALOGUE_MIN_WIDTH
+}
+
+/// La largeur de la colonne, une fois la règle appliquée.
+pub fn effective_sidebar_width(user_collapsed: bool, viewport_width: f32) -> f32 {
+    if user_collapsed || spine_is_forced_collapsed(viewport_width) {
+        UiMetrics::SIDEBAR_COLLAPSED
+    } else {
+        UiMetrics::SIDEBAR_EXPANDED
+    }
+}
+
+/// How far the wheel's distance may wait before the list is given it.
+pub const MAX_SCROLL_PENDING: f32 = 240.0;
+
+/// The distance that waits after a wheel notch.
+///
+/// The distance is bounded: a long scroll must not leave the list behind by a
+/// mile, and the list must never be asked for more than it can give.
+pub fn scroll_pending_after(pending: f32, delta: f32) -> f32 {
+    (pending + delta).clamp(-MAX_SCROLL_PENDING, MAX_SCROLL_PENDING)
+}
+
+/// The wheel, taken back from the list.
+///
+/// The list applies a notch in one jump. We take it back: the distance waits,
+/// to be handed over eased, frame by frame.
+///
+/// The two cancel out whichever order the handlers run in — the list adds the
+/// distance and we take it back, or we take it back and the list adds it. The
+/// list is where it was, and the distance waits.
+pub fn take_wheel_back(offset: &mut Point<Pixels>, delta: f32) {
+    offset.y -= px(delta);
+}
+
+/// The frame's movement: the part of the waiting distance given back now.
+pub fn apply_scroll_step(offset: &mut Point<Pixels>, step: f32) {
+    offset.y += px(step);
+}
+
+/// The eased step of the smooth scroll, and what is left of the distance.
+///
+/// A frame gives back a fifth of what waits. The notch is therefore a movement
+/// spread over a dozen frames rather than a jump, and the last frame gives the
+/// remainder back whole, so the list lands exactly where the wheel asked.
+pub fn scroll_step(pending: f32) -> (f32, f32) {
+    const SHARE: f32 = 0.22;
+    let step = pending * SHARE;
+    let rest = pending - step;
+    if rest.abs() < 0.5 {
+        (pending, 0.0)
+    } else {
+        (step, rest)
+    }
+}
+
+/// La position du porteur dans le renfoncement : le haut de la liste, puis la
+/// ligne, moins ce que la liste a défilé.
+///
+/// La ligne peut être fractionnaire : la barre voyage entre deux lignes.
+pub fn carrier_top(header_height: f32, row_height: f32, row: f32, scroll_y: f32) -> f32 {
+    header_height + row * row_height - scroll_y
+}
+
+/// L'ordre des périmètres sur le cadran : la gauche, le haut, la droite. Le
+/// sens du changement décide du côté par lequel l'entrée arrive.
+pub fn scope_order(scope: NavScope) -> i32 {
+    match scope {
+        NavScope::Results => 0,
+        NavScope::Installed => 1,
+        NavScope::Updates => 2,
+    }
+}
+
+/// Le voyage de l'entrée du périmètre, en pixels. La courbe de sortie dépense
+/// l'essentiel de sa course au début : la surface doit donc parcourir une part
+/// de sa propre largeur pour que le mouvement se voie.
+pub const SCOPE_ENTRY_TRAVEL: f32 = 44.0;
+
+/// Le voyage de l'entrée de la plaque, en pixels.
+pub const PLATE_ENTRY_TRAVEL: f32 = 22.0;
+
+pub struct PackageWorkstationView {
+    pub session: Entity<AppSession>,
+    pub store: Entity<PackageStore>,
+    pub console: Entity<ConsoleModel>,
+    pub toast_center: Entity<ToastCenter>,
+    /// The height of the nameplate: the caption of the readout, under it.
+    pub nameplate_height: f32,
+    pub nameplate_drag: Option<NameplateDragState>,
+    pub scroll_handle: UniformListScrollHandle,
+    /// The distance the wheel asked for and the list has not been given yet.
+    ///
+    /// The list applies a wheel notch in one jump. We take the wheel back,
+    /// keep the distance here, and give it back eased, frame by frame: a notch
+    /// becomes a movement, not a step.
+    pub scroll_pending: f32,
+    /// La sélection est un objet qui voyage : la barre du porteur glisse d'une
+    /// ligne à l'autre au lieu de sauter.
+    pub marker: Option<SelectionMarker>,
+    /// Le commutateur de vue est une troisième surface du même porteur : sa
+    /// marque voyage d'une cellule à l'autre.
+    pub view_marker: Option<SelectionMarker>,
+    /// La hauteur que le propriétaire de la mise en page lui attribue.
+    ///
+    /// La station ne mesure plus la fenêtre : elle occupe une bande, et sa
+    /// part se décide plus haut. Avant, elle croyait avoir toute la fenêtre
+    /// pendant que le tiroir lui en prenait le bas — et la plaque, qui ne
+    /// sait pas rétrécir, gardait sa part pendant que le catalogue
+    /// disparaissait.
+    pub assigned_height: f32,
+    /// Le numéro du dernier changement de sélection : la plaque de nom entre
+    /// avec la sélection, pas à chaque rendu.
+    pub selection_epoch: usize,
+    /// Le périmètre précédent : il donne la direction de l'entrée.
+    pub last_scope: NavScope,
+    pub scope_epoch: usize,
+    pub scope_direction: f32,
+    /// L'onglet précédent : il donne le sens de la coupe de la plaque.
+    pub last_inspector_tab: InspectorTab,
+    pub tab_direction: f32,
+    pub on_mutation: Option<PackageMutationHandler>,
+    pub on_upgrade_all: Option<SystemUpgradeHandler>,
+    pub on_retry_source: Option<SourceRetryHandler>,
+    pub on_reload_installed: Option<ActionReloadHandler>,
+    pub on_reload_updates: Option<ActionReloadHandler>,
+    pub on_retry_details: Option<DetailsRetryHandler>,
+    pub copy_cmd_feedback: bool,
+    pub is_loading_pkgbuild: bool,
+    pub reduce_motion: bool,
+    pub theme: Theme,
+    pub visual_style: VisualStyleId,
+    pub compact: bool,
+    pub search_input: Entity<SearchInputView>,
+    /// The dial of the scope: one object with three positions.
+    pub scope_dial: Entity<ScopeDialView>,
+    /// The dial's ear to the session: the needle follows the scope.
+    _scope_dial_sub: Subscription,
+    pub active_menu: Option<ActiveMenuState>,
+    pub menu_epoch: usize,
+    pub state_btn_focus: FocusHandle,
+    pub sort_btn_focus: FocusHandle,
+    pub menu_surface_focus: FocusHandle,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct PackageWorkstationConfig {
+    pub theme: Theme,
+    pub reduce_motion: bool,
+    pub compact: bool,
+    pub visual_style: VisualStyleId,
+}
+
+impl PackageWorkstationView {
+    pub fn new(
+        session: Entity<AppSession>,
+        store: Entity<PackageStore>,
+        console: Entity<ConsoleModel>,
+        toast_center: Entity<ToastCenter>,
+        config: PackageWorkstationConfig,
+        cx: &mut Context<Self>,
+    ) -> Self {
+        cx.subscribe(&session, |_this, _emitter, _event, cx| {
+            cx.notify();
+        })
+        .detach();
+
+        cx.subscribe(&store, |_this, _emitter, _event, cx| {
+            cx.notify();
+        })
+        .detach();
+
+        cx.subscribe(&console, |_this, _emitter, event, cx| match event {
+            ConsoleEvent::OperationStarted(_) | ConsoleEvent::OperationFinished(_) => {
+                cx.notify();
+            }
+            _ => {}
+        })
+        .detach();
+
+        let search_input = cx.new(|cx| {
+            SearchInputView::new(
+                "Search packages and apps...",
+                config.theme,
+                config.reduce_motion,
+                cx,
+            )
+        });
+
+        // Le cadran du périmètre. Il est une entité à part entière : l'aiguille
+        // a son propre état, et elle se jette sur son cran quand le
+        // périmètre change, d'où qu'il vienne.
+        let dial_entity = cx.entity();
+        let initial_scope = session.read(cx).scope;
+        let scope_dial = cx.new(|_cx| {
+            ScopeDialView::new(
+                initial_scope,
+                config.theme,
+                config.reduce_motion,
+                Rc::new(move |scope, _window, cx| {
+                    dial_entity.update(cx, |view, cx| {
+                        view.session.update(cx, |s, cx| {
+                            s.set_scope(scope, cx);
+                        });
+                    });
+                }),
+            )
+        });
+
+        // Le cadran suit le périmètre, d'où qu'il vienne.
+        let dial = scope_dial.clone();
+        let dial_subscription = cx.subscribe(&session, move |_this, _emitter, event, cx| {
+            if let SessionEvent::ScopeChanged(scope) = event {
+                dial.update(cx, |view, cx| {
+                    view.set_scope(*scope, cx);
+                });
+            }
+        });
+
+        Self {
+            session,
+            store,
+            console,
+            toast_center,
+            // The plate starts at its floor: it grows when the user pulls
+            // it, and it never takes the catalogue's rows to do it.
+            nameplate_height: UiMetrics::NAMEPLATE_MIN_HEIGHT,
+            nameplate_drag: None,
+            scroll_handle: UniformListScrollHandle::new(),
+            scroll_pending: 0.0,
+            on_mutation: None,
+            on_upgrade_all: None,
+            on_retry_source: None,
+            on_reload_installed: None,
+            on_reload_updates: None,
+            on_retry_details: None,
+            copy_cmd_feedback: false,
+            is_loading_pkgbuild: false,
+            reduce_motion: config.reduce_motion,
+            theme: config.theme,
+            visual_style: config.visual_style,
+            compact: config.compact,
+            search_input,
+            marker: None,
+            view_marker: None,
+            assigned_height: 0.0,
+            selection_epoch: 0,
+            last_scope: initial_scope,
+            scope_epoch: 0,
+            scope_direction: 1.0,
+            last_inspector_tab: InspectorTab::Overview,
+            tab_direction: 1.0,
+            scope_dial,
+            _scope_dial_sub: dial_subscription,
+            active_menu: None,
+            menu_epoch: 0,
+            state_btn_focus: cx.focus_handle(),
+            sort_btn_focus: cx.focus_handle(),
+            menu_surface_focus: cx.focus_handle(),
+        }
+    }
+
+    pub fn toggle_menu(
+        &mut self,
+        target: Option<WorkbenchMenu>,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        match target {
+            None => self.close_menu(window, cx),
+            Some(menu) => {
+                if let Some(ref current) = self.active_menu {
+                    if current.menu == menu
+                        && current.lifecycle != MenuLifecycle::Closing
+                        && current.lifecycle != MenuLifecycle::Closed
+                    {
+                        self.close_menu(window, cx);
+                        return;
+                    }
+                }
+                self.open_menu(menu, window, cx);
+            }
+        }
+    }
+
+    pub fn open_menu(&mut self, menu: WorkbenchMenu, window: &mut Window, cx: &mut Context<Self>) {
+        self.menu_epoch = self.menu_epoch.wrapping_add(1);
+        let epoch = self.menu_epoch;
+
+        if self.reduce_motion {
+            self.active_menu = Some(ActiveMenuState {
+                menu,
+                lifecycle: MenuLifecycle::Open,
+                anim_epoch: epoch,
+                highlighted_index: 0,
+            });
+            window.focus(&self.menu_surface_focus, cx);
+            cx.notify();
+        } else {
+            self.active_menu = Some(ActiveMenuState {
+                menu,
+                lifecycle: MenuLifecycle::Opening,
+                anim_epoch: epoch,
+                highlighted_index: 0,
+            });
+            window.focus(&self.menu_surface_focus, cx);
+            cx.notify();
+
+            cx.spawn(async move |this, cx| {
+                cx.background_executor()
+                    .timer(Duration::from_millis(150))
+                    .await;
+                let _ = this.update(cx, |view, cx| {
+                    if let Some(ref mut state) = view.active_menu {
+                        if state.lifecycle == MenuLifecycle::Opening && state.anim_epoch == epoch {
+                            state.lifecycle = MenuLifecycle::Open;
+                            cx.notify();
+                        }
+                    }
+                });
+            })
+            .detach();
+        }
+    }
+
+    pub fn close_menu(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        let Some(current) = self.active_menu else {
+            return;
+        };
+
+        if current.lifecycle == MenuLifecycle::Closing || current.lifecycle == MenuLifecycle::Closed
+        {
+            return;
+        }
+
+        match current.menu {
+            WorkbenchMenu::State => window.focus(&self.state_btn_focus, cx),
+            WorkbenchMenu::Sort => window.focus(&self.sort_btn_focus, cx),
+        }
+
+        if self.reduce_motion {
+            self.active_menu = None;
+            cx.notify();
+        } else {
+            self.menu_epoch = self.menu_epoch.wrapping_add(1);
+            let epoch = self.menu_epoch;
+
+            self.active_menu = Some(ActiveMenuState {
+                menu: current.menu,
+                lifecycle: MenuLifecycle::Closing,
+                anim_epoch: epoch,
+                highlighted_index: current.highlighted_index,
+            });
+            cx.notify();
+
+            cx.spawn(async move |this, cx| {
+                cx.background_executor()
+                    .timer(Duration::from_millis(100))
+                    .await;
+                let _ = this.update(cx, |view, cx| {
+                    if let Some(ref state) = view.active_menu {
+                        if state.lifecycle == MenuLifecycle::Closing && state.anim_epoch == epoch {
+                            view.active_menu = None;
+                            cx.notify();
+                        }
+                    }
+                });
+            })
+            .detach();
+        }
+    }
+
+    pub fn menu_item_count(&self, menu: WorkbenchMenu, scope: NavScope) -> usize {
+        match menu {
+            // Les états sont ceux du périmètre : le menu montre exactement la
+            // liste que le clavier parcourt.
+            WorkbenchMenu::State => PackageStateFilter::options_for(scope).len(),
+            WorkbenchMenu::Sort => 6,
+        }
+    }
+
+    pub fn navigate_menu(
+        &mut self,
+        key: &str,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        let Some(current) = self.active_menu else {
+            return;
+        };
+
+        let total = self.menu_item_count(current.menu, self.session.read(cx).scope);
+        if total == 0 {
+            return;
+        }
+
+        match key {
+            "up" => {
+                let next_idx = if current.highlighted_index == 0 {
+                    total - 1
+                } else {
+                    current.highlighted_index - 1
+                };
+                if let Some(ref mut st) = self.active_menu {
+                    st.highlighted_index = next_idx;
+                }
+                cx.notify();
+            }
+            "down" => {
+                let next_idx = (current.highlighted_index + 1) % total;
+                if let Some(ref mut st) = self.active_menu {
+                    st.highlighted_index = next_idx;
+                }
+                cx.notify();
+            }
+            "home" => {
+                if let Some(ref mut st) = self.active_menu {
+                    st.highlighted_index = 0;
+                }
+                cx.notify();
+            }
+            "end" => {
+                if let Some(ref mut st) = self.active_menu {
+                    st.highlighted_index = total - 1;
+                }
+                cx.notify();
+            }
+            "enter" | "space" => {
+                self.activate_menu_item(
+                    current.menu,
+                    current.highlighted_index,
+                    window,
+                    cx,
+                );
+            }
+            _ => {}
+        }
+    }
+
+    pub fn activate_menu_item(
+        &mut self,
+        menu: WorkbenchMenu,
+        index: usize,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        match menu {
+            WorkbenchMenu::State => {
+                // Les états sont ceux du périmètre, dans l'ordre où le menu
+                // les montre : les deux listes sont la même.
+                let scope = self.session.read(cx).scope;
+                if let Some(&state) = PackageStateFilter::options_for(scope).get(index) {
+                    self.session.update(cx, |s, cx| {
+                        s.set_state_filter(state, cx);
+                    });
+                    self.close_menu(window, cx);
+                }
+            }
+            WorkbenchMenu::Sort => {
+                let sorts = [
+                    SortMode::Relevance,
+                    SortMode::NameAsc,
+                    SortMode::NameDesc,
+                    SortMode::Source,
+                    SortMode::InstalledFirst,
+                    SortMode::UpdatesFirst,
+                ];
+                if let Some(&sort) = sorts.get(index) {
+                    self.session.update(cx, |s, cx| {
+                        s.set_sort_mode(sort, cx);
+                    });
+                    self.close_menu(window, cx);
+                }
+            }
+        }
+    }
+
+    pub fn set_on_mutation(&mut self, handler: PackageMutationHandler) {
+        self.on_mutation = Some(handler);
+    }
+
+    pub fn set_on_upgrade_all(&mut self, handler: SystemUpgradeHandler) {
+        self.on_upgrade_all = Some(handler);
+    }
+
+    pub fn on_pointer_move(
+        &mut self,
+        event: &MouseMoveEvent,
+        content_height: f32,
+        cx: &mut Context<Self>,
+    ) {
+        if let Some(drag) = self.nameplate_drag {
+            let current_y = event.position.y.to_f64() as f32;
+            let new_height = nameplate_height_after_drag(
+                drag.start_height,
+                drag.start_pointer_y,
+                current_y,
+                content_height,
+            );
+            if (new_height - self.nameplate_height).abs() >= 1.0 {
+                self.nameplate_height = new_height;
+                cx.notify();
+            }
+        }
+    }
+
+    pub fn set_compact(&mut self, compact: bool, cx: &mut Context<Self>) {
+        if self.compact != compact {
+            self.compact = compact;
+            cx.notify();
+        }
+    }
+
+    pub fn set_reduce_motion(&mut self, reduce_motion: bool, cx: &mut Context<Self>) {
+        if self.reduce_motion != reduce_motion {
+            self.reduce_motion = reduce_motion;
+            cx.notify();
+        }
+    }
+
+    /// The owner of the layout gives the station its height.
+    ///
+    /// The station occupies a band, not the window: the band is what it
+    /// composes in. A station rendered outside an owner — the bench — falls
+    /// back to the window's height, which is then the whole of its space.
+    pub fn set_assigned_height(&mut self, height: f32, cx: &mut Context<Self>) {
+        if (self.assigned_height - height).abs() > 0.5 {
+            self.assigned_height = height;
+            cx.notify();
+        }
+    }
+
+    pub fn set_theme(&mut self, theme: Theme, cx: &mut Context<Self>) {
+        self.theme = theme;
+        self.search_input
+            .update(cx, |si, cx| si.set_theme(theme, cx));
+        cx.notify();
+    }
+
+    pub fn set_visual_style(&mut self, style: VisualStyleId, cx: &mut Context<Self>) {
+        self.visual_style = style;
+        cx.notify();
+    }
+
+    pub fn on_pointer_up(&mut self, cx: &mut Context<Self>) {
+        if self.nameplate_drag.is_some() {
+            self.nameplate_drag = None;
+            cx.notify();
+        }
+    }
+}
+
+impl Render for PackageWorkstationView {
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        let theme = self.theme;
+        let entity = cx.entity().clone();
+        let is_busy = self.console.read(cx).is_running();
+
+        // The smooth scroll gives back what waits, a fifth at a time, until
+        // nothing waits any more. Each frame is one step, and the view asks
+        // for the next one.
+        if self.scroll_pending.abs() > 0.0 {
+            let (step, rest) = scroll_step(self.scroll_pending);
+            self.scroll_pending = rest;
+            let base = self.scroll_handle.0.borrow().base_handle.clone();
+            let mut offset = base.offset();
+            apply_scroll_step(&mut offset, step);
+            base.set_offset(offset);
+            // The view asks for the next frame itself: a window animation frame
+            // would notify the enclosing view instead of this one, and panics
+            // when the view is laid out on its own.
+            cx.notify();
+        }
+
+        // La colonne de navigation : la largeur que l'utilisateur lui a
+        // donnée, ou celle que la place lui laisse.
+        let user_collapsed = self.session.read(cx).sidebar_collapsed;
+        let sidebar_width = effective_sidebar_width(user_collapsed, window.viewport_size().width / px(1.0));
+        let window_width = window.viewport_size().width / px(1.0);
+        let content_width = content_width(window_width, sidebar_width);
+        // The height the owner gave us. The station composes in its band, not
+        // in the window: the difference is the drawer, and it is decided
+        // before we are drawn.
+        let window_height = if self.assigned_height > 0.0 {
+            self.assigned_height
+        } else {
+            // A station drawn outside an owner — the bench. There, the window
+            // *is* its space.
+            window.viewport_size().height / px(1.0)
+        };
+
+        // The plate is read from the top down: the band of the header, the
+        // bank, the readout, the nameplate. The band we were given is what
+        // the nameplate is bounded against — not the window.
+        //
+        // La plaque cède d'abord : elle se réduit, et le catalogue garde sa
+        // place. Elle ne passe jamais par-dessus — on sait toujours quel
+        // paquet est sélectionné. Le plancher du catalogue n'est jamais
+        // abaissé pour une légende.
+        let effective_nameplate_height =
+            nameplate_height(window_height, self.nameplate_height);
+        self.nameplate_height = effective_nameplate_height;
+
+=== the dead scaffolding that was removed
+43:    pub overlays: bool,
+212:    pub plate_overlay: AnimatedScalar,
+359:            plate_overlay: AnimatedScalar::new(0.0),
+617:                if (bounded - self.plate_overlay.current).abs() >= 1.0 {
+618:                    self.plate_overlay.snap(bounded);
+732:        let plate_overlays = false;
+733:        let effective_nameplate_height = if plate_overlays {
+742:        self.plate_overlay.update(Instant::now());
+743:        let overlay_height = self.plate_overlay.current;
+1390:                    let overlays = plate_overlays;
+1394:                                view.plate_overlay.current
+1405:        let splitter = if plate_overlays {
+1606:        let nameplate = if plate_overlays {
+1608:                .id("workstation_nameplate_overlay")
+1611:                .debug_selector(|| "workstation_nameplate_overlay".to_string())
+2253:            overlays: true,
+
+=== the tests, after
+test result: ok. 264 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.98s
