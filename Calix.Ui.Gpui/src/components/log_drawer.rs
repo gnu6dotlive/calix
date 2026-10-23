@@ -95,7 +95,7 @@ impl LogDrawer {
                 .bg(theme.warning)
                 .text_xs()
                 .font_weight(FontWeight::BOLD)
-                .text_color(theme.bg_app)
+                .text_color(theme.on(theme.warning))
                 .child(format!("Running: {}", op)),
             OperationStatus::Success(msg) => div()
                 .px_2()
@@ -104,7 +104,7 @@ impl LogDrawer {
                 .bg(theme.success)
                 .text_xs()
                 .font_weight(FontWeight::BOLD)
-                .text_color(theme.bg_app)
+                .text_color(theme.on(theme.success))
                 .child(format!("Success: {}", msg)),
             OperationStatus::Error(err) => div()
                 .px_2()
@@ -113,7 +113,7 @@ impl LogDrawer {
                 .bg(theme.danger)
                 .text_xs()
                 .font_weight(FontWeight::BOLD)
-                .text_color(theme.bg_app)
+                .text_color(theme.on(theme.danger))
                 .child(format!("Error: {}", err)),
         };
 
@@ -511,7 +511,7 @@ impl LogDrawer {
                             div()
                                 .px_1p5()
                                 .py_0p5()
-                                .rounded_xs()
+                                .rounded_sm()
                                 .bg(bg_color)
                                 .text_color(text_color)
                                 .font_weight(FontWeight::MEDIUM)

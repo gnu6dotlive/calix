@@ -42,7 +42,6 @@ pub struct SearchInputView {
     pub is_selecting: bool,
     pub is_searching: bool,
     pub reduce_motion: bool,
-    pub theme: Theme,
 }
 
 impl EventEmitter<SearchEvent> for SearchInputView {}
@@ -56,7 +55,6 @@ impl Focusable for SearchInputView {
 impl SearchInputView {
     pub fn new(
         placeholder: impl Into<SharedString>,
-        theme: Theme,
         reduce_motion: bool,
         cx: &mut Context<Self>,
     ) -> Self {
@@ -72,7 +70,6 @@ impl SearchInputView {
             is_selecting: false,
             is_searching: false,
             reduce_motion,
-            theme,
         }
     }
 
@@ -93,11 +90,6 @@ impl SearchInputView {
             self.is_searching = is_searching;
             cx.notify();
         }
-    }
-
-    pub fn set_theme(&mut self, theme: Theme, cx: &mut Context<Self>) {
-        self.theme = theme;
-        cx.notify();
     }
 
     pub fn focus(&self, window: &mut Window, cx: &mut App) {
@@ -577,7 +569,7 @@ impl Element for SearchInputElement {
         let selected_range = input.selected_range.clone();
         let cursor = input.cursor_offset();
         let style = window.text_style();
-        let theme = &input.theme;
+        let theme = &Theme::of(cx);
 
         let (display_text, text_color) = if content.is_empty() {
             (input.placeholder.clone(), theme.text_muted)
@@ -709,7 +701,7 @@ impl Element for SearchInputElement {
 impl Render for SearchInputView {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let is_focused = self.focus_handle.is_focused(window);
-        let theme = self.theme;
+        let theme = Theme::of(cx);
         let border_color = if is_focused {
             theme.border_focus
         } else {
@@ -792,7 +784,7 @@ impl Render for SearchInputView {
                     .flex_none()
                     .px(px(5.0))
                     .py(px(1.0))
-                    .rounded_xs()
+                    .rounded_sm()
                     .bg(theme.bg_surface)
                     .border_1()
                     .border_color(theme.border)
@@ -805,7 +797,7 @@ impl Render for SearchInputView {
             None
         };
 
-        let mut container = div()
+        let container = div()
             .id("search_input_container")
             // The handle the bench measures: the harness reads the bounds of
             // the search field under this name. A noop outside the tests.
@@ -822,10 +814,8 @@ impl Render for SearchInputView {
             .border_1()
             .border_color(border_color)
             .rounded_md();
-
-        if is_focused {
-            container = container.shadow_sm();
-        }
+        // The focus ring says the field has the keyboard: no shadow besides
+        // (only menus and toasts are elevated).
 
         let container = container
             .hover(move |s| {

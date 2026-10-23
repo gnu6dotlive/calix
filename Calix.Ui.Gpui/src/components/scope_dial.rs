@@ -96,7 +96,6 @@ pub struct ScopeDialView {
     /// (`with_animation`), keyed by this count: the view never re-renders
     /// itself to move it.
     needle_throw: usize,
-    theme: Theme,
     reduce_motion: bool,
     on_select: ScopeSelectHandler,
 }
@@ -104,7 +103,6 @@ pub struct ScopeDialView {
 impl ScopeDialView {
     pub fn new(
         scope: NavScope,
-        theme: Theme,
         reduce_motion: bool,
         on_select: ScopeSelectHandler,
     ) -> Self {
@@ -112,7 +110,6 @@ impl ScopeDialView {
             scope,
             needle_from: scope_angle(scope),
             needle_throw: 0,
-            theme,
             reduce_motion,
             on_select,
         }
@@ -145,7 +142,7 @@ impl ScopeDialView {
 
 impl Render for ScopeDialView {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let theme = self.theme;
+        let theme = Theme::of(cx);
         let angle = scope_angle(self.scope);
         let from = self.needle_from;
         let throw = self.needle_throw;
