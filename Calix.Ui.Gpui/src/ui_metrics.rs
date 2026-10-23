@@ -25,15 +25,6 @@ impl UiMetrics {
     // context surface — it is the first to give way — and its floor is the
     // height at which it still shows its tabs.
     pub const SPLITTER_THICKNESS: f32 = 5.0;
-    /// Le chrome de la plaque, mesuré : l'identité, les actions, les onglets.
-    ///
-    /// Ce n'est pas une estimation : ce sont les hauteurs que le banc a
-    /// mesurées sur la vraie plaque (identity 47.5, actions 29.5, tabs
-    /// 34.5). Le chrome complet fait 131.5 px.
-    pub const PLATE_IDENTITY_HEIGHT: f32 = 47.5;
-    pub const PLATE_ACTIONS_HEIGHT: f32 = 29.5;
-    pub const PLATE_TABS_HEIGHT: f32 = 34.5;
-    pub const PLATE_CHROME_HEIGHT: f32 = 131.5;
     /// Le plancher de la plaque : l'identité seule.
     ///
     /// La plaque cède d'abord — elle rend sa place avant que le catalogue
@@ -149,10 +140,6 @@ impl UiMetrics {
 
     // ── The vertical budget, inside the station ─────────────────────────────
     //
-    /// The bank's band: the seven sources. Measured, and *reserved* — the
-    /// plate's share is computed after it, so the reservation has to be an
-    /// upper bound of what the bank really takes.
-    pub const BANK_HEIGHT: f32 = 100.5;
     /// The vertical space the catalogue keeps, whatever else.
     ///
     /// Six rows: a catalogue that shows two rows is a strip, and a strip is

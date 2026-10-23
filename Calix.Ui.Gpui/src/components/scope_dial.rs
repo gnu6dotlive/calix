@@ -1,10 +1,9 @@
 use crate::icons::AppIcon;
-use crate::state::motion::{ease_spring, AnimatedScalar, MotionDurations};
+use crate::state::motion::{ease_spring, MotionDurations};
 use crate::state::NavScope;
 use crate::theme::Theme;
 use gpui::*;
 use std::rc::Rc;
-use std::time::Instant;
 
 pub type ScopeSelectHandler = Rc<dyn Fn(NavScope, &mut Window, &mut App) + 'static>;
 
@@ -91,7 +90,12 @@ impl Default for DialGeometry {
 /// The dial: the entity that holds the needle's angle.
 pub struct ScopeDialView {
     scope: NavScope,
-    needle: AnimatedScalar,
+    /// The detent the needle left: its throw starts there.
+    needle_from: f32,
+    /// One per throw. The needle is animated by its element
+    /// (`with_animation`), keyed by this count: the view never re-renders
+    /// itself to move it.
+    needle_throw: usize,
     theme: Theme,
     reduce_motion: bool,
     on_select: ScopeSelectHandler,
@@ -104,13 +108,10 @@ impl ScopeDialView {
         reduce_motion: bool,
         on_select: ScopeSelectHandler,
     ) -> Self {
-        let mut needle = AnimatedScalar::new(scope_angle(scope));
-        // The needle overshoots the detent and comes back: an instrument
-        // overshoots, a switch does not.
-        needle.easing = ease_spring;
         Self {
             scope,
-            needle,
+            needle_from: scope_angle(scope),
+            needle_throw: 0,
             theme,
             reduce_motion,
             on_select,
@@ -122,14 +123,14 @@ impl ScopeDialView {
         if scope == self.scope {
             return;
         }
-        self.scope = scope;
-        self.needle.retarget(
-            scope_angle(scope),
-            MotionDurations::EMPHASIS,
-            Instant::now(),
-            self.reduce_motion,
-        );
+        self.throw_needle(scope);
         cx.notify();
+    }
+
+    fn throw_needle(&mut self, scope: NavScope) {
+        self.needle_from = scope_angle(self.scope);
+        self.scope = scope;
+        self.needle_throw += 1;
     }
 
     /// The needle is thrown at a detent.
@@ -137,27 +138,18 @@ impl ScopeDialView {
         if scope == self.scope {
             return;
         }
-        self.scope = scope;
-        self.needle.retarget(
-            scope_angle(scope),
-            MotionDurations::EMPHASIS,
-            Instant::now(),
-            self.reduce_motion,
-        );
+        self.throw_needle(scope);
         cx.notify();
     }
 }
 
 impl Render for ScopeDialView {
     fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        // The needle's throw: the frame gives back the next position.
-        let animating = self.needle.update(Instant::now());
-        if animating {
-            cx.notify();
-        }
-
         let theme = self.theme;
-        let angle = self.needle.current;
+        let angle = scope_angle(self.scope);
+        let from = self.needle_from;
+        let throw = self.needle_throw;
+        let still = self.reduce_motion || throw == 0;
         let selected = self.scope;
         let g = DialGeometry::new();
 
@@ -183,15 +175,35 @@ impl Render for ScopeDialView {
                     .flex()
                     .items_center()
                     .justify_center()
-                    .child(
-                        svg()
+                    .child({
+                        let needle = svg()
                             .path(AppIcon::DialNeedle.path())
                             .size(px(g.face))
-                            .text_color(theme.accent)
-                            .with_transformation(Transformation::rotate(
-                                gpui::radians(angle.to_radians()),
-                            )),
-                    ),
+                            .text_color(theme.accent);
+                        if still {
+                            needle
+                                .with_transformation(Transformation::rotate(gpui::radians(
+                                    angle.to_radians(),
+                                )))
+                                .into_any_element()
+                        } else {
+                            // The needle overshoots the detent and comes back:
+                            // an instrument overshoots, a switch does not.
+                            needle
+                                .with_animation(
+                                    ("scope_dial_needle", throw),
+                                    Animation::new(MotionDurations::EMPHASIS)
+                                        .with_easing(ease_spring),
+                                    move |needle, delta| {
+                                        let at = from + (angle - from) * delta;
+                                        needle.with_transformation(Transformation::rotate(
+                                            gpui::radians(at.to_radians()),
+                                        ))
+                                    },
+                                )
+                                .into_any_element()
+                        }
+                    }),
             )
             .child(
                 // The hub: the needle's pivot.

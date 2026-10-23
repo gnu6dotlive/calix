@@ -1,28 +1,21 @@
 use crate::components::log_drawer::{LogDrawer, LogDrawerProps};
 use crate::state::console::{ConsoleEvent, ConsoleModel};
 use crate::state::toast::{ToastCenter, ToastKind};
-use crate::state::{AnimatedScalar, MotionDurations};
 use crate::theme::Theme;
 use gpui::*;
 use std::rc::Rc;
-use std::time::Instant;
 
 /// Vue d'état isolée pour le tiroir de console d'opérations.
-/// Possède son propre cycle d'animation continue (AnimatedScalar),
-/// évitant toute propagation de frames au niveau du Workspace racine lors de l'ouverture/fermeture.
+///
+/// Le tiroir s'ouvre et se ferme d'un coup. Sa hauteur est celle que
+/// l'utilisateur a demandée ; le flex du propriétaire la borne (plafond
+/// relatif, plancher de la station). Il ne s'anime pas en se re-notifiant :
+/// une hauteur animée relançait la mise en page de tout le catalogue à
+/// chaque image.
 pub struct OperationConsoleView {
     pub console: Entity<ConsoleModel>,
     pub toast_center: Entity<ToastCenter>,
-    pub height_scalar: AnimatedScalar,
     pub configured_height: f32,
-    /// Le plafond que le propriétaire de la mise en page a calculé pour le
-    /// tiroir : une part de l'espace disponible, et jamais ce que la station
-    /// garde. Le tiroir ne décide pas de sa propre taille.
-    pub budget_max: f32,
-    /// Le tiroir n'a pas la place d'être un tiroir : il passe par-dessus du
-    /// catalogue. Il garde alors sa hauteur entière — c'est une présentation
-    /// dépliée, pas une fente — et il ne déplace rien.
-    pub overlays: bool,
     pub theme: Theme,
     pub reduce_motion: bool,
     pub logs_copied_feedback: bool,
@@ -38,45 +31,14 @@ impl OperationConsoleView {
         reduce_motion: bool,
         cx: &mut Context<Self>,
     ) -> Self {
-        let is_open = console.read(cx).is_open;
-        let initial_height = if is_open { configured_height } else { 0.0 };
-        let mut height_scalar = AnimatedScalar::new(initial_height);
-        height_scalar.easing = crate::state::motion::ease_in_out;
-
-        let console_sub = cx.subscribe(&console, |this, _console, event, cx| match event {
-            ConsoleEvent::Toggled(open) => {
-                let target = if *open { this.open_height() } else { 0.0 };
-                let duration = if *open
-                    && matches!(
-                        this.console.read(cx).status,
-                        crate::state::OperationStatus::Error(_)
-                    ) {
-                    MotionDurations::EMPHASIS
-                } else {
-                    MotionDurations::STANDARD
-                };
-                this.height_scalar
-                    .retarget(target, duration, Instant::now(), this.reduce_motion);
-                cx.notify();
-            }
-            ConsoleEvent::OperationStarted(_) => {
-                cx.notify();
-            }
-            ConsoleEvent::OperationFinished(_) => {
-                cx.notify();
-            }
-            _ => {
-                cx.notify();
-            }
+        let console_sub = cx.subscribe(&console, |_this, _console, _event: &ConsoleEvent, cx| {
+            cx.notify();
         });
 
         Self {
             console,
             toast_center,
-            height_scalar,
             configured_height,
-            budget_max: configured_height,
-            overlays: false,
             theme,
             reduce_motion,
             logs_copied_feedback: false,
@@ -86,46 +48,7 @@ impl OperationConsoleView {
 
     pub fn set_reduce_motion(&mut self, reduce_motion: bool, cx: &mut Context<Self>) {
         self.reduce_motion = reduce_motion;
-        if reduce_motion {
-            self.height_scalar.snap(self.height_scalar.target_value);
-        }
         cx.notify();
-    }
-
-    /// La hauteur que le corps du tiroir prend quand il s'ouvre : celle que
-    /// l'utilisateur a demandée, dans la limite du budget.
-    ///
-    /// Par-dessus, le tiroir garde sa hauteur entière : il ne displace
-    /// rien, et une fente de 36 px ne serait pas un journal.
-    pub fn open_height(&self) -> f32 {
-        if self.overlays {
-            self.configured_height
-        } else {
-            self.configured_height.min(self.budget_max)
-        }
-    }
-
-    /// Le plafond du tiroir, calculé par le propriétaire de la mise en page.
-    ///
-    /// Le tiroir ne peut pas dépasser ce que la station garde : c'est la
-    /// protection du catalogue, et elle se décide ici, une fois.
-    pub fn set_budget(&mut self, max: f32, overlays: bool, cx: &mut Context<Self>) {
-        if (self.budget_max - max).abs() > 0.5 || self.overlays != overlays {
-            self.budget_max = max;
-            self.overlays = overlays;
-            // Un tiroir ouvert qui vient de perdre sa place se referme à sa
-            // nouvelle taille : pas de bond, pas de débordement.
-            if self.console.read(cx).is_open {
-                let target = self.open_height();
-                self.height_scalar.retarget(
-                    target,
-                    MotionDurations::STANDARD,
-                    Instant::now(),
-                    self.reduce_motion,
-                );
-            }
-            cx.notify();
-        }
     }
 
     pub fn set_theme(&mut self, theme: Theme, cx: &mut Context<Self>) {
@@ -135,9 +58,6 @@ impl OperationConsoleView {
 
     pub fn set_configured_height(&mut self, height: f32, cx: &mut Context<Self>) {
         self.configured_height = height;
-        if self.console.read(cx).is_open {
-            self.height_scalar.snap(height);
-        }
         cx.notify();
     }
 
@@ -173,20 +93,17 @@ impl OperationConsoleView {
 }
 
 impl Render for OperationConsoleView {
-    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let animating = self.height_scalar.update(Instant::now());
-        if animating || self.height_scalar.is_active() {
-            // The view asks for the next frame itself: a window animation frame
-            // would notify the enclosing view instead of this one, and panics
-            // when the view is laid out on its own.
-            cx.notify();
-        }
-
-        let current_height = self.height_scalar.current;
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let (is_open, auto_scroll) = {
             let c = self.console.read(cx);
             (c.is_open, c.auto_scroll)
         };
+        // Par-dessus, le tiroir garde sa hauteur entière : il ne déplace rien,
+        // et une fente ne serait pas un journal. Dans le flux, son plafond est
+        // relatif et la station garde son plancher.
+        let overlays =
+            crate::views::workspace::drawer_overlays(window.viewport_size().height / px(1.0));
+        let current_height = if is_open { self.configured_height } else { 0.0 };
 
         let entity = cx.entity().clone();
         let entity_toggle = entity.clone();
@@ -206,6 +123,7 @@ impl Render for OperationConsoleView {
             auto_scroll,
             show_raw_logs: console_read.show_raw_logs,
             height: current_height,
+            overlays,
             copied_feedback: self.logs_copied_feedback,
             scroll_handle: &console_read.scroll_handle,
             theme: &self.theme,
