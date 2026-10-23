@@ -365,24 +365,26 @@ impl SortMode {
     }
 }
 
-/// Point de rupture adaptatif de la géométrie de l'établi de recherche
+/// Les formes de la barre de requête, de la plus riche à la plus compacte.
+///
+/// Aucune largeur n'y est attachée : la barre est dessinée dans chaque forme,
+/// et `elements::adaptive::AdaptiveRow` garde la première qui tient.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum WorkbenchBreakpoint {
-    Wide,   // >= 640px : puces rapides + popover filtres + tri + vue
-    Medium, // 460px .. 640px : popover filtres + état + tri + vue
-    Narrow, // < 460px : popover filtres compact + tri compact + vue
+    /// Les commandes disent ce qu'elles font.
+    Wide,
+    /// Le tri se réduit à son abréviation.
+    Medium,
+    /// L'état et le tri ne disent plus que leur nom.
+    Narrow,
 }
 
 impl WorkbenchBreakpoint {
-    pub fn from_width(width: f32) -> Self {
-        if width >= 640.0 {
-            WorkbenchBreakpoint::Wide
-        } else if width >= 460.0 {
-            WorkbenchBreakpoint::Medium
-        } else {
-            WorkbenchBreakpoint::Narrow
-        }
-    }
+    pub const RICHEST_FIRST: [WorkbenchBreakpoint; 3] = [
+        WorkbenchBreakpoint::Wide,
+        WorkbenchBreakpoint::Medium,
+        WorkbenchBreakpoint::Narrow,
+    ];
 }
 
 /// Les lignes d'un périmètre, filtrées et triées comme l'interface les filtre.
@@ -626,33 +628,5 @@ mod tests {
             inner: UnifiedPackageSource::Standard(AlpmPackage::default()),
         };
         assert!(!matches_query(&other, "ripgrep"));
-    }
-
-    #[test]
-    fn test_query_workbench_breakpoints_wide_medium_narrow() {
-        assert_eq!(
-            WorkbenchBreakpoint::from_width(800.0),
-            WorkbenchBreakpoint::Wide
-        );
-        assert_eq!(
-            WorkbenchBreakpoint::from_width(640.0),
-            WorkbenchBreakpoint::Wide
-        );
-        assert_eq!(
-            WorkbenchBreakpoint::from_width(639.0),
-            WorkbenchBreakpoint::Medium
-        );
-        assert_eq!(
-            WorkbenchBreakpoint::from_width(460.0),
-            WorkbenchBreakpoint::Medium
-        );
-        assert_eq!(
-            WorkbenchBreakpoint::from_width(459.0),
-            WorkbenchBreakpoint::Narrow
-        );
-        assert_eq!(
-            WorkbenchBreakpoint::from_width(340.0),
-            WorkbenchBreakpoint::Narrow
-        );
     }
 }
