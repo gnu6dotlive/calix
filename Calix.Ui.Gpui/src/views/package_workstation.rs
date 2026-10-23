@@ -117,15 +117,6 @@ pub fn spine_is_forced_collapsed(viewport_width: f32) -> bool {
     content_width(viewport_width, UiMetrics::SIDEBAR_EXPANDED) < UiMetrics::CATALOGUE_MIN_WIDTH
 }
 
-/// La largeur de la colonne, une fois la règle appliquée.
-pub fn effective_sidebar_width(user_collapsed: bool, viewport_width: f32) -> f32 {
-    if user_collapsed || spine_is_forced_collapsed(viewport_width) {
-        UiMetrics::SIDEBAR_COLLAPSED
-    } else {
-        UiMetrics::SIDEBAR_EXPANDED
-    }
-}
-
 /// La position du porteur dans le renfoncement : le haut de la liste, puis la
 /// ligne, moins ce que la liste a défilé.
 ///
@@ -587,19 +578,10 @@ impl PackageWorkstationView {
 }
 
 impl Render for PackageWorkstationView {
-    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let theme = Theme::of(cx);
         let entity = cx.entity().clone();
         let is_busy = self.console.read(cx).is_running();
-
-        // La colonne de navigation : la largeur que l'utilisateur lui a
-        // donnée, ou celle que la place lui laisse.
-        let user_collapsed = self.session.read(cx).sidebar_collapsed;
-        let sidebar_width = effective_sidebar_width(user_collapsed, window.viewport_size().width / px(1.0));
-        let window_width = window.viewport_size().width / px(1.0);
-        let content_width = content_width(window_width, sidebar_width);
-
-        let active_list_width = content_width;
 
         let (
             scope,
@@ -762,7 +744,6 @@ impl Render for PackageWorkstationView {
 
         let top_bar = QueryWorkbench::render(&QueryWorkbenchProps {
             search_input: self.search_input.clone(),
-            list_pane_width: active_list_width,
             scope,
             state_filter,
             sort_mode,
@@ -1496,7 +1477,6 @@ mod tests {
     fn the_spine_folds_when_the_catalogue_needs_the_room() {
         // Une fenêtre large : la colonne garde la forme de l'utilisateur.
         assert!(!spine_is_forced_collapsed(1440.0));
-        assert_eq!(effective_sidebar_width(false, 1440.0), UiMetrics::SIDEBAR_EXPANDED);
 
         // Au plancher de la fenêtre, la colonne se replie : le catalogue
         // garde sa place.
@@ -1505,7 +1485,6 @@ mod tests {
             "à 720 px, la colonne dépliée ne laisserait que {} px au catalogue",
             content_width(720.0, UiMetrics::SIDEBAR_EXPANDED)
         );
-        assert_eq!(effective_sidebar_width(false, 720.0), UiMetrics::SIDEBAR_COLLAPSED);
 
         // La colonne repliée laisse au catalogue son plancher.
         assert!(
@@ -1513,10 +1492,6 @@ mod tests {
             "le catalogue garde {} px",
             content_width(720.0, UiMetrics::SIDEBAR_COLLAPSED)
         );
-
-        // La forme que l'utilisateur a donnée reste la sienne : la règle
-        // ne fait que la plier.
-        assert_eq!(effective_sidebar_width(true, 1440.0), UiMetrics::SIDEBAR_COLLAPSED);
 
         // Le cas qui échoue, et il est gardé : un compositeur qui accorde
         // moins que le plancher. À 600 px, la colonne repliée laisse 544 px

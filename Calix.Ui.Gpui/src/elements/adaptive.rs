@@ -32,6 +32,100 @@ fn select(
     )
 }
 
+/// Une rangée qui garde la plus riche de ses variantes qui tient en largeur.
+///
+/// Remplace les seuils en pixels (« à 640 px, la forme large ») : chaque
+/// variante est mesurée à sa largeur naturelle dans `prepaint`, avec la police
+/// et la langue réelles, et la première qui tient est dessinée. La rangée a
+/// sa propre hauteur (un jeton d'échelle) et prend toute la largeur.
+pub struct AdaptiveRow {
+    /// Les variantes, de la plus riche à la plus compacte.
+    pub variants: Vec<AnyElement>,
+    pub height: Pixels,
+}
+
+impl AdaptiveRow {
+    pub fn new(variants: Vec<AnyElement>, height: Pixels) -> Self {
+        Self { variants, height }
+    }
+}
+
+impl IntoElement for AdaptiveRow {
+    type Element = Self;
+    fn into_element(self) -> Self {
+        self
+    }
+}
+
+impl Element for AdaptiveRow {
+    type RequestLayoutState = ();
+    type PrepaintState = Option<usize>;
+
+    fn id(&self) -> Option<ElementId> {
+        None
+    }
+
+    fn source_location(&self) -> Option<&'static std::panic::Location<'static>> {
+        None
+    }
+
+    fn request_layout(
+        &mut self,
+        _: Option<&GlobalElementId>,
+        _: Option<&InspectorElementId>,
+        window: &mut Window,
+        cx: &mut App,
+    ) -> (LayoutId, ()) {
+        let mut style = Style::default();
+        style.size.width = relative(1.).into();
+        style.size.height = self.height.into();
+        style.flex_shrink = 0.;
+        (window.request_layout(style, [], cx), ())
+    }
+
+    fn prepaint(
+        &mut self,
+        _: Option<&GlobalElementId>,
+        _: Option<&InspectorElementId>,
+        bounds: Bounds<Pixels>,
+        _: &mut (),
+        window: &mut Window,
+        cx: &mut App,
+    ) -> Option<usize> {
+        let height = AvailableSpace::Definite(bounds.size.height);
+        let variants = &mut self.variants;
+        // Un demi-pixel d'arrondi n'est pas une raison de rendre les mots.
+        let selected = select(variants.len(), bounds.size.width + px(0.5), |index| {
+            variants[index]
+                .layout_as_root(size(AvailableSpace::MaxContent, height), window, cx)
+                .width
+        })?;
+        let row = &mut self.variants[selected];
+        row.layout_as_root(
+            size(AvailableSpace::Definite(bounds.size.width), height),
+            window,
+            cx,
+        );
+        row.prepaint_at(bounds.origin, window, cx);
+        Some(selected)
+    }
+
+    fn paint(
+        &mut self,
+        _: Option<&GlobalElementId>,
+        _: Option<&InspectorElementId>,
+        _: Bounds<Pixels>,
+        _: &mut (),
+        selected: &mut Option<usize>,
+        window: &mut Window,
+        cx: &mut App,
+    ) {
+        if let Some(index) = *selected {
+            self.variants[index].paint(window, cx);
+        }
+    }
+}
+
 /// Une pile verticale qui cède partie par partie : un chrome choisi parmi des
 /// variantes, de la plus riche à la plus compacte, puis un corps qui prend ce
 /// qui reste.
