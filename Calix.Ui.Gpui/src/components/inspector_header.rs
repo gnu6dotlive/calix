@@ -12,12 +12,41 @@ use std::rc::Rc;
 pub type TabSelectHandler = Rc<dyn Fn(InspectorTab, &mut Window, &mut App) + 'static>;
 pub type WindowActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 
+/// Les rangées que la plaque porte. La plaque cède d'abord ses actions, puis
+/// ses onglets ; son identité reste — sans elle, elle ne dit plus quel paquet
+/// est sélectionné.
+///
+/// Ce n'est pas la plaque qui choisit : elle est dessinée dans chacune de ses
+/// formes, et l'élément qui la pose (`elements::adaptive::AdaptiveStack`)
+/// garde la plus riche qui tient, mesurée dans son `prepaint`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PlateRows {
+    /// L'identité, les actions, les onglets.
+    Full,
+    /// L'identité et les onglets : les actions ont cédé.
+    IdentityAndTabs,
+    /// L'identité seule.
+    Identity,
+}
+
+impl PlateRows {
+    /// Les formes de la plaque, de la plus riche à la plus compacte.
+    pub const RICHEST_FIRST: [PlateRows; 3] =
+        [PlateRows::Full, PlateRows::IdentityAndTabs, PlateRows::Identity];
+
+    fn has_actions(self) -> bool {
+        self == PlateRows::Full
+    }
+
+    fn has_tabs(self) -> bool {
+        self != PlateRows::Identity
+    }
+}
+
 pub struct InspectorHeaderProps<'a> {
     pub package: &'a UnifiedPackage,
-    /// La hauteur que la plaque a. Elle décide de ce que la plaque garde :
-    /// son identité toujours, ses onglets quand la place les porte, ses
-    /// actions quand elles portent aussi.
-    pub available_height: f32,
+    /// La forme de la plaque à dessiner.
+    pub rows: PlateRows,
     pub capabilities: &'a PackageCapabilities,
     pub active_tab: InspectorTab,
     pub theme: &'a Theme,
@@ -461,8 +490,7 @@ impl InspectorHeader {
             // identité reste — sans elle, elle ne dit plus quel paquet est
             // sélectionné.
             .when(
-                props.available_height
-                    >= crate::ui_metrics::UiMetrics::PLATE_CHROME_HEIGHT,
+                props.rows.has_actions(),
                 |element| {
                     element.child(
                         actions_row
@@ -472,9 +500,7 @@ impl InspectorHeader {
                 },
             )
             .when(
-                props.available_height
-                    >= crate::ui_metrics::UiMetrics::PLATE_IDENTITY_HEIGHT
-                        + crate::ui_metrics::UiMetrics::PLATE_TABS_HEIGHT,
+                props.rows.has_tabs(),
                 |element| {
                     element.child(
                         tab_bar

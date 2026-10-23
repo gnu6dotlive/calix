@@ -32,6 +32,16 @@ pub type SystemUpgradeHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 pub type ActionReloadHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 pub type DetailsRetryHandler = Rc<dyn Fn(&PackageKey, &mut Window, &mut App) + 'static>;
 
+/// What the nameplate's edge carries while it is dragged. Nothing follows the
+/// pointer: the edge itself moves.
+pub struct NameplateEdge;
+
+impl Render for NameplateEdge {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+        Empty
+    }
+}
+
 /// The drag of the nameplate's edge.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct NameplateDragState {
@@ -51,10 +61,10 @@ pub struct NameplateDragState {
 /// takes the rest.
 pub fn nameplate_bounds(band_height: f32) -> (f32, f32) {
     let min = UiMetrics::NAMEPLATE_MIN_HEIGHT;
-    let after_the_catalogue = band_height
-        - UiMetrics::BANK_HEIGHT
-        - UiMetrics::SPLITTER_THICKNESS
-        - UiMetrics::CATALOGUE_MIN_HEIGHT;
+    // The band is the one the catalogue and the plate share, under the bank:
+    // what the drag reads from its own bounds.
+    let after_the_catalogue =
+        band_height - UiMetrics::SPLITTER_THICKNESS - UiMetrics::CATALOGUE_MIN_HEIGHT;
     // Two ceilings: the space that is left once the catalogue has kept its
     // rows, and the share of the band a context surface may take.
     let max = after_the_catalogue
@@ -116,50 +126,6 @@ pub fn effective_sidebar_width(user_collapsed: bool, viewport_width: f32) -> f32
     }
 }
 
-/// How far the wheel's distance may wait before the list is given it.
-pub const MAX_SCROLL_PENDING: f32 = 240.0;
-
-/// The distance that waits after a wheel notch.
-///
-/// The distance is bounded: a long scroll must not leave the list behind by a
-/// mile, and the list must never be asked for more than it can give.
-pub fn scroll_pending_after(pending: f32, delta: f32) -> f32 {
-    (pending + delta).clamp(-MAX_SCROLL_PENDING, MAX_SCROLL_PENDING)
-}
-
-/// The wheel, taken back from the list.
-///
-/// The list applies a notch in one jump. We take it back: the distance waits,
-/// to be handed over eased, frame by frame.
-///
-/// The two cancel out whichever order the handlers run in — the list adds the
-/// distance and we take it back, or we take it back and the list adds it. The
-/// list is where it was, and the distance waits.
-pub fn take_wheel_back(offset: &mut Point<Pixels>, delta: f32) {
-    offset.y -= px(delta);
-}
-
-/// The frame's movement: the part of the waiting distance given back now.
-pub fn apply_scroll_step(offset: &mut Point<Pixels>, step: f32) {
-    offset.y += px(step);
-}
-
-/// The eased step of the smooth scroll, and what is left of the distance.
-///
-/// A frame gives back a fifth of what waits. The notch is therefore a movement
-/// spread over a dozen frames rather than a jump, and the last frame gives the
-/// remainder back whole, so the list lands exactly where the wheel asked.
-pub fn scroll_step(pending: f32) -> (f32, f32) {
-    const SHARE: f32 = 0.22;
-    let step = pending * SHARE;
-    let rest = pending - step;
-    if rest.abs() < 0.5 {
-        (pending, 0.0)
-    } else {
-        (step, rest)
-    }
-}
-
 /// La position du porteur dans le renfoncement : le haut de la liste, puis la
 /// ligne, moins ce que la liste a défilé.
 ///
@@ -195,26 +161,12 @@ pub struct PackageWorkstationView {
     pub nameplate_height: f32,
     pub nameplate_drag: Option<NameplateDragState>,
     pub scroll_handle: UniformListScrollHandle,
-    /// The distance the wheel asked for and the list has not been given yet.
-    ///
-    /// The list applies a wheel notch in one jump. We take the wheel back,
-    /// keep the distance here, and give it back eased, frame by frame: a notch
-    /// becomes a movement, not a step.
-    pub scroll_pending: f32,
     /// La sélection est un objet qui voyage : la barre du porteur glisse d'une
     /// ligne à l'autre au lieu de sauter.
     pub marker: Option<SelectionMarker>,
     /// Le commutateur de vue est une troisième surface du même porteur : sa
     /// marque voyage d'une cellule à l'autre.
     pub view_marker: Option<SelectionMarker>,
-    /// La hauteur que le propriétaire de la mise en page lui attribue.
-    ///
-    /// La station ne mesure plus la fenêtre : elle occupe une bande, et sa
-    /// part se décide plus haut. Avant, elle croyait avoir toute la fenêtre
-    /// pendant que le tiroir lui en prenait le bas — et la plaque, qui ne
-    /// sait pas rétrécir, gardait sa part pendant que le catalogue
-    /// disparaissait.
-    pub assigned_height: f32,
     /// Le numéro du dernier changement de sélection : la plaque de nom entre
     /// avec la sélection, pas à chaque rendu.
     pub selection_epoch: usize,
@@ -333,7 +285,6 @@ impl PackageWorkstationView {
             nameplate_height: UiMetrics::NAMEPLATE_MIN_HEIGHT,
             nameplate_drag: None,
             scroll_handle: UniformListScrollHandle::new(),
-            scroll_pending: 0.0,
             on_mutation: None,
             on_upgrade_all: None,
             on_retry_source: None,
@@ -349,7 +300,6 @@ impl PackageWorkstationView {
             search_input,
             marker: None,
             view_marker: None,
-            assigned_height: 0.0,
             selection_epoch: 0,
             last_scope: initial_scope,
             scope_epoch: 0,
@@ -589,14 +539,18 @@ impl PackageWorkstationView {
         self.on_upgrade_all = Some(handler);
     }
 
-    pub fn on_pointer_move(
+    /// The edge is dragged: the band it shares with the catalogue is read
+    /// from the drag itself (`DragMoveEvent::bounds`), where it is real —
+    /// never from the window, which the drawer and the bank also share.
+    pub fn on_edge_dragged(
         &mut self,
-        event: &MouseMoveEvent,
-        content_height: f32,
+        pointer_y: f32,
+        band_height: f32,
         cx: &mut Context<Self>,
     ) {
         if let Some(drag) = self.nameplate_drag {
-            let current_y = event.position.y.to_f64() as f32;
+            let current_y = pointer_y;
+            let content_height = band_height;
             let new_height = nameplate_height_after_drag(
                 drag.start_height,
                 drag.start_pointer_y,
@@ -620,18 +574,6 @@ impl PackageWorkstationView {
     pub fn set_reduce_motion(&mut self, reduce_motion: bool, cx: &mut Context<Self>) {
         if self.reduce_motion != reduce_motion {
             self.reduce_motion = reduce_motion;
-            cx.notify();
-        }
-    }
-
-    /// The owner of the layout gives the station its height.
-    ///
-    /// The station occupies a band, not the window: the band is what it
-    /// composes in. A station rendered outside an owner — the bench — falls
-    /// back to the window's height, which is then the whole of its space.
-    pub fn set_assigned_height(&mut self, height: f32, cx: &mut Context<Self>) {
-        if (self.assigned_height - height).abs() > 0.5 {
-            self.assigned_height = height;
             cx.notify();
         }
     }
@@ -662,50 +604,12 @@ impl Render for PackageWorkstationView {
         let entity = cx.entity().clone();
         let is_busy = self.console.read(cx).is_running();
 
-        // The smooth scroll gives back what waits, a fifth at a time, until
-        // nothing waits any more. Each frame is one step, and the view asks
-        // for the next one.
-        if self.scroll_pending.abs() > 0.0 {
-            let (step, rest) = scroll_step(self.scroll_pending);
-            self.scroll_pending = rest;
-            let base = self.scroll_handle.0.borrow().base_handle.clone();
-            let mut offset = base.offset();
-            apply_scroll_step(&mut offset, step);
-            base.set_offset(offset);
-            // The view asks for the next frame itself: a window animation frame
-            // would notify the enclosing view instead of this one, and panics
-            // when the view is laid out on its own.
-            cx.notify();
-        }
-
         // La colonne de navigation : la largeur que l'utilisateur lui a
         // donnée, ou celle que la place lui laisse.
         let user_collapsed = self.session.read(cx).sidebar_collapsed;
         let sidebar_width = effective_sidebar_width(user_collapsed, window.viewport_size().width / px(1.0));
         let window_width = window.viewport_size().width / px(1.0);
         let content_width = content_width(window_width, sidebar_width);
-        // The height the owner gave us. The station composes in its band, not
-        // in the window: the difference is the drawer, and it is decided
-        // before we are drawn.
-        let window_height = if self.assigned_height > 0.0 {
-            self.assigned_height
-        } else {
-            // A station drawn outside an owner — the bench. There, the window
-            // *is* its space.
-            window.viewport_size().height / px(1.0)
-        };
-
-        // The plate is read from the top down: the band of the header, the
-        // bank, the readout, the nameplate. The band we were given is what
-        // the nameplate is bounded against — not the window.
-        //
-        // La plaque cède d'abord : elle se réduit, et le catalogue garde sa
-        // place. Elle ne passe jamais par-dessus — on sait toujours quel
-        // paquet est sélectionné. Le plancher du catalogue n'est jamais
-        // abaissé pour une légende.
-        let effective_nameplate_height =
-            nameplate_height(window_height, self.nameplate_height);
-        self.nameplate_height = effective_nameplate_height;
 
         let active_list_width = content_width;
 
@@ -1148,33 +1052,9 @@ impl Render for PackageWorkstationView {
             }
         };
 
-        // The wheel belongs to the workbench, not to the list. The list would
-        // apply a notch in one jump; we take the wheel before it does, and the
-        // distance waits to be given back eased, frame by frame.
-        let list_body = {
-            let entity = cx.entity().clone();
-            let scroll_base = self.scroll_handle.0.borrow().base_handle.clone();
-            div()
-                .flex_1()
-                .overflow_hidden()
-                .on_scroll_wheel(move |event, window, cx| {
-                    let delta: f32 = event.delta.pixel_delta(window.line_height()).y.into();
-                    if delta == 0.0 {
-                        return;
-                    }
-                    // The list has already taken this notch in one jump: give it
-                    // back, and keep the distance here. It is handed over eased,
-                    // a fifth at a time, frame by frame.
-                    let mut offset = scroll_base.offset();
-                    take_wheel_back(&mut offset, delta);
-                    scroll_base.set_offset(offset);
-                    entity.update(cx, |view, cx| {
-                        view.scroll_pending = scroll_pending_after(view.scroll_pending, delta);
-                        cx.notify();
-                    });
-                })
-                .child(list_body)
-        };
+        // The list scrolls natively: the wheel moves it at once, and nothing
+        // here re-renders itself frame by frame to ease it.
+        let list_body = div().flex_1().overflow_hidden().child(list_body);
 
         // The readout: a recess cut into the plate.
         //
@@ -1325,6 +1205,8 @@ impl Render for PackageWorkstationView {
             .flex_col()
             .w_full()
             .flex_1()
+            // The catalogue keeps its rows: the plate yields first.
+            .min_h(px(UiMetrics::CATALOGUE_MIN_HEIGHT))
             .overflow_hidden()
             .child(top_bar)
             .child(readout_recess);
@@ -1350,7 +1232,10 @@ impl Render for PackageWorkstationView {
                     let h = theme.accent;
                     move |s| s.bg(h)
                 })
+                .on_drag(NameplateEdge, |_, _, _, cx| cx.new(|_| NameplateEdge))
                 .on_mouse_down(MouseButton::Left, move |event, _window, cx| {
+                    // The press gives where the drag starts; only the
+                    // distance travelled matters (`on_edge_dragged`).
                     let pointer_y = event.position.y.to_f64() as f32;
                     entity_split.update(cx, |view, cx| {
                         view.nameplate_drag = Some(NameplateDragState {
@@ -1432,7 +1317,6 @@ impl Render for PackageWorkstationView {
         let inspector_element = PackageInspectorView::render_with_motion(
             PackageInspectorProps {
                 package: selected_pkg.as_ref(),
-                available_height: effective_nameplate_height,
                 quiet,
                 alpm_details: alpm_details.as_ref(),
                 also_in: &also_in,
@@ -1528,15 +1412,12 @@ impl Render for PackageWorkstationView {
         let inspector_element = if self.reduce_motion {
             inspector_element
         } else {
-            // La hauteur est celle de la bande, en pixels : la bande la
-            // connaît, et une hauteur relative dans un conteneur en absolu
-            // n'ajoute qu'une règle de résolution à vérifier.
+            // La plaque remplit la bande que le flex lui a donnée.
             div()
                 .absolute()
                 .top(px(0.0))
                 .left(px(0.0))
-                .w_full()
-                .h(px(effective_nameplate_height))
+                .size_full()
                 .child(inspector_element)
                 .with_animation(
                     ("nameplate_entry", self.selection_epoch),
@@ -1556,14 +1437,19 @@ impl Render for PackageWorkstationView {
         //
         // It is a band under the catalogue, and it yields before the
         // catalogue is reduced: one always knows which package is selected.
+        // The flex decides, where the room is real: the plate asks for the
+        // height the user gave it, shrinks first (the catalogue has a floor),
+        // never below its own floor and never above its share of the band.
         let nameplate = div()
             .id("workstation_nameplate")
             // The handle the audit measures: the harness reads the bounds
             // of the band under this name. A noop outside the tests.
             .debug_selector(|| "workstation_nameplate".to_string())
             .w_full()
-            .h(px(effective_nameplate_height))
-            .flex_shrink_0()
+            .h(px(self.nameplate_height))
+            .flex_shrink(1.0)
+            .min_h(px(UiMetrics::NAMEPLATE_MIN_HEIGHT))
+            .max_h(relative(UiMetrics::NAMEPLATE_MAX_RATIO))
             .overflow_hidden()
             .child(inspector_element)
             .into_any_element();
@@ -1576,21 +1462,34 @@ impl Render for PackageWorkstationView {
             .size_full()
             .relative()
             .overflow_hidden()
-            .on_mouse_move(move |event, window, cx| {
-                let window_height = window.window_bounds().get_bounds().size.height / px(1.0);
-                entity_move.update(cx, |view, cx| {
-                    view.on_pointer_move(event, window_height, cx);
-                });
-            })
             .on_mouse_up(MouseButton::Left, move |_event, _window, cx| {
                 entity_up.update(cx, |view, cx| {
                     view.on_pointer_up(cx);
                 });
             })
             .child(source_bank)
-            .child(readout)
-            .child(splitter)
-            .child(nameplate)
+            .child(
+                // The band the catalogue and the plate share. The edge's drag
+                // reads its bounds from here, where they are real.
+                div()
+                    .id("workstation_band")
+                    .flex()
+                    .flex_col()
+                    .flex_1()
+                    .min_h(px(0.0))
+                    .w_full()
+                    .overflow_hidden()
+                    .on_drag_move::<NameplateEdge>(move |event, _window, cx| {
+                        let band_height: f32 = event.bounds.size.height.into();
+                        let pointer_y: f32 = event.event.position.y.into();
+                        entity_move.update(cx, |view, cx| {
+                            view.on_edge_dragged(pointer_y, band_height, cx);
+                        });
+                    })
+                    .child(readout)
+                    .child(splitter)
+                    .child(nameplate),
+            )
     }
 }
 
@@ -1598,163 +1497,6 @@ impl Render for PackageWorkstationView {
 mod tests {
     use super::*;
     use core::prelude::v1::test;
-    use gpui::prelude::StatefulInteractiveElement;
-    use gpui::ScrollHandle;
-
-    /// Le défilement fluide, proof : a wheel notch does not make the list jump,
-    /// the distance is handed over in steps, and it lands exactly where the
-    /// wheel asked.
-    ///
-    /// The harness cannot lay out the application's own uniform list — its
-    /// measured layout never resolves there, and a list of no size does not
-    /// scroll — so the proof is made on the same structure the application
-    /// uses: an outer container that takes the wheel from the scroller, and
-    /// the scroller itself, which is gpui's own scroll machinery.
-    #[gpui::test]
-    fn the_wheel_moves_the_list_by_steps(cx: &mut gpui::TestAppContext) {
-        struct ScrollFixture {
-            handle: ScrollHandle,
-            pending: f32,
-        }
-
-        impl Render for ScrollFixture {
-            fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-                // The frame: the waiting distance is given back, a fifth at a time.
-                if self.pending.abs() > 0.0 {
-                    let (step, rest) = scroll_step(self.pending);
-                    self.pending = rest;
-                    let mut offset = self.handle.offset();
-                    apply_scroll_step(&mut offset, step);
-                    self.handle.set_offset(offset);
-                    cx.notify();
-                }
-
-                // The wheel: the container takes it back from the scroller.
-                let handle = self.handle.clone();
-                let entity = cx.entity();
-                div()
-                    .size_full()
-                    .on_scroll_wheel(move |event, window, cx| {
-                        let delta: f32 = event.delta.pixel_delta(window.line_height()).y.into();
-                        if delta == 0.0 {
-                            return;
-                        }
-                        let mut offset = handle.offset();
-                        take_wheel_back(&mut offset, delta);
-                        handle.set_offset(offset);
-                        entity.update(cx, |view, cx| {
-                            view.pending = scroll_pending_after(view.pending, delta);
-                            cx.notify();
-                        });
-                    })
-                    .child(
-                        div()
-                            .id("scroll-fixture-inner")
-                            .size_full()
-                            .overflow_y_scroll()
-                            .track_scroll(&self.handle)
-                            .child(div().h(px(2000.)).w_full()),
-                    )
-            }
-        }
-
-        let cx = cx.add_empty_window();
-        let fixture = cx.new(|_| ScrollFixture {
-            handle: ScrollHandle::new(),
-            pending: 0.0,
-        });
-
-        let draw = |cx: &mut gpui::VisualTestContext| {
-            cx.draw(
-                point(px(0.), px(0.)),
-                size(px(800.), px(600.)),
-                |_window, _cx| fixture.clone().into_element(),
-            );
-        };
-        let offset = |cx: &mut gpui::VisualTestContext| {
-            cx.update(|_window, app| {
-                let handle = fixture.read(app).handle.clone();
-                let offset = handle.offset().y;
-                offset
-            })
-        };
-
-        // The scroller is there, and it has room to travel.
-        draw(cx);
-        assert_eq!(offset(cx), px(0.), "the list starts at the top");
-        let waiting = cx.update(|_window, app| fixture.read(app).pending);
-        assert_eq!(waiting, 0.0, "nothing waits before the wheel");
-
-        // The mouse goes over the list, then the wheel turns.
-        cx.simulate_event(MouseMoveEvent {
-            position: point(px(400.), px(300.)),
-            pressed_button: None,
-            modifiers: Modifiers::default(),
-        });
-        cx.simulate_event(ScrollWheelEvent {
-            position: point(px(400.), px(300.)),
-            delta: ScrollDelta::Pixels(point(px(0.), px(-200.))),
-            modifiers: Modifiers::default(),
-            touch_phase: TouchPhase::default(),
-        });
-
-        // The list was played back: it did not jump.
-        assert_eq!(
-            offset(cx),
-            px(0.),
-            "the wheel does not make the list jump"
-        );
-
-        // One frame: a fifth of the distance.
-        draw(cx);
-        let first = offset(cx);
-        assert!(
-            first < px(-30.) && first > px(-60.),
-            "the first frame gives a fraction of the distance, not all of it: {first:?}"
-        );
-
-        // A few frames: the whole distance, and not a pixel more.
-        for _ in 0..40 {
-            draw(cx);
-        }
-        assert!(
-            (offset(cx) - px(-200.)).abs() < px(1.),
-            "the list lands exactly where the wheel asked: {:?}",
-            offset(cx)
-        );
-    }
-
-    #[test]
-    fn the_smooth_scroll_gives_the_distance_back_in_several_frames() {
-        // Une molette : la distance revient en une vingtaine d'images, pas en
-        // un saut, et la liste finit exactement où la molette l'avait demandé.
-        let mut pending = 120.0f32;
-        let mut total = 0.0f32;
-        let mut frames = 0u32;
-        while pending.abs() > 0.0 {
-            let (step, rest) = scroll_step(pending);
-            total += step;
-            pending = rest;
-            frames += 1;
-            assert!(frames < 60, "le mouvement se termine");
-        }
-        assert!(frames >= 6, "la distance est rendue en plusieurs images");
-        assert!(
-            (total - 120.0).abs() < 0.01,
-            "toute la distance est rendue"
-        );
-        assert_eq!(pending, 0.0);
-    }
-
-    #[test]
-    fn the_pending_distance_is_bounded() {
-        // Une longue course ne doit pas laisser la liste en retard d'un mile.
-        let pending = scroll_pending_after(0.0, 10_000.0);
-        assert_eq!(pending, MAX_SCROLL_PENDING);
-        let pending = scroll_pending_after(0.0, -10_000.0);
-        assert_eq!(pending, -MAX_SCROLL_PENDING);
-        assert_eq!(scroll_pending_after(10.0, 5.0), 15.0);
-    }
 
     /// L'échelle horizontale : la colonne se replie quand le catalogue n'a
     /// plus la place, et elle reprend sa forme quand la fenêtre la rend.
@@ -1971,7 +1713,6 @@ mod tests {
         // Et le catalogue garde le minimum, même quand la plaque prend le
         // reste.
         let catalogue = band
-            - UiMetrics::BANK_HEIGHT
             - UiMetrics::SPLITTER_THICKNESS
             - nameplate_height(band, 1000.0);
         assert!(
@@ -2080,10 +1821,6 @@ mod tests {
             band: None,
         });
 
-        // The owner attributes the height: the station composes in it.
-        station.update(cx, |station, cx| {
-            station.set_assigned_height(680.0, cx);
-        });
 
         let draw = |cx: &mut gpui::VisualTestContext| {
             cx.draw(
@@ -2126,13 +1863,12 @@ mod tests {
         // keeps its identity (48 px) and the catalogue keeps the rest.
         let band_height = 372.0;
         fixture.update(cx, |fixture, _cx| fixture.band = Some(band_height));
-        station.update(cx, |station, cx| {
-            station.set_assigned_height(band_height, cx);
-        });
         draw(cx);
         let squeezed_readout = cx
             .debug_bounds("workstation_readout")
             .expect("the readout is drawn");
+        // The bank takes what its content needs: read, never assumed.
+        let squeezed_bank = cx.debug_bounds("source_bank").expect("the bank is drawn");
 
         // The plate stays in the flow — it yields, it does not leave: one
         // always knows which package is selected.
@@ -2147,7 +1883,7 @@ mod tests {
         assert_eq!(
             squeezed_readout.size.height,
             px(band_height
-                - UiMetrics::BANK_HEIGHT
+                - f32::from(squeezed_bank.size.height)
                 - UiMetrics::SPLITTER_THICKNESS
                 - UiMetrics::NAMEPLATE_MIN_HEIGHT),
             "le catalogue garde son plancher, la plaque son identité : {}",
@@ -2164,7 +1900,7 @@ mod tests {
         assert_eq!(
             readout.size.height,
             px(window.1 / px(1.0)
-                - UiMetrics::BANK_HEIGHT
+                - f32::from(bank.size.height)
                 - UiMetrics::SPLITTER_THICKNESS
                 - UiMetrics::NAMEPLATE_MIN_HEIGHT),
             "dans le flux, la plaque prend son chrome et le catalogue le reste : {}",
@@ -2345,9 +2081,6 @@ mod tests {
             station: station.clone(),
             band,
         });
-        station.update(cx, |station, cx| {
-            station.set_assigned_height(band, cx);
-        });
         cx.draw(
             point(px(0.0), px(0.0)),
             size(window.0, window.1),
@@ -2396,7 +2129,6 @@ mod tests {
         for band in [320.0_f32, 356.0, 420.0, 680.0] {
             let (_, max) = nameplate_bounds(band);
             let catalogue = band
-                - UiMetrics::BANK_HEIGHT
                 - UiMetrics::SPLITTER_THICKNESS
                 - nameplate_height(band, 1000.0);
             assert!(
@@ -2406,17 +2138,8 @@ mod tests {
             );
         }
 
-        // The plate's floor is its identity: 48 px, measured.
-        assert_eq!(UiMetrics::NAMEPLATE_MIN_HEIGHT, 48.0);
-        assert!(
-            UiMetrics::NAMEPLATE_MIN_HEIGHT
-                < UiMetrics::PLATE_IDENTITY_HEIGHT + UiMetrics::PLATE_TABS_HEIGHT,
-            "sous l'identité seule, les onglets cèdent"
-        );
-        assert!(
-            UiMetrics::PLATE_IDENTITY_HEIGHT + UiMetrics::PLATE_TABS_HEIGHT
-                < UiMetrics::PLATE_CHROME_HEIGHT,
-            "et les actions cèdent avant les onglets"
-        );
+        // Which rows the plate keeps is decided by the element that lays it
+        // out, measured where the room is real
+        // (`views::inspector::tests::the_plate_yields_part_by_part_in_a_real_window`).
     }
 }

@@ -4,8 +4,9 @@ pub mod overview;
 
 use crate::backend::models::{AlpmPackage, UnifiedPackage};
 use crate::components::inspector_header::{
-    InspectorHeader, InspectorHeaderProps, TabSelectHandler, WindowActionHandler,
+    InspectorHeader, InspectorHeaderProps, PlateRows, TabSelectHandler, WindowActionHandler,
 };
+use crate::elements::adaptive::AdaptiveStack;
 use crate::components::semantic_value::StringActionHandler;
 use crate::state::{AlsoIn, InspectorTab, PackageCapabilities};
 use crate::theme::Theme;
@@ -37,10 +38,6 @@ pub struct PackageInspectorProps<'a> {
     pub pkgbuild: Option<&'a String>,
     pub is_loading_pkgbuild: bool,
     pub active_tab: InspectorTab,
-    /// La hauteur que la plaque a dans la bande. Elle décide de ce que la
-    /// plaque garde : son identité toujours, ses onglets et ses actions
-    /// quand la place les porte.
-    pub available_height: f32,
     pub theme: &'a Theme,
     pub is_busy: bool,
     pub copy_feedback: bool,
@@ -119,19 +116,35 @@ impl PackageInspectorView {
 
         let capabilities = PackageCapabilities::derive(pkg, props.alpm_details);
 
-        let header = InspectorHeader::render(InspectorHeaderProps {
-            package: pkg,
-            available_height: props.available_height,
-            capabilities: &capabilities,
-            active_tab: props.active_tab,
-            theme,
-            is_busy: props.is_busy,
-            copy_feedback: props.copy_feedback,
-            on_select_tab: props.on_select_tab.clone(),
-            on_install: props.on_install.clone(),
-            on_remove: props.on_remove.clone(),
-            on_copy_install_cmd: props.on_copy_install_cmd.clone(),
-        });
+        // La plaque, dans chacune de ses formes : l'élément qui la pose garde
+        // la plus riche qui tient dans la hauteur réelle de la bande.
+        let headers: Vec<AnyElement> = PlateRows::RICHEST_FIRST
+            .iter()
+            .map(|&rows| {
+                div()
+                    .id("inspector_pinned_header")
+                    .flex()
+                    .flex_col()
+                    .w_full()
+                    .px_4()
+                    .pt_3()
+                    .bg(theme.bg_app)
+                    .child(InspectorHeader::render(InspectorHeaderProps {
+                        package: pkg,
+                        rows,
+                        capabilities: &capabilities,
+                        active_tab: props.active_tab,
+                        theme,
+                        is_busy: props.is_busy,
+                        copy_feedback: props.copy_feedback,
+                        on_select_tab: props.on_select_tab.clone(),
+                        on_install: props.on_install.clone(),
+                        on_remove: props.on_remove.clone(),
+                        on_copy_install_cmd: props.on_copy_install_cmd.clone(),
+                    }))
+                    .into_any_element()
+            })
+            .collect();
 
         let body: AnyElement = match props.active_tab {
             InspectorTab::Overview => OverviewView::render(OverviewViewProps {
@@ -243,31 +256,19 @@ impl PackageInspectorView {
 
         div()
             .id("inspector_container")
-            .flex()
-            .flex_col()
             .size_full()
             .bg(theme.bg_app)
-            .child(
-                div()
-                    .id("inspector_pinned_header")
-                    .flex()
-                    .flex_col()
-                    .w_full()
-                    .px_4()
-                    .pt_3()
-                    .bg(theme.bg_app)
-                    .child(header),
-            )
-            .child(
+            .child(AdaptiveStack::new(
+                headers,
                 div()
                     .id("inspector_scroll_body")
-                    .flex_1()
+                    .size_full()
                     .overflow_scroll()
                     .px_4()
                     .py_3()
                     .children(error_banner)
                     .child(animated_body),
-            )
+            ))
             .into_any_element()
     }
 }
@@ -283,15 +284,18 @@ mod tests {
     use crate::state::session::InspectorTab;
     use crate::theme::Theme;
 
-    /// La plaque, mesurée : ses parties, et jusqu'où elle peut céder.
+    /// La plaque cède partie par partie, mesurée par l'élément qui la pose.
     ///
-    /// La plaque cède d'abord — c'est la surface contextuelle, et elle
-    /// rend sa place avant que le catalogue ne soit réduit. Pour savoir
-    /// jusqu'où, il faut mesurer ses parties : l'identité (le nom, la
-    /// version, la marque), les actions, et la bande des onglets.
+    /// Aucune hauteur n'est recopiée en constante : la plaque est dessinée
+    /// dans ses trois formes, et `AdaptiveStack` garde la plus riche qui
+    /// tient dans la hauteur réelle. Haute, elle garde ses actions et ses
+    /// onglets ; basse, son identité seule.
     #[gpui::test]
-    fn the_plate_is_measured_part_by_part(cx: &mut gpui::TestAppContext) {
-        use crate::components::inspector_header::{InspectorHeader, InspectorHeaderProps};
+    fn the_plate_yields_part_by_part_in_a_real_window(cx: &mut gpui::TestAppContext) {
+        use crate::components::inspector_header::{
+            InspectorHeader, InspectorHeaderProps, PlateRows,
+        };
+        use crate::elements::adaptive::AdaptiveStack;
         use crate::state::semantic::PackageCapabilities;
         use gpui::prelude::*;
         use gpui::{div, point, px, size, Context, Render, Window};
@@ -299,6 +303,7 @@ mod tests {
         struct Fixture {
             theme: Theme,
             pkg: UnifiedPackage,
+            height: f32,
         }
 
         impl Render for Fixture {
@@ -309,61 +314,89 @@ mod tests {
             ) -> impl IntoElement {
                 let theme = self.theme.clone();
                 let capabilities = PackageCapabilities::derive(&self.pkg, None);
-                div().size_full().child(InspectorHeader::render(
-                    InspectorHeaderProps {
-                        package: &self.pkg,
-                        available_height: crate::ui_metrics::UiMetrics::PLATE_CHROME_HEIGHT,
-                        capabilities: &capabilities,
-                        active_tab: InspectorTab::Overview,
-                        theme: &theme,
-                        is_busy: false,
-                        copy_feedback: false,
-                        on_select_tab: std::rc::Rc::new(|_, _, _| {}),
-                        on_install: None,
-                        on_remove: None,
-                        on_copy_install_cmd: None,
-                    },
-                ))
+                let headers = PlateRows::RICHEST_FIRST
+                    .iter()
+                    .map(|&rows| {
+                        InspectorHeader::render(InspectorHeaderProps {
+                            package: &self.pkg,
+                            rows,
+                            capabilities: &capabilities,
+                            active_tab: InspectorTab::Overview,
+                            theme: &theme,
+                            is_busy: false,
+                            copy_feedback: false,
+                            on_select_tab: std::rc::Rc::new(|_, _, _| {}),
+                            on_install: Some(std::rc::Rc::new(|_, _| {})),
+                            on_remove: Some(std::rc::Rc::new(|_, _| {})),
+                            on_copy_install_cmd: None,
+                        })
+                        .into_any_element()
+                    })
+                    .collect();
+                div()
+                    .w_full()
+                    .h(px(self.height))
+                    .child(AdaptiveStack::new(headers, div().size_full()))
             }
         }
 
         let cx = cx.add_empty_window();
         let pkg = UnifiedPackage {
-                name: "ripgrep".into(),
-                version: "14.1.0-1".into(),
-                description: "fast search".into(),
-                source_type: "ALPM".into(),
-                repository_or_remote: "extra".into(),
-                is_installed: true,
-                has_update: false,
-                new_version: None,
-                inner: UnifiedPackageSource::Standard(AlpmPackage::default()),
+            name: "ripgrep".into(),
+            version: "14.1.0-1".into(),
+            description: "fast search".into(),
+            source_type: "ALPM".into(),
+            repository_or_remote: "extra".into(),
+            is_installed: true,
+            has_update: false,
+            new_version: None,
+            inner: UnifiedPackageSource::Standard(AlpmPackage::default()),
         };
         let fixture = cx.new(|_| Fixture {
             theme: Theme::dark(),
             pkg,
+            height: 600.0,
         });
-
-        cx.draw(
-            point(px(0.0), px(0.0)),
-            size(px(900.0), px(600.0)),
-            |_window, _cx| fixture.clone().into_element(),
-        );
-
-        let mut height = |selector: &'static str| -> f32 {
-            cx.debug_bounds(selector)
-                .map(|b| b.size.height.into())
-                .unwrap_or(0.0)
+        let draw = |cx: &mut gpui::VisualTestContext| {
+            cx.draw(
+                point(px(0.0), px(0.0)),
+                size(px(900.0), px(700.0)),
+                |_window, _cx| fixture.clone().into_element(),
+            );
         };
-        let identity = height("inspector_identity_row");
-        let actions = height("inspector_actions_row");
-        let tabs = height("inspector_tab_bar");
-        let root = height("inspector_header_root");
-        eprintln!(
-            "PROBE the plate: identity={identity} actions={actions} tabs={tabs} root={root}"
+
+        draw(cx);
+        assert!(cx.debug_bounds("inspector_identity_row").is_some());
+        assert!(
+            cx.debug_bounds("inspector_actions_row").is_some(),
+            "haute, la plaque garde ses actions"
         );
-        assert!(identity > 0.0, "the identity row is drawn");
-        assert!(root >= identity, "the chrome holds the identity");
+        assert!(cx.debug_bounds("inspector_tab_bar").is_some());
+        let full: f32 = cx
+            .debug_bounds("inspector_header_root")
+            .map(|b| b.size.height.into())
+            .unwrap_or(0.0);
+        let identity: f32 = cx
+            .debug_bounds("inspector_identity_row")
+            .map(|b| b.size.height.into())
+            .unwrap_or(0.0);
+
+        // Juste sous la plaque entière : les actions cèdent les premières.
+        fixture.update(cx, |f, _| f.height = full - 1.0);
+        draw(cx);
+        assert!(
+            cx.debug_bounds("inspector_actions_row").is_none(),
+            "sous sa hauteur entière, la plaque rend ses actions"
+        );
+
+        // Plus bas que l'identité et les onglets : l'identité reste seule.
+        fixture.update(cx, |f, _| f.height = identity + 1.0);
+        draw(cx);
+        assert!(cx.debug_bounds("inspector_identity_row").is_some());
+        assert!(
+            cx.debug_bounds("inspector_tab_bar").is_none(),
+            "basse, la plaque ne garde que son identité"
+        );
     }
 
     #[core::prelude::v1::test]
@@ -375,7 +408,6 @@ mod tests {
         // 1. Empty state
         let empty_props = PackageInspectorProps {
             package: None,
-            available_height: crate::ui_metrics::UiMetrics::PLATE_CHROME_HEIGHT,
             alpm_details: None,
             also_in: &[],
             detail_error: None,
@@ -415,7 +447,6 @@ mod tests {
 
         let populated_props = PackageInspectorProps {
             package: Some(&pkg),
-            available_height: crate::ui_metrics::UiMetrics::PLATE_CHROME_HEIGHT,
             alpm_details: None,
             also_in: &[],
             detail_error: Some("Simulated detail error"),
@@ -476,8 +507,7 @@ mod tests {
                     std::rc::Rc::new(|_, _, _| {});
                 let props = PackageInspectorProps {
                     package: Some(&self.pkg),
-                    available_height: crate::ui_metrics::UiMetrics::PLATE_CHROME_HEIGHT,
-                    alpm_details: None,
+                            alpm_details: None,
                     also_in: &[],
                     detail_error: None,
                     pkgbuild: None,

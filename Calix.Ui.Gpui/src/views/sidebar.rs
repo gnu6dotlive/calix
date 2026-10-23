@@ -2,25 +2,20 @@ use crate::components::sidebar::{Sidebar, SidebarProps};
 use crate::state::motion::{advance_marker, SelectionMarker};
 use crate::state::package_store::PackageStore;
 use crate::state::session::{AppSession, RailEntry, SessionEvent};
-use crate::state::{AnimatedScalar, MotionDurations};
 use crate::theme::Theme;
 use crate::ui_metrics::UiMetrics;
 use crate::visual_style::VisualStyleId;
 use gpui::*;
 use std::rc::Rc;
-use std::time::Instant;
 
 /// Vue d'état isolée pour la barre latérale de navigation.
-/// Possède son propre cycle d'animation continue (AnimatedScalar),
-/// garantissant que le rafraîchissement à 60/120 FPS ne déclenche pas le re-render du Workspace racine.
+///
+/// Sa largeur change d'un coup : une colonne qui s'anime redessine la fenêtre
+/// à chaque image et fait onduler le catalogue à côté d'elle. Rien ici ne se
+/// re-notifie depuis `render`.
 pub struct SidebarView {
     pub session: Entity<AppSession>,
     pub store: Entity<PackageStore>,
-    pub width_scalar: AnimatedScalar,
-    /// La place manque : la colonne se replie, quelle que soit la forme que
-    /// l'utilisateur lui a donnée. C'est la règle de l'échelle, et elle se
-    /// défait quand la fenêtre reprend de la place.
-    pub forced_collapsed: bool,
     /// Le trait de la sélection : la rangée qu'il marque, celle qu'il quitte.
     pub rail_marker: Option<SelectionMarker>,
     pub theme: Theme,
@@ -38,27 +33,8 @@ impl SidebarView {
         visual_style: VisualStyleId,
         cx: &mut Context<Self>,
     ) -> Self {
-        let is_collapsed = session.read(cx).sidebar_collapsed;
-        let initial_width = if is_collapsed {
-            UiMetrics::SIDEBAR_COLLAPSED
-        } else {
-            UiMetrics::SIDEBAR_EXPANDED
-        };
-        let width_scalar = AnimatedScalar::new(initial_width);
-
-        let session_sub = cx.subscribe(&session, |this, _session, event, cx| {
-            if let SessionEvent::SidebarToggled(collapsed) = event {
-                let target = if *collapsed {
-                    UiMetrics::SIDEBAR_COLLAPSED
-                } else {
-                    UiMetrics::SIDEBAR_EXPANDED
-                };
-                this.width_scalar.retarget(
-                    target,
-                    MotionDurations::STANDARD,
-                    Instant::now(),
-                    this.reduce_motion,
-                );
+        let session_sub = cx.subscribe(&session, |_this, _session, event, cx| {
+            if let SessionEvent::SidebarToggled(_) = event {
                 cx.notify();
             }
         });
@@ -66,8 +42,6 @@ impl SidebarView {
         Self {
             session,
             store,
-            width_scalar,
-            forced_collapsed: false,
             rail_marker: None,
             theme,
             visual_style,
@@ -76,20 +50,8 @@ impl SidebarView {
         }
     }
 
-    /// La place manque : la colonne se replie. Le propriétaire de la mise en
-    /// page le décide, à partir de la largeur qu'il a.
-    pub fn set_forced_collapsed(&mut self, forced: bool, cx: &mut Context<Self>) {
-        if self.forced_collapsed != forced {
-            self.forced_collapsed = forced;
-            cx.notify();
-        }
-    }
-
     pub fn set_reduce_motion(&mut self, reduce_motion: bool, cx: &mut Context<Self>) {
         self.reduce_motion = reduce_motion;
-        if reduce_motion {
-            self.width_scalar.snap(self.width_scalar.target_value);
-        }
         cx.notify();
     }
 
@@ -105,37 +67,24 @@ impl SidebarView {
 }
 
 impl Render for SidebarView {
-    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let animating = self.width_scalar.update(Instant::now());
-        if animating || self.width_scalar.is_active() {
-            // The view asks for the next frame itself: a window animation frame
-            // would notify the enclosing view instead of this one, and panics
-            // when the view is laid out on its own.
-            cx.notify();
-        }
-
-        let current_width = self.width_scalar.current;
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let (place, scope, user_collapsed) = {
             let s = self.session.read(cx);
             (s.place, s.scope, s.sidebar_collapsed)
         };
         // La forme de la colonne : celle de l'utilisateur, ou celle que la
-        // place impose. Elle s'animationne comme un voyage : la colonne se
-        // replie, elle ne saute pas.
-        let is_collapsed = user_collapsed || self.forced_collapsed;
-        let target_width = if is_collapsed {
+        // place impose. La colonne lit elle-même la fenêtre : c'est une
+        // décision prise en dessinant, sans rien écrire, et personne n'a à la
+        // lui pousser depuis un autre `render`.
+        let forced_collapsed = crate::views::package_workstation::spine_is_forced_collapsed(
+            window.viewport_size().width / px(1.0),
+        );
+        let is_collapsed = user_collapsed || forced_collapsed;
+        let current_width = if is_collapsed {
             UiMetrics::SIDEBAR_COLLAPSED
         } else {
             UiMetrics::SIDEBAR_EXPANDED
         };
-        if (self.width_scalar.target_value - target_width).abs() > 0.5 {
-            self.width_scalar.retarget(
-                target_width,
-                MotionDurations::STANDARD,
-                Instant::now(),
-                self.reduce_motion,
-            );
-        }
         let updates_count = self.store.read(cx).updates_count;
 
         // La sélection du rail est un objet qui voyage : quand le périmètre
