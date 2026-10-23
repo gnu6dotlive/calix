@@ -50,7 +50,9 @@ impl ToastOverlay {
                 .flex_col()
                 .w(px(320.0))
                 .p_3()
-                .rounded_md()
+                // A panel: the large radius, and the toasts' elevation.
+                .rounded_lg()
+                .shadow_lg()
                 .bg(theme.bg_surface)
                 .border_1()
                 .border_color(border_color);

@@ -1,5 +1,27 @@
+//! Les jetons de l'interface : une seule source, lue là où l'on dessine.
+//!
+//! La leçon de Skwir : le thème est un `Global` de GPUI (`Theme::of(cx)`), pas
+//! une copie passée de vue en vue et rafraîchie par des `set_theme` en
+//! cascade. Un changement de thème est un `cx.set_global` ; chaque vue le lit
+//! au prochain rendu.
+//!
+//! - surfaces : `bg_app` pour ce qui se lit, `bg_surface` pour le chrome,
+//!   `bg_sidebar` pour le rail.
+//! - états : `bg_surface_hover` sous le pointeur, `selection_bg` /
+//!   `selection_text` pour ce qui est choisi, `on_accent` pour le texte et les glyphes posés sur une couleur pleine
+//!   (l'accent, un badge, un succès). Un état n'est jamais dérivé localement.
+//! - rayons : `rounded_sm` dans les contrôles (segments, rangées de menu),
+//!   `rounded_md` pour les contrôles et les rangées, `rounded_lg` pour les
+//!   panneaux (menus, toasts, cartes, dialogues), `rounded_full` pour les
+//!   pastilles. Rien d'autre.
+//! - élévation : `shadow_md` pour les menus et popovers, `shadow_lg` pour les
+//!   toasts et dialogues ; rien d'autre ne porte d'ombre.
+//!
+//! Les jetons d'état sont dérivés (`Theme::derive_states`) de la palette et de
+//! l'accent, puis leur contraste est garanti : un accent choisi par
+//! l'utilisateur ne peut pas rendre un texte illisible.
 use crate::brand::Brand;
-use gpui::{rgb, Rgba};
+use gpui::{rgb, App, Global, Rgba};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Theme {
@@ -28,7 +50,16 @@ pub struct Theme {
     pub badge_cargo: Rgba,
     pub badge_npm: Rgba,
     pub badge_release: Rgba,
+    /// Ce qui est choisi : une rangée, une cellule. Dérivé de l'accent.
+    pub selection_bg: Rgba,
+    /// Le texte posé sur `selection_bg`, à contraste garanti.
+    pub selection_text: Rgba,
+    /// Le texte et les glyphes posés sur l'accent : blanc, ou sombre sur un
+    /// accent clair — celui des deux qui se lit.
+    pub on_accent: Rgba,
 }
+
+impl Global for Theme {}
 
 impl Default for Theme {
     fn default() -> Self {
@@ -36,7 +67,109 @@ impl Default for Theme {
     }
 }
 
+/// Le texte doit se lire à 4,5:1 sur ce qui le porte (WCAG 2.1, 1.4.3).
+const TEXT_CONTRAST: f64 = 4.5;
+
+fn lerp(a: Rgba, b: Rgba, t: f32) -> Rgba {
+    Rgba {
+        r: a.r + (b.r - a.r) * t,
+        g: a.g + (b.g - a.g) * t,
+        b: a.b + (b.b - a.b) * t,
+        a: a.a + (b.a - a.a) * t,
+    }
+}
+
+fn luminance(c: Rgba) -> f64 {
+    let channel = |v: f32| -> f64 {
+        let v = v as f64;
+        if v <= 0.04045 {
+            v / 12.92
+        } else {
+            ((v + 0.055) / 1.055).powf(2.4)
+        }
+    };
+    0.2126 * channel(c.r) + 0.7152 * channel(c.g) + 0.0722 * channel(c.b)
+}
+
+fn contrast(a: Rgba, b: Rgba) -> f64 {
+    let (la, lb) = (luminance(a), luminance(b));
+    (la.max(lb) + 0.05) / (la.min(lb) + 0.05)
+}
+
+/// Celui des deux textes qui se lit le mieux sur `ground`.
+fn readable_on(ground: Rgba, light: Rgba, dark: Rgba) -> Rgba {
+    if contrast(light, ground) >= contrast(dark, ground) {
+        light
+    } else {
+        dark
+    }
+}
+
+/// Un fond sous du texte qui cède : il s'éclaircit ou s'assombrit vers
+/// `toward` jusqu'à ce que le meilleur des deux textes s'y lise.
+fn guarded_fill(fill: Rgba, toward: Rgba, light: Rgba, dark: Rgba) -> (Rgba, Rgba) {
+    let mut ground = fill;
+    for step in 0..=10 {
+        let text = readable_on(ground, light, dark);
+        if contrast(text, ground) >= TEXT_CONTRAST {
+            return (ground, text);
+        }
+        ground = lerp(fill, toward, step as f32 / 10.0);
+    }
+    (ground, readable_on(ground, light, dark))
+}
+
 impl Theme {
+    /// Le thème de la fenêtre. Hors d'une fenêtre qui l'a posé (un banc de
+    /// test), le thème sombre par défaut.
+    pub fn of(cx: &App) -> Self {
+        cx.try_global::<Theme>().copied().unwrap_or_default()
+    }
+
+    /// Le texte qui se lit sur une couleur pleine (un badge, un état) : blanc,
+    /// ou sombre sur une couleur claire.
+    pub fn on(&self, fill: Rgba) -> Rgba {
+        readable_on(fill, rgb(0xffffff), rgb(0x0b0b10))
+    }
+
+    /// Le thème d'un look et d'une marque.
+    pub fn look(dark: bool, brand: Brand) -> Self {
+        if dark { Self::dark() } else { Self::light() }.with_brand(brand)
+    }
+
+    /// Pose le thème de l'application et redessine les fenêtres : la seule
+    /// façon de changer de thème. Aucune vue ne garde de copie à rafraîchir.
+    pub fn install(theme: Theme, cx: &mut App) {
+        cx.set_global(theme);
+        cx.refresh_windows();
+    }
+
+    /// Dérive les jetons d'état de la palette et de l'accent, contraste
+    /// garanti. Appelé par chaque constructeur et après chaque changement
+    /// d'accent : un état n'est jamais choisi à la main.
+    fn derive_states(self) -> Self {
+        let white = rgb(0xffffff);
+        let ink = rgb(0x0b0b10);
+        let dark = self.is_dark();
+        // La sélection est l'accent, adouci vers le fond : elle se voit sans
+        // crier, et son texte reste lisible.
+        let tint = lerp(self.bg_app, self.accent, if dark { 0.45 } else { 0.30 });
+        let toward = if dark { self.bg_app } else { white };
+        let (light_text, dark_text) = if dark {
+            (self.text_primary, ink)
+        } else {
+            (white, self.text_primary)
+        };
+        let (selection_bg, selection_text) = guarded_fill(tint, toward, light_text, dark_text);
+        let on_accent = self.on(self.accent);
+        Self {
+            selection_bg,
+            selection_text,
+            on_accent,
+            ..self
+        }
+    }
+
     pub fn dark() -> Self {
         Self {
             bg_app: rgb(0x0f0f14),            // Ultra-deep charcoal base
@@ -64,7 +197,12 @@ impl Theme {
             badge_cargo: rgb(0xd97757),       // Burnt Sienna (Cargo)
             badge_npm: rgb(0xcb3837),         // NPM Red
             badge_release: rgb(0x10b981),     // Emerald (Release)
+            // Dérivés plus bas (`derive_states`).
+            selection_bg: rgb(0x000000),
+            selection_text: rgb(0x000000),
+            on_accent: rgb(0x000000),
         }
+        .derive_states()
     }
 
     pub fn light() -> Self {
@@ -94,7 +232,12 @@ impl Theme {
             badge_cargo: rgb(0xb45309),
             badge_npm: rgb(0x9f1239),
             badge_release: rgb(0x047857),
+            // Dérivés plus bas (`derive_states`).
+            selection_bg: rgb(0x000000),
+            selection_text: rgb(0x000000),
+            on_accent: rgb(0x000000),
         }
+        .derive_states()
     }
 
     /// Applique la couleur de marque choisie par l'utilisateur.
@@ -110,6 +253,7 @@ impl Theme {
             border_focus: brand.accent(),
             ..self
         }
+        .derive_states()
     }
 
     pub fn is_dark(&self) -> bool {
@@ -238,5 +382,37 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn the_derived_states_read_under_every_brand_and_look() {
+        for base in [Theme::dark(), Theme::light()] {
+            for &brand in Brand::ALL {
+                let theme = base.with_brand(brand);
+                let on_accent = super::contrast(theme.on_accent, theme.accent);
+                assert!(
+                    on_accent >= 4.5,
+                    "{brand:?}: le texte sur l'accent se lit à {on_accent:.2}:1"
+                );
+                let selection = super::contrast(theme.selection_text, theme.selection_bg);
+                assert!(
+                    selection >= 4.5,
+                    "{brand:?}: le texte sélectionné se lit à {selection:.2}:1"
+                );
+                assert_ne!(
+                    theme.selection_bg, theme.bg_app,
+                    "{brand:?}: la sélection se voit sur le fond"
+                );
+            }
+        }
+    }
+
+    #[gpui::test]
+    fn the_theme_is_read_from_the_global(cx: &mut gpui::TestAppContext) {
+        cx.update(|cx| {
+            assert_eq!(Theme::of(cx).bg_app, Theme::dark().bg_app, "sombre par défaut");
+            cx.set_global(Theme::light());
+            assert_eq!(Theme::of(cx).bg_app, Theme::light().bg_app);
+        });
     }
 }

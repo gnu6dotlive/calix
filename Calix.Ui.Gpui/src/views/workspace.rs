@@ -88,7 +88,6 @@ pub struct WorkspaceView {
     pub render_lab_catalog_scroll: ScrollHandle,
     pub calix_settings: CalixSettings,
     pub gpui_config: GpuiUiConfig,
-    pub theme: Theme,
     pub search_focus: FocusHandle,
     pub search_input_buffer: String,
     pub search_debounce_task: Option<Task<()>>,
@@ -107,12 +106,10 @@ impl WorkspaceView {
         gpui_config: GpuiUiConfig,
         cx: &mut Context<Self>,
     ) -> Self {
-        let theme = if gpui_config.dark_theme {
-            Theme::dark()
-        } else {
-            Theme::light()
-        }
-        .with_brand(gpui_config.brand_color);
+        Theme::install(
+            Theme::look(gpui_config.dark_theme, gpui_config.brand_color),
+            cx,
+        );
 
         let client = CalixClient::new(None);
         let session = cx.new(|_cx| {
@@ -149,7 +146,6 @@ impl WorkspaceView {
                 console.clone(),
                 toast_center.clone(),
                 PackageWorkstationConfig {
-                    theme,
                     reduce_motion,
                     compact,
                     visual_style: gpui_config.visual_style,
@@ -162,7 +158,6 @@ impl WorkspaceView {
             SidebarView::new(
                 session.clone(),
                 store.clone(),
-                theme,
                 reduce_motion,
                 gpui_config.visual_style,
                 cx,
@@ -174,7 +169,6 @@ impl WorkspaceView {
                 console.clone(),
                 toast_center.clone(),
                 gpui_config.log_drawer_height,
-                theme,
                 reduce_motion,
                 cx,
             )
@@ -360,7 +354,6 @@ impl WorkspaceView {
             render_lab_catalog_scroll: ScrollHandle::new(),
             calix_settings,
             gpui_config: gpui_config.clone(),
-            theme,
             search_focus: cx.focus_handle(),
             search_input_buffer: String::new(),
             search_debounce_task: None,
@@ -1046,13 +1039,7 @@ impl WorkspaceView {
         self.gpui_config = gpui.clone();
         self.settings.reset_to(calix.clone(), gpui.clone());
 
-        self.theme = if gpui.dark_theme {
-            Theme::dark()
-        } else {
-            Theme::light()
-        }
-        .with_brand(gpui.brand_color);
-        let theme = self.theme;
+        Theme::install(Theme::look(gpui.dark_theme, gpui.brand_color), cx);
 
         self.motion_policy = crate::state::motion::MotionPolicy::new(gpui.reduce_motion);
         let reduce = self.motion_policy.reduce_motion;
@@ -1069,20 +1056,17 @@ impl WorkspaceView {
         });
 
         self.workstation.update(cx, |ws, cx| {
-            ws.set_theme(theme, cx);
             ws.set_visual_style(gpui.visual_style, cx);
             ws.set_reduce_motion(reduce, cx);
             ws.set_compact(gpui.compact_view, cx);
         });
 
         self.sidebar.update(cx, |sb, cx| {
-            sb.set_theme(theme, cx);
             sb.set_visual_style(gpui.visual_style, cx);
             sb.set_reduce_motion(reduce, cx);
         });
 
         self.console_view.update(cx, |cv, cx| {
-            cv.set_theme(theme, cx);
             cv.set_reduce_motion(reduce, cx);
             cv.set_configured_height(gpui.log_drawer_height, cx);
         });
@@ -1876,20 +1860,15 @@ impl WorkspaceView {
 
                 self.calix_settings = self.settings.draft_calix.clone();
                 self.gpui_config = self.settings.draft_gpui.clone();
-                self.theme = if self.gpui_config.dark_theme {
-                    Theme::dark()
-                } else {
-                    Theme::light()
-                }
-                .with_brand(self.gpui_config.brand_color);
-
-                let theme = self.theme;
+                Theme::install(
+                    Theme::look(self.gpui_config.dark_theme, self.gpui_config.brand_color),
+                    cx,
+                );
                 self.motion_policy =
                     crate::state::motion::MotionPolicy::new(self.gpui_config.reduce_motion);
                 let reduce = self.motion_policy.reduce_motion;
 
                 self.workstation.update(cx, |ws, cx| {
-                    ws.set_theme(theme, cx);
                     ws.set_visual_style(self.gpui_config.visual_style, cx);
                     ws.set_reduce_motion(reduce, cx);
                     ws.set_compact(self.gpui_config.compact_view, cx);
@@ -1902,13 +1881,11 @@ impl WorkspaceView {
                 }
 
                 self.sidebar.update(cx, |sb, cx| {
-                    sb.set_theme(theme, cx);
                     sb.set_visual_style(self.gpui_config.visual_style, cx);
                     sb.set_reduce_motion(reduce, cx);
                 });
 
                 self.console_view.update(cx, |cv, cx| {
-                    cv.set_theme(theme, cx);
                     cv.set_reduce_motion(reduce, cx);
                     cv.set_configured_height(self.gpui_config.log_drawer_height, cx);
                 });
@@ -2209,7 +2186,7 @@ impl WorkspaceView {
 }
 impl Render for WorkspaceView {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let theme = self.theme;
+        let theme = Theme::of(cx);
         let entity = cx.entity().clone();
 
         // ── Lecture de l'état de session ────────────────────────────────────
@@ -2307,18 +2284,10 @@ impl Render for WorkspaceView {
                             Rc::new(move |_w, cx| {
                                 e.update(cx, |view, cx| {
                                     view.settings.toggle_dark_theme();
-                                    let theme = if view.settings.draft_gpui.dark_theme {
-                                        Theme::dark()
-                                    } else {
-                                        Theme::light()
-                                    }
-                                    .with_brand(view.settings.draft_gpui.brand_color);
-                                    view.theme = theme;
-                                    view.workstation
-                                        .update(cx, |ws, cx| ws.set_theme(theme, cx));
-                                    view.sidebar.update(cx, |sb, cx| sb.set_theme(theme, cx));
-                                    view.console_view
-                                        .update(cx, |cv, cx| cv.set_theme(theme, cx));
+                                    Theme::install(
+                                        Theme::look(view.settings.draft_gpui.dark_theme, view.settings.draft_gpui.brand_color),
+                                        cx,
+                                    );
                                     cx.notify();
                                 })
                             })
@@ -2331,18 +2300,10 @@ impl Render for WorkspaceView {
                                     // theme at once: the accent changes under the
                                     // user's finger, the save commits it.
                                     view.settings.set_brand_color(brand);
-                                    let theme = if view.settings.draft_gpui.dark_theme {
-                                        Theme::dark()
-                                    } else {
-                                        Theme::light()
-                                    }
-                                    .with_brand(brand);
-                                    view.theme = theme;
-                                    view.workstation
-                                        .update(cx, |ws, cx| ws.set_theme(theme, cx));
-                                    view.sidebar.update(cx, |sb, cx| sb.set_theme(theme, cx));
-                                    view.console_view
-                                        .update(cx, |cv, cx| cv.set_theme(theme, cx));
+                                    Theme::install(
+                                        Theme::look(view.settings.draft_gpui.dark_theme, brand),
+                                        cx,
+                                    );
                                     cx.notify();
                                 })
                             })
@@ -2462,18 +2423,10 @@ impl Render for WorkspaceView {
                                         view.calix_settings.clone(),
                                         view.gpui_config.clone(),
                                     );
-                                    let theme = if view.gpui_config.dark_theme {
-                                        Theme::dark()
-                                    } else {
-                                        Theme::light()
-                                    }
-                                    .with_brand(view.gpui_config.brand_color);
-                                    view.theme = theme;
-                                    view.workstation
-                                        .update(cx, |ws, cx| ws.set_theme(theme, cx));
-                                    view.sidebar.update(cx, |sb, cx| sb.set_theme(theme, cx));
-                                    view.console_view
-                                        .update(cx, |cv, cx| cv.set_theme(theme, cx));
+                                    Theme::install(
+                                        Theme::look(view.gpui_config.dark_theme, view.gpui_config.brand_color),
+                                        cx,
+                                    );
                                     let compact = view.gpui_config.compact_view;
                                     view.session
                                         .update(cx, |s, cx| s.set_sidebar_collapsed(compact, cx));
