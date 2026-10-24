@@ -70,7 +70,7 @@ impl Cheatsheet {
             .px_1p5()
             .py(px(1.0))
             .text_xs()
-            .font_family("monospace")
+            .font_family(crate::fonts::UI)
             .text_color(theme.text_primary)
             .child(binding.label())
     }
@@ -116,7 +116,7 @@ impl Cheatsheet {
                     .text_xs()
                     .font_weight(FontWeight::BOLD)
                     .text_color(theme.text_muted)
-                    .child(group.to_uppercase()),
+                    .child(group),
             )
             .children(labels.into_iter().map(|label| Self::render_action(label, group, theme)))
     }
@@ -174,13 +174,13 @@ impl Cheatsheet {
                                     .text_xs()
                                     .font_weight(FontWeight::BOLD)
                                     .text_color(theme.text_primary)
-                                    .child("KEYBOARD"),
+                                    .child("Keyboard shortcuts"),
                             )
                             .child(
                                 div()
                                     .text_xs()
                                     .text_color(theme.text_muted)
-                                    .child("esc closes"),
+                                    .child("Esc closes"),
                             ),
                     )
                     .child(

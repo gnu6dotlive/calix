@@ -2581,13 +2581,22 @@ impl Render for WorkspaceView {
                     NavScope::Installed => &store.installed_packages,
                     NavScope::Updates => &store.updates_packages,
                 };
+                // The count is the list's: in Installed and Updates the text
+                // typed narrows the rows, as the station narrows them, so the
+                // header never says "3 packages" over an empty list.
+                let query = self.session.read(cx).search_query.clone();
+                let query_narrows = header_scope != NavScope::Results && !query.trim().is_empty();
                 crate::state::query::visible_packages(
                     rows,
                     &source_scope,
                     state_filter,
                     SortMode::Relevance,
                 )
-                .len()
+                .iter()
+                .filter(|package| {
+                    !query_narrows || crate::state::query::matches_query(package, &query)
+                })
+                .count()
             }
             Place::News => self.news.len(),
             Place::Settings => 0,
@@ -2683,7 +2692,8 @@ impl Render for WorkspaceView {
             .relative()
             .flex()
             .flex_row()
-            .bg(theme.bg_app)
+            .bg(theme.bg_sidebar)
+            .font_family(crate::fonts::UI)
             .text_color(theme.text_primary)
             .track_focus(&self.search_focus)
             .key_context(keys::WORKSPACE_CONTEXT)

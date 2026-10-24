@@ -9,6 +9,7 @@ mod components;
 mod config;
 mod control;
 mod elements;
+mod fonts;
 pub mod brand;
 pub mod icons;
 pub mod render_lab;
@@ -101,6 +102,7 @@ fn main() {
     Application::with_platform(gpui_linux::current_platform(false))
         .with_assets(crate::icons::AppIcons::new())
         .run(move |cx: &mut App| {
+            crate::fonts::install(cx);
             cx.bind_keys([
                 KeyBinding::new("backspace", Backspace, Some("SearchInput")),
                 KeyBinding::new("delete", Delete, Some("SearchInput")),

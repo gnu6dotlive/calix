@@ -145,7 +145,7 @@ impl ToastOverlay {
                         .border_color(theme.border)
                         .text_xs()
                         .font_weight(FontWeight::MEDIUM)
-                        .text_color(theme.accent)
+                        .text_color(theme.accent_text)
                         .cursor_pointer()
                         .hover(move |s| s.bg(theme.bg_surface_hover))
                         .child("Open Logs")

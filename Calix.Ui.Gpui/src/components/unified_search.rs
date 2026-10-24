@@ -19,42 +19,26 @@ impl UnifiedSearch {
                 svg()
                     .path(AppIcon::Search.path())
                     .size_8()
-                    .text_color(theme.accent)
+                    .text_color(theme.accent_text)
                     .mb_3(),
             )
             .child(
                 div()
-                    .text_base()
-                    .font_weight(FontWeight::BOLD)
+                    .text_xl()
+                    .font_weight(FontWeight::SEMIBOLD)
                     .text_color(theme.text_primary)
                     .mb_2()
-                    .child("Unified Search in Calix"),
+                    .child("Search every source at once"),
             )
             .child(
                 div()
-                    .text_xs()
+                    .text_sm()
+                    .line_height(relative(1.5))
                     .text_color(theme.text_secondary)
-                    .max_w(px(460.0))
-                    .mb_4()
+                    .max_w(px(440.0))
                     .child(
-                        "Type a package or application name to search across Arch repositories, the AUR, Flatpak, and AppImages.",
+                        "The Arch repositories, the AUR, Flatpak and AppImages answer together. Type a name; the arrows walk the results, and Ctrl+K runs any command.",
                     ),
-            )
-            .child(
-                div()
-                    .flex()
-                    .flex_col()
-                    .gap_1()
-                    .p_3()
-                    .rounded_md()
-                    .bg(theme.bg_surface)
-                    .border_1()
-                    .border_color(theme.border)
-                    .text_xs()
-                    .text_color(theme.text_muted)
-                    .child("• No network requests are dispatched on empty input")
-                    .child("• Filters menu refines results by distribution backend and state")
-                    .child("• Use Up / Down arrows to navigate through the virtualized results"),
             )
     }
 }

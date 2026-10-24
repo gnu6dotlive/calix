@@ -43,6 +43,44 @@ impl Render for NameplateEdge {
     }
 }
 
+/// What the side inspector's edge carries while it is dragged.
+pub struct InspectorEdge;
+
+impl Render for InspectorEdge {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
+        Empty
+    }
+}
+
+/// The drag of the side inspector's edge.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct InspectorDragState {
+    pub start_width: f32,
+    pub start_pointer_x: f32,
+}
+
+/// Whether the inspector stands beside the catalogue: the window has the
+/// room for the rail, the catalogue's floor, the edge and a useful inspector.
+/// A pure decision from the window's width, as Skwir decides its split.
+pub fn inspector_beside(window_width: f32) -> bool {
+    window_width
+        >= UiMetrics::SIDEBAR_EXPANDED
+            + UiMetrics::CATALOGUE_MIN_WIDTH
+            + UiMetrics::SPLITTER_THICKNESS
+            + UiMetrics::INSPECTOR_SIDE_MIN_WIDTH
+            + 4.0 * UiMetrics::PLANE_GAP
+}
+
+/// The side inspector's width after a drag of its edge: pulling left makes it
+/// grow, never past its share of the band nor into the catalogue's floor.
+pub fn inspector_width_after_drag(drag: InspectorDragState, pointer_x: f32, band_width: f32) -> f32 {
+    let requested = drag.start_width - (pointer_x - drag.start_pointer_x);
+    let max = (band_width - UiMetrics::CATALOGUE_MIN_WIDTH - UiMetrics::SPLITTER_THICKNESS)
+        .min(band_width * UiMetrics::INSPECTOR_SIDE_MAX_RATIO)
+        .max(UiMetrics::INSPECTOR_SIDE_MIN_WIDTH);
+    requested.clamp(UiMetrics::INSPECTOR_SIDE_MIN_WIDTH, max)
+}
+
 /// The drag of the nameplate's edge.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct NameplateDragState {
@@ -152,6 +190,9 @@ pub struct PackageWorkstationView {
     /// The height of the nameplate: the caption of the readout, under it.
     pub nameplate_height: f32,
     pub nameplate_drag: Option<NameplateDragState>,
+    /// The side inspector's width, as the user left it.
+    pub inspector_width: f32,
+    pub inspector_drag: Option<InspectorDragState>,
     pub scroll_handle: UniformListScrollHandle,
     /// The inspector's body scroll: its bar reads it.
     pub inspector_scroll: ScrollHandle,
@@ -272,8 +313,10 @@ impl PackageWorkstationView {
             toast_center,
             // The plate starts at its floor: it grows when the user pulls
             // it, and it never takes the catalogue's rows to do it.
-            nameplate_height: UiMetrics::NAMEPLATE_MIN_HEIGHT,
+            nameplate_height: UiMetrics::NAMEPLATE_REQUESTED_HEIGHT,
             nameplate_drag: None,
+            inspector_width: UiMetrics::INSPECTOR_SIDE_WIDTH,
+            inspector_drag: None,
             scroll_handle: UniformListScrollHandle::new(),
             inspector_scroll: ScrollHandle::new(),
             on_mutation: None,
@@ -574,15 +617,26 @@ impl PackageWorkstationView {
     }
 
     pub fn on_pointer_up(&mut self, cx: &mut Context<Self>) {
-        if self.nameplate_drag.is_some() {
+        if self.nameplate_drag.is_some() || self.inspector_drag.is_some() {
             self.nameplate_drag = None;
+            self.inspector_drag = None;
             cx.notify();
+        }
+    }
+
+    pub fn on_side_edge_dragged(&mut self, pointer_x: f32, band_width: f32, cx: &mut Context<Self>) {
+        if let Some(drag) = self.inspector_drag {
+            let width = inspector_width_after_drag(drag, pointer_x, band_width);
+            if (width - self.inspector_width).abs() >= 1.0 {
+                self.inspector_width = width;
+                cx.notify();
+            }
         }
     }
 }
 
 impl Render for PackageWorkstationView {
-    fn render(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let theme = Theme::of(cx);
         let entity = cx.entity().clone();
         let is_busy = self.console.read(cx).is_running();
@@ -1118,9 +1172,10 @@ impl Render for PackageWorkstationView {
                 .size_full()
                 .flex_1()
                 .overflow_hidden()
-                .border_1()
+                // The table is the plane itself: a rule under the toolbar, no
+                // recess cut into the plane.
+                .border_t_1()
                 .border_color(theme.border)
-                .bg(theme.bg_sidebar)
                 .when(shows_a_table, |element| {
                     element.child(PackageTable::render_header(
                         &theme,
@@ -1138,9 +1193,10 @@ impl Render for PackageWorkstationView {
                 .size_full()
                 .flex_1()
                 .overflow_hidden()
-                .border_1()
+                // The table is the plane itself: a rule under the toolbar, no
+                // recess cut into the plane.
+                .border_t_1()
                 .border_color(theme.border)
-                .bg(theme.bg_sidebar)
                 .child(list_body)
         };
 
@@ -1193,6 +1249,12 @@ impl Render for PackageWorkstationView {
         // The readout: the band where the work happens, in full width.
         let readout = div()
             .id("workstation_readout")
+            // A plane resting on the aluminium.
+            .bg(theme.bg_app)
+            .border_1()
+            .border_color(theme.border)
+            .rounded_lg()
+            .shadow_sm()
             // The handle the audit measures: the harness reads the bounds of
             // the band under this name. A noop outside the tests.
             .debug_selector(|| "workstation_readout".to_string())
@@ -1212,21 +1274,35 @@ impl Render for PackageWorkstationView {
         // it rides on the sheet's top edge: the same gesture, but it lifts
         // the sheet instead of resizing it.
         let is_resizing = self.nameplate_drag.is_some();
+        // The edge is the aluminium between the two planes: a groove that
+        // shows its line only under the pointer or while it is dragged.
+        let groove_line = |vertical: bool, active: bool| {
+            let line = div().rounded_full().bg(if active {
+                theme.accent
+            } else {
+                gpui::transparent_black().into()
+            });
+            let line = if vertical {
+                line.w(px(2.0)).h(px(32.0))
+            } else {
+                line.h(px(2.0)).w(px(32.0))
+            };
+            line.group_hover("workstation_edge", {
+                let accent = theme.accent;
+                move |s| s.bg(accent)
+            })
+        };
         let edge_style = |style: gpui::Div| {
             style
                 .id("workstation_nameplate_edge")
+                .group("workstation_edge")
                 .w_full()
                 .h(px(UiMetrics::SPLITTER_THICKNESS))
-                .bg(if is_resizing {
-                    theme.accent
-                } else {
-                    theme.border
-                })
+                .flex()
+                .items_center()
+                .justify_center()
+                .child(groove_line(false, is_resizing))
                 .cursor_row_resize()
-                .hover({
-                    let h = theme.accent;
-                    move |s| s.bg(h)
-                })
                 .on_drag(NameplateEdge, |_, _, _, cx| cx.new(|_| NameplateEdge))
                 .on_mouse_down(MouseButton::Left, move |event, _window, cx| {
                     // The press gives where the drag starts; only the
@@ -1242,6 +1318,30 @@ impl Render for PackageWorkstationView {
                 })
         };
         let splitter = edge_style(div().flex_shrink_0());
+        let is_side_resizing = self.inspector_drag.is_some();
+        let entity_side = entity.clone();
+        let side_edge = div()
+            .id("workstation_inspector_edge")
+            .group("workstation_edge")
+            .flex_shrink_0()
+            .h_full()
+            .w(px(UiMetrics::SPLITTER_THICKNESS))
+            .flex()
+            .items_center()
+            .justify_center()
+            .child(groove_line(true, is_side_resizing))
+            .cursor_col_resize()
+            .on_drag(InspectorEdge, |_, _, _, cx| cx.new(|_| InspectorEdge))
+            .on_mouse_down(MouseButton::Left, move |event, _window, cx| {
+                let pointer_x = event.position.x.to_f64() as f32;
+                entity_side.update(cx, |view, cx| {
+                    view.inspector_drag = Some(InspectorDragState {
+                        start_width: view.inspector_width,
+                        start_pointer_x: pointer_x,
+                    });
+                    cx.notify();
+                });
+            });
 
         // ── 4. Panneau d'inspection sémantique ──────────────────────────────
         let alpm_details = selected_key
@@ -1295,7 +1395,7 @@ impl Render for PackageWorkstationView {
         // excuse.
         let anchor_entry = source_axis.get(crate::state::anchor_index(&source_axis));
         let quiet = QuietPlate {
-            heading: "THE BANK",
+            heading: "No package selected",
             subject: anchor_entry
                 .map(|entry| entry.label.to_string())
                 .unwrap_or_else(|| "All sources".to_string()),
@@ -1429,26 +1529,79 @@ impl Render for PackageWorkstationView {
                 .into_any_element()
         };
 
-        // The nameplate: the caption of the readout, in full width, under it.
-        //
-        // It is a band under the catalogue, and it yields before the
-        // catalogue is reduced: one always knows which package is selected.
-        // The flex decides, where the room is real: the plate asks for the
-        // height the user gave it, shrinks first (the catalogue has a floor),
-        // never below its own floor and never above its share of the band.
-        let nameplate = div()
+        // The inspector's plane, beside the catalogue or under it: the window
+        // decides, from its width (`inspector_beside`).
+        let beside = inspector_beside(f32::from(window.viewport_size().width));
+        let inspector_plane = div()
             .id("workstation_nameplate")
             // The handle the audit measures: the harness reads the bounds
             // of the band under this name. A noop outside the tests.
             .debug_selector(|| "workstation_nameplate".to_string())
-            .w_full()
-            .h(px(self.nameplate_height))
-            .flex_shrink(1.0)
-            .min_h(px(UiMetrics::NAMEPLATE_MIN_HEIGHT))
-            .max_h(relative(UiMetrics::NAMEPLATE_MAX_RATIO))
+            .relative()
+            .bg(theme.bg_app)
+            .border_1()
+            .border_color(theme.border)
+            .rounded_lg()
+            .shadow_sm()
             .overflow_hidden()
-            .child(inspector_element)
-            .into_any_element();
+            .child(inspector_element);
+
+        let band = if beside {
+            // Beside: the catalogue keeps its floor, the inspector the width
+            // the user left it, within its share.
+            div()
+                .id("workstation_band")
+                .flex()
+                .flex_row()
+                .flex_1()
+                .min_h(px(0.0))
+                .w_full()
+                .on_drag_move::<InspectorEdge>(move |event, _window, cx| {
+                    let band_width: f32 = event.bounds.size.width.into();
+                    let pointer_x: f32 = event.event.position.x.into();
+                    entity_move.update(cx, |view, cx| {
+                        view.on_side_edge_dragged(pointer_x, band_width, cx);
+                    });
+                })
+                .child(readout.min_w(px(UiMetrics::CATALOGUE_MIN_WIDTH)))
+                .child(side_edge)
+                .child(
+                    inspector_plane
+                        .h_full()
+                        .w(px(self.inspector_width))
+                        .flex_shrink(1.0)
+                        .min_w(px(UiMetrics::INSPECTOR_SIDE_MIN_WIDTH))
+                        .max_w(relative(UiMetrics::INSPECTOR_SIDE_MAX_RATIO)),
+                )
+        } else {
+            // Under: the plate is the caption of the readout. It asks for the
+            // height the user gave it, shrinks first (the catalogue has a
+            // floor), never below its own floor nor above its share.
+            div()
+                .id("workstation_band")
+                .flex()
+                .flex_col()
+                .flex_1()
+                .min_h(px(0.0))
+                .w_full()
+                .on_drag_move::<NameplateEdge>(move |event, _window, cx| {
+                    let band_height: f32 = event.bounds.size.height.into();
+                    let pointer_y: f32 = event.event.position.y.into();
+                    entity_move.update(cx, |view, cx| {
+                        view.on_edge_dragged(pointer_y, band_height, cx);
+                    });
+                })
+                .child(readout)
+                .child(splitter)
+                .child(
+                    inspector_plane
+                        .w_full()
+                        .h(px(self.nameplate_height))
+                        .flex_shrink(1.0)
+                        .min_h(px(UiMetrics::NAMEPLATE_MIN_HEIGHT))
+                        .max_h(relative(UiMetrics::NAMEPLATE_MAX_RATIO)),
+                )
+        };
 
         // ── 5. Conteneur racine de la station de travail absorbant les moves ──
         div()
@@ -1458,34 +1611,17 @@ impl Render for PackageWorkstationView {
             .size_full()
             .relative()
             .overflow_hidden()
+            // The aluminium around the planes.
+            .px(px(UiMetrics::PLANE_GAP))
+            .pb(px(UiMetrics::PLANE_GAP))
+            .gap(px(UiMetrics::PLANE_GAP))
             .on_mouse_up(MouseButton::Left, move |_event, _window, cx| {
                 entity_up.update(cx, |view, cx| {
                     view.on_pointer_up(cx);
                 });
             })
             .child(source_bank)
-            .child(
-                // The band the catalogue and the plate share. The edge's drag
-                // reads its bounds from here, where they are real.
-                div()
-                    .id("workstation_band")
-                    .flex()
-                    .flex_col()
-                    .flex_1()
-                    .min_h(px(0.0))
-                    .w_full()
-                    .overflow_hidden()
-                    .on_drag_move::<NameplateEdge>(move |event, _window, cx| {
-                        let band_height: f32 = event.bounds.size.height.into();
-                        let pointer_y: f32 = event.event.position.y.into();
-                        entity_move.update(cx, |view, cx| {
-                            view.on_edge_dragged(pointer_y, band_height, cx);
-                        });
-                    })
-                    .child(readout)
-                    .child(splitter)
-                    .child(nameplate),
-            )
+            .child(band)
     }
 }
 
@@ -1867,7 +2003,10 @@ mod tests {
             );
         };
 
-        // ── The whole window: the composition at the window's floor.
+        // ── A window too narrow for the inspector beside the catalogue: the
+        // plate lies under it, as the window decides (`inspector_beside`).
+        assert!(!inspector_beside(f32::from(window.0)));
+        cx.simulate_resize(size(window.0, window.1));
         draw(cx);
         let bank = cx.debug_bounds("source_bank").expect("the bank is drawn");
         let readout = cx
@@ -1876,72 +2015,91 @@ mod tests {
         let nameplate = cx
             .debug_bounds("workstation_nameplate")
             .expect("the nameplate is drawn");
+        let gap = UiMetrics::PLANE_GAP;
 
-        // The three bands fill the window: nothing is lost between them.
-        assert!(
-            (bank.size.height + readout.size.height + nameplate.size.height).floor()
-                <= window.1.floor(),
-            "the bands fit in the window: {} + {} + {} <= {}",
-            bank.size.height,
-            readout.size.height,
+        // The bands fill the window, with the aluminium between them: the
+        // bank, a gap, the catalogue, the edge, the plate, a gap.
+        assert_eq!(
+            (f32::from(bank.size.height)
+                + gap
+                + f32::from(readout.size.height)
+                + UiMetrics::SPLITTER_THICKNESS
+                + f32::from(nameplate.size.height)
+                + gap)
+                .round(),
+            f32::from(window.1).round(),
+            "the bands and the aluminium fill the window"
+        );
+        // With the room, the plate has the height it asks for: a name, its
+        // actions, its tabs and a first paragraph, not a name alone.
+        assert_eq!(
             nameplate.size.height,
-            window.1
+            px(UiMetrics::NAMEPLATE_REQUESTED_HEIGHT),
+            "the plate has the height it asks for"
         );
-        assert!(
-            readout.size.height > px(0.0),
-            "the catalogue has room when the window is whole: {}",
-            readout.size.height
-        );
+        assert!(readout.size.height >= px(UiMetrics::CATALOGUE_MIN_HEIGHT));
 
         // ── The station in the band the log drawer leaves it.
         //
-        // 372 px: the band cannot hold the bank, the edge, the catalogue's
-        // six rows *and* the plate's chrome. The plate yields first — it
-        // keeps its identity (48 px) and the catalogue keeps the rest.
+        // 372 px cannot hold the bank, the catalogue's six rows and the
+        // plate's request: the plate yields first, down to its floor, and the
+        // catalogue keeps its floor.
         let band_height = 372.0;
         fixture.update(cx, |fixture, _cx| fixture.band = Some(band_height));
         draw(cx);
         let squeezed_readout = cx
             .debug_bounds("workstation_readout")
             .expect("the readout is drawn");
-        // The bank takes what its content needs: read, never assumed.
-        let squeezed_bank = cx.debug_bounds("source_bank").expect("the bank is drawn");
-
-        // The plate stays in the flow — it yields, it does not leave: one
-        // always knows which package is selected.
-        assert!(
-            cx.debug_bounds("workstation_nameplate").is_some(),
-            "la plaque reste une bande du flux"
-        );
-
-        // And the catalogue takes the band below the bank, less the plate's
-        // floor: the plate yields, it does not leave, and the catalogue
-        // keeps its floor.
+        let squeezed_plate = cx
+            .debug_bounds("workstation_nameplate")
+            .expect("la plaque reste une bande du flux");
         assert_eq!(
             squeezed_readout.size.height,
-            px(band_height
-                - f32::from(squeezed_bank.size.height)
-                - UiMetrics::SPLITTER_THICKNESS
-                - UiMetrics::NAMEPLATE_MIN_HEIGHT),
-            "le catalogue garde son plancher, la plaque son identité : {}",
-            squeezed_readout.size.height
+            px(UiMetrics::CATALOGUE_MIN_HEIGHT),
+            "le catalogue garde son plancher de six lignes"
         );
         assert!(
-            squeezed_readout.size.height >= px(UiMetrics::CATALOGUE_MIN_HEIGHT) - px(0.5),
-            "et il garde son plancher de six lignes : {}",
-            squeezed_readout.size.height
+            squeezed_plate.size.height >= px(UiMetrics::NAMEPLATE_MIN_HEIGHT)
+                && squeezed_plate.size.height < px(UiMetrics::NAMEPLATE_REQUESTED_HEIGHT),
+            "la plaque cède d'abord, jusqu'à son identité : {}",
+            squeezed_plate.size.height
         );
 
-        // In the flow, the plate takes its chrome from the band, and the
-        // catalogue keeps the rest.
+        // ── A wide window: the inspector stands beside the catalogue, as tall
+        // as it, at the width it asks for.
+        fixture.update(cx, |fixture, _cx| fixture.band = None);
+        let wide = (px(1400.0), px(800.0));
+        assert!(inspector_beside(f32::from(wide.0)));
+        cx.simulate_resize(size(wide.0, wide.1));
+        cx.draw(point(px(0.0), px(0.0)), size(wide.0, wide.1), |_window, _cx| {
+            fixture.clone().into_element()
+        });
+        let readout = cx.debug_bounds("workstation_readout").unwrap();
+        let inspector = cx.debug_bounds("workstation_nameplate").unwrap();
+        assert_eq!(readout.origin.y, inspector.origin.y, "side by side");
+        assert_eq!(readout.size.height, inspector.size.height, "as tall as the catalogue");
+        assert_eq!(inspector.size.width, px(UiMetrics::INSPECTOR_SIDE_WIDTH));
+        assert!(readout.size.width >= px(UiMetrics::CATALOGUE_MIN_WIDTH));
+    }
+
+    #[test]
+    fn the_side_inspector_is_dragged_within_its_bounds() {
+        let drag = InspectorDragState {
+            start_width: 400.0,
+            start_pointer_x: 1000.0,
+        };
+        // Pulled left, it grows.
+        assert_eq!(inspector_width_after_drag(drag, 950.0, 1200.0), 450.0);
+        // Never past its share of the band, nor into the catalogue's floor.
+        assert_eq!(inspector_width_after_drag(drag, 0.0, 1200.0), 600.0);
         assert_eq!(
-            readout.size.height,
-            px(window.1 / px(1.0)
-                - f32::from(bank.size.height)
-                - UiMetrics::SPLITTER_THICKNESS
-                - UiMetrics::NAMEPLATE_MIN_HEIGHT),
-            "dans le flux, la plaque prend son chrome et le catalogue le reste : {}",
-            readout.size.height
+            inspector_width_after_drag(drag, 0.0, 1000.0),
+            1000.0 - UiMetrics::CATALOGUE_MIN_WIDTH - UiMetrics::SPLITTER_THICKNESS
+        );
+        // Pushed right, never below its floor.
+        assert_eq!(
+            inspector_width_after_drag(drag, 2000.0, 1200.0),
+            UiMetrics::INSPECTOR_SIDE_MIN_WIDTH
         );
     }
 

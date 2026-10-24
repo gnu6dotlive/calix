@@ -1,4 +1,5 @@
 use crate::backend::models::{AlpmPackage, UnifiedPackage, UnifiedPackageSource};
+use crate::components::facts;
 use crate::components::package_table::PackageTable;
 use crate::components::semantic_value::{SemanticValue, StringActionHandler};
 use crate::state::{AlsoIn, SemanticTarget};
@@ -17,30 +18,6 @@ pub struct OverviewViewProps<'a> {
 pub struct OverviewView;
 
 impl OverviewView {
-    fn render_meta_item(
-        label: &'static str,
-        value: impl IntoElement,
-        theme: &Theme,
-    ) -> impl IntoElement {
-        div()
-            .flex()
-            .flex_col()
-            .gap(px(2.0))
-            .p_2()
-            .rounded_md()
-            .bg(theme.bg_surface)
-            .border_1()
-            .border_color(theme.border)
-            .child(
-                div()
-                    .text_xs()
-                    .font_weight(FontWeight::SEMIBOLD)
-                    .text_color(theme.text_muted)
-                    .child(label),
-            )
-            .child(div().text_sm().text_color(theme.text_primary).child(value))
-    }
-
     pub fn render(props: OverviewViewProps) -> impl IntoElement {
         let theme = props.theme;
         let pkg = props.package;
@@ -115,75 +92,20 @@ impl OverviewView {
 
         let install_reason = alpm.and_then(|d| d.install_reason.clone());
 
-        // 1. Description
+        // 1. The description: the first paragraph, which needs no caption.
         let desc_section = div()
-            .flex()
-            .flex_col()
-            .gap(px(4.0))
-            .mb_4()
-            .child(
-                div()
-                    .text_xs()
-                    .font_weight(FontWeight::BOLD)
-                    .text_color(theme.text_muted)
-                    .child("DESCRIPTION"),
-            )
-            .child(
-                div()
-                    .text_sm()
-                    .text_color(theme.text_primary)
-                    .line_height(relative(1.4))
-                    .child(if pkg.description.is_empty() {
-                        "No description available for this package.".to_string()
-                    } else {
-                        pkg.description.clone()
-                    }),
-            );
+            .mb_3()
+            .text_base()
+            .text_color(theme.text_primary)
+            .line_height(relative(1.5))
+            .child(if pkg.description.is_empty() {
+                "No description available for this package.".to_string()
+            } else {
+                pkg.description.clone()
+            });
 
-        // 2. Grille de métadonnées
-        let mut meta_grid = div().flex().flex_col().gap_3();
-
-        // Ligne 1 : Dépôt & Licence
-        let row1 = div()
-            .flex()
-            .gap_3()
-            .child(div().flex_1().child(Self::render_meta_item(
-                "REPOSITORY / REMOTE",
-                if pkg.repository_or_remote.is_empty() {
-                    "—".to_string()
-                } else {
-                    pkg.repository_or_remote.clone()
-                },
-                theme,
-            )))
-            .child(div().flex_1().child(Self::render_meta_item(
-                "LICENSE",
-                if licenses.is_empty() {
-                    "—".to_string()
-                } else {
-                    licenses
-                },
-                theme,
-            )));
-        meta_grid = meta_grid.child(row1);
-
-        // Ligne 2 : Tailles (Installée & Téléchargement)
-        let row2 = div()
-            .flex()
-            .gap_3()
-            .child(div().flex_1().child(Self::render_meta_item(
-                "INSTALLED SIZE",
-                installed_size_str.unwrap_or_else(|| "—".to_string()),
-                theme,
-            )))
-            .child(div().flex_1().child(Self::render_meta_item(
-                "DOWNLOAD SIZE",
-                download_size_str.unwrap_or_else(|| "—".to_string()),
-                theme,
-            )));
-        meta_grid = meta_grid.child(row2);
-
-        // Ligne 3 : URL amont & Mainteneur
+        // 2. The facts, one under the other.
+        let or_dash = |value: String| if value.is_empty() { "—".to_string() } else { value };
         let on_nav = props.on_navigate_package.clone();
         let url_element: AnyElement = if let Some(url) = upstream_url {
             let url_c = url.clone();
@@ -192,7 +114,13 @@ impl OverviewView {
         } else {
             div().child("—").into_any_element()
         };
-
+        // In the AUR a person keeps the recipe; in the repositories a package
+        // comes from a base: the label says which one is meant.
+        let maintainer_label = if matches!(pkg.inner, UnifiedPackageSource::Aur(_)) {
+            "Maintainer"
+        } else {
+            "Package base"
+        };
         let maintainer_element: AnyElement = if let Some(m) = maintainer {
             let m_c = m.clone();
             SemanticValue::render(m, SemanticTarget::CopyText(m_c), theme, None).into_any_element()
@@ -200,24 +128,24 @@ impl OverviewView {
             div().child("—").into_any_element()
         };
 
-        let row3 = div()
-            .flex()
-            .gap_3()
-            .child(
-                div()
-                    .flex_1()
-                    .child(Self::render_meta_item("UPSTREAM URL", url_element, theme)),
-            )
-            .child(div().flex_1().child(Self::render_meta_item(
-                "MAINTAINER / BASE",
-                maintainer_element,
+        let mut meta_grid = facts::list([
+            facts::fact("Repository", or_dash(pkg.repository_or_remote.clone()), theme),
+            facts::fact("License", or_dash(licenses), theme),
+            facts::fact(
+                "Installed size",
+                installed_size_str.unwrap_or_else(|| "—".to_string()),
                 theme,
-            )));
-        meta_grid = meta_grid.child(row3);
-
-        // Ligne 4 : Raison d'installation (si installée)
+            ),
+            facts::fact(
+                "Download size",
+                download_size_str.unwrap_or_else(|| "—".to_string()),
+                theme,
+            ),
+            facts::fact("Upstream", url_element, theme),
+            facts::fact(maintainer_label, maintainer_element, theme),
+        ]);
         if let Some(reason) = install_reason {
-            meta_grid = meta_grid.child(Self::render_meta_item("INSTALL REASON", reason, theme));
+            meta_grid = meta_grid.child(facts::fact("Install reason", reason, theme));
         }
 
         // 3. Le même nom, ailleurs.
@@ -233,13 +161,7 @@ impl OverviewView {
                 .flex_col()
                 .gap(px(4.0))
                 .mt_4()
-                .child(
-                    div()
-                        .text_xs()
-                        .font_weight(FontWeight::BOLD)
-                        .text_color(theme.text_muted)
-                        .child("ALSO IN"),
-                )
+                .child(facts::section_label("Also in", theme))
                 .child(
                     div()
                         .flex()
@@ -259,7 +181,7 @@ impl OverviewView {
                                 .child(
                                     div()
                                         .text_xs()
-                                        .font_family("monospace")
+                                        .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                                         .text_color(theme.text_muted)
                                         .child(entry.version.clone()),
                                 )

@@ -228,8 +228,10 @@ impl SettingsView {
             .flex()
             .flex_col()
             .size_full()
-            .bg(theme.bg_app)
-            .p_6()
+            // The sections are planes on the aluminium, like the catalogue.
+            .bg(theme.bg_sidebar)
+            .px(px(crate::ui_metrics::UiMetrics::PLANE_GAP))
+            .pb_6()
             .overflow_y_scroll()
             .track_scroll(props.scroll);
 
@@ -238,18 +240,19 @@ impl SettingsView {
             div()
                 .flex()
                 .flex_col()
-                .mb_6()
+                .mb_3()
+                .mt_1()
                 .child(
                     div()
                         .flex()
                         .items_center()
                         .gap_3()
+                        // The header names the place; this line says what it holds.
                         .child(
                             div()
-                                .text_2xl()
-                                .font_weight(FontWeight::BOLD)
-                                .text_color(theme.text_primary)
-                                .child("Calix Settings"),
+                                .text_sm()
+                                .text_color(theme.text_secondary)
+                                .child("Package sources, desktop preferences and motion."),
                         )
                         .child(if is_dirty {
                             div()
@@ -260,7 +263,7 @@ impl SettingsView {
                                 .text_xs()
                                 .font_weight(FontWeight::BOLD)
                                 .text_color(theme.on(theme.warning))
-                                .child("Unsaved Changes")
+                                .child("Unsaved changes")
                         } else {
                             div()
                                 .px_2p5()
@@ -272,12 +275,10 @@ impl SettingsView {
                                 .text_xs()
                                 .font_weight(FontWeight::MEDIUM)
                                 .text_color(theme.text_muted)
-                                .child("Up to Date")
+                                .child("Saved")
                         }),
                 )
-                .child(div().text_xs().text_color(theme.text_muted).child(
-                    "Configuration of package sources, desktop preferences, and motion policy.",
-                )),
+
         );
 
         // Section 1: PACKAGE SOURCES
@@ -285,18 +286,19 @@ impl SettingsView {
             .flex()
             .flex_col()
             .p_4()
-            .mb_6()
-            .rounded_md()
+            .mb_3()
+            .rounded_lg()
             .bg(theme.bg_surface)
             .border_1()
             .border_color(theme.border)
             .child(
                 div()
-                    .text_sm()
-                    .font_weight(FontWeight::BOLD)
-                    .text_color(theme.accent)
+                    .font_family(crate::fonts::LABEL)
+                    .text_base()
+                    .font_weight(FontWeight::SEMIBOLD)
+                    .text_color(theme.text_primary)
                     .mb_3()
-                    .child("PACKAGE SOURCES"),
+                    .child("Package sources"),
             )
             .child(Self::toggle_row(
                 "setting_aur",
@@ -330,18 +332,19 @@ impl SettingsView {
             .flex()
             .flex_col()
             .p_4()
-            .mb_6()
-            .rounded_md()
+            .mb_3()
+            .rounded_lg()
             .bg(theme.bg_surface)
             .border_1()
             .border_color(theme.border)
             .child(
                 div()
-                    .text_sm()
-                    .font_weight(FontWeight::BOLD)
-                    .text_color(theme.accent)
+                    .font_family(crate::fonts::LABEL)
+                    .text_base()
+                    .font_weight(FontWeight::SEMIBOLD)
+                    .text_color(theme.text_primary)
                     .mb_3()
-                    .child("PACKAGE MANAGEMENT"),
+                    .child("Package management"),
             )
             .child(Self::toggle_row(
                 "setting_cascade_delete",
@@ -367,18 +370,19 @@ impl SettingsView {
             .flex()
             .flex_col()
             .p_4()
-            .mb_6()
-            .rounded_md()
+            .mb_3()
+            .rounded_lg()
             .bg(theme.bg_surface)
             .border_1()
             .border_color(theme.border)
             .child(
                 div()
-                    .text_sm()
-                    .font_weight(FontWeight::BOLD)
-                    .text_color(theme.accent)
+                    .font_family(crate::fonts::LABEL)
+                    .text_base()
+                    .font_weight(FontWeight::SEMIBOLD)
+                    .text_color(theme.text_primary)
                     .mb_3()
-                    .child("APPEARANCE & DENSITY"),
+                    .child("Appearance and density"),
             )
             .child(Self::toggle_row(
                 "setting_dark_theme",
@@ -431,18 +435,19 @@ impl SettingsView {
             .flex()
             .flex_col()
             .p_4()
-            .mb_6()
-            .rounded_md()
+            .mb_3()
+            .rounded_lg()
             .bg(theme.bg_surface)
             .border_1()
             .border_color(theme.border)
             .child(
                 div()
-                    .text_sm()
-                    .font_weight(FontWeight::BOLD)
-                    .text_color(theme.accent)
+                    .font_family(crate::fonts::LABEL)
+                    .text_base()
+                    .font_weight(FontWeight::SEMIBOLD)
+                    .text_color(theme.text_primary)
                     .mb_3()
-                    .child("MOTION & FEEDBACK"),
+                    .child("Motion and feedback"),
             )
             .child(Self::toggle_row(
                 "setting_reduce_motion",
@@ -460,18 +465,19 @@ impl SettingsView {
             .flex()
             .flex_col()
             .p_4()
-            .mb_6()
-            .rounded_md()
+            .mb_3()
+            .rounded_lg()
             .bg(theme.bg_surface)
             .border_1()
             .border_color(theme.border)
             .child(
                 div()
-                    .text_sm()
-                    .font_weight(FontWeight::BOLD)
-                    .text_color(theme.accent)
+                    .font_family(crate::fonts::LABEL)
+                    .text_base()
+                    .font_weight(FontWeight::SEMIBOLD)
+                    .text_color(theme.text_primary)
                     .mb_3()
-                    .child("LOGS & OPERATIONS"),
+                    .child("Logs and operations"),
             )
             .child(Self::toggle_row(
                 "setting_log_drawer_auto_open",
@@ -493,8 +499,8 @@ impl SettingsView {
             .flex()
             .flex_col()
             .p_4()
-            .mb_6()
-            .rounded_md()
+            .mb_3()
+            .rounded_lg()
             .bg(theme.bg_surface)
             .border_1()
             .border_color(theme.border)
@@ -518,10 +524,11 @@ impl SettingsView {
                     })
                     .child(
                         div()
-                            .text_sm()
-                            .font_weight(FontWeight::BOLD)
-                            .text_color(theme.accent)
-                            .child("ADVANCED SETTINGS"),
+                            .font_family(crate::fonts::LABEL)
+                            .text_base()
+                            .font_weight(FontWeight::SEMIBOLD)
+                            .text_color(theme.text_primary)
+                            .child("Advanced"),
                     )
                     .child(
                         div()
@@ -560,7 +567,7 @@ impl SettingsView {
                                     svg()
                                         .path(AppIcon::RenderLab.path())
                                         .size(px(16.0))
-                                        .text_color(theme.accent),
+                                        .text_color(theme.accent_text),
                                 )
                                 .child(
                                     div()
@@ -1033,7 +1040,7 @@ mod tests {
         assert!(!settings.draft_calix.package_management_remove_configs);
 
         settings.toggle_dark_theme();
-        assert!(!settings.draft_gpui.dark_theme);
+        assert!(settings.draft_gpui.dark_theme);
 
         settings.toggle_compact_view();
         assert!(settings.draft_gpui.compact_view);

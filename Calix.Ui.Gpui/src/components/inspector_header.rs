@@ -62,7 +62,7 @@ pub struct InspectorHeaderProps<'a> {
 pub struct InspectorHeader;
 
 impl InspectorHeader {
-    /// Formate la ligne de métadonnées calme du bureau (Arch · extra · ● Installed)
+    /// Formate la ligne de métadonnées calme du bureau (Arch / extra ● Installed)
     pub fn format_metadata_line(pkg: &UnifiedPackage) -> (String, &'static str) {
         let source_name = match pkg.source_type.to_uppercase().as_str() {
             "ALPM" => "Arch",
@@ -74,7 +74,8 @@ impl InspectorHeader {
 
         let mut meta = source_name.to_string();
         if !pkg.repository_or_remote.is_empty() {
-            meta.push_str(" \u{00B7} ");
+            // The same words as the catalogue's Source column.
+            meta.push_str(" / ");
             meta.push_str(&pkg.repository_or_remote);
         }
 
@@ -128,7 +129,7 @@ impl InspectorHeader {
                 FontWeight::MEDIUM
             })
             .text_color(if is_active {
-                theme.accent
+                theme.accent_text
             } else {
                 theme.text_secondary
             })
@@ -146,7 +147,7 @@ impl InspectorHeader {
                     .path(tab.icon().path())
                     .size_3_5()
                     .text_color(if is_active {
-                        theme.accent
+                        theme.accent_text
                     } else {
                         theme.text_secondary
                     }),
@@ -178,7 +179,7 @@ impl InspectorHeader {
         let mut version_row = div().flex().items_center().gap_1().flex_shrink_0().child(
             div()
                 .text_xs()
-                .font_family("monospace")
+                .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                 .text_color(theme.text_muted)
                 .child(pkg.version.clone()),
         );
@@ -188,7 +189,7 @@ impl InspectorHeader {
                 version_row = version_row.child(
                     div()
                         .text_xs()
-                        .font_family("monospace")
+                        .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                         .font_weight(FontWeight::BOLD)
                         .text_color(theme.warning_text)
                         .child(format!(" → {}", nv)),
@@ -197,7 +198,7 @@ impl InspectorHeader {
                 version_row = version_row.child(
                     div()
                         .text_xs()
-                        .font_family("monospace")
+                        .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                         .font_weight(FontWeight::BOLD)
                         .text_color(theme.warning_text)
                         .child(" (update)"),
@@ -243,8 +244,9 @@ impl InspectorHeader {
                     .gap_1p5()
                     .text_xs()
                     .text_color(theme.text_muted)
-                    .child(div().child(meta_origin))
-                    .child(div().child("\u{00B7}"))
+                    // Where it comes from, then its state behind its lamp: the
+                    // lamp separates them, no dot between.
+                    .child(div().mr_1().child(meta_origin))
                     .child(
                         div()
                             .size(px(6.0))
@@ -514,7 +516,7 @@ mod tests {
         };
 
         let (meta, status) = InspectorHeader::format_metadata_line(&pkg_installed);
-        assert_eq!(meta, "Arch \u{00B7} extra");
+        assert_eq!(meta, "Arch / extra");
         assert_eq!(status, "Installed");
 
         let pkg_update = UnifiedPackage {
@@ -546,7 +548,7 @@ mod tests {
         };
 
         let (meta3, status3) = InspectorHeader::format_metadata_line(&pkg_flatpak);
-        assert_eq!(meta3, "Flatpak \u{00B7} flathub");
+        assert_eq!(meta3, "Flatpak / flathub");
         assert_eq!(status3, "Available");
     }
 }

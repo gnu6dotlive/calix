@@ -874,7 +874,7 @@ impl Render for SearchInputView {
                     .size(px(16.0))
                     .flex_none()
                     .text_color(if is_focused || is_searching {
-                        theme.accent
+                        theme.accent_text
                     } else {
                         theme.text_muted
                     }),

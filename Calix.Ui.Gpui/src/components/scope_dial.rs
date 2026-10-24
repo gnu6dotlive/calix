@@ -162,6 +162,9 @@ impl Render for ScopeDialView {
             .bg(theme.bg_surface)
             .border_1()
             .border_color(theme.border)
+            // The knob stands proud of the aluminium: the one object of the
+            // chassis that casts a shadow of its own.
+            .shadow_md()
             .child(
                 // The needle, thrown at the detent. The SVG is painted upside
                 // down — the engine flips it — so the file's needle points
@@ -176,7 +179,7 @@ impl Render for ScopeDialView {
                         let needle = svg()
                             .path(AppIcon::DialNeedle.path())
                             .size(px(g.face))
-                            .text_color(theme.accent);
+                            .text_color(theme.accent_text);
                         if still {
                             needle
                                 .with_transformation(Transformation::rotate(gpui::radians(
@@ -277,7 +280,7 @@ impl Render for ScopeDialView {
                             .path(scope.icon().path())
                             .size(px(g.icon))
                             .text_color(if is_selected {
-                                theme.accent
+                                theme.accent_text
                             } else {
                                 theme.text_muted
                             }),
