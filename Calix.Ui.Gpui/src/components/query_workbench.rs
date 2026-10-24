@@ -4,7 +4,9 @@ use crate::components::menu::{
 use crate::components::search_input::SearchInputView;
 use crate::components::view_mode_switcher::{ViewModeSwitcher, ViewModeSwitcherProps};
 use crate::state::motion::SelectionMarker;
+use crate::elements::adaptive::AdaptiveRow;
 use crate::state::query::{PackageStateFilter, SortMode, WorkbenchBreakpoint};
+use crate::ui_metrics::UiMetrics;
 use crate::state::session::NavScope;
 use crate::state::PackageViewMode;
 use crate::theme::Theme;
@@ -36,8 +38,6 @@ pub type ActionHandler = Rc<dyn Fn(&mut Window, &mut App) + 'static>;
 
 pub struct QueryWorkbenchProps<'a> {
     pub search_input: Entity<SearchInputView>,
-    /// The dial of the scope: one object with three positions.
-    pub list_pane_width: f32,
     /// Le périmètre : il décide de ce que la banque et le filtre d'état
     /// proposent.
     pub scope: NavScope,
@@ -76,7 +76,6 @@ pub struct QueryWorkbench;
 impl QueryWorkbench {
     pub fn render(props: &QueryWorkbenchProps) -> impl IntoElement {
         let theme = props.theme;
-        let breakpoint = WorkbenchBreakpoint::from_width(props.list_pane_width);
 
         // ── 1. Row 1: Dominant Full-Width Search Input ────────────────────────
         let row1 = div()
@@ -88,6 +87,48 @@ impl QueryWorkbench {
             .h(px(40.0))
             .child(props.search_input.clone());
 
+        // ── 2. Row 2: the toolbar, in the richest form that fits ─────────────
+        //
+        // The three forms are drawn, and the element that lays them out keeps
+        // the first whose natural width fits the room the row really has —
+        // measured in its `prepaint`, with the real labels and font. No pixel
+        // breakpoint: a longer translation or a larger font picks the next
+        // form by itself.
+        let row2 = AdaptiveRow::new(
+            WorkbenchBreakpoint::RICHEST_FIRST
+                .iter()
+                .map(|&form| Self::toolbar(props, form))
+                .collect(),
+            px(UiMetrics::QUERY_CONTROLS_HEIGHT),
+        );
+
+        // ── 8. Final Container Assembly (Fixed Invariant Geometry) ────────────
+        let base_container = div()
+            .id("query_workbench_container")
+            .w_full()
+            .flex()
+            .flex_col()
+            .gap(px(4.0))
+            .p(px(8.0))
+            .border_b_1()
+            .border_color(theme.border);
+
+        apply_surface_projection(
+            base_container,
+            SurfaceRole::QueryChrome,
+            props.visual_style,
+            theme.bg_sidebar,
+            theme,
+        )
+        .child(row1)
+        .child(row2)
+    }
+
+    /// One form of the toolbar: the state, the sort, the view and the scope's
+    /// action. The labels say what the commands do when there is room, and
+    /// what they are when there is not.
+    fn toolbar(props: &QueryWorkbenchProps, breakpoint: WorkbenchBreakpoint) -> AnyElement {
+        let theme = props.theme;
         // ── 2. The menus' shared state ────────────────────────────────────────
         let on_toggle_menu = props.on_toggle_menu.clone();
         let active_state = props.active_menu_state;
@@ -492,28 +533,7 @@ impl QueryWorkbench {
                     .child(view_switcher)
                     .children(scope_action),
             );
-
-
-        // ── 8. Final Container Assembly (Fixed Invariant Geometry) ────────────
-        let base_container = div()
-            .id("query_workbench_container")
-            .w_full()
-            .flex()
-            .flex_col()
-            .gap(px(4.0))
-            .p(px(8.0))
-            .border_b_1()
-            .border_color(theme.border);
-
-        apply_surface_projection(
-            base_container,
-            SurfaceRole::QueryChrome,
-            props.visual_style,
-            theme.bg_sidebar,
-            theme,
-        )
-        .child(row1)
-        .child(row2)
+        row2.into_any_element()
     }
 }
 
@@ -564,7 +584,6 @@ mod tests {
                     .h(px(120.0))
                     .child(QueryWorkbench::render(&QueryWorkbenchProps {
                         search_input: self.search_input.clone(),
-                        list_pane_width: self.width,
                         scope: NavScope::Installed,
                         state_filter: PackageStateFilter::All,
                         sort_mode: SortMode::Relevance,
@@ -627,50 +646,44 @@ mod tests {
             )
         };
 
-        // The wide form: the commands say what they do.
-        let (wide_state, wide_sort, wide_row) = measure(760.0);
-        // The medium form: the sort says what it is.
-        let (medium_state, medium_sort, medium_row) = measure(560.0);
-        // The narrow form: both say what they are.
-        let (narrow_state, narrow_sort, narrow_row) = measure(420.0);
-
+        // Drawn from wide to narrow: the toolbar keeps the richest form that
+        // fits, so the buttons only ever get shorter as the room shrinks.
+        let forms: Vec<(f32, f32, f32, f32)> = [1400.0, 900.0, 700.0, 600.0, 520.0, 460.0, 400.0, 340.0, 280.0, 240.0]
+            .iter()
+            .map(|&width| {
+                let (state, sort, search) = measure(width);
+                (width, state, sort, search)
+            })
+            .collect();
+        for pair in forms.windows(2) {
+            let (wide, narrow) = (pair[0], pair[1]);
+            assert!(
+                narrow.1 <= wide.1 + 0.5 && narrow.2 <= wide.2 + 0.5,
+                "à {} px les boutons ne grandissent pas : état {} -> {}, tri {} -> {}",
+                narrow.0, wide.1, narrow.1, wide.2, narrow.2
+            );
+        }
+        let widest = forms.first().unwrap();
+        let narrowest = forms.last().unwrap();
         assert!(
-            medium_sort < wide_sort,
-            "la forme moyenne réduit le tri : {} puis {}",
-            wide_sort,
-            medium_sort
-        );
-        assert_eq!(
-            medium_state, wide_state,
-            "l'état garde sa forme tant qu'il y a la place"
+            narrowest.2 < widest.2,
+            "la forme étroite réduit le tri : {} puis {}",
+            widest.2,
+            narrowest.2
         );
         assert!(
-            narrow_sort < medium_sort,
-            "la forme étroite réduit le tri encore : {} puis {}",
-            medium_sort,
-            narrow_sort
-        );
-        assert!(
-            narrow_state < medium_state,
+            narrowest.1 < widest.1,
             "et l'état se réduit à son mot : {} puis {}",
-            medium_state,
-            narrow_state
+            widest.1,
+            narrowest.1
         );
-
-        // And the search keeps its room in every form: it is the command
-        // that carries the most, and it is the last to be cut.
-        assert!(
-            wide_row > 300.0,
-            "la recherche garde sa place dans la forme large : {wide_row}"
-        );
-        assert!(
-            medium_row > 250.0,
-            "et dans la forme moyenne : {medium_row}"
-        );
-        assert!(
-            narrow_row > 150.0,
-            "et dans la forme étroite : {narrow_row}"
-        );
-        let _ = (wide_state, medium_state);
+        // The search keeps its room in every form: it is the command that
+        // carries the most, and it is the last to be cut.
+        for (width, _, _, search) in &forms {
+            assert!(
+                *search > 150.0,
+                "la recherche garde sa place à {width} px : {search}"
+            );
+        }
     }
 }
