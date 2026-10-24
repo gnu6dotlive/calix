@@ -87,10 +87,7 @@ impl PackageInspectorView {
                         .flex_col()
                         .gap(px(5.0))
                         .child(
-                            div()
-                                .text_xs()
-                                .text_color(theme.text_muted)
-                                .child(quiet.heading),
+                            crate::components::facts::section_label(quiet.heading, theme),
                         )
                         .child(
                             div()
@@ -112,7 +109,7 @@ impl PackageInspectorView {
                     div()
                         .text_xs()
                         .text_color(theme.text_muted)
-                        .child("Select a row above and it opens here."),
+                        .child("Select a package and it opens here."),
                 )
                 .into_any_element();
         };
@@ -431,7 +428,7 @@ mod tests {
             is_busy: false,
             copy_feedback: false,
             quiet: QuietPlate {
-                heading: "THE BANK",
+                heading: "No package selected",
                 subject: "Official / ALPM".to_string(),
                 detail: "official repositories — binaries · 1914 rows in this scope".to_string(),
             },
@@ -473,7 +470,7 @@ mod tests {
             // La plaque au repos n'est pas rendue quand un paquet est ouvert,
             // mais la charge est toujours fournie : une seule forme de props.
             quiet: QuietPlate {
-                heading: "THE BANK",
+                heading: "No package selected",
                 subject: "Official / ALPM".to_string(),
                 detail: String::new(),
             },
@@ -533,7 +530,7 @@ mod tests {
                     is_busy: false,
                     copy_feedback: false,
                     quiet: QuietPlate {
-                        heading: "THE BANK",
+                        heading: "No package selected",
                         subject: "Official / ALPM".to_string(),
                         detail: String::new(),
                     },

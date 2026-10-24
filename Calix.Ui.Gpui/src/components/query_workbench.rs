@@ -272,7 +272,7 @@ impl QueryWorkbench {
                     .text_xs()
                     .text_color(
                         if props.state_filter != PackageStateFilter::All || is_state_open {
-                            theme.accent
+                            theme.accent_text
                         } else {
                             theme.text_secondary
                         },
@@ -457,7 +457,7 @@ impl QueryWorkbench {
             })
             .text_xs()
             .text_color(if props.sort_mode != SortMode::Relevance || is_sort_open {
-                theme.accent
+                theme.accent_text
             } else {
                 theme.text_secondary
             })
@@ -500,7 +500,7 @@ impl QueryWorkbench {
                 .cursor_pointer()
                 .text_xs()
                 .font_weight(FontWeight::BOLD)
-                .text_color(theme.accent)
+                .text_color(theme.accent_text)
                 .hover(|s| s.bg(theme.bg_surface_hover).text_color(theme.accent_hover))
                 .child(action.label)
                 .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {

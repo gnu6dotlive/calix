@@ -172,7 +172,7 @@ impl NewsView {
                         .child(
                             div()
                                 .text_xs()
-                                .text_color(theme.accent)
+                                .text_color(theme.accent_text)
                                 .child(item.published_date.clone().unwrap_or_default()),
                         ),
                 )
@@ -200,13 +200,13 @@ impl NewsView {
                         .items_center()
                         .gap_1()
                         .text_xs()
-                        .text_color(theme.accent)
+                        .text_color(theme.accent_text)
                         .mt_2()
                         .child(
                             svg()
                                 .path(AppIcon::ExternalUrl.path())
                                 .size_3()
-                                .text_color(theme.accent),
+                                .text_color(theme.accent_text),
                         )
                         .child("Open in browser"),
                 );

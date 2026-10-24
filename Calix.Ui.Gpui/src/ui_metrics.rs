@@ -24,7 +24,7 @@ impl UiMetrics {
     // 168 left the catalogue with less than a row and a half. The plate is a
     // context surface — it is the first to give way — and its floor is the
     // height at which it still shows its tabs.
-    pub const SPLITTER_THICKNESS: f32 = 5.0;
+    pub const SPLITTER_THICKNESS: f32 = 8.0;
     /// Le plancher de la plaque : l'identité seule.
     ///
     /// La plaque cède d'abord — elle rend sa place avant que le catalogue
@@ -33,6 +33,25 @@ impl UiMetrics {
     /// sélectionné, et que sans elle la plaque ne dit plus rien.
     pub const NAMEPLATE_MIN_HEIGHT: f32 = 48.0;
     pub const NAMEPLATE_MAX_RATIO: f32 = 0.55;
+    /// What the plate asks for under the catalogue until the user drags it:
+    /// enough for its name, its actions, its tabs and a first paragraph. It
+    /// asked for its floor, and a plate at its floor says only a name.
+    pub const NAMEPLATE_REQUESTED_HEIGHT: f32 = 300.0;
+
+    // ── The inspector beside the catalogue ──────────────────────────────────
+    //
+    // Where the window has the room for the catalogue's floor and a useful
+    // inspector side by side, the inspector stands to the right; otherwise
+    // it lies under the catalogue (the plate).
+    /// What the side inspector asks for until the user drags its edge.
+    pub const INSPECTOR_SIDE_WIDTH: f32 = 400.0;
+    /// Below this, a side inspector wraps its facts word by word: it goes
+    /// under the catalogue instead.
+    pub const INSPECTOR_SIDE_MIN_WIDTH: f32 = 340.0;
+    /// The share of the band the side inspector may take.
+    pub const INSPECTOR_SIDE_MAX_RATIO: f32 = 0.5;
+    /// The aluminium between two planes.
+    pub const PLANE_GAP: f32 = 8.0;
 
     // ── Workbench Dimensions ─────────────────────────────────────────────────
     pub const SEARCH_INPUT_HEIGHT: f32 = 40.0;
@@ -55,7 +74,7 @@ impl UiMetrics {
     // The header's band: the place that says where we are. It is a band, not
     // a text that happens to be there — the budget divides the window with
     // it, so its height has to be a number everyone knows.
-    pub const CONTEXT_HEADER_HEIGHT: f32 = 88.0;
+    pub const CONTEXT_HEADER_HEIGHT: f32 = 84.0;
     /// The vertical space the primary workspace keeps, whatever else is open.
     ///
     /// The catalogue is the body; the plate and the log are context surfaces.

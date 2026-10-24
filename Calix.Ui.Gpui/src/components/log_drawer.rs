@@ -248,34 +248,19 @@ impl LogDrawer {
                         }
                     }
                 })
+                .flex()
+                .items_center()
+                .gap(px(6.0))
                 .px_2()
                 .py_1()
-                .rounded_sm()
-                .border_1()
-                .border_color(if auto_scroll {
-                    theme.accent
-                } else {
-                    theme.border
-                })
-                .bg(if auto_scroll {
-                    theme.bg_surface_active
-                } else {
-                    theme.bg_surface
-                })
+                .rounded_md()
                 .text_xs()
                 .font_weight(FontWeight::MEDIUM)
-                .text_color(if auto_scroll {
-                    theme.accent
-                } else {
-                    theme.text_muted
-                })
+                .text_color(theme.text_secondary)
                 .cursor_pointer()
-                .hover(move |s| s.bg(hover_bg).border_color(border_focus))
-                .child(if auto_scroll {
-                    "Auto-scroll: ON"
-                } else {
-                    "Auto-scroll: PAUSE"
-                });
+                .hover(move |s| s.bg(hover_bg))
+                .child(lamp(auto_scroll, theme))
+                .child("Follow output");
 
             if let Some(handler) = on_toggle_autoscroll {
                 btn = btn.on_mouse_down(MouseButton::Left, move |_e, w, cx| handler(w, cx));
@@ -302,30 +287,19 @@ impl LogDrawer {
                         }
                     }
                 })
+                .flex()
+                .items_center()
+                .gap(px(6.0))
                 .px_2()
                 .py_1()
-                .rounded_sm()
-                .border_1()
-                .border_color(if show_raw { theme.accent } else { theme.border })
-                .bg(if show_raw {
-                    theme.bg_surface_active
-                } else {
-                    theme.bg_surface
-                })
+                .rounded_md()
                 .text_xs()
                 .font_weight(FontWeight::MEDIUM)
-                .text_color(if show_raw {
-                    theme.accent
-                } else {
-                    theme.text_secondary
-                })
+                .text_color(theme.text_secondary)
                 .cursor_pointer()
-                .hover(move |s| s.bg(hover_bg).border_color(border_focus))
-                .child(if show_raw {
-                    "Logs: Raw"
-                } else {
-                    "Logs: Formatted"
-                });
+                .hover(move |s| s.bg(hover_bg))
+                .child(lamp(show_raw, theme))
+                .child("Raw output");
 
             if let Some(handler) = on_toggle_raw {
                 btn = btn.on_mouse_down(MouseButton::Left, move |_e, w, cx| handler(w, cx));
@@ -360,7 +334,7 @@ impl LogDrawer {
                 .text_xs()
                 .font_weight(FontWeight::MEDIUM)
                 .text_color(theme.text_secondary)
-                .hover(|s| s.text_color(theme.accent))
+                .hover(|s| s.text_color(theme.accent_text))
                 .child(
                     svg()
                         .path(if is_open {
@@ -389,9 +363,8 @@ impl LogDrawer {
             // Le bandeau du tiroir est une bande permanente : le budget
             // vertical le compte quand il répartit la fenêtre.
             .h(px(crate::ui_metrics::UiMetrics::DRAWER_HEADER_HEIGHT))
-            .bg(theme.bg_surface)
-            .border_t_1()
-            .border_color(theme.border)
+            // The chassis' foot: it holds a state, on the aluminium.
+            .bg(theme.bg_sidebar)
             .child(
                 div()
                     .flex()
@@ -399,10 +372,11 @@ impl LogDrawer {
                     .gap_3()
                     .child(
                         div()
-                            .text_xs()
-                            .font_weight(FontWeight::BOLD)
-                            .text_color(theme.text_primary)
-                            .child("CALIX OPERATION LOG"),
+                            .font_family(crate::fonts::LABEL)
+                            .text_sm()
+                            .font_weight(FontWeight::SEMIBOLD)
+                            .text_color(theme.text_secondary)
+                            .child("Operation log"),
                     )
                     // La commande du produit, puis ce que le moteur a
                     // réellement lancé. Les deux ne sont jamais la même
@@ -410,8 +384,8 @@ impl LogDrawer {
                     .children(props.product_command.map(|command| {
                         div()
                             .text_xs()
-                            .font_family("monospace")
-                            .text_color(theme.accent)
+                            .font_family(crate::fonts::CODE)
+                            .text_color(theme.accent_text)
                             .child(format!("$ {}", command))
                     }))
                     .child(status_badge),
@@ -561,7 +535,7 @@ impl LogDrawer {
                         div()
                             .id(idx)
                             .py_0p5()
-                            .font_family("monospace")
+                            .font_family(crate::fonts::CODE)
                             .text_color(color)
                             .child(display_text.to_string()),
                     );
@@ -601,4 +575,15 @@ pub fn sanitize_ansi(s: &str) -> String {
         }
     }
     clean
+}
+
+
+/// A toggle's lamp: lit in the accent while the toggle is on, a ring when it
+/// is off — the same indicator as the source strip's.
+fn lamp(on: bool, theme: &Theme) -> Div {
+    div()
+        .size(px(7.0))
+        .rounded_full()
+        .when(on, |lamp| lamp.bg(theme.accent))
+        .when(!on, |lamp| lamp.border_1().border_color(theme.text_muted))
 }

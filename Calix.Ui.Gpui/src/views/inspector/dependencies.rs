@@ -48,7 +48,7 @@ impl DependenciesView {
             div()
                 .font_weight(FontWeight::BOLD)
                 .text_color(if is_nav {
-                    theme.accent
+                    theme.accent_text
                 } else {
                     theme.text_primary
                 })

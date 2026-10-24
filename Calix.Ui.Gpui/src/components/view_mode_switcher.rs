@@ -123,14 +123,14 @@ impl ViewModeSwitcher {
                         .rounded_sm()
                         .cursor_pointer()
                         .text_color(if is_active {
-                            theme.accent
+                            theme.accent_text
                         } else {
                             theme.text_muted
                         })
                         .hover(move |s| s.bg(hover_bg).text_color(theme.text_primary))
                         .child(svg().path(mode.icon().path()).size(px(14.0)).text_color(
                             if is_active {
-                                theme.accent
+                                theme.accent_text
                             } else {
                                 theme.text_muted
                             },

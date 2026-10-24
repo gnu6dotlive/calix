@@ -97,7 +97,7 @@ impl Sidebar {
         };
 
         let icon_color = if is_active {
-            theme.accent
+            theme.accent_text
         } else {
             theme.text_secondary
         };
@@ -277,14 +277,14 @@ impl Sidebar {
                             svg()
                                 .path(AppIcon::Calix.path())
                                 .size_8()
-                                .text_color(theme.accent),
+                                .text_color(theme.accent_text),
                         )
                         .child(if !is_collapsed {
                             div()
                                 .text_lg()
-                                .font_weight(FontWeight::BOLD)
+                                .font_weight(FontWeight::SEMIBOLD)
                                 .text_color(theme.text_primary)
-                                .child("CALIX")
+                                .child("Calix")
                         } else {
                             div()
                         }),

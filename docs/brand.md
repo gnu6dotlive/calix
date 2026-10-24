@@ -66,6 +66,39 @@ From the logo pack, and they are the rules the application follows:
 - Clear space: at least 10% of the mark's height on every side.
 - Scale uniformly only. Never skew, never re-typeset.
 
+## The interface: the workshop
+
+The window is an instrument made of the mark's own materials: the brushed
+aluminium of the stem and the anthracite of the tile. Calix opens in the
+**day workshop** (light); the **night workshop** is a choice in the settings.
+
+| Token | Day | Night | What it is |
+|---|---|---|---|
+| `bg_sidebar` | `#E7EAEE` | `#111418` | The chassis: aluminium by day, the brand's anthracite tile by night |
+| `bg_app` | `#F7F8FA` | `#171B21` | The planes where one reads: the catalogue, the inspector, the settings' sections |
+| `bg_surface` | `#FFFFFF` | `#1E232B` | Controls and fields |
+| `border` | `#D5DAE0` | `#2B313A` | A plane's edge, a hairline between two facts |
+| `text_primary` | `#111418` | `#ECEEF1` | The ink: the brand's anthracite by day |
+| `accent_text` | derived | derived | The accent written as text, darkened toward the ink until it reads at 4.5:1 |
+
+Rules the interface keeps:
+
+- **The accent signals, it does not decorate.** It is the cursor (the
+  selection's bar), the focus, the primary action, and the lamps of what is
+  on. A figure (a size bar) is graphite.
+- **Two kinds of surface.** Planes rest on the chassis with an edge and a fine
+  shadow, separated by a groove of aluminium that is also their resize handle.
+  The dial is the one object of the chassis with a shadow of its own.
+- **Lamps for what is on.** A source in the scope, a toggle that is on: a dot
+  lit in the accent; off, a ring.
+- **Three voices** (`src/fonts.rs`, embedded, OFL): Instrument Sans for the
+  interface, its SemiCondensed cut for labels, JetBrains Mono only for what is
+  machine text (the log, a PKGBUILD, a command). Figures in columns are
+  tabular.
+- **Sentence case.** A label is set apart by its narrow cut and its colour,
+  never by capitals; meta is joined by its own words ("Arch / extra"), not by
+  middle dots.
+
 ## Provenance
 
 The pack is a deterministic build: `src/build_calix_logo.py` regenerates the whole

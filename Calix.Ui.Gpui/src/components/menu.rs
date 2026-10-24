@@ -183,7 +183,7 @@ impl MenuCheckmarkItem {
                 gpui::rgba(0x00000000)
             })
             .text_color(if is_selected {
-                theme.accent
+                theme.accent_text
             } else {
                 theme.text_secondary
             })
@@ -203,7 +203,7 @@ impl MenuCheckmarkItem {
                         svg()
                             .path(AppIcon::Check.path())
                             .size(px(12.0))
-                            .text_color(theme.accent)
+                            .text_color(theme.accent_text)
                             .into_any_element()
                     } else {
                         div().size(px(12.0)).into_any_element()
