@@ -70,7 +70,7 @@ impl Cheatsheet {
             .px_1p5()
             .py(px(1.0))
             .text_xs()
-            .font_family("monospace")
+            .font_family(crate::fonts::UI)
             .text_color(theme.text_primary)
             .child(binding.label())
     }

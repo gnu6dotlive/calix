@@ -294,7 +294,7 @@ impl SettingsView {
                 div()
                     .text_sm()
                     .font_weight(FontWeight::BOLD)
-                    .text_color(theme.accent)
+                    .text_color(theme.accent_text)
                     .mb_3()
                     .child("PACKAGE SOURCES"),
             )
@@ -339,7 +339,7 @@ impl SettingsView {
                 div()
                     .text_sm()
                     .font_weight(FontWeight::BOLD)
-                    .text_color(theme.accent)
+                    .text_color(theme.accent_text)
                     .mb_3()
                     .child("PACKAGE MANAGEMENT"),
             )
@@ -376,7 +376,7 @@ impl SettingsView {
                 div()
                     .text_sm()
                     .font_weight(FontWeight::BOLD)
-                    .text_color(theme.accent)
+                    .text_color(theme.accent_text)
                     .mb_3()
                     .child("APPEARANCE & DENSITY"),
             )
@@ -440,7 +440,7 @@ impl SettingsView {
                 div()
                     .text_sm()
                     .font_weight(FontWeight::BOLD)
-                    .text_color(theme.accent)
+                    .text_color(theme.accent_text)
                     .mb_3()
                     .child("MOTION & FEEDBACK"),
             )
@@ -469,7 +469,7 @@ impl SettingsView {
                 div()
                     .text_sm()
                     .font_weight(FontWeight::BOLD)
-                    .text_color(theme.accent)
+                    .text_color(theme.accent_text)
                     .mb_3()
                     .child("LOGS & OPERATIONS"),
             )
@@ -520,7 +520,7 @@ impl SettingsView {
                         div()
                             .text_sm()
                             .font_weight(FontWeight::BOLD)
-                            .text_color(theme.accent)
+                            .text_color(theme.accent_text)
                             .child("ADVANCED SETTINGS"),
                     )
                     .child(
@@ -560,7 +560,7 @@ impl SettingsView {
                                     svg()
                                         .path(AppIcon::RenderLab.path())
                                         .size(px(16.0))
-                                        .text_color(theme.accent),
+                                        .text_color(theme.accent_text),
                                 )
                                 .child(
                                     div()
@@ -1033,7 +1033,7 @@ mod tests {
         assert!(!settings.draft_calix.package_management_remove_configs);
 
         settings.toggle_dark_theme();
-        assert!(!settings.draft_gpui.dark_theme);
+        assert!(settings.draft_gpui.dark_theme);
 
         settings.toggle_compact_view();
         assert!(settings.draft_gpui.compact_view);

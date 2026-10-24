@@ -259,7 +259,7 @@ impl OverviewView {
                                 .child(
                                     div()
                                         .text_xs()
-                                        .font_family("monospace")
+                                        .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                                         .text_color(theme.text_muted)
                                         .child(entry.version.clone()),
                                 )

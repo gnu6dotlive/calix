@@ -19,7 +19,7 @@ impl UnifiedSearch {
                 svg()
                     .path(AppIcon::Search.path())
                     .size_8()
-                    .text_color(theme.accent)
+                    .text_color(theme.accent_text)
                     .mb_3(),
             )
             .child(

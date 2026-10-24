@@ -200,7 +200,7 @@ impl SourceBank {
                 let count = div()
                     .id(count_id(kind))
                     .text_sm()
-                    .font_family("monospace")
+                    .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                     .text_color(count_color)
                     .child(entry.count.to_string());
                 if props.reduce_motion {

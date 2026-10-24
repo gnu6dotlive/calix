@@ -360,7 +360,7 @@ impl LogDrawer {
                 .text_xs()
                 .font_weight(FontWeight::MEDIUM)
                 .text_color(theme.text_secondary)
-                .hover(|s| s.text_color(theme.accent))
+                .hover(|s| s.text_color(theme.accent_text))
                 .child(
                     svg()
                         .path(if is_open {
@@ -410,8 +410,8 @@ impl LogDrawer {
                     .children(props.product_command.map(|command| {
                         div()
                             .text_xs()
-                            .font_family("monospace")
-                            .text_color(theme.accent)
+                            .font_family(crate::fonts::CODE)
+                            .text_color(theme.accent_text)
                             .child(format!("$ {}", command))
                     }))
                     .child(status_badge),
@@ -561,7 +561,7 @@ impl LogDrawer {
                         div()
                             .id(idx)
                             .py_0p5()
-                            .font_family("monospace")
+                            .font_family(crate::fonts::CODE)
                             .text_color(color)
                             .child(display_text.to_string()),
                     );

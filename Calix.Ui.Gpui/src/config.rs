@@ -129,8 +129,9 @@ pub const MIN_WINDOW_WIDTH: f32 = 620.0;
 /// demande, et non un chiffre posé à côté.
 pub const MIN_WINDOW_HEIGHT: f32 = 520.0;
 
+/// Le look par défaut est l'atelier de jour ; la nuit est un choix.
 fn default_dark_theme() -> bool {
-    true
+    false
 }
 
 fn default_window_width() -> f32 {
@@ -667,7 +668,7 @@ mod tests {
         let parsed: GpuiUiConfig = serde_json::from_str(empty_json)
             .expect("Empty JSON object should deserialize with default values for all fields");
 
-        assert!(parsed.dark_theme);
+        assert!(!parsed.dark_theme, "the day workshop is the default look");
         assert_eq!(parsed.window_width, 1280.0);
         assert_eq!(parsed.window_height, 840.0);
         assert!(!parsed.compact_view);

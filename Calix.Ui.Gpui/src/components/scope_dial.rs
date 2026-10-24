@@ -176,7 +176,7 @@ impl Render for ScopeDialView {
                         let needle = svg()
                             .path(AppIcon::DialNeedle.path())
                             .size(px(g.face))
-                            .text_color(theme.accent);
+                            .text_color(theme.accent_text);
                         if still {
                             needle
                                 .with_transformation(Transformation::rotate(gpui::radians(

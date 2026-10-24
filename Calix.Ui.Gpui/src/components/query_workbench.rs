@@ -500,7 +500,7 @@ impl QueryWorkbench {
                 .cursor_pointer()
                 .text_xs()
                 .font_weight(FontWeight::BOLD)
-                .text_color(theme.accent)
+                .text_color(theme.accent_text)
                 .hover(|s| s.bg(theme.bg_surface_hover).text_color(theme.accent_hover))
                 .child(action.label)
                 .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {

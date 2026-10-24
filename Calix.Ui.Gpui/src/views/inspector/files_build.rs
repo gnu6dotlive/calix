@@ -71,7 +71,7 @@ impl FilesBuildView {
                             .child(
                                 div()
                                     .text_xs()
-                                    .text_color(theme.accent)
+                                    .text_color(theme.accent_text)
                                     .child(format!("via calix search aur {} -p", pkg.name)),
                             ),
                     )
@@ -174,7 +174,7 @@ impl FilesBuildView {
                         .child(
                             div()
                                 .text_sm()
-                                .text_color(theme.accent)
+                                .text_color(theme.accent_text)
                                 .child("Loading PKGBUILD recipe..."),
                         )
                         .into_any_element()
@@ -457,7 +457,7 @@ impl FilesBuildView {
                                 svg()
                                     .path(AppIcon::Info.path())
                                     .size_3_5()
-                                    .text_color(theme.accent),
+                                    .text_color(theme.accent_text),
                             )
                             .child("Detailed File Tree Listing"),
                     )

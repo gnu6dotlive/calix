@@ -277,7 +277,7 @@ impl Sidebar {
                             svg()
                                 .path(AppIcon::Calix.path())
                                 .size_8()
-                                .text_color(theme.accent),
+                                .text_color(theme.accent_text),
                         )
                         .child(if !is_collapsed {
                             div()

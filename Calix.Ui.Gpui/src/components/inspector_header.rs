@@ -178,7 +178,7 @@ impl InspectorHeader {
         let mut version_row = div().flex().items_center().gap_1().flex_shrink_0().child(
             div()
                 .text_xs()
-                .font_family("monospace")
+                .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                 .text_color(theme.text_muted)
                 .child(pkg.version.clone()),
         );
@@ -188,7 +188,7 @@ impl InspectorHeader {
                 version_row = version_row.child(
                     div()
                         .text_xs()
-                        .font_family("monospace")
+                        .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                         .font_weight(FontWeight::BOLD)
                         .text_color(theme.warning_text)
                         .child(format!(" → {}", nv)),
@@ -197,7 +197,7 @@ impl InspectorHeader {
                 version_row = version_row.child(
                     div()
                         .text_xs()
-                        .font_family("monospace")
+                        .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                         .font_weight(FontWeight::BOLD)
                         .text_color(theme.warning_text)
                         .child(" (update)"),

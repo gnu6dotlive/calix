@@ -154,8 +154,11 @@ impl PackageTable {
             .bg(gpui::rgba(0x00000000))
             .border_b_1()
             .border_color(theme.border)
+            // A column's name is a label: the narrow face, in sentence case;
+            // its width, not capitals, sets it apart from the rows.
+            .font_family(crate::fonts::LABEL)
             .text_xs()
-            .font_weight(FontWeight::SEMIBOLD)
+            .font_weight(FontWeight::MEDIUM)
             .text_color(theme.text_muted)
             .child(
                 div()
@@ -163,21 +166,21 @@ impl PackageTable {
                     .min_w_0()
                     .overflow_hidden()
                     .text_ellipsis()
-                    .child("NAME"),
+                    .child("Name"),
             )
             .child(
                 div()
                     .w(px(105.0))
                     .overflow_hidden()
                     .text_ellipsis()
-                    .child("VERSION"),
+                    .child("Version"),
             )
             .child(
                 div()
                     .w(px(105.0))
                     .overflow_hidden()
                     .text_ellipsis()
-                    .child("SOURCE"),
+                    .child("Source"),
             )
             .child(Self::render_header_size_cell(theme, scale_max))
             .child(
@@ -185,7 +188,7 @@ impl PackageTable {
                     .w(px(85.0))
                     .overflow_hidden()
                     .text_ellipsis()
-                    .child("STATUS"),
+                    .child("Status"),
             )
     }
 
@@ -215,7 +218,7 @@ impl PackageTable {
                 div()
                     .overflow_hidden()
                     .text_ellipsis()
-                    .child("SIZE"),
+                    .child("Size"),
             )
             .child(
                 div()
@@ -223,7 +226,7 @@ impl PackageTable {
                     .debug_selector(|| "package_header_size_caption".to_string())
                     .overflow_hidden()
                     .text_size(px(8.0))
-                    .font_family("monospace")
+                    .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                     .font_weight(FontWeight::NORMAL)
                     .text_color(theme.text_muted)
                     .child(caption),
@@ -338,7 +341,7 @@ impl PackageTable {
             .overflow_hidden()
             .text_ellipsis()
             .text_xs()
-            .font_family("monospace")
+            .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
             .font_weight(FontWeight::MEDIUM)
             .text_color(theme.text_muted);
         let mut version_cell = clip::clipped(version_cell, version_text);
@@ -371,7 +374,7 @@ impl PackageTable {
             .overflow_hidden()
             .text_ellipsis()
             .text_xs()
-            .font_family("monospace")
+            .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
             .text_color(theme.text_secondary)
             .child(Self::display_size(pkg));
         let measurement = Self::render_measurement(Self::size_bytes(pkg), scale_max, theme);

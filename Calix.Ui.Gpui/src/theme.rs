@@ -57,13 +57,16 @@ pub struct Theme {
     /// Le texte et les glyphes posés sur l'accent : blanc, ou sombre sur un
     /// accent clair — celui des deux qui se lit.
     pub on_accent: Rgba,
+    /// L'accent écrit en texte sur un plan : l'orange de la marque se lit mal
+    /// sur l'aluminium clair, il fonce vers l'encre jusqu'à 4,5:1.
+    pub accent_text: Rgba,
 }
 
 impl Global for Theme {}
 
 impl Default for Theme {
     fn default() -> Self {
-        Self::dark()
+        Self::light()
     }
 }
 
@@ -119,9 +122,18 @@ fn guarded_fill(fill: Rgba, toward: Rgba, light: Rgba, dark: Rgba) -> (Rgba, Rgb
     (ground, readable_on(ground, light, dark))
 }
 
+/// Une couleur écrite en texte sur `ground` : elle va vers `toward` (l'encre)
+/// jusqu'à se lire à 4,5:1.
+fn guarded_text(color: Rgba, ground: Rgba, toward: Rgba) -> Rgba {
+    (0..=20)
+        .map(|step| lerp(color, toward, step as f32 / 20.0))
+        .find(|candidate| contrast(*candidate, ground) >= TEXT_CONTRAST)
+        .unwrap_or(toward)
+}
+
 impl Theme {
     /// Le thème de la fenêtre. Hors d'une fenêtre qui l'a posé (un banc de
-    /// test), le thème sombre par défaut.
+    /// test), l'atelier de jour par défaut.
     pub fn of(cx: &App) -> Self {
         cx.try_global::<Theme>().copied().unwrap_or_default()
     }
@@ -153,7 +165,9 @@ impl Theme {
         let dark = self.is_dark();
         // La sélection est l'accent, adouci vers le fond : elle se voit sans
         // crier, et son texte reste lisible.
-        let tint = lerp(self.bg_app, self.accent, if dark { 0.45 } else { 0.30 });
+        // L'atelier : une sélection est un plan teinté, pas un aplat ; c'est la
+        // barre d'accent de la rangée qui la désigne.
+        let tint = lerp(self.bg_app, self.accent, if dark { 0.24 } else { 0.14 });
         let toward = if dark { self.bg_app } else { white };
         let (light_text, dark_text) = if dark {
             (self.text_primary, ink)
@@ -162,80 +176,92 @@ impl Theme {
         };
         let (selection_bg, selection_text) = guarded_fill(tint, toward, light_text, dark_text);
         let on_accent = self.on(self.accent);
+        let accent_text = guarded_text(self.accent, self.bg_app, self.text_primary);
         Self {
             selection_bg,
             selection_text,
             on_accent,
+            accent_text,
             ..self
         }
     }
 
+    /// L'atelier de nuit : la tuile anthracite de la marque (`#111418`) pour le
+    /// châssis, des plans d'aluminium anodisé foncé pour ce qui se lit.
     pub fn dark() -> Self {
         Self {
-            bg_app: rgb(0x0f0f14),            // Ultra-deep charcoal base
-            bg_sidebar: rgb(0x0a0a0e),        // Dark contrast header/nav
-            bg_surface: rgb(0x181822),        // Layered elevated card surface
-            bg_surface_hover: rgb(0x232332),  // Immediate reactive hover state
-            bg_surface_active: rgb(0x2c2d40), // Active item surface
-            border: rgb(0x262638),            // Subtle 1px boundary frame
-            border_focus: rgb(0x38bdf8),      // Electric cyan focus glow
-            text_primary: rgb(0xf1f5f9),      // Crisp high-contrast slate-50
-            text_secondary: rgb(0x94a3b8),    // Balanced legible secondary text
-            text_muted: rgb(0x94a3b8),        // Legible WCAG AA hints and captions (6.87:1)
-            accent: rgb(0x38bdf8),            // Electric cyan
-            accent_hover: rgb(0x7dd3fc),      // Luminous cyan highlight
-            success: rgb(0x10b981),           // Vibrant emerald accent dot
-            success_text: rgb(0x34d399),      // High-contrast emerald text label (9.16:1)
-            warning: rgb(0xf59e0b),           // Bright amber accent dot
-            warning_text: rgb(0xfbbf24),      // High-contrast amber text label (10.55:1)
-            danger: rgb(0xf43f5e),            // Vivid ruby rose
-            danger_hover: rgb(0xfb7185),      // Luminous ruby highlight
-            badge_alpm: rgb(0x38bdf8),        // Electric Cyan (Official ALPM)
-            badge_aur: rgb(0xa855f7),         // Vivid Violet (AUR)
-            badge_flatpak: rgb(0x06b6d4),     // Cyan (Flatpak)
-            badge_appimage: rgb(0xf97316),    // Warm Orange (AppImage)
-            badge_cargo: rgb(0xd97757),       // Burnt Sienna (Cargo)
-            badge_npm: rgb(0xcb3837),         // NPM Red
-            badge_release: rgb(0x10b981),     // Emerald (Release)
+            bg_sidebar: rgb(0x111418),        // Le châssis : la tuile anthracite
+            bg_app: rgb(0x171b21),            // Les plans posés dessus
+            bg_surface: rgb(0x1e232b),        // Les contrôles et les champs
+            bg_surface_hover: rgb(0x242a33),
+            bg_surface_active: rgb(0x2c333d),
+            border: rgb(0x2b313a),            // L'arête d'un plan
+            border_focus: rgb(0xff6a00),
+            text_primary: rgb(0xeceef1),
+            text_secondary: rgb(0xb3b9c2),
+            text_muted: rgb(0x8f97a2),
+            accent: rgb(0xff6a00),
+            accent_hover: rgb(0xff8e40),
+            success: rgb(0x3fb971),
+            success_text: rgb(0x62cf90),
+            warning: rgb(0xe9a23b),
+            warning_text: rgb(0xf2b961),
+            danger: rgb(0xf05a63),
+            danger_hover: rgb(0xf57c83),
+            // Les badges disent un écosystème, pas la marque : chacun sa
+            // couleur, celle de son projet quand il en a une.
+            badge_alpm: rgb(0x1793d1),        // Le bleu d'Arch
+            badge_aur: rgb(0xa182e6),
+            badge_flatpak: rgb(0x5c9de0),
+            badge_appimage: rgb(0x8fb3c9),
+            badge_cargo: rgb(0xe0763f),
+            badge_npm: rgb(0xe0565a),
+            badge_release: rgb(0x3fb971),
             // Dérivés plus bas (`derive_states`).
             selection_bg: rgb(0x000000),
             selection_text: rgb(0x000000),
             on_accent: rgb(0x000000),
+            accent_text: rgb(0x000000),
         }
         .derive_states()
     }
 
+    /// L'atelier de jour, le look par défaut : un instrument d'aluminium clair,
+    /// à l'encre anthracite. Le châssis est l'aluminium brossé (`bg_sidebar`),
+    /// les plans où l'on lit sont plus clairs et posés dessus, l'orange ne sert
+    /// qu'à signaler : le curseur, le focus, l'action.
     pub fn light() -> Self {
         Self {
-            bg_app: rgb(0xf8fafc),
-            bg_sidebar: rgb(0xf1f5f9),
-            bg_surface: rgb(0xffffff),
-            bg_surface_hover: rgb(0xe2e8f0),
-            bg_surface_active: rgb(0xcbd5e1),
-            border: rgb(0xe2e8f0),
-            border_focus: rgb(0x0284c7),
-            text_primary: rgb(0x0f172a),
-            text_secondary: rgb(0x475569),
-            text_muted: rgb(0x64748b), // WCAG AA compliant muted text (4.76:1)
-            accent: rgb(0x0284c7),
-            accent_hover: rgb(0x0369a1),
-            success: rgb(0x059669),      // Emerald accent dot
-            success_text: rgb(0x047857), // WCAG AA compliant emerald text (5.48:1)
-            warning: rgb(0xd97706),      // Amber accent dot
-            warning_text: rgb(0xb45309), // WCAG AA compliant amber text (5.02:1)
-            danger: rgb(0xe11d48),
-            danger_hover: rgb(0xbe123c),
-            badge_alpm: rgb(0x0284c7),
-            badge_aur: rgb(0x7c3aed),
-            badge_flatpak: rgb(0x0891b2),
-            badge_appimage: rgb(0xea580c),
-            badge_cargo: rgb(0xb45309),
-            badge_npm: rgb(0x9f1239),
-            badge_release: rgb(0x047857),
+            bg_sidebar: rgb(0xe7eaee),        // Le châssis : aluminium brossé
+            bg_app: rgb(0xf7f8fa),            // Les plans : ce qui se lit
+            bg_surface: rgb(0xffffff),        // Les contrôles et les champs
+            bg_surface_hover: rgb(0xeef0f3),
+            bg_surface_active: rgb(0xe2e6eb),
+            border: rgb(0xd5dae0),            // L'arête d'un plan
+            border_focus: rgb(0xff6a00),
+            text_primary: rgb(0x111418),      // L'encre : l'anthracite de la marque
+            text_secondary: rgb(0x3d444f),
+            text_muted: rgb(0x5d6571),
+            accent: rgb(0xff6a00),
+            accent_hover: rgb(0xff8e40),
+            success: rgb(0x1f8a4c),
+            success_text: rgb(0x16703c),
+            warning: rgb(0xc26a00),
+            warning_text: rgb(0x8c4a00),
+            danger: rgb(0xc62839),
+            danger_hover: rgb(0xa91f30),
+            badge_alpm: rgb(0x1793d1),
+            badge_aur: rgb(0x7a4cc2),
+            badge_flatpak: rgb(0x3c78c3),
+            badge_appimage: rgb(0x52707f),
+            badge_cargo: rgb(0xb7410e),
+            badge_npm: rgb(0xcb3837),
+            badge_release: rgb(0x1f8a4c),
             // Dérivés plus bas (`derive_states`).
             selection_bg: rgb(0x000000),
             selection_text: rgb(0x000000),
             on_accent: rgb(0x000000),
+            accent_text: rgb(0x000000),
         }
         .derive_states()
     }
@@ -321,10 +347,10 @@ mod tests {
         assert_ne!(dark.border, dark.border_focus);
         assert_ne!(light.border, light.border_focus);
 
-        // Ensure default is dark theme
+        // The default is the day workshop.
         let def = Theme::default();
-        assert_eq!(def.bg_app, dark.bg_app);
-        assert_eq!(def.accent, dark.accent);
+        assert_eq!(def.bg_app, light.bg_app);
+        assert_eq!(def.accent, light.accent);
     }
 
     #[test]
@@ -407,12 +433,26 @@ mod tests {
         }
     }
 
+    #[test]
+    fn the_accent_written_as_text_reads_on_the_planes() {
+        // Signal orange is 2.8:1 on the day workshop's planes: as text it
+        // darkens toward the ink until it reads, in every look and brand.
+        for brand in Brand::ALL {
+            for theme in [Theme::light().with_brand(*brand), Theme::dark().with_brand(*brand)] {
+                let ratio = Theme::contrast_ratio(theme.accent_text, theme.bg_app);
+                assert!(ratio >= 4.5, "{brand:?}: accent text at {ratio:.2}:1");
+            }
+        }
+        // In the night workshop the brand's own colour already reads.
+        assert_eq!(Theme::dark().accent_text, Theme::dark().accent);
+    }
+
     #[gpui::test]
     fn the_theme_is_read_from_the_global(cx: &mut gpui::TestAppContext) {
         cx.update(|cx| {
-            assert_eq!(Theme::of(cx).bg_app, Theme::dark().bg_app, "sombre par défaut");
-            cx.set_global(Theme::light());
-            assert_eq!(Theme::of(cx).bg_app, Theme::light().bg_app);
+            assert_eq!(Theme::of(cx).bg_app, Theme::light().bg_app, "l'atelier de jour par défaut");
+            cx.set_global(Theme::dark());
+            assert_eq!(Theme::of(cx).bg_app, Theme::dark().bg_app);
         });
     }
 }

@@ -205,7 +205,7 @@ impl ContextHeader {
                     on_clear(window, cx);
                 })
                 .text_xs()
-                .text_color(theme.accent)
+                .text_color(theme.accent_text)
                 .hover(|s| s.bg(theme.bg_surface_hover).text_color(theme.accent_hover))
                 .child(summary.clone())
         });

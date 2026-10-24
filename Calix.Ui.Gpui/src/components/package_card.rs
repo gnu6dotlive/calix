@@ -144,7 +144,7 @@ impl PackageCard {
                                     el.child(
                                         div()
                                             .text_xs()
-                                            .font_family("monospace")
+                                            .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                                             .font_weight(FontWeight::BOLD)
                                             .text_color(theme.warning_text)
                                             .child(format!("→ {}", new_ver)),
@@ -153,7 +153,7 @@ impl PackageCard {
                                 .child(
                                     div()
                                         .text_xs()
-                                        .font_family("monospace")
+                                        .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                                         .font_weight(FontWeight::MEDIUM)
                                         .text_color(theme.text_muted)
                                         .child(pkg.version.clone()),
@@ -162,7 +162,7 @@ impl PackageCard {
                                     el.child(
                                         div()
                                             .text_xs()
-                                            .font_family("monospace")
+                                            .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
                                             .font_weight(FontWeight::NORMAL)
                                             .text_color(theme.text_secondary)
                                             .child(display_size),
