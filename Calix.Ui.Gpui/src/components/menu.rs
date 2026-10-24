@@ -183,7 +183,7 @@ impl MenuCheckmarkItem {
                 gpui::rgba(0x00000000)
             })
             .text_color(if is_selected {
-                theme.accent
+                theme.accent_text
             } else {
                 theme.text_secondary
             })

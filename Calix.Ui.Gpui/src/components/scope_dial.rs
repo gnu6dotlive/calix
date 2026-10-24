@@ -280,7 +280,7 @@ impl Render for ScopeDialView {
                             .path(scope.icon().path())
                             .size(px(g.icon))
                             .text_color(if is_selected {
-                                theme.accent
+                                theme.accent_text
                             } else {
                                 theme.text_muted
                             }),

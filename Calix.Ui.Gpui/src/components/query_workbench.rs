@@ -272,7 +272,7 @@ impl QueryWorkbench {
                     .text_xs()
                     .text_color(
                         if props.state_filter != PackageStateFilter::All || is_state_open {
-                            theme.accent
+                            theme.accent_text
                         } else {
                             theme.text_secondary
                         },
@@ -457,7 +457,7 @@ impl QueryWorkbench {
             })
             .text_xs()
             .text_color(if props.sort_mode != SortMode::Relevance || is_sort_open {
-                theme.accent
+                theme.accent_text
             } else {
                 theme.text_secondary
             })

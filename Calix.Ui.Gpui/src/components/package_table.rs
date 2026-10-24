@@ -39,7 +39,9 @@ impl PackageTable {
             _ => 0.0,
         };
         let track = crate::ui_metrics::UiMetrics::SIZE_BAR_TRACK;
-        let bar = theme.accent;
+        // The figure is read, not signalled: the bar is graphite, and the
+        // accent stays for what the user acts on.
+        let bar = theme.text_secondary;
         div()
             .debug_selector(|| "package_row_bar_track".to_string())
             .w(px(track))
@@ -338,6 +340,8 @@ impl PackageTable {
             .debug_selector(|| "package_row_version".to_string())
             .w(px(105.0))
             .min_w(px(crate::ui_metrics::UiMetrics::ROW_VERSION_MIN_WIDTH))
+            // A cut version keeps its distance from the source beside it.
+            .pr_2()
             .overflow_hidden()
             .text_ellipsis()
             .text_xs()

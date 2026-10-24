@@ -1395,7 +1395,7 @@ impl Render for PackageWorkstationView {
         // excuse.
         let anchor_entry = source_axis.get(crate::state::anchor_index(&source_axis));
         let quiet = QuietPlate {
-            heading: "THE BANK",
+            heading: "No package selected",
             subject: anchor_entry
                 .map(|entry| entry.label.to_string())
                 .unwrap_or_else(|| "All sources".to_string()),
