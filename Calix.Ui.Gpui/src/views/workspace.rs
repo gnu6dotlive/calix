@@ -8,6 +8,8 @@ use crate::control::protocol::{
     ControlCommand, ControlFilters, ControlResponse, ControlStatus, CONTROL_PROTOCOL_VERSION,
 };
 use crate::components::cheatsheet::{Cheatsheet, CheatsheetProps};
+use crate::components::palette::{CommandPalette, PaletteEvent};
+use crate::state::keys;
 use crate::components::context_header::{ContextHeader, ContextHeaderProps};
 use crate::state::package_store::SourceHealth;
 use crate::state::query::SortMode;
@@ -98,6 +100,10 @@ pub struct WorkspaceView {
     pub cheatsheet_visible: bool,
     /// The gesture: the timer that reveals the sheet.
     pub cheatsheet_hold: Option<Task<()>>,
+    /// The command palette, while it is open, and what it answers.
+    pub palette: Option<(Entity<CommandPalette>, Subscription)>,
+    /// Where the keyboard was before the palette took it: it goes back there.
+    pub palette_restore: Option<FocusHandle>,
 }
 
 impl WorkspaceView {
@@ -362,6 +368,8 @@ impl WorkspaceView {
             motion_policy: crate::state::motion::MotionPolicy::new(gpui_config.reduce_motion),
             cheatsheet_visible: false,
             cheatsheet_hold: None,
+            palette: None,
+            palette_restore: None,
         };
 
         // Liaison des mutations depuis PackageWorkstationView vers WorkspaceView
@@ -2007,7 +2015,134 @@ impl WorkspaceView {
         });
     }
 
-    /// Navigation au clavier dans la liste virtuelle (flèches Haut/Bas)
+    /// What an action of the registry does, by its id.
+    ///
+    /// GPUI's keymap dispatches the action (`keys::bindings`), whether a key
+    /// or the palette asked for it; this is the one place that carries it out.
+    fn run_action(&mut self, id: &str, window: &mut Window, cx: &mut Context<Self>) {
+        // An action is another key: it ends the help's gesture, and it closes
+        // the sheet (Escape included), as any key did before actions.
+        self.cheatsheet_hold = None;
+        if self.cheatsheet_visible && id != "help.toggle" {
+            self.cheatsheet_visible = false;
+            cx.notify();
+        }
+        match id {
+            "rail.search" | "rail.installed" | "rail.updates" | "rail.news" | "rail.settings" => {
+                if let Some((place, scope)) = crate::state::keys::rail_target(id) {
+                    self.session.update(cx, |s, cx| {
+                        if let Some(scope) = scope {
+                            s.set_scope(scope, cx);
+                        }
+                        s.set_place(place, cx);
+                    });
+                }
+            }
+            "search.focus" => {
+                let search_input = self.workstation.read(cx).search_input.clone();
+                search_input.update(cx, |si, cx| si.focus(window, cx));
+            }
+            "console.toggle" => {
+                self.console.update(cx, |c, cx| c.toggle_drawer(cx));
+            }
+            "sidebar.toggle" => {
+                self.session.update(cx, |s, cx| s.toggle_sidebar(cx));
+            }
+            "scope.previous" | "scope.next" => {
+                let scope = self.session.read(cx).scope;
+                let next = if id == "scope.previous" {
+                    scope.previous()
+                } else {
+                    scope.next()
+                };
+                if let Some(next) = next {
+                    self.session.update(cx, |s, cx| {
+                        s.set_scope(next, cx);
+                        s.set_place(Place::Packages, cx);
+                    });
+                }
+            }
+            "search.open" => {
+                let search_input = self.workstation.read(cx).search_input.clone();
+                let is_focused = search_input.read(cx).is_focused(window);
+                if !is_focused {
+                    search_input.update(cx, |si, cx| si.focus(window, cx));
+                }
+            }
+            "list.clear" => {
+                // Escape is the local way back: it clears the search, then
+                // it leaves the place, then it empties the selection.
+                let search_input = self.workstation.read(cx).search_input.clone();
+                let query = self.session.read(cx).search_query.clone();
+                if search_input.read(cx).is_focused(window) && !query.trim().is_empty() {
+                    search_input.update(cx, |si, cx| si.set_text(String::new(), cx));
+                    self.session.update(cx, |s, cx| {
+                        s.set_search_query(String::new(), cx)
+                    });
+                    self.on_search_input(String::new(), cx);
+                    return;
+                }
+                let place = self.session.read(cx).place;
+                if place != Place::Packages {
+                    self.session.update(cx, |s, cx| s.set_place(Place::Packages, cx));
+                    return;
+                }
+                self.session.update(cx, |s, cx| s.select_package(None, cx));
+            }
+            "list.next" | "list.previous" => {
+                self.move_selection(id == "list.next", cx);
+            }
+            "help.toggle" => {
+                self.cheatsheet_visible = !self.cheatsheet_visible;
+                cx.notify();
+            }
+            "palette.open" => self.open_palette(window, cx),
+            _ => {}
+        }
+    }
+
+    /// The palette takes the keyboard; the window keeps where it was.
+    fn open_palette(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        if self.palette.is_some() {
+            return;
+        }
+        self.palette_restore = window.focused(cx);
+        let reduce_motion = self.gpui_config.reduce_motion;
+        let palette = cx.new(|cx| CommandPalette::new(reduce_motion, window, cx));
+        let subscription = cx.subscribe_in(
+            &palette,
+            window,
+            |this, _palette, event: &PaletteEvent, window, cx| {
+                let chosen = match event {
+                    PaletteEvent::Run(action) => Some(*action),
+                    PaletteEvent::Dismissed => None,
+                };
+                this.close_palette(window, cx);
+                if let Some(action) = chosen {
+                    // The action goes where a key would have sent it: from
+                    // the place the keyboard came back to.
+                    window.dispatch_action((action.action)(), cx);
+                }
+            },
+        );
+        self.palette = Some((palette, subscription));
+        cx.notify();
+    }
+
+    /// The palette lets go: the keyboard goes back where it was, or to the
+    /// window, never nowhere.
+    fn close_palette(&mut self, window: &mut Window, cx: &mut Context<Self>) {
+        if self.palette.take().is_none() {
+            return;
+        }
+        match self.palette_restore.take() {
+            Some(handle) => window.focus(&handle, cx),
+            None => window.focus(&self.search_focus, cx),
+        }
+        cx.notify();
+    }
+
+    /// The keys no action carries: the help's gesture, and Tab's walk.
     pub fn on_key_down(
         &mut self,
         event: &KeyDownEvent,
@@ -2015,7 +2150,6 @@ impl WorkspaceView {
         cx: &mut Context<Self>,
     ) {
         let key = event.keystroke.key.as_str();
-        let modifiers = event.keystroke.modifiers;
 
         // ── Le geste : tenir la modificatrice seule ─────────────────────────
         //
@@ -2024,96 +2158,13 @@ impl WorkspaceView {
         // ⌘C ne la déclenche jamais, parce qu'une autre touche l'annule.
         self.handle_help_gesture(event, cx);
 
-        // ── Les touches globales ─────────────────────────────────────────────
-        //
-        // Le registre est la source : le handler demande au registre ce que
-        // la touche signifie, et la fiche d'aide en découle. Les deux ne
-        // peuvent pas se contredire, puisqu'il n'y a qu'une liste.
-        if let Some(action) = crate::state::keys::action_for(
-            key,
-            modifiers.platform,
-            modifiers.alt,
-            modifiers.shift,
-        ) {
-            match action.id {
-                "rail.search" | "rail.installed" | "rail.updates" | "rail.news" | "rail.settings" => {
-                    if let Some((place, scope)) = crate::state::keys::rail_target(action.id) {
-                        self.session.update(cx, |s, cx| {
-                            if let Some(scope) = scope {
-                                s.set_scope(scope, cx);
-                            }
-                            s.set_place(place, cx);
-                        });
-                    }
-                }
-                "search.focus" => {
-                    let search_input = self.workstation.read(cx).search_input.clone();
-                    search_input.update(cx, |si, cx| si.focus(window, cx));
-                }
-                "console.toggle" => {
-                    self.console.update(cx, |c, cx| c.toggle_drawer(cx));
-                }
-                "sidebar.toggle" => {
-                    self.session.update(cx, |s, cx| s.toggle_sidebar(cx));
-                }
-                "scope.previous" | "scope.next" => {
-                    let scope = self.session.read(cx).scope;
-                    let next = if action.id == "scope.previous" {
-                        scope.previous()
-                    } else {
-                        scope.next()
-                    };
-                    if let Some(next) = next {
-                        self.session.update(cx, |s, cx| {
-                            s.set_scope(next, cx);
-                            s.set_place(Place::Packages, cx);
-                        });
-                    }
-                }
-                "search.open" => {
-                    let search_input = self.workstation.read(cx).search_input.clone();
-                    let is_focused = search_input.read(cx).is_focused(window);
-                    if !is_focused {
-                        search_input.update(cx, |si, cx| si.focus(window, cx));
-                    }
-                }
-                "list.clear" => {
-                    // Escape is the local way back: it clears the search, then
-                    // it leaves the place, then it empties the selection.
-                    let search_input = self.workstation.read(cx).search_input.clone();
-                    let query = self.session.read(cx).search_query.clone();
-                    if search_input.read(cx).is_focused(window) && !query.trim().is_empty() {
-                        search_input.update(cx, |si, cx| si.set_text(String::new(), cx));
-                        self.session.update(cx, |s, cx| {
-                            s.set_search_query(String::new(), cx)
-                        });
-                        self.on_search_input(String::new(), cx);
-                        return;
-                    }
-                    let place = self.session.read(cx).place;
-                    if place != Place::Packages {
-                        self.session.update(cx, |s, cx| s.set_place(Place::Packages, cx));
-                        return;
-                    }
-                    self.session.update(cx, |s, cx| s.select_package(None, cx));
-                }
-                "list.next" | "list.previous" => {
-                    self.move_selection(action.id == "list.next", cx);
-                }
-                _ => {}
-            }
-            return;
-        }
-
         if key == "tab" {
             if event.keystroke.modifiers.shift {
                 window.focus_prev(cx);
             } else {
                 window.focus_next(cx);
             }
-            return;
         }
-
     }
 
     /// La surface de développement : le laboratoire de rendu.
@@ -2623,6 +2674,23 @@ impl Render for WorkspaceView {
             .bg(theme.bg_app)
             .text_color(theme.text_primary)
             .track_focus(&self.search_focus)
+            .key_context(keys::WORKSPACE_CONTEXT)
+            .on_action(cx.listener(|v, _: &keys::RailSearch, w, cx| v.run_action("rail.search", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::RailInstalled, w, cx| v.run_action("rail.installed", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::RailUpdates, w, cx| v.run_action("rail.updates", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::RailNews, w, cx| v.run_action("rail.news", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::RailSettings, w, cx| v.run_action("rail.settings", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::ScopePrevious, w, cx| v.run_action("scope.previous", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::ScopeNext, w, cx| v.run_action("scope.next", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::FocusSearch, w, cx| v.run_action("search.focus", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::OpenSearch, w, cx| v.run_action("search.open", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::ToggleConsole, w, cx| v.run_action("console.toggle", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::ToggleSidebar, w, cx| v.run_action("sidebar.toggle", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::ListNext, w, cx| v.run_action("list.next", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::ListPrevious, w, cx| v.run_action("list.previous", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::ListClear, w, cx| v.run_action("list.clear", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::ToggleHelp, w, cx| v.run_action("help.toggle", w, cx)))
+            .on_action(cx.listener(|v, _: &keys::OpenPalette, w, cx| v.run_action("palette.open", w, cx)))
             .on_key_down(move |event, window, cx| {
                 entity_key.update(cx, |view, cx| {
                     view.on_key_down(event, window, cx);
@@ -2650,6 +2718,7 @@ impl Render for WorkspaceView {
             )
             .child(toast_overlay)
             .children(cheatsheet)
+            .children(self.palette.as_ref().map(|(palette, _)| palette.clone()))
     }
 }
 

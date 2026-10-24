@@ -52,7 +52,7 @@ pub struct Cheatsheet;
 
 impl Cheatsheet {
     /// One keycap: the binding, written the way it is on the key.
-    fn render_keycap(binding: &keys::KeyBinding, theme: &Theme) -> impl IntoElement {
+    pub(crate) fn render_keycap(binding: &keys::KeyBinding, theme: &Theme) -> impl IntoElement {
         div()
             .rounded_sm()
             .border_1()

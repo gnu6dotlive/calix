@@ -121,6 +121,9 @@ fn main() {
                 KeyBinding::new("escape", Escape, Some("SearchInput")),
                 KeyBinding::new("enter", Enter, Some("SearchInput")),
             ]);
+            // The window's actions, from the one registry of keys.
+            cx.bind_keys(crate::state::keys::bindings());
+            cx.bind_keys(crate::components::palette::bindings());
             let options = WindowOptions {
                 window_bounds: Some(WindowBounds::Windowed(Bounds {
                     origin: Point::default(),

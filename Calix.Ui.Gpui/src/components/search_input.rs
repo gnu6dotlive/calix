@@ -294,6 +294,12 @@ impl SearchInputView {
     }
 
     fn escape(&mut self, _: &Escape, window: &mut Window, cx: &mut Context<Self>) {
+        // An empty field has nothing to clear: Escape goes on to the window,
+        // which goes back (`list.clear`).
+        if self.content.is_empty() {
+            cx.propagate();
+            return;
+        }
         self.clear_internal();
         self.focus(window, cx);
         cx.emit(SearchEvent::Cleared);
