@@ -4,6 +4,7 @@ pub mod inspector_header;
 pub mod log_drawer;
 pub mod menu;
 pub mod package_card;
+pub mod palette;
 pub mod package_identity;
 pub mod package_table;
 pub mod query_workbench;
