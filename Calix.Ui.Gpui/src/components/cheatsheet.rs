@@ -1,3 +1,4 @@
+use crate::elements::scrollbar;
 use crate::state::keys;
 use crate::theme::Theme;
 use gpui::prelude::StatefulInteractiveElement;
@@ -17,11 +18,16 @@ mod tests {
         // window which view it belongs to, and the harness's window has none.
         struct SheetFixture {
             theme: Theme,
+            scroll: ScrollHandle,
         }
 
         impl Render for SheetFixture {
             fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-                Cheatsheet::render(CheatsheetProps { theme: &self.theme }).into_any_element()
+                Cheatsheet::render(CheatsheetProps {
+                    theme: &self.theme,
+                    scroll: &self.scroll,
+                })
+                .into_any_element()
             }
         }
 
@@ -32,6 +38,7 @@ mod tests {
             |_window, cx| {
                 cx.new(|_| SheetFixture {
                     theme: Theme::dark(),
+                    scroll: ScrollHandle::new(),
                 })
                 .into_element()
             },
@@ -46,6 +53,8 @@ mod tests {
 /// the registry, so it cannot lie about what the keys do.
 pub struct CheatsheetProps<'a> {
     pub theme: &'a Theme,
+    /// The sheet's scroll, kept by the window: the bar reads it.
+    pub scroll: &'a ScrollHandle,
 }
 
 pub struct Cheatsheet;
@@ -66,8 +75,9 @@ impl Cheatsheet {
             .child(binding.label())
     }
 
-    /// One line: what the action does, and the key that does it.
-    fn render_action(action: &keys::KeyAction, theme: &Theme) -> impl IntoElement {
+    /// One line: what the action does, and every key that does it (Ctrl+F
+    /// and / focus the search: one line, two keys).
+    fn render_action(label: &'static str, group: &str, theme: &Theme) -> impl IntoElement {
         div()
             .flex()
             .items_center()
@@ -77,14 +87,26 @@ impl Cheatsheet {
                 div()
                     .text_xs()
                     .text_color(theme.text_secondary)
-                    .child(action.label),
+                    .child(label),
             )
-            .child(Self::render_keycap(&action.binding, theme))
+            .child(
+                div().flex().gap_1().children(
+                    keys::actions_in(group)
+                        .into_iter()
+                        .filter(|action| action.label == label)
+                        .map(|action| Self::render_keycap(&action.binding, theme)),
+                ),
+            )
     }
 
-    /// One group: its name, and its actions.
-    fn render_group(group: &str, theme: &Theme) -> impl IntoElement {
-        let actions = keys::actions_in(group);
+    /// One group: its name, and its actions, one line per thing done.
+    fn render_group(group: &'static str, theme: &Theme) -> impl IntoElement {
+        let mut labels: Vec<&'static str> = Vec::new();
+        for action in keys::actions_in(group) {
+            if !labels.contains(&action.label) {
+                labels.push(action.label);
+            }
+        }
         div()
             .flex()
             .flex_col()
@@ -96,7 +118,7 @@ impl Cheatsheet {
                     .text_color(theme.text_muted)
                     .child(group.to_uppercase()),
             )
-            .children(actions.into_iter().map(|action| Self::render_action(action, theme)))
+            .children(labels.into_iter().map(|label| Self::render_action(label, group, theme)))
     }
 
     pub fn render(props: CheatsheetProps) -> impl IntoElement {
@@ -121,10 +143,18 @@ impl Cheatsheet {
             .justify_center()
             .child(
                 div()
-                    .id("cheatsheet_panel")
+                    .relative()
                     .w(px(520.0))
-                    .max_h(px(620.0))
+                    .max_h(relative(0.85))
+                    .flex()
+                    .flex_col()
+                    .child(
+                div()
+                    .id("cheatsheet_panel")
+                    .flex_1()
+                    .min_h_0()
                     .overflow_y_scroll()
+                    .track_scroll(props.scroll)
                     .rounded_lg()
                     .shadow_lg()
                     .border_1()
@@ -160,6 +190,8 @@ impl Cheatsheet {
                             .gap(px(10.0))
                             .children(groups),
                     ),
+                    )
+                    .child(scrollbar::vertical("cheatsheet_scrollbar", props.scroll)),
             )
     }
 }

@@ -1,4 +1,5 @@
 use crate::backend::models::{UnifiedPackage, UnifiedPackageSource};
+use crate::elements::clip;
 use crate::components::package_identity::PackageIdentity;
 use crate::theme::Theme;
 use crate::ui_metrics::UiMetrics;
@@ -249,7 +250,10 @@ impl PackageTable {
             UiMetrics::ROW_HEIGHT_NORMAL
         };
         div()
-            .id("package_row")
+            // A row is known by its package, never by where it stands: the
+            // list reuses places as it scrolls and filters, and an id by
+            // place would hand one package's tooltip to the next.
+            .id(clip::known_by("package_row", pkg.key()))
             // The handle the bench measures: the harness reads the bounds of
             // the row under this name — *named*, so that a test can click
             // *this* row and not merely the first one. A noop outside the
@@ -320,7 +324,12 @@ impl PackageTable {
         // La taille et l'état ne cèdent jamais : l'une est la figure et
         // porte la lecture de l'instrument (§5.7), l'autre l'état du paquet.
         // Et le nom ne cède jamais : c'est la clé.
-        let mut version_cell = div()
+        let version_text = if pkg.has_update {
+            format!("→ {}", pkg.new_version.as_deref().unwrap_or(&pkg.version))
+        } else {
+            pkg.version.clone()
+        };
+        let version_cell = div()
             .id("package_row_version")
             // The handle the bench measures.
             .debug_selector(|| "package_row_version".to_string())
@@ -331,15 +340,11 @@ impl PackageTable {
             .text_xs()
             .font_family("monospace")
             .font_weight(FontWeight::MEDIUM)
-            .text_color(theme.text_muted)
-            .child(if pkg.has_update {
-                format!("→ {}", pkg.new_version.as_deref().unwrap_or(&pkg.version))
-            } else {
-                pkg.version.clone()
-            });
+            .text_color(theme.text_muted);
+        let mut version_cell = clip::clipped(version_cell, version_text);
         version_cell.style().flex_shrink = Some(crate::ui_metrics::UiMetrics::ROW_SHRINK_VERSION);
 
-        let mut source_cell = div()
+        let source_cell = div()
             .id("package_row_source")
             // The handle the bench measures.
             .debug_selector(|| "package_row_source".to_string())
@@ -349,8 +354,8 @@ impl PackageTable {
             .text_ellipsis()
             .text_xs()
             .font_weight(FontWeight::NORMAL)
-            .text_color(theme.text_secondary)
-            .child(source_display);
+            .text_color(theme.text_secondary);
+        let mut source_cell = clip::clipped(source_cell, source_display);
         source_cell.style().flex_shrink = Some(crate::ui_metrics::UiMetrics::ROW_SHRINK_SOURCE);
 
         // La cellule Taille : la figure — les octets — et, sous elle, la
@@ -400,11 +405,11 @@ impl PackageTable {
                     .gap_2()
                     .overflow_hidden()
                     .child(PackageIdentity::render_inline_glyph(pkg, 14.0, theme))
-                    .child(
+                    .child(clip::clipped(
                         div()
                             .id("package_row_name")
-                    // The handle the bench measures.
-                    .debug_selector(|| "package_row_name".to_string())
+                            // The handle the bench measures.
+                            .debug_selector(|| "package_row_name".to_string())
                             .flex_1()
                             .min_w_0()
                             .overflow_hidden()
@@ -415,9 +420,9 @@ impl PackageTable {
                                 theme.selection_text
                             } else {
                                 theme.text_primary
-                            })
-                            .child(pkg.name.clone()),
-                    ),
+                            }),
+                        pkg.name.clone(),
+                    )),
             )
             // Column 2: Version en police monospace
             .child(version_cell)

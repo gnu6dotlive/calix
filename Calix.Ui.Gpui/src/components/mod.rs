@@ -15,5 +15,6 @@ pub mod sidebar;
 pub mod source_bank;
 pub mod status_pill;
 pub mod toast_overlay;
+pub mod tooltip;
 pub mod unified_search;
 pub mod view_mode_switcher;
