@@ -259,7 +259,7 @@ impl LogDrawer {
                 .text_color(theme.text_secondary)
                 .cursor_pointer()
                 .hover(move |s| s.bg(hover_bg))
-                .child(lamp(auto_scroll, &theme))
+                .child(lamp(auto_scroll, theme))
                 .child("Follow output");
 
             if let Some(handler) = on_toggle_autoscroll {
@@ -298,7 +298,7 @@ impl LogDrawer {
                 .text_color(theme.text_secondary)
                 .cursor_pointer()
                 .hover(move |s| s.bg(hover_bg))
-                .child(lamp(show_raw, &theme))
+                .child(lamp(show_raw, theme))
                 .child("Raw output");
 
             if let Some(handler) = on_toggle_raw {
