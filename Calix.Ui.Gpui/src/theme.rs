@@ -5,8 +5,9 @@
 //! cascade. Un changement de thème est un `cx.set_global` ; chaque vue le lit
 //! au prochain rendu.
 //!
-//! - surfaces : `bg_app` pour ce qui se lit, `bg_surface` pour le chrome,
-//!   `bg_sidebar` pour le rail.
+//! - surfaces : `bg_sidebar` est le châssis (l'aluminium, le rail, l'en-tête),
+//!   `bg_app` les plans posés dessus où l'on lit, `bg_surface` les contrôles et
+//!   les champs. Voir « The interface: the workshop » dans `docs/brand.md`.
 //! - états : `bg_surface_hover` sous le pointeur, `selection_bg` /
 //!   `selection_text` pour ce qui est choisi, `on_accent` pour le texte et les glyphes posés sur une couleur pleine
 //!   (l'accent, un badge, un succès). Un état n'est jamais dérivé localement.
@@ -14,8 +15,10 @@
 //!   `rounded_md` pour les contrôles et les rangées, `rounded_lg` pour les
 //!   panneaux (menus, toasts, cartes, dialogues), `rounded_full` pour les
 //!   pastilles. Rien d'autre.
-//! - élévation : `shadow_md` pour les menus et popovers, `shadow_lg` pour les
-//!   toasts et dialogues ; rien d'autre ne porte d'ombre.
+//! - élévation : `shadow_xs` sous un contrôle posé sur le châssis (la bande
+//!   des sources), `shadow_sm` sous un plan (catalogue, inspecteur),
+//!   `shadow_md` pour les menus, les popovers et le cadran, `shadow_lg` pour
+//!   les toasts et dialogues ; rien d'autre ne porte d'ombre.
 //!
 //! Les jetons d'état sont dérivés (`Theme::derive_states`) de la palette et de
 //! l'accent, puis leur contraste est garanti : un accent choisi par

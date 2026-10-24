@@ -170,7 +170,7 @@ impl PackageCard {
                                 }),
                         ),
                 )
-                // Ligne 2 : Métadonnées desktop calmes sans pilules colorées ("Arch · extra · Installed")
+                // Ligne 2 : Métadonnées desktop calmes sans pilules colorées ("Arch / extra ● Installed")
                 .child({
                     let mut meta = div().flex().items_center().gap_1p5().text_xs().child(
                         div()
@@ -180,16 +180,16 @@ impl PackageCard {
                     );
 
                     if show_repo {
-                        meta = meta
-                            .child(div().text_color(theme.text_muted).child("·"))
-                            .child(
-                                div()
-                                    .text_color(theme.text_muted)
-                                    .child(pkg.repository_or_remote.clone()),
-                            );
+                        // The same words as the table's Source column.
+                        meta = meta.child(
+                            div()
+                                .text_color(theme.text_muted)
+                                .child(format!("/ {}", pkg.repository_or_remote)),
+                        );
                     }
 
-                    meta = meta.child(div().text_color(theme.text_muted).child("·"));
+                    // The state follows behind its lamp: no dot between.
+                    meta = meta.child(div().w(px(4.0)));
 
                     if pkg.has_update {
                         meta = meta.child(
