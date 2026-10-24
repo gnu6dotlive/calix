@@ -1,5 +1,6 @@
 use crate::backend::models::ArchNewsItem;
 use crate::icons::AppIcon;
+use crate::elements::scrollbar;
 use crate::theme::Theme;
 use gpui::*;
 use std::rc::Rc;
@@ -10,6 +11,8 @@ pub struct NewsViewProps<'a> {
     pub news: &'a [ArchNewsItem],
     pub error: Option<&'a str>,
     pub theme: &'a Theme,
+    /// The page's scroll, kept by the window: the bar reads it.
+    pub scroll: &'a ScrollHandle,
     pub is_loading: bool,
     pub on_retry: Option<NewsRetryHandler>,
 }
@@ -18,6 +21,16 @@ pub struct NewsView;
 
 impl NewsView {
     pub fn render(props: NewsViewProps) -> impl IntoElement {
+        let scroll = props.scroll.clone();
+        div()
+            .size_full()
+            .relative()
+            .child(Self::page(props))
+            .child(scrollbar::vertical("news_scrollbar", &scroll))
+    }
+
+    /// The page itself, which scrolls under the bar.
+    fn page(props: NewsViewProps) -> Stateful<Div> {
         let theme = props.theme;
 
         let mut root = div()
@@ -27,7 +40,8 @@ impl NewsView {
             .size_full()
             .bg(theme.bg_app)
             .p_6()
-            .overflow_scroll();
+            .overflow_y_scroll()
+            .track_scroll(props.scroll);
 
         root = root.child(
             div()
@@ -129,9 +143,8 @@ impl NewsView {
                     .focusable()
                     .tab_stop(true)
                     .focus(move |s| s.border_1().border_color(focus_border))
-                    .on_key_down(move |event, _window, cx| {
-                        let key = event.keystroke.key.as_str();
-                        if key == "enter" || key == "space" {
+                    .on_click(move |event, _window, cx| {
+                        if event.is_keyboard() {
                             cx.open_url(&url_key);
                         }
                     })

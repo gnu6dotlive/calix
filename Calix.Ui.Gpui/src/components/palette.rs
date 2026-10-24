@@ -11,6 +11,7 @@
 
 use crate::components::cheatsheet::Cheatsheet;
 use crate::components::search_input::{self, SearchEvent, SearchInputView};
+use crate::elements::scrollbar;
 use crate::state::keys::{self, KeyAction, PALETTE_CONTEXT};
 use crate::theme::Theme;
 use crate::ui_metrics::UiMetrics;
@@ -221,6 +222,13 @@ impl Render for CommandPalette {
                     )
                     .child(
                         div()
+                            .flex_1()
+                            .min_h_0()
+                            .flex()
+                            .flex_col()
+                            .relative()
+                            .child(
+                        div()
                             .id("command_palette_lines")
                             .role(Role::ListBox)
                             .aria_label("Commands")
@@ -232,6 +240,8 @@ impl Render for CommandPalette {
                             .flex_col()
                             .children(lines)
                             .children(empty),
+                            )
+                            .child(scrollbar::vertical("command_palette_scrollbar", &self.scroll)),
                     ),
             )
     }

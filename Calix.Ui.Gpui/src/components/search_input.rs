@@ -725,9 +725,8 @@ impl Render for SearchInputView {
                     .focusable()
                     .tab_stop(true)
                     .focus(move |s| s.border_1().border_color(theme.border_focus))
-                    .on_key_down(cx.listener(|this, event: &KeyDownEvent, window, cx| {
-                        let key = event.keystroke.key.as_str();
-                        if key == "enter" || key == "space" {
+                    .on_click(cx.listener(|this, event: &ClickEvent, window, cx| {
+                        if event.is_keyboard() {
                             this.clear_and_focus(window, cx);
                         }
                     }))

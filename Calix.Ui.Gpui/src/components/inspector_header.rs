@@ -109,9 +109,8 @@ impl InspectorHeader {
             .focusable()
             .tab_stop(true)
             .focus(move |s| s.border_1().border_color(focus_border))
-            .on_key_down(move |event, window, cx| {
-                let key = event.keystroke.key.as_str();
-                if key == "enter" || key == "space" {
+            .on_click(move |event, window, cx| {
+                if event.is_keyboard() {
                     on_select_key(tab, window, cx);
                 }
             })
@@ -277,7 +276,6 @@ impl InspectorHeader {
         if caps.can_remove {
             let danger_hover = theme.danger_hover;
             let focus_border = theme.border_focus;
-            let on_remove_key = props.on_remove.clone();
             let mut remove_btn = div()
                 .id("inspector_remove_btn")
                 .px_3()
@@ -289,7 +287,7 @@ impl InspectorHeader {
                 .text_color(if is_busy {
                     theme.text_muted
                 } else {
-                    theme.bg_app
+                    theme.on(theme.danger)
                 });
 
             if !is_busy {
@@ -300,18 +298,9 @@ impl InspectorHeader {
                     .cursor_pointer()
                     .hover(move |s| s.bg(danger_hover));
                 if let Some(on_rm) = props.on_remove {
-                    remove_btn = remove_btn
-                        .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
-                            on_rm(window, cx);
-                        })
-                        .on_key_down(move |event, window, cx| {
-                            let key = event.keystroke.key.as_str();
-                            if key == "enter" || key == "space" {
-                                if let Some(ref cb) = on_remove_key {
-                                    cb(window, cx);
-                                }
-                            }
-                        });
+                    // A click, not a press: a press dragged off the button
+                    // cancels, and a held Enter does not uninstall twice.
+                    remove_btn = remove_btn.on_click(move |_event, window, cx| on_rm(window, cx));
                 }
             }
 
@@ -319,7 +308,6 @@ impl InspectorHeader {
         } else if caps.can_install {
             let accent_hover = theme.accent_hover;
             let focus_border = theme.border_focus;
-            let on_install_key = props.on_install.clone();
             let mut install_btn = div()
                 .id("inspector_install_btn")
                 .px_3()
@@ -331,7 +319,7 @@ impl InspectorHeader {
                 .text_color(if is_busy {
                     theme.text_muted
                 } else {
-                    theme.bg_app
+                    theme.on(theme.accent)
                 });
 
             if !is_busy {
@@ -342,16 +330,7 @@ impl InspectorHeader {
                     .cursor_pointer()
                     .hover(move |s| s.bg(accent_hover));
                 if let Some(on_inst) = props.on_install {
-                    install_btn = install_btn
-                        .on_key_down(move |event, window, cx| {
-                            let key = event.keystroke.key.as_str();
-                            if key == "enter" || key == "space" {
-                                if let Some(ref cb) = on_install_key {
-                                    cb(window, cx);
-                                }
-                            }
-                        })
-                        .on_mouse_down(MouseButton::Left, move |_e, w, cx| on_inst(w, cx));
+                    install_btn = install_btn.on_click(move |_event, window, cx| on_inst(window, cx));
                 }
             }
             actions_row = actions_row.child(install_btn.child("Install"));
@@ -385,9 +364,8 @@ impl InspectorHeader {
                 .focusable()
                 .tab_stop(true)
                 .focus(move |s| s.border_1().border_color(focus_border))
-                .on_key_down(move |event, window, cx| {
-                    let key = event.keystroke.key.as_str();
-                    if key == "enter" || key == "space" {
+                .on_click(move |event, window, cx| {
+                    if event.is_keyboard() {
                         if let Some(ref cb) = on_copy_key {
                             cb(window, cx);
                         }

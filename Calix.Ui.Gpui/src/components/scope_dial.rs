@@ -260,12 +260,11 @@ impl Render for ScopeDialView {
                             on_select(*scope, window, cx);
                         }
                     })
-                    .on_key_down({
+                    .on_click({
                         let on_select = on_select.clone();
                         let entity = entity.clone();
                         move |event, window, cx| {
-                            let key = event.keystroke.key.as_str();
-                            if key == "enter" || key == "space" {
+                            if event.is_keyboard() {
                                 entity.update(cx, |view, cx| {
                                     view.retarget(*scope, cx);
                                 });

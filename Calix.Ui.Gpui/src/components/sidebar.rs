@@ -89,9 +89,8 @@ impl Sidebar {
             .focusable()
             .tab_stop(true)
             .focus(move |s| s.border_1().border_color(focus_border))
-            .on_key_down(move |event, window, cx| {
-                let key = event.keystroke.key.as_str();
-                if key == "enter" || key == "space" {
+            .on_click(move |event, window, cx| {
+                if event.is_keyboard() {
                     on_select_key(entry, window, cx);
                 }
             })
@@ -230,9 +229,8 @@ impl Sidebar {
                 .focusable()
                 .tab_stop(true)
                 .focus(move |s| s.border_1().border_color(focus_border))
-                .on_key_down(move |event, window, cx| {
-                    let key = event.keystroke.key.as_str();
-                    if key == "enter" || key == "space" {
+                .on_click(move |event, window, cx| {
+                    if event.is_keyboard() {
                         on_toggle_key(window, cx);
                     }
                 })
