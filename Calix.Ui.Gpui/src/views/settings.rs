@@ -4,6 +4,7 @@ use crate::components::menu::{
 };
 use crate::config::{ConfigManager, GpuiUiConfig, CalixSettings};
 use crate::icons::AppIcon;
+use crate::elements::scrollbar;
 use crate::theme::Theme;
 use crate::visual_style::VisualStyleId;
 use gpui::prelude::FluentBuilder;
@@ -31,6 +32,8 @@ pub struct SettingsViewProps<'a> {
     pub calix_settings: &'a CalixSettings,
     pub gpui_config: &'a GpuiUiConfig,
     pub is_dirty: bool,
+    /// The page's scroll, kept by the window: the bar reads it.
+    pub scroll: &'a ScrollHandle,
     pub style_menu_open: bool,
     pub style_menu_epoch: usize,
     pub style_menu_highlighted: usize,
@@ -227,7 +230,8 @@ impl SettingsView {
             .size_full()
             .bg(theme.bg_app)
             .p_6()
-            .overflow_scroll();
+            .overflow_y_scroll()
+            .track_scroll(props.scroll);
 
         // En-tête des paramètres
         root = root.child(
@@ -500,9 +504,8 @@ impl SettingsView {
                     .focusable()
                     .tab_stop(true)
                     .focus(move |s| s.border_1().border_color(focus_border))
-                    .on_key_down(move |event, window, cx| {
-                        let key = event.keystroke.key.as_str();
-                        if key == "enter" || key == "space" {
+                    .on_click(move |event, window, cx| {
+                        if event.is_keyboard() {
                             advanced_toggle_key(window, cx);
                         }
                     })
@@ -585,9 +588,8 @@ impl SettingsView {
                                 .focusable()
                                 .tab_stop(true)
                                 .focus(move |s| s.border_1().border_color(theme.border_focus))
-                                .on_key_down(move |event, window, cx| {
-                                    let key = event.keystroke.key.as_str();
-                                    if key == "enter" || key == "space" {
+                                .on_click(move |event, window, cx| {
+                                    if event.is_keyboard() {
                                         advanced_open_key(window, cx);
                                     }
                                 })
@@ -619,7 +621,6 @@ impl SettingsView {
 
         if is_dirty {
             if let Some(reset_handler) = on_reset {
-                let reset_key = reset_handler.clone();
                 let focus_border = theme.border_focus;
                 actions_bar = actions_bar.child(
                     div()
@@ -627,12 +628,7 @@ impl SettingsView {
                         .focusable()
                         .tab_stop(true)
                         .focus(move |s| s.border_1().border_color(focus_border))
-                        .on_key_down(move |event, window, cx| {
-                            let key = event.keystroke.key.as_str();
-                            if key == "enter" || key == "space" {
-                                reset_key(window, cx);
-                            }
-                        })
+                        .on_click(move |_event, window, cx| reset_handler(window, cx))
                         .px_4()
                         .py_2()
                         .rounded_md()
@@ -644,14 +640,10 @@ impl SettingsView {
                         .text_color(theme.text_secondary)
                         .cursor_pointer()
                         .hover(move |s| s.bg(theme.bg_surface_hover).text_color(theme.text_primary))
-                        .child("Reset Changes")
-                        .on_mouse_down(MouseButton::Left, move |_e, window, cx| {
-                            reset_handler(window, cx);
-                        }),
+                        .child("Reset Changes"),
                 );
             }
 
-            let on_save_key = on_save.clone();
             let focus_border = theme.border_focus;
             actions_bar = actions_bar.child(
                 div()
@@ -659,12 +651,7 @@ impl SettingsView {
                     .focusable()
                     .tab_stop(true)
                     .focus(move |s| s.border_1().border_color(focus_border))
-                    .on_key_down(move |event, window, cx| {
-                        let key = event.keystroke.key.as_str();
-                        if key == "enter" || key == "space" {
-                            on_save_key(window, cx);
-                        }
-                    })
+                    .on_click(move |_event, window, cx| on_save(window, cx))
                     .px_6()
                     .py_2()
                     .rounded_md()
@@ -676,10 +663,7 @@ impl SettingsView {
                     .text_color(theme.on_accent)
                     .cursor_pointer()
                     .hover(move |s| s.bg(theme.accent_hover).text_color(theme.on(theme.accent_hover)))
-                    .child("Save Settings *")
-                    .on_mouse_down(MouseButton::Left, move |_e, window, cx| {
-                        on_save(window, cx);
-                    }),
+                    .child("Save Settings *"),
             );
         } else {
             actions_bar = actions_bar.child(
@@ -699,7 +683,11 @@ impl SettingsView {
         }
 
         root = root.child(actions_bar);
-        root
+        div()
+            .size_full()
+            .relative()
+            .child(root)
+            .child(scrollbar::vertical("settings_scrollbar", props.scroll))
     }
 
     fn style_select_row(props: StyleSelectRowProps) -> impl IntoElement {
@@ -801,9 +789,8 @@ impl SettingsView {
                     .focusable()
                     .tab_stop(true)
                     .focus(move |s| s.border_1().border_color(focus_border))
-                    .on_key_down(move |event, window, cx| {
-                        let key = event.keystroke.key.as_str();
-                        if key == "enter" || key == "space" {
+                    .on_click(move |event, window, cx| {
+                        if event.is_keyboard() {
                             on_open_key(window, cx);
                         }
                     })
@@ -872,9 +859,8 @@ impl SettingsView {
                     .focusable()
                     .tab_stop(true)
                     .focus(move |s| s.border_1().border_color(focus_border))
-                    .on_key_down(move |event, window, cx| {
-                        let key = event.keystroke.key.as_str();
-                        if key == "enter" || key == "space" {
+                    .on_click(move |event, window, cx| {
+                        if event.is_keyboard() {
                             select_cb_key(brand_val, window, cx);
                         }
                     })
@@ -980,9 +966,8 @@ impl SettingsView {
                     .focusable()
                     .tab_stop(true)
                     .focus(move |s| s.border_1().border_color(focus_border))
-                    .on_key_down(move |event, window, cx| {
-                        let key = event.keystroke.key.as_str();
-                        if key == "enter" || key == "space" {
+                    .on_click(move |event, window, cx| {
+                        if event.is_keyboard() {
                             on_toggle_key(window, cx);
                         }
                     })
@@ -994,7 +979,7 @@ impl SettingsView {
                     .font_weight(FontWeight::BOLD)
                     .cursor_pointer()
                     .text_color(if active {
-                        theme.bg_app
+                        theme.on(theme.success)
                     } else {
                         theme.text_muted
                     })

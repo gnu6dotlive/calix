@@ -1,5 +1,6 @@
 use crate::icons::AppIcon;
 use crate::theme::Theme;
+use crate::elements::scrollbar;
 use gpui::*;
 use gpui::prelude::FluentBuilder;
 use std::rc::Rc;
@@ -128,9 +129,8 @@ impl LogDrawer {
                 .focusable()
                 .tab_stop(true)
                 .focus(move |s| s.border_1().border_color(border_focus))
-                .on_key_down(move |event, window, cx| {
-                    let key = event.keystroke.key.as_str();
-                    if key == "enter" || key == "space" {
+                .on_click(move |event, window, cx| {
+                    if event.is_keyboard() {
                         if let Some(ref handler) = on_copy_key {
                             handler(window, cx);
                         }
@@ -152,7 +152,7 @@ impl LogDrawer {
                 .text_xs()
                 .font_weight(FontWeight::MEDIUM)
                 .text_color(if copied_feedback {
-                    theme.bg_app
+                    theme.on(theme.success)
                 } else {
                     theme.text_primary
                 })
@@ -167,7 +167,7 @@ impl LogDrawer {
                         })
                         .size_3()
                         .text_color(if copied_feedback {
-                            theme.bg_app
+                            theme.on(theme.success)
                         } else {
                             theme.text_primary
                         }),
@@ -195,9 +195,8 @@ impl LogDrawer {
                 .focusable()
                 .tab_stop(true)
                 .focus(move |s| s.border_1().border_color(border_focus))
-                .on_key_down(move |event, window, cx| {
-                    let key = event.keystroke.key.as_str();
-                    if key == "enter" || key == "space" {
+                .on_click(move |event, window, cx| {
+                    if event.is_keyboard() {
                         if let Some(ref handler) = on_clear_key {
                             handler(window, cx);
                         }
@@ -242,9 +241,8 @@ impl LogDrawer {
                 .focusable()
                 .tab_stop(true)
                 .focus(move |s| s.border_1().border_color(border_focus))
-                .on_key_down(move |event, window, cx| {
-                    let key = event.keystroke.key.as_str();
-                    if key == "enter" || key == "space" {
+                .on_click(move |event, window, cx| {
+                    if event.is_keyboard() {
                         if let Some(ref handler) = on_autoscroll_key {
                             handler(window, cx);
                         }
@@ -297,9 +295,8 @@ impl LogDrawer {
                 .focusable()
                 .tab_stop(true)
                 .focus(move |s| s.border_1().border_color(border_focus))
-                .on_key_down(move |event, window, cx| {
-                    let key = event.keystroke.key.as_str();
-                    if key == "enter" || key == "space" {
+                .on_click(move |event, window, cx| {
+                    if event.is_keyboard() {
                         if let Some(ref handler) = on_raw_key {
                             handler(window, cx);
                         }
@@ -346,9 +343,8 @@ impl LogDrawer {
                 .focusable()
                 .tab_stop(true)
                 .focus(move |s| s.border_1().border_color(border_focus))
-                .on_key_down(move |event, window, cx| {
-                    let key = event.keystroke.key.as_str();
-                    if key == "enter" || key == "space" {
+                .on_click(move |event, window, cx| {
+                    if event.is_keyboard() {
                         if let Some(ref handler) = on_toggle_key {
                             handler(window, cx);
                         }
@@ -481,13 +477,13 @@ impl LogDrawer {
                             } else {
                                 "⟳ In progress".to_string()
                             };
-                            (theme.warning, theme.bg_app, p_str)
+                            (theme.warning, theme.on(theme.warning), p_str)
                         }
                         BackendPhaseStatus::Success(s) => {
-                            (theme.success, theme.bg_app, format!("✓ {}", s))
+                            (theme.success, theme.on(theme.success), format!("✓ {}", s))
                         }
                         BackendPhaseStatus::Failed(e) => {
-                            (theme.danger, theme.bg_app, format!("✕ {}", e))
+                            (theme.danger, theme.on(theme.danger), format!("✕ {}", e))
                         }
                     };
                     let card = div()
@@ -533,7 +529,7 @@ impl LogDrawer {
                 .flex()
                 .flex_1()
                 .flex_col()
-                .overflow_scroll()
+                .overflow_y_scroll()
                 .track_scroll(props.scroll_handle)
                 .p_3()
                 .bg(theme.bg_sidebar)
@@ -572,7 +568,16 @@ impl LogDrawer {
                 }
             }
 
-            body_container = body_container.child(log_content);
+            body_container = body_container.child(
+                div()
+                    .flex()
+                    .flex_col()
+                    .flex_1()
+                    .min_h_0()
+                    .relative()
+                    .child(log_content)
+                    .child(scrollbar::vertical("log_drawer_scrollbar", props.scroll_handle)),
+            );
             container = container.child(body_container);
         }
 

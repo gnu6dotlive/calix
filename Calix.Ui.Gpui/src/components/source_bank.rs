@@ -165,11 +165,10 @@ impl SourceBank {
                     on_toggle(kind, window, cx);
                 }
             })
-            .on_key_down({
+            .on_click({
                 let on_toggle = on_toggle.clone();
                 move |event, window, cx| {
-                    let key = event.keystroke.key.as_str();
-                    if key == "enter" || key == "space" {
+                    if event.is_keyboard() {
                         on_toggle(kind, window, cx);
                     }
                 }

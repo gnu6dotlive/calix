@@ -22,6 +22,7 @@ use crate::views::inspector::{PackageInspectorProps, PackageInspectorView, Quiet
 use crate::visual_style::VisualStyleId;
 use gpui::prelude::FluentBuilder;
 use gpui::*;
+use crate::elements::scrollbar;
 use gpui::{uniform_list, UniformListScrollHandle};
 use std::rc::Rc;
 use std::time::Duration;
@@ -152,6 +153,8 @@ pub struct PackageWorkstationView {
     pub nameplate_height: f32,
     pub nameplate_drag: Option<NameplateDragState>,
     pub scroll_handle: UniformListScrollHandle,
+    /// The inspector's body scroll: its bar reads it.
+    pub inspector_scroll: ScrollHandle,
     /// La sélection est un objet qui voyage : la barre du porteur glisse d'une
     /// ligne à l'autre au lieu de sauter.
     pub marker: Option<SelectionMarker>,
@@ -272,6 +275,7 @@ impl PackageWorkstationView {
             nameplate_height: UiMetrics::NAMEPLATE_MIN_HEIGHT,
             nameplate_drag: None,
             scroll_handle: UniformListScrollHandle::new(),
+            inspector_scroll: ScrollHandle::new(),
             on_mutation: None,
             on_upgrade_all: None,
             on_retry_source: None,
@@ -918,7 +922,7 @@ impl Render for PackageWorkstationView {
                     .flex_col()
                     .size_full()
                     .child(
-                        div().flex_1().h_full().overflow_hidden().child(
+                        div().flex_1().h_full().overflow_hidden().relative().child(
                             uniform_list("package-list-table", package_count, {
                                 let packages = packages.clone();
                                 let selected_name = selected_name.clone();
@@ -966,7 +970,10 @@ impl Render for PackageWorkstationView {
                             // outside the tests.
                             .debug_selector(|| "package_list".to_string())
                             .track_scroll(&self.scroll_handle),
-                        ),
+                        )
+                        // The bar says how much catalogue lies below the fold,
+                        // over the list's edge, never beside it.
+                        .child(scrollbar::for_list("catalogue_table_scrollbar", &self.scroll_handle)),
                     )
                     .into_any_element()
             } else {
@@ -977,7 +984,7 @@ impl Render for PackageWorkstationView {
                 };
                 let is_compact = self.compact;
                 let visual_style = self.visual_style;
-                uniform_list("package-list-surface", package_count, {
+                let list = uniform_list("package-list-surface", package_count, {
                     let packages = packages.clone();
                     let selected_name = selected_name.clone();
 
@@ -1016,8 +1023,13 @@ impl Render for PackageWorkstationView {
                     }
                 })
                 .h_full()
-                .track_scroll(&self.scroll_handle)
-                .into_any_element()
+                .track_scroll(&self.scroll_handle);
+                div()
+                    .size_full()
+                    .relative()
+                    .child(list)
+                    .child(scrollbar::for_list("catalogue_cards_scrollbar", &self.scroll_handle))
+                    .into_any_element()
             }
         };
 
@@ -1285,6 +1297,7 @@ impl Render for PackageWorkstationView {
 
         let inspector_element = PackageInspectorView::render_with_motion(
             PackageInspectorProps {
+                scroll: &self.inspector_scroll,
                 package: selected_pkg.as_ref(),
                 quiet,
                 alpm_details: alpm_details.as_ref(),

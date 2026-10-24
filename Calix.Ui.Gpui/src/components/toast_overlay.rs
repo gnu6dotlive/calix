@@ -90,9 +90,8 @@ impl ToastOverlay {
                         .focusable()
                         .tab_stop(true)
                         .focus(move |s| s.border_1().border_color(border_focus))
-                        .on_key_down(move |event, window, cx| {
-                            let key = event.keystroke.key.as_str();
-                            if key == "enter" || key == "space" {
+                        .on_click(move |event, window, cx| {
+                            if event.is_keyboard() {
                                 on_dismiss_key(toast_id, window, cx);
                             }
                         })
@@ -133,9 +132,8 @@ impl ToastOverlay {
                         .focusable()
                         .tab_stop(true)
                         .focus(move |s| s.border_1().border_color(border_focus))
-                        .on_key_down(move |event, window, cx| {
-                            let key = event.keystroke.key.as_str();
-                            if key == "enter" || key == "space" {
+                        .on_click(move |event, window, cx| {
+                            if event.is_keyboard() {
                                 on_action_key(act_key.clone(), window, cx);
                             }
                         })
