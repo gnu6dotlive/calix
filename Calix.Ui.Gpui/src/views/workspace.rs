@@ -107,6 +107,7 @@ pub struct WorkspaceView {
     /// The scroll of the news and of the settings: their bars read them.
     pub news_scroll: ScrollHandle,
     pub settings_scroll: ScrollHandle,
+    pub cheatsheet_scroll: ScrollHandle,
 }
 
 impl WorkspaceView {
@@ -375,6 +376,7 @@ impl WorkspaceView {
             palette_restore: None,
             news_scroll: ScrollHandle::new(),
             settings_scroll: ScrollHandle::new(),
+            cheatsheet_scroll: ScrollHandle::new(),
         };
 
         // Liaison des mutations depuis PackageWorkstationView vers WorkspaceView
@@ -2649,7 +2651,10 @@ impl Render for WorkspaceView {
         // The shortcut sheet, above the frame: it appears when the user holds
         // the modifier alone, and it never sits on the surface.
         let cheatsheet = if self.cheatsheet_visible {
-            Some(Cheatsheet::render(CheatsheetProps { theme: &theme }))
+            Some(Cheatsheet::render(CheatsheetProps {
+                theme: &theme,
+                scroll: &self.cheatsheet_scroll,
+            }))
         } else {
             None
         };

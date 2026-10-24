@@ -48,7 +48,7 @@ impl EventEmitter<PaletteEvent> for CommandPalette {}
 
 impl CommandPalette {
     pub fn new(reduce_motion: bool, window: &mut Window, cx: &mut Context<Self>) -> Self {
-        let field = cx.new(|cx| SearchInputView::new("Run a command…", reduce_motion, cx));
+        let field = cx.new(|cx| SearchInputView::new("Run a command…", reduce_motion, cx).without_slash_hint());
         let field_events = cx.subscribe(&field, |this, _field, event: &SearchEvent, cx| {
             match event {
                 SearchEvent::Changed(text) => {

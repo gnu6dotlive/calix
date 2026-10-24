@@ -42,6 +42,9 @@ pub struct SearchInputView {
     pub is_selecting: bool,
     pub is_searching: bool,
     pub reduce_motion: bool,
+    /// The `/` keycap shown while the field is empty: the key that reaches
+    /// the catalogue's search from anywhere. Another field has no such key.
+    pub slash_hint: bool,
 }
 
 impl EventEmitter<SearchEvent> for SearchInputView {}
@@ -70,7 +73,14 @@ impl SearchInputView {
             is_selecting: false,
             is_searching: false,
             reduce_motion,
+            slash_hint: true,
         }
+    }
+
+    /// A field no `/` reaches (the palette's): no keycap that would lie.
+    pub fn without_slash_hint(mut self) -> Self {
+        self.slash_hint = false;
+        self
     }
 
     pub fn text(&self) -> &str {
@@ -783,7 +793,7 @@ impl Render for SearchInputView {
                     .child(indicator_el)
                     .into_any_element(),
             )
-        } else if !has_content {
+        } else if !has_content && self.slash_hint {
             Some(
                 div()
                     .flex_none()
