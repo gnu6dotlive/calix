@@ -22,7 +22,7 @@ use crate::views::inspector::{PackageInspectorProps, PackageInspectorView, Quiet
 use crate::visual_style::VisualStyleId;
 use gpui::prelude::FluentBuilder;
 use gpui::*;
-use crate::elements::scrollbar;
+use crate::elements::{clip, scrollbar};
 use gpui::{uniform_list, UniformListScrollHandle};
 use std::rc::Rc;
 use std::time::Duration;
@@ -899,16 +899,28 @@ impl Render for PackageWorkstationView {
                 .size_full()
                 .p_8()
                 .text_center()
-                .child(
-                    div()
-                        .text_sm()
-                        .text_color(theme.text_muted)
-                        .child(if is_searching {
-                            "Searching..."
-                        } else {
-                            "No matching packages found."
-                        }),
-                )
+                .gap_1()
+                .map(|el| {
+                    if is_searching {
+                        return el.child(
+                            div().text_sm().text_color(theme.text_muted).child("Searching…"),
+                        );
+                    }
+                    // Empty is a state: say why, and the way out.
+                    let filtered =
+                        !source_scope.is_all() || state_filter != PackageStateFilter::All;
+                    let (title, hint) = empty_reason(scope, &search_query, filtered);
+                    el.child(
+                        div()
+                            .text_sm()
+                            .font_weight(FontWeight::MEDIUM)
+                            .text_color(theme.text_secondary)
+                            .child(title),
+                    )
+                    .children(hint.map(|hint| {
+                        div().text_xs().text_color(theme.text_muted).child(hint)
+                    }))
+                })
                 .into_any_element()
         } else {
             let package_count = packages.len();
@@ -1000,6 +1012,8 @@ impl Render for PackageWorkstationView {
                                 let on_select = entity_select.clone();
 
                                 div()
+                                    // A card is known by its package.
+                                    .id(clip::known_by("package_card", &pkg_key))
                                     .h(px(card_wrapper_h))
                                     .px_3()
                                     .py_1()
@@ -1475,10 +1489,58 @@ impl Render for PackageWorkstationView {
     }
 }
 
+/// Why a scope shows nothing, and the way out: an empty list is a state, not
+/// a blank (Skwir's lesson). The words follow what narrows it — the text
+/// typed, the filters — and an empty Updates is good news, said as such.
+fn empty_reason(scope: NavScope, query: &str, filtered: bool) -> (String, Option<&'static str>) {
+    let query = query.trim();
+    match (scope, query.is_empty(), filtered) {
+        (NavScope::Results, false, false) => (
+            format!("No package matches “{query}”."),
+            Some("Check the spelling, or search with fewer words."),
+        ),
+        (_, false, false) => (
+            format!("Nothing here matches “{query}”."),
+            Some("Escape clears the search."),
+        ),
+        (_, false, true) => (
+            format!("Nothing matches “{query}” with these filters."),
+            Some("Clear the filters in the header, or the search with Escape."),
+        ),
+        (_, true, true) => (
+            "The filters hide every package here.".to_string(),
+            Some("Clear the filters in the header to see them again."),
+        ),
+        (NavScope::Updates, true, false) => ("Everything is up to date.".to_string(), None),
+        (NavScope::Installed, true, false) => (
+            "No package is installed from these sources.".to_string(),
+            None,
+        ),
+        (NavScope::Results, true, false) => ("Type to search every source.".to_string(), None),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use core::prelude::v1::test;
+
+    #[test]
+    fn an_empty_list_says_why_and_the_way_out() {
+        // The text typed is named, and Escape is the way out of it.
+        let (title, hint) = empty_reason(NavScope::Installed, " vim ", false);
+        assert_eq!(title, "Nothing here matches “vim”.");
+        assert_eq!(hint, Some("Escape clears the search."));
+        // Filters that hide everything say so, and where to clear them.
+        let (title, hint) = empty_reason(NavScope::Installed, "", true);
+        assert_eq!(title, "The filters hide every package here.");
+        assert!(hint.unwrap().contains("Clear the filters"));
+        // An empty Updates is good news.
+        assert_eq!(
+            empty_reason(NavScope::Updates, "", false),
+            ("Everything is up to date.".to_string(), None)
+        );
+    }
 
     /// L'échelle horizontale : la colonne se replie quand le catalogue n'a
     /// plus la place, et elle reprend sa forme quand la fenêtre la rend.

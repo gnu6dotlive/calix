@@ -1,4 +1,5 @@
 use crate::backend::models::UnifiedPackage;
+use crate::elements::clip;
 use crate::components::package_identity::PackageIdentity;
 use crate::components::package_table::PackageTable;
 use crate::theme::Theme;
@@ -116,8 +117,9 @@ impl PackageCard {
                         .items_center()
                         .justify_between()
                         .gap_2()
-                        .child(
+                        .child(clip::clipped(
                             div()
+                                .id("package_card_name")
                                 .flex_1()
                                 .min_w_0()
                                 .font_weight(FontWeight::BOLD)
@@ -128,9 +130,9 @@ impl PackageCard {
                                     theme.text_primary
                                 })
                                 .overflow_hidden()
-                                .text_ellipsis()
-                                .child(pkg.name.clone()),
-                        )
+                                .text_ellipsis(),
+                            pkg.name.clone(),
+                        ))
                         .child(
                             div()
                                 .flex_shrink_0()
@@ -218,19 +220,20 @@ impl PackageCard {
                     meta
                 })
                 // Ligne 3 : Description aérée avec bornage strict multi-lignes
-                .child(
+                .child(clip::clipped(
                     div()
+                        .id("package_card_description")
                         .text_xs()
                         .text_color(theme.text_secondary)
                         .overflow_hidden()
                         .text_ellipsis()
-                        .line_clamp(if props.compact { 1 } else { 2 })
-                        .child(if pkg.description.is_empty() {
-                            "No description available for this package.".to_string()
-                        } else {
-                            pkg.description.clone()
-                        }),
-                ),
+                        .line_clamp(if props.compact { 1 } else { 2 }),
+                    if pkg.description.is_empty() {
+                        "No description available for this package.".to_string()
+                    } else {
+                        pkg.description.clone()
+                    },
+                )),
         )
     }
 }

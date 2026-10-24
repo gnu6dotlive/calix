@@ -1,4 +1,5 @@
 use crate::components::status_pill::StatusPill;
+use crate::components::tooltip;
 use crate::icons::AppIcon;
 use crate::state::motion::{carrier_travel, ease_in_out, SelectionMarker};
 use crate::state::{MotionDurations, NavScope, Place, RailEntry};
@@ -39,27 +40,6 @@ pub struct Sidebar;
 /// permet au trait de voyager entre deux rangées sans mesurer la mise en page.
 pub fn rail_mark_top(index: f32) -> f32 {
     UiMetrics::RAIL_TOP_PAD + index * (UiMetrics::RAIL_ROW_HEIGHT + UiMetrics::RAIL_ROW_GAP)
-}
-
-struct DestinationTooltip {
-    label: &'static str,
-    theme: Theme,
-}
-
-impl Render for DestinationTooltip {
-    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        div()
-            .bg(self.theme.bg_surface)
-            .text_color(self.theme.text_primary)
-            .border_1()
-            .border_color(self.theme.border)
-            .rounded_md()
-            .px(px(8.0))
-            .py(px(4.0))
-            .text_xs()
-            .shadow_md()
-            .child(self.label)
-    }
 }
 
 impl Sidebar {
@@ -137,10 +117,7 @@ impl Sidebar {
                 item = item.child(StatusPill::badge_count(badge_count, theme));
             }
         } else {
-            let t = *theme;
-            item = item.tooltip(move |_window, cx| {
-                cx.new(|_cx| DestinationTooltip { label, theme: t }).into()
-            });
+            item = item.tooltip(move |_window, cx| tooltip::tip(Some(label.into()), cx));
         }
 
         item.on_mouse_down(MouseButton::Left, move |_e, window, cx| {
@@ -223,7 +200,6 @@ impl Sidebar {
                 AppIcon::Collapse
             };
             let toggle_label = if is_collapsed { "Expand" } else { "Collapse" };
-            let t = *theme;
             div()
                 .id("sidebar_collapse_toggle")
                 .focusable()
@@ -254,13 +230,7 @@ impl Sidebar {
                 )
                 .when(!is_collapsed, |el| el.child("Collapse"))
                 .when(is_collapsed, |el| {
-                    el.tooltip(move |_window, cx| {
-                        cx.new(|_cx| DestinationTooltip {
-                            label: toggle_label,
-                            theme: t,
-                        })
-                        .into()
-                    })
+                    el.tooltip(move |_window, cx| tooltip::tip(Some(toggle_label.into()), cx))
                 })
                 .on_mouse_down(MouseButton::Left, move |_e, window, cx| {
                     on_toggle(window, cx);
