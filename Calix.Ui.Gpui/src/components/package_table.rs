@@ -44,7 +44,7 @@ impl PackageTable {
             .w(px(track))
             .h(px(6.0))
             .flex_shrink_0()
-            .rounded_xs()
+            .rounded_sm()
             .bg(theme.border)
             .relative()
             .child(
@@ -55,7 +55,7 @@ impl PackageTable {
                     .top(px(0.0))
                     .h(px(6.0))
                     .w(px(track * ratio))
-                    .rounded_xs()
+                    .rounded_sm()
                     .bg(Rgba {
                         a: 0.55,
                         ..bar
@@ -270,8 +270,10 @@ impl PackageTable {
         // The rows are engraved into the recess: the ground is the recess's
         // own, and the rules are what separate them. Only the selected row
         // is lifted off it.
+        // The selection is a token, derived from the accent with its text's
+        // contrast guarded: never a local mix.
         let bg_color = if is_selected {
-            theme.bg_surface_active
+            theme.selection_bg
         } else {
             gpui::rgba(0x00000000)
         };
@@ -410,7 +412,7 @@ impl PackageTable {
                             .font_weight(FontWeight::SEMIBOLD)
                             .text_sm()
                             .text_color(if is_selected {
-                                theme.accent
+                                theme.selection_text
                             } else {
                                 theme.text_primary
                             })

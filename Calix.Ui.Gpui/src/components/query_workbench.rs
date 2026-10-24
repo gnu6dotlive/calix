@@ -592,7 +592,6 @@ mod tests {
         let search_input = cx.new(|cx| {
             SearchInputView::new(
                 "Search packages and apps...",
-                theme,
                 false,
                 cx,
             )

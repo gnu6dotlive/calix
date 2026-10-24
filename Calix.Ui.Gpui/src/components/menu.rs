@@ -71,7 +71,9 @@ impl MenuSurface {
             .p_1p5()
             .border_1()
             .border_color(theme.border)
-            .rounded_md();
+            // A panel: the large radius, and the menus' elevation.
+            .rounded_lg()
+            .shadow_md();
 
         base = apply_surface_projection(
             base,

@@ -186,7 +186,6 @@ pub struct PackageWorkstationView {
     pub copy_cmd_feedback: bool,
     pub is_loading_pkgbuild: bool,
     pub reduce_motion: bool,
-    pub theme: Theme,
     pub visual_style: VisualStyleId,
     pub compact: bool,
     pub search_input: Entity<SearchInputView>,
@@ -203,7 +202,6 @@ pub struct PackageWorkstationView {
 
 #[derive(Clone, Copy, Debug)]
 pub struct PackageWorkstationConfig {
-    pub theme: Theme,
     pub reduce_motion: bool,
     pub compact: bool,
     pub visual_style: VisualStyleId,
@@ -239,7 +237,6 @@ impl PackageWorkstationView {
         let search_input = cx.new(|cx| {
             SearchInputView::new(
                 "Search packages and apps...",
-                config.theme,
                 config.reduce_motion,
                 cx,
             )
@@ -253,7 +250,6 @@ impl PackageWorkstationView {
         let scope_dial = cx.new(|_cx| {
             ScopeDialView::new(
                 initial_scope,
-                config.theme,
                 config.reduce_motion,
                 Rc::new(move |scope, _window, cx| {
                     dial_entity.update(cx, |view, cx| {
@@ -294,7 +290,6 @@ impl PackageWorkstationView {
             copy_cmd_feedback: false,
             is_loading_pkgbuild: false,
             reduce_motion: config.reduce_motion,
-            theme: config.theme,
             visual_style: config.visual_style,
             compact: config.compact,
             search_input,
@@ -578,13 +573,6 @@ impl PackageWorkstationView {
         }
     }
 
-    pub fn set_theme(&mut self, theme: Theme, cx: &mut Context<Self>) {
-        self.theme = theme;
-        self.search_input
-            .update(cx, |si, cx| si.set_theme(theme, cx));
-        cx.notify();
-    }
-
     pub fn set_visual_style(&mut self, style: VisualStyleId, cx: &mut Context<Self>) {
         self.visual_style = style;
         cx.notify();
@@ -600,7 +588,7 @@ impl PackageWorkstationView {
 
 impl Render for PackageWorkstationView {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        let theme = self.theme;
+        let theme = Theme::of(cx);
         let entity = cx.entity().clone();
         let is_busy = self.console.read(cx).is_running();
 
@@ -864,7 +852,7 @@ impl Render for PackageWorkstationView {
                         .bg(theme.accent)
                         .text_xs()
                         .font_weight(FontWeight::BOLD)
-                        .text_color(theme.bg_app)
+                        .text_color(theme.on_accent)
                         .cursor_pointer()
                         .hover(|s| s.bg(theme.accent_hover))
                         .child("Retry")
@@ -901,7 +889,7 @@ impl Render for PackageWorkstationView {
                         .bg(theme.accent)
                         .text_xs()
                         .font_weight(FontWeight::BOLD)
-                        .text_color(theme.bg_app)
+                        .text_color(theme.on_accent)
                         .cursor_pointer()
                         .hover(|s| s.bg(theme.accent_hover))
                         .child("Retry")
@@ -1805,7 +1793,6 @@ mod tests {
                 console,
                 toast_center,
                 PackageWorkstationConfig {
-                    theme: Theme::dark(),
                     reduce_motion: false,
                     compact: false,
                     visual_style: VisualStyleId::default(),
@@ -1981,7 +1968,6 @@ mod tests {
                 console.clone(),
                 toast_center.clone(),
                 PackageWorkstationConfig {
-                    theme: Theme::dark(),
                     reduce_motion: false,
                     compact: false,
                     visual_style: VisualStyleId::default(),
@@ -2065,7 +2051,6 @@ mod tests {
                 console.clone(),
                 toast_center.clone(),
                 PackageWorkstationConfig {
-                    theme: Theme::dark(),
                     reduce_motion: false,
                     compact: false,
                     visual_style: VisualStyleId::default(),

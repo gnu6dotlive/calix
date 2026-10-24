@@ -87,7 +87,7 @@ impl NewsView {
                             .bg(theme.accent)
                             .text_xs()
                             .font_weight(FontWeight::BOLD)
-                            .text_color(theme.bg_app)
+                            .text_color(theme.on_accent)
                             .cursor_pointer()
                             .hover(|s| s.bg(theme.accent_hover))
                             .child("Retry")

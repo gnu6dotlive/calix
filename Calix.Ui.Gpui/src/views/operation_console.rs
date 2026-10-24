@@ -16,7 +16,6 @@ pub struct OperationConsoleView {
     pub console: Entity<ConsoleModel>,
     pub toast_center: Entity<ToastCenter>,
     pub configured_height: f32,
-    pub theme: Theme,
     pub reduce_motion: bool,
     pub logs_copied_feedback: bool,
     _console_sub: Subscription,
@@ -27,7 +26,6 @@ impl OperationConsoleView {
         console: Entity<ConsoleModel>,
         toast_center: Entity<ToastCenter>,
         configured_height: f32,
-        theme: Theme,
         reduce_motion: bool,
         cx: &mut Context<Self>,
     ) -> Self {
@@ -39,7 +37,6 @@ impl OperationConsoleView {
             console,
             toast_center,
             configured_height,
-            theme,
             reduce_motion,
             logs_copied_feedback: false,
             _console_sub: console_sub,
@@ -48,11 +45,6 @@ impl OperationConsoleView {
 
     pub fn set_reduce_motion(&mut self, reduce_motion: bool, cx: &mut Context<Self>) {
         self.reduce_motion = reduce_motion;
-        cx.notify();
-    }
-
-    pub fn set_theme(&mut self, theme: Theme, cx: &mut Context<Self>) {
-        self.theme = theme;
         cx.notify();
     }
 
@@ -104,6 +96,7 @@ impl Render for OperationConsoleView {
         let overlays =
             crate::views::workspace::drawer_overlays(window.viewport_size().height / px(1.0));
         let current_height = if is_open { self.configured_height } else { 0.0 };
+        let theme = Theme::of(cx);
 
         let entity = cx.entity().clone();
         let entity_toggle = entity.clone();
@@ -126,7 +119,7 @@ impl Render for OperationConsoleView {
             overlays,
             copied_feedback: self.logs_copied_feedback,
             scroll_handle: &console_read.scroll_handle,
-            theme: &self.theme,
+            theme: &theme,
             on_toggle: Some(Rc::new(move |_w, cx| {
                 entity_toggle.update(cx, |this, cx| {
                     this.console.update(cx, |c, cx| c.toggle_drawer(cx));

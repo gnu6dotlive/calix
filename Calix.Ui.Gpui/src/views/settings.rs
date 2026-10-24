@@ -255,7 +255,7 @@ impl SettingsView {
                                 .bg(theme.warning)
                                 .text_xs()
                                 .font_weight(FontWeight::BOLD)
-                                .text_color(theme.bg_app)
+                                .text_color(theme.on(theme.warning))
                                 .child("Unsaved Changes")
                         } else {
                             div()
@@ -673,9 +673,9 @@ impl SettingsView {
                     .border_color(theme.accent)
                     .text_xs()
                     .font_weight(FontWeight::BOLD)
-                    .text_color(theme.bg_app)
+                    .text_color(theme.on_accent)
                     .cursor_pointer()
-                    .hover(move |s| s.bg(theme.accent_hover).text_color(theme.bg_app))
+                    .hover(move |s| s.bg(theme.accent_hover).text_color(theme.on(theme.accent_hover)))
                     .child("Save Settings *")
                     .on_mouse_down(MouseButton::Left, move |_e, window, cx| {
                         on_save(window, cx);

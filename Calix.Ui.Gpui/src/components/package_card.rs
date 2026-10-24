@@ -26,7 +26,7 @@ impl PackageCard {
         let is_selected = props.is_selected;
 
         let bg_color = if is_selected {
-            theme.bg_surface_active
+            theme.selection_bg
         } else {
             theme.bg_surface
         };
@@ -123,7 +123,7 @@ impl PackageCard {
                                 .font_weight(FontWeight::BOLD)
                                 .text_sm()
                                 .text_color(if is_selected {
-                                    theme.accent
+                                    theme.selection_text
                                 } else {
                                     theme.text_primary
                                 })

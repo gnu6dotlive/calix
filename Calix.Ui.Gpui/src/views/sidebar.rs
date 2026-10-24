@@ -18,7 +18,6 @@ pub struct SidebarView {
     pub store: Entity<PackageStore>,
     /// Le trait de la sélection : la rangée qu'il marque, celle qu'il quitte.
     pub rail_marker: Option<SelectionMarker>,
-    pub theme: Theme,
     pub visual_style: VisualStyleId,
     pub reduce_motion: bool,
     _session_sub: Subscription,
@@ -28,7 +27,6 @@ impl SidebarView {
     pub fn new(
         session: Entity<AppSession>,
         store: Entity<PackageStore>,
-        theme: Theme,
         reduce_motion: bool,
         visual_style: VisualStyleId,
         cx: &mut Context<Self>,
@@ -43,7 +41,6 @@ impl SidebarView {
             session,
             store,
             rail_marker: None,
-            theme,
             visual_style,
             reduce_motion,
             _session_sub: session_sub,
@@ -52,11 +49,6 @@ impl SidebarView {
 
     pub fn set_reduce_motion(&mut self, reduce_motion: bool, cx: &mut Context<Self>) {
         self.reduce_motion = reduce_motion;
-        cx.notify();
-    }
-
-    pub fn set_theme(&mut self, theme: Theme, cx: &mut Context<Self>) {
-        self.theme = theme;
         cx.notify();
     }
 
@@ -86,6 +78,7 @@ impl Render for SidebarView {
             UiMetrics::SIDEBAR_EXPANDED
         };
         let updates_count = self.store.read(cx).updates_count;
+        let theme = Theme::of(cx);
 
         // La sélection du rail est un objet qui voyage : quand le périmètre
         // change, le trait part de l'entrée quittée et se pose sur l'entrée
@@ -105,7 +98,7 @@ impl Render for SidebarView {
             updates_count,
             is_collapsed,
             current_width,
-            theme: &self.theme,
+            theme: &theme,
             visual_style: self.visual_style,
             on_select: Rc::new(move |entry: RailEntry, _w, cx| {
                 session_dest.update(cx, |s, cx| {
