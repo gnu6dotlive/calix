@@ -142,10 +142,16 @@ fn main() {
                 ..Default::default()
             };
 
-            let _ = cx.open_window(options, move |_, cx| {
-                cx.new(|cx| {
+            let _ = cx.open_window(options, move |window, cx| {
+                let workspace = cx.new(|cx| {
                     WorkspaceView::with_config(initial_calix_settings, initial_gpui_config, cx)
-                })
+                });
+                // The keyboard starts in the window, never nowhere: with no
+                // focus, the window's actions (Ctrl+K, Ctrl+F, ↓) are on no
+                // dispatch path until something is clicked.
+                let root = workspace.read(cx).search_focus.clone();
+                window.focus(&root, cx);
+                workspace
             });
         });
 
