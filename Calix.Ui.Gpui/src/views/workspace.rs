@@ -104,6 +104,9 @@ pub struct WorkspaceView {
     pub palette: Option<(Entity<CommandPalette>, Subscription)>,
     /// Where the keyboard was before the palette took it: it goes back there.
     pub palette_restore: Option<FocusHandle>,
+    /// The scroll of the news and of the settings: their bars read them.
+    pub news_scroll: ScrollHandle,
+    pub settings_scroll: ScrollHandle,
 }
 
 impl WorkspaceView {
@@ -370,6 +373,8 @@ impl WorkspaceView {
             cheatsheet_hold: None,
             palette: None,
             palette_restore: None,
+            news_scroll: ScrollHandle::new(),
+            settings_scroll: ScrollHandle::new(),
         };
 
         // Liaison des mutations depuis PackageWorkstationView vers WorkspaceView
@@ -2260,6 +2265,7 @@ impl Render for WorkspaceView {
                 let entity_retry = entity.clone();
                 let store = self.store.read(cx);
                 div().size_full().child(NewsView::render(NewsViewProps {
+                    scroll: &self.news_scroll,
                     news: &self.news,
                     error: store.news_error.as_deref(),
                     is_loading: self.is_loading_news,
@@ -2277,6 +2283,7 @@ impl Render for WorkspaceView {
                 div()
                     .size_full()
                     .child(SettingsView::render(SettingsViewProps {
+                        scroll: &self.settings_scroll,
                         calix_settings: &self.settings.draft_calix,
                         gpui_config: &self.settings.draft_gpui,
                         is_dirty: self.settings.is_dirty,

@@ -242,9 +242,8 @@ impl QueryWorkbench {
                     .track_focus(&props.state_btn_focus)
                     .tab_stop(true)
                     .focus(move |s| s.border_1().border_color(focus_border))
-                    .on_key_down(move |event, window, cx| {
-                        let key = event.keystroke.key.as_str();
-                        if key == "enter" || key == "space" {
+                    .on_click(move |event, window, cx| {
+                        if event.is_keyboard() {
                             let next = if is_state_open {
                                 None
                             } else {
@@ -429,9 +428,8 @@ impl QueryWorkbench {
             .track_focus(&props.sort_btn_focus)
             .tab_stop(true)
             .focus(move |s| s.border_1().border_color(focus_border))
-            .on_key_down(move |event, window, cx| {
-                let key = event.keystroke.key.as_str();
-                if key == "enter" || key == "space" {
+            .on_click(move |event, window, cx| {
+                if event.is_keyboard() {
                     let next = if is_sort_open {
                         None
                     } else {

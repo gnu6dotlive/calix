@@ -7,6 +7,7 @@ use crate::components::inspector_header::{
     InspectorHeader, InspectorHeaderProps, PlateRows, TabSelectHandler, WindowActionHandler,
 };
 use crate::elements::adaptive::AdaptiveStack;
+use crate::elements::scrollbar;
 use crate::components::semantic_value::StringActionHandler;
 use crate::state::{AlsoIn, InspectorTab, PackageCapabilities};
 use crate::theme::Theme;
@@ -39,6 +40,8 @@ pub struct PackageInspectorProps<'a> {
     pub is_loading_pkgbuild: bool,
     pub active_tab: InspectorTab,
     pub theme: &'a Theme,
+    /// The body's scroll, kept by the station: the bar reads it.
+    pub scroll: &'a ScrollHandle,
     pub is_busy: bool,
     pub copy_feedback: bool,
     /// Ce que la plaque inscrit quand aucun paquet n'est ouvert.
@@ -261,13 +264,20 @@ impl PackageInspectorView {
             .child(AdaptiveStack::new(
                 headers,
                 div()
-                    .id("inspector_scroll_body")
                     .size_full()
-                    .overflow_scroll()
-                    .px_4()
-                    .py_3()
-                    .children(error_banner)
-                    .child(animated_body),
+                    .relative()
+                    .child(
+                        div()
+                            .id("inspector_scroll_body")
+                            .size_full()
+                            .overflow_y_scroll()
+                            .track_scroll(props.scroll)
+                            .px_4()
+                            .py_3()
+                            .children(error_banner)
+                            .child(animated_body),
+                    )
+                    .child(scrollbar::vertical("inspector_scrollbar", props.scroll)),
             ))
             .into_any_element()
     }
@@ -283,6 +293,7 @@ mod tests {
     use crate::backend::models::{AlpmPackage, UnifiedPackage, UnifiedPackageSource};
     use crate::state::session::InspectorTab;
     use crate::theme::Theme;
+    use gpui::ScrollHandle;
 
     /// La plaque cède partie par partie, mesurée par l'élément qui la pose.
     ///
@@ -406,7 +417,9 @@ mod tests {
             std::rc::Rc::new(|_, _, _| {});
 
         // 1. Empty state
+        let scroll = ScrollHandle::new();
         let empty_props = PackageInspectorProps {
+            scroll: &scroll,
             package: None,
             alpm_details: None,
             also_in: &[],
@@ -446,6 +459,7 @@ mod tests {
         };
 
         let populated_props = PackageInspectorProps {
+            scroll: &scroll,
             package: Some(&pkg),
             alpm_details: None,
             also_in: &[],
@@ -505,7 +519,9 @@ mod tests {
                 let theme = self.theme.clone();
                 let on_tab: crate::components::inspector_header::TabSelectHandler =
                     std::rc::Rc::new(|_, _, _| {});
+                let scroll = ScrollHandle::new();
                 let props = PackageInspectorProps {
+                    scroll: &scroll,
                     package: Some(&self.pkg),
                             alpm_details: None,
                     also_in: &[],
