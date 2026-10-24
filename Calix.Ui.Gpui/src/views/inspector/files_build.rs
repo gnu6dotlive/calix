@@ -4,6 +4,7 @@ use crate::components::package_table::PackageTable;
 use crate::components::semantic_value::SemanticValue;
 use crate::icons::AppIcon;
 use crate::state::SemanticTarget;
+use crate::components::facts;
 use crate::theme::Theme;
 use gpui::*;
 
@@ -19,26 +20,8 @@ pub struct FilesBuildViewProps<'a> {
 pub struct FilesBuildView;
 
 impl FilesBuildView {
-    fn render_info_row(
-        label: &'static str,
-        value: impl IntoElement,
-        theme: &Theme,
-    ) -> impl IntoElement {
-        div()
-            .flex()
-            .items_center()
-            .justify_between()
-            .py_1p5()
-            .border_b_1()
-            .border_color(theme.border)
-            .child(
-                div()
-                    .text_xs()
-                    .font_weight(FontWeight::SEMIBOLD)
-                    .text_color(theme.text_muted)
-                    .child(label),
-            )
-            .child(div().text_sm().text_color(theme.text_primary).child(value))
+    fn render_info_row(label: &'static str, value: impl IntoElement, theme: &Theme) -> Div {
+        facts::fact(label, value, theme)
     }
 
     pub fn render(props: FilesBuildViewProps) -> impl IntoElement {
@@ -108,62 +91,23 @@ impl FilesBuildView {
                             }),
                     );
 
-                let meta_summary = div()
-                    .flex()
-                    .gap_3()
-                    .mb_4()
-                    .child(
-                        div()
-                            .flex_1()
-                            .p_2()
-                            .rounded_md()
-                            .bg(theme.bg_surface)
-                            .border_1()
-                            .border_color(theme.border)
-                            .child(
-                                div()
-                                    .text_xs()
-                                    .text_color(theme.text_muted)
-                                    .child("PACKAGE BASE"),
-                            )
-                            .child(
-                                div()
-                                    .text_sm()
-                                    .font_weight(FontWeight::BOLD)
-                                    .text_color(theme.text_primary)
-                                    .child(
-                                        aur.package_base
-                                            .clone()
-                                            .unwrap_or_else(|| pkg.name.clone()),
-                                    ),
-                            ),
-                    )
-                    .child(
-                        div()
-                            .flex_1()
-                            .p_2()
-                            .rounded_md()
-                            .bg(theme.bg_surface)
-                            .border_1()
-                            .border_color(theme.border)
-                            .child(
-                                div()
-                                    .text_xs()
-                                    .text_color(theme.text_muted)
-                                    .child("POPULARITY / VOTES"),
-                            )
-                            .child(
-                                div()
-                                    .text_sm()
-                                    .font_weight(FontWeight::BOLD)
-                                    .text_color(theme.text_primary)
-                                    .child(format!(
-                                        "{:.2} ({} votes)",
-                                        aur.popularity.unwrap_or(0.0),
-                                        aur.num_votes.unwrap_or(0)
-                                    )),
-                            ),
-                    );
+                let meta_summary = facts::list([
+                    facts::fact(
+                        "Package base",
+                        aur.package_base.clone().unwrap_or_else(|| pkg.name.clone()),
+                        theme,
+                    ),
+                    facts::fact(
+                        "Popularity",
+                        format!(
+                            "{:.2} · {} votes",
+                            aur.popularity.unwrap_or(0.0),
+                            aur.num_votes.unwrap_or(0)
+                        ),
+                        theme,
+                    ),
+                ])
+                .mb_4();
 
                 let viewer = if props.is_loading_pkgbuild {
                     div()
@@ -253,16 +197,16 @@ impl FilesBuildView {
                     .border_1()
                     .border_color(theme.border)
                     .gap_2()
-                    .child(Self::render_info_row("LOCAL FILE PATH", path_elem, theme))
-                    .child(Self::render_info_row("SIZE ON DISK", size_str, theme))
-                    .child(Self::render_info_row("UPDATE URL", update_elem, theme))
+                    .child(Self::render_info_row("File", path_elem, theme))
+                    .child(Self::render_info_row("Size on disk", size_str, theme))
+                    .child(Self::render_info_row("Update URL", update_elem, theme))
                     .child(Self::render_info_row(
-                        "DESKTOP ENTRY",
+                        "Desktop entry",
                         ai.desktop_name.clone().unwrap_or_else(|| "—".to_string()),
                         theme,
                     ))
                     .child(Self::render_info_row(
-                        "ICON NAME",
+                        "Icon name",
                         ai.icon_name.clone().unwrap_or_else(|| "—".to_string()),
                         theme,
                     ));
@@ -273,11 +217,7 @@ impl FilesBuildView {
                     .py_4()
                     .gap_4()
                     .child(
-                        div()
-                            .text_xs()
-                            .font_weight(FontWeight::BOLD)
-                            .text_color(theme.text_muted)
-                            .child("APPIMAGE BUNDLE METADATA"),
+                        facts::section_label("AppImage bundle", theme),
                     )
                     .child(info)
             }
@@ -297,11 +237,11 @@ impl FilesBuildView {
                     .border_1()
                     .border_color(theme.border)
                     .gap_2()
-                    .child(Self::render_info_row("CRATE", pkg.name.clone(), theme))
-                    .child(Self::render_info_row("VERSION", crate_.version.clone(), theme))
-                    .child(Self::render_info_row("BINARIES", binaries, theme))
+                    .child(Self::render_info_row("Crate", pkg.name.clone(), theme))
+                    .child(Self::render_info_row("Version", crate_.version.clone(), theme))
+                    .child(Self::render_info_row("Binaries", binaries, theme))
                     .child(Self::render_info_row(
-                        "REGISTRY",
+                        "Registry",
                         if crate_.source.is_empty() {
                             "crates.io".to_string()
                         } else {
@@ -316,11 +256,7 @@ impl FilesBuildView {
                     .py_4()
                     .gap_4()
                     .child(
-                        div()
-                            .text_xs()
-                            .font_weight(FontWeight::BOLD)
-                            .text_color(theme.text_muted)
-                            .child("CARGO ECOSYSTEM METADATA"),
+                        facts::section_label("Cargo crate", theme),
                     )
                     .child(info)
             }
@@ -335,10 +271,10 @@ impl FilesBuildView {
                     .border_1()
                     .border_color(theme.border)
                     .gap_2()
-                    .child(Self::render_info_row("PACKAGE", pkg.name.clone(), theme))
-                    .child(Self::render_info_row("VERSION", package.version.clone(), theme))
+                    .child(Self::render_info_row("Package", pkg.name.clone(), theme))
+                    .child(Self::render_info_row("Version", package.version.clone(), theme))
                     .child(Self::render_info_row(
-                        "OVERRIDDEN",
+                        "Overridden",
                         if package.overridden { "yes" } else { "no" }.to_string(),
                         theme,
                     ));
@@ -349,11 +285,7 @@ impl FilesBuildView {
                     .py_4()
                     .gap_4()
                     .child(
-                        div()
-                            .text_xs()
-                            .font_weight(FontWeight::BOLD)
-                            .text_color(theme.text_muted)
-                            .child("NPM ECOSYSTEM METADATA"),
+                        facts::section_label("npm package", theme),
                     )
                     .child(info)
             }
@@ -368,24 +300,24 @@ impl FilesBuildView {
                     .border_1()
                     .border_color(theme.border)
                     .gap_2()
-                    .child(Self::render_info_row("PACKAGE", pkg.name.clone(), theme))
+                    .child(Self::render_info_row("Package", pkg.name.clone(), theme))
                     .child(Self::render_info_row(
-                        "INSTALLED",
+                        "Installed",
                         release.installed_version.clone().unwrap_or_else(|| "—".into()),
                         theme,
                     ))
                     .child(Self::render_info_row(
-                        "LATEST",
+                        "Latest",
                         release.latest_version.clone().unwrap_or_else(|| "—".into()),
                         theme,
                     ))
                     .child(Self::render_info_row(
-                        "UPSTREAM",
+                        "Upstream",
                         release.repo.clone().unwrap_or_else(|| "—".into()),
                         theme,
                     ))
                     .child(Self::render_info_row(
-                        "CHANNEL",
+                        "Channel",
                         release.canal.clone().unwrap_or_else(|| "—".into()),
                         theme,
                     ));
@@ -396,11 +328,7 @@ impl FilesBuildView {
                     .py_4()
                     .gap_4()
                     .child(
-                        div()
-                            .text_xs()
-                            .font_weight(FontWeight::BOLD)
-                            .text_color(theme.text_muted)
-                            .child("RELEASE ECOSYSTEM METADATA"),
+                        facts::section_label("Release", theme),
                     )
                     .child(info)
             }
@@ -425,11 +353,11 @@ impl FilesBuildView {
                     .border_1()
                     .border_color(theme.border)
                     .gap_2()
-                    .child(Self::render_info_row("PACKAGE BASE", pkg_base, theme))
-                    .child(Self::render_info_row("BUILD DATE", build_date, theme))
-                    .child(Self::render_info_row("INSTALL DATE", install_date, theme))
+                    .child(Self::render_info_row("Package base", pkg_base, theme))
+                    .child(Self::render_info_row("Build date", build_date, theme))
+                    .child(Self::render_info_row("Install date", install_date, theme))
                     .child(Self::render_info_row(
-                        "REPOSITORY",
+                        "Repository",
                         if pkg.repository_or_remote.is_empty() {
                             "—".to_string()
                         } else {
@@ -474,13 +402,7 @@ impl FilesBuildView {
                     .flex_col()
                     .py_4()
                     .gap_4()
-                    .child(
-                        div()
-                            .text_xs()
-                            .font_weight(FontWeight::BOLD)
-                            .text_color(theme.text_muted)
-                            .child("BUILD & INSTALLATION METADATA"),
-                    )
+                    .child(facts::section_label("Build and installation", theme))
                     .child(build_info)
                     .child(notice)
             }
@@ -506,9 +428,9 @@ impl FilesBuildView {
                     .border_1()
                     .border_color(theme.border)
                     .gap_2()
-                    .child(Self::render_info_row("APPLICATION ID", app_id, theme))
-                    .child(Self::render_info_row("REMOTE CATALOG", remote, theme))
-                    .child(Self::render_info_row("APPLICATION TYPE", app_type, theme));
+                    .child(Self::render_info_row("Application ID", app_id, theme))
+                    .child(Self::render_info_row("Remote catalog", remote, theme))
+                    .child(Self::render_info_row("Application type", app_type, theme));
 
                 let notice = div()
                     .p_4()
@@ -538,11 +460,7 @@ impl FilesBuildView {
                     .py_4()
                     .gap_4()
                     .child(
-                        div()
-                            .text_xs()
-                            .font_weight(FontWeight::BOLD)
-                            .text_color(theme.text_muted)
-                            .child("FLATPAK PACKAGE DETAILS"),
+                        facts::section_label("Flatpak application", theme),
                     )
                     .child(info)
                     .child(notice)

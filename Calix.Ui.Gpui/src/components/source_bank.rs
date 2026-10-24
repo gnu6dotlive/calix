@@ -103,10 +103,8 @@ impl SourceBank {
     fn render_aperture(
         entry: &SourceAxisEntry,
         health: Option<(&'static str, bool)>,
-        // The anchor: the channel that carries the most of this scope's
-        // work. It is wider than the others and it is the only one that
-        // says what it holds — seven equal slabs read as a form.
-        anchor: bool,
+        // The first segment has no rule before it.
+        first: bool,
         props: &SourceBankProps,
         on_toggle: SourceToggleHandler,
         step: Option<(WaterfallStep, Duration)>,
@@ -114,23 +112,27 @@ impl SourceBank {
         let theme = props.theme;
         let on_retry = props.on_retry.clone();
         let kind = entry.kind;
-        let border = if anchor {
-            theme.accent
+        // A source in the scope is a raised segment, in ink; one left out
+        // lies flat in the aluminium, muted.
+        let in_scope = entry.selected;
+        let failed = health.map(|(_, failed)| failed).unwrap_or(false);
+        let name_color = if in_scope {
+            theme.text_primary
         } else {
-            theme.border
+            theme.text_muted
         };
         let count_color = if entry.count == 0 {
             theme.text_muted
         } else {
-            theme.text_primary
+            theme.text_secondary
         };
-
-        let health_line = health.map(|(label, failed)| {
-            div()
-                .text_xs()
-                .text_color(if failed { theme.danger } else { theme.text_muted })
-                .child(label)
-        });
+        // What it holds is said when asked: a recipe and a binary are not the
+        // same thing, and the tooltip says so without a line of its own.
+        let says: SharedString = match (entry.inventory_only, health) {
+            (true, _) => format!("{} — listed, not queried", entry.holds).into(),
+            (false, Some((state, _))) => format!("{} — {}", entry.holds, state.to_lowercase()).into(),
+            (false, None) => entry.holds.into(),
+        };
 
         let aperture = div()
             .id(aperture_id(kind))
@@ -138,27 +140,18 @@ impl SourceBank {
             // the aperture under this name. A noop outside the tests.
             .debug_selector(move || aperture_selector(kind).to_string())
             .flex()
-            .flex_col()
-            .gap(px(2.0))
-            .min_w(px(96.0))
-            // The aperture that carries the scope's work is wider than the
-            // others: the bank has a front, and the eye has a place to land.
-            .flex_basis(px(if anchor { 160.0 } else { 0.0 }))
-            .flex_grow(1.0)
-            .px_3()
-            .py_2()
-            .border_b_2()
-            .border_color(border)
-            .bg(if anchor {
-                theme.bg_surface_hover
-            } else {
-                theme.bg_surface
-            })
+            .flex_none()
+            .items_center()
+            .gap(px(7.0))
+            .h(px(28.0))
+            .px(px(11.0))
+            .when(!first, |el| el.border_l_1().border_color(theme.border))
             .cursor_pointer()
             .hover(move |s| s.bg(theme.bg_surface_hover))
             .focusable()
             .tab_stop(true)
-            .focus(move |s| s.border_b_2().border_color(theme.accent))
+            .focus(move |s| s.bg(theme.bg_surface_hover))
+            .tooltip(move |_, cx| crate::components::tooltip::tip(Some(says.clone()), cx))
             .on_mouse_down(MouseButton::Left, {
                 let on_toggle = on_toggle.clone();
                 move |_ev, window, cx| {
@@ -173,34 +166,31 @@ impl SourceBank {
                     }
                 }
             })
-            // The name of the source.
+            // The source's lamp: lit in the accent while the source is in
+            // the scope, a ring when it is left out — an instrument's
+            // indicator, read before the name.
             .child(
                 div()
-                    .text_xs()
-                    .font_weight(FontWeight::BOLD)
+                    .size(px(7.0))
+                    .rounded_full()
+                    .when(in_scope, |lamp| lamp.bg(theme.accent))
+                    .when(!in_scope, |lamp| lamp.border_1().border_color(theme.text_muted)),
+            )
+            .child(
+                div()
+                    .text_sm()
+                    .font_weight(FontWeight::MEDIUM)
                     .whitespace_nowrap()
-                    .overflow_hidden()
-                    .text_color(if anchor {
-                        theme.accent
-                    } else {
-                        theme.text_primary
-                    })
-                    // L'ancre a la place de son nom entier ; les autres
-                    // canaux sont étroits et portent leur nom court. Un nom
-                    // coupé au milieu d'un mot se lirait comme un défaut.
-                    .child(if anchor {
-                        entry.label
-                    } else {
-                        entry.kind.short_label()
-                    }),
+                    .text_color(name_color)
+                    .child(entry.kind.short_label()),
             )
             // The count of the scope's rows in this source. A value that
             // changes re-reads and flashes once: it does not glide into place.
             .child({
                 let count = div()
                     .id(count_id(kind))
-                    .text_sm()
-                    .font_family(crate::fonts::UI).font_features(crate::fonts::figures())
+                    .text_xs()
+                    .font_features(crate::fonts::figures())
                     .text_color(count_color)
                     .child(entry.count.to_string());
                 if props.reduce_motion {
@@ -218,46 +208,25 @@ impl SourceBank {
                         .into_any_element()
                 }
             })
-            // What it holds: the non-interchangeability, stated up front.
-            // Only the engaged aperture has the room to say it — the others
-            // are narrow enough that the line would be cut in the middle of
-            // a word, which reads as a defect, not as a caption.
-            .when(anchor, |element| {
-                element.child(
-                    div()
-                        .text_xs()
-                        .text_color(theme.text_muted)
-                        .child(entry.holds),
-                )
-            })
-            // The state of the source: a source that did not answer says so.
-            .children(health_line)
-            .when(
-                health.map(|(_, failed)| failed).unwrap_or(false),
-                |element| {
-                    let retry = on_retry.clone();
-                    element.child(
+            // A source that did not answer: a red mark, and the way out.
+            .when(failed, |element| {
+                let retry = on_retry.clone();
+                element
+                    .child(div().size(px(6.0)).rounded_full().bg(theme.danger))
+                    .child(
                         div()
                             .id(retry_id(kind))
                             .text_xs()
-                            .font_weight(FontWeight::BOLD)
+                            .font_weight(FontWeight::MEDIUM)
                             .text_color(theme.danger)
                             .cursor_pointer()
+                            .hover(|s| s.underline())
                             .child("Retry")
-                            .on_mouse_down(MouseButton::Left, move |_ev, window, cx| {
+                            .on_click(move |_ev, window, cx| {
+                                cx.stop_propagation();
                                 retry(kind, window, cx);
                             }),
                     )
-                },
-            )
-            // The inventory ecosystems are listed, never queried.
-            .when(entry.inventory_only, |element| {
-                element.child(
-                    div()
-                        .text_xs()
-                        .text_color(theme.text_muted)
-                        .child("listed, not queried"),
-                )
             });
 
         // L'arrivée : la banque arrive par en dessous, dans une vague qui
@@ -286,7 +255,6 @@ impl SourceBank {
     }
 
     pub fn render(props: SourceBankProps) -> impl IntoElement {
-        let theme = props.theme;
         let health_of = |kind| {
             props.source_health.get(&kind).and_then(|health| match health.status {
                 SourceHealthStatus::Failed => Some(("Failed", true)),
@@ -315,15 +283,12 @@ impl SourceBank {
         let steps = waterfall_entry(&weights);
         let total = waterfall_duration(&steps);
 
-        // L'ancre : le canal qui porte le plus de lignes du périmètre.
-        let anchor = crate::state::anchor_index(props.axis);
-
         let mut apertures = Vec::with_capacity(props.axis.len());
         for (index, entry) in props.axis.iter().enumerate() {
             apertures.push(Self::render_aperture(
                 entry,
                 health_of(entry.kind),
-                index == anchor,
+                index == 0,
                 &props,
                 props.on_toggle.clone(),
                 steps.get(index).copied().map(|step| (step, total)),
@@ -337,14 +302,24 @@ impl SourceBank {
             .debug_selector(|| "source_bank".to_string())
             .flex()
             .flex_row()
-            .gap(px(6.0))
+            .items_center()
+            .flex_none()
             .w_full()
-            .px_3()
-            .py_2()
-            .border_b_1()
-            .border_color(theme.border)
-            .bg(theme.bg_app)
-            .children(apertures)
+            .child(
+                // One control, its segments side by side: the sources are an
+                // axis, not a pile of chips.
+                div()
+                    .flex()
+                    .flex_row()
+                    .items_center()
+                    .rounded_md()
+                    .border_1()
+                    .border_color(props.theme.border)
+                    .bg(props.theme.bg_surface)
+                    .shadow_xs()
+                    .overflow_hidden()
+                    .children(apertures),
+            )
     }
 }
 

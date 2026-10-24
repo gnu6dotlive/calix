@@ -162,6 +162,9 @@ impl Render for ScopeDialView {
             .bg(theme.bg_surface)
             .border_1()
             .border_color(theme.border)
+            // The knob stands proud of the aluminium: the one object of the
+            // chassis that casts a shadow of its own.
+            .shadow_md()
             .child(
                 // The needle, thrown at the detent. The SVG is painted upside
                 // down — the engine flips it — so the file's needle points

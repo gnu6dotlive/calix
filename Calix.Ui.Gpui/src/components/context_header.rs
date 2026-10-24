@@ -122,31 +122,8 @@ impl ContextHeader {
             }
         };
 
-        // ── La couverture : les écosystèmes du périmètre ────────────────────
-        let coverage = if is_packages {
-            // Les sources interrogeables, puis celles que le périmètre liste
-            // sans pouvoir les interroger : la ligne le dit, pour que la
-            // couverture ne mente pas sur ce qui se cherche.
-            let inventory_only = props.scope.inventory_only_sources();
-            let searchable: Vec<String> = props
-                .scope
-                .sources()
-                .iter()
-                .filter(|source| !inventory_only.contains(source))
-                .map(|source| source.to_string())
-                .collect();
-            let listed: Vec<String> = inventory_only
-                .iter()
-                .map(|source| source.to_string())
-                .collect();
-            let mut parts = vec![searchable.join(" · ")];
-            if !listed.is_empty() {
-                parts.push(format!("{} (inventory only)", listed.join(" · ")));
-            }
-            parts.join("  +  ")
-        } else {
-            String::new()
-        };
+        // The coverage (which ecosystems the scope searches) is the source
+        // strip's to say, under the header: the header names the place.
 
         // Une source qui n'a pas répondu se dit, et se réessaie : la barre
         // d'état a laissé la place, la santé reste.
@@ -218,15 +195,6 @@ impl ContextHeader {
             .items_center()
             .gap(px(8.0))
             .overflow_hidden();
-        if !coverage.is_empty() {
-            second_line = second_line.child(
-                div()
-                    .text_xs()
-                    .text_color(theme.text_muted)
-                    .truncate()
-                    .child(coverage),
-            );
-        }
         if let Some(age) = props.age.as_ref() {
             second_line = second_line.child(
                 div().text_xs().text_color(theme.text_muted).child(age.clone()),
@@ -273,12 +241,27 @@ impl ContextHeader {
                 .flex_col()
                 .gap(px(3.0))
                 .min_w(px(0.0))
+                // The place's name is the one large thing in the chassis: the
+                // dial's label, set in the interface face at a display size.
                 .child(
                     div()
-                        .text_sm()
-                        .font_weight(FontWeight::BOLD)
-                        .text_color(theme.text_primary)
-                        .child(title),
+                        .flex()
+                        .items_baseline()
+                        .gap(px(10.0))
+                        .child(
+                            div()
+                                .text_xl()
+                                .font_weight(FontWeight::SEMIBOLD)
+                                .text_color(theme.text_primary)
+                                .child(title),
+                        )
+                        .child(
+                            div()
+                                .text_sm()
+                                .font_features(crate::fonts::figures())
+                                .text_color(theme.text_muted)
+                                .child(count),
+                        ),
                 )
                 .child(second_line),
         );
@@ -303,20 +286,12 @@ impl ContextHeader {
             .px(px(16.0))
             .py(px(6.0))
             .bg(theme.bg_sidebar)
-            .border_b_1()
-            .border_color(theme.border)
             .child(nameplate)
             .child(
                 div()
                     .flex()
                     .items_center()
                     .gap(px(10.0))
-                    .child(
-                        div()
-                            .text_xs()
-                            .text_color(theme.text_secondary)
-                            .child(count),
-                    )
                     // Le disque de l'aide : la fiche des raccourcis n'est
                     // jamais sur la surface, mais elle est découvrable.
                     .when(props.on_toggle_help.is_some(), |element| {
