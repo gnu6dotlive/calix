@@ -1,6 +1,7 @@
 use crate::icons::AppIcon;
 use crate::theme::Theme;
 use gpui::*;
+use gpui::prelude::FluentBuilder;
 use std::rc::Rc;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -56,6 +57,9 @@ pub struct LogDrawerProps<'a> {
     pub auto_scroll: bool,
     pub show_raw_logs: bool,
     pub height: f32,
+    /// Le tiroir passe par-dessus le catalogue : il garde sa hauteur entière,
+    /// sans plafond relatif.
+    pub overlays: bool,
     pub copied_feedback: bool,
     pub scroll_handle: &'a ScrollHandle,
     pub theme: &'a Theme,
@@ -428,11 +432,27 @@ impl LogDrawer {
                     .child(toggle_btn),
             );
 
-        let mut container = div().flex().flex_col().bg(theme.bg_sidebar).child(header);
+        // Le tiroir est une bande qui cède : sa hauteur est son bandeau et le
+        // corps demandé, son plafond une part de la colonne, et il rétrécit
+        // avant la station (qui a un plancher). Le flex décide — personne ne
+        // lui pousse de budget.
+        let mut container = div()
+            .flex()
+            .flex_col()
+            .flex_shrink(1.0)
+            .min_h(px(crate::ui_metrics::UiMetrics::DRAWER_HEADER_HEIGHT))
+            .overflow_hidden()
+            .when(!props.overlays, |drawer| {
+                drawer.max_h(relative(crate::ui_metrics::UiMetrics::DRAWER_MAX_RATIO))
+            })
+            .bg(theme.bg_sidebar)
+            .child(header.flex_none());
 
         if props.height > 10.0 {
             let mut body_container = div()
                 .h(px(props.height))
+                .flex_shrink(1.0)
+                .min_h(px(0.0))
                 .overflow_hidden()
                 .flex()
                 .flex_col()
