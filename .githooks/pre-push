@@ -41,4 +41,8 @@ if [ "$touches_dependencies" = 1 ]; then
     }
 fi
 
+# Unset Git hook environment variables so nested git commands in test fixtures
+# execute in their own isolated fixture directories rather than this repo.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_PREFIX
+
 exec "$root/scripts/verify"
