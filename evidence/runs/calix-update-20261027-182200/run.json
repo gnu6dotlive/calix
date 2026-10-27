@@ -1,0 +1,76 @@
+{
+  "run_id": "calix-update-20261027-182200",
+  "kind": "calix-update",
+  "status": "ok",
+  "destination": "repo",
+  "started_at": "2026-10-27T22:22:00Z",
+  "finished_at": "2026-10-27T22:22:08Z",
+  "duration_ms": 8047,
+  "tool_version": "2.0.0",
+  "host": {
+    "kernel": "7.3.0-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "python": "3.14.8"
+  },
+  "steps": [
+    {
+      "name": "probe",
+      "status": "ok",
+      "at": "2026-10-27T22:22:01Z",
+      "releases": 14,
+      "provider": "github"
+    },
+    {
+      "name": "resolve",
+      "status": "ok",
+      "at": "2026-10-27T22:22:01Z",
+      "installed": "0.5.1",
+      "latest": "0.8.1"
+    },
+    {
+      "name": "updpkgsums",
+      "status": "ok",
+      "at": "2026-10-27T22:22:01Z",
+      "returncode": 0
+    },
+    {
+      "name": "checksum",
+      "status": "ok",
+      "at": "2026-10-27T22:22:01Z",
+      "artifact": "artcraft-launcher-0.8.1-linux-x86_64.tar.gz",
+      "verified": true
+    },
+    {
+      "name": "makepkg",
+      "status": "ok",
+      "at": "2026-10-27T22:22:04Z",
+      "returncode": 0
+    },
+    {
+      "name": "pkexec-pacman",
+      "status": "ok",
+      "at": "2026-10-27T22:22:08Z",
+      "returncode": 0,
+      "artifact": "artcraft-launcher-bin-0.8.1-1-x86_64.pkg.tar.zst"
+    },
+    {
+      "name": "verify",
+      "status": "ok",
+      "at": "2026-10-27T22:22:08Z",
+      "installed_version": "0.8.1"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "../artcraft-launcher-bin/PKGBUILD.calix-bak",
+      "sha256": "b1da8aa76d00188fbc0d2bec9c5df5c94bab5c9857893f6c231e76451db742de"
+    },
+    {
+      "path": "../artcraft-launcher-bin/artcraft-launcher-bin-0.8.1-1-x86_64.pkg.tar.zst",
+      "sha256": "69f58332117b0bed347c85a867ae01b574fb22751512228e745daab705942109"
+    }
+  ],
+  "known_gaps": [],
+  "package": "artcraft-launcher-bin-0.8.1-1-x86_64.pkg.tar.zst",
+  "version": "0.8.1"
+}

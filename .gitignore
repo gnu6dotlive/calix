@@ -24,3 +24,4 @@ vendor/
 # The work of a run lives here: the caches, the scratch and the logs a run needs
 # to run again. It is ignored, and it is not /tmp.
 .ci-cache/
+target/

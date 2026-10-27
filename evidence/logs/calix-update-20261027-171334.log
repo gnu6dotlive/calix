@@ -1,0 +1,7 @@
+[2026-10-27T17:13:34-0400] update requested for 'artcraft-launcher' (repo=storytold/craft-launcher, canal=stable)
+[2026-10-27T17:13:35-0400] step probe -> ok {'releases': 14, 'provider': 'github'}
+[2026-10-27T17:13:35-0400] step resolve -> ok {'installed': '0.5.1', 'latest': '0.8.1'}
+[2026-10-27T17:13:36-0400] step updpkgsums -> ok {'returncode': 0}
+[2026-10-27T17:13:36-0400] step checksum -> ok {'artifact': 'artcraft-launcher-0.8.1-linux-x86_64.tar.gz', 'verified': True}
+[2026-10-27T17:13:36-0400] PKGBUILD restored from backup
+[2026-10-27T17:13:36-0400] step dry-run -> ok {'pkgver': '0.8.1', 'pkgbuild_restored': True}
