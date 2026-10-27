@@ -34,6 +34,7 @@ Commands:
                        and tracked GitHub/GitLab/Gitea releases.
                        Pass --runtime to record the run in the engine's state
                        directory instead of the repository's evidence/ tree.
+  inventory            Print unified package inventory across all ecosystems as JSON.
   list [all|appimage|cargo|npm|alpm|releases]
                        List installed packages in a unified table.
   probe <repo_or_url> [--canal stable|beta|canary|nightly|all]
@@ -185,6 +186,16 @@ case "${1:-help}" in
   health)
     cmd_health
     ;;
+  inventory)
+    shift
+    for bin in "$CALIX_HOME/Calix.Cli.Zig/zig-out/bin/calix" "/usr/lib/calix/calix"; do
+      if [ -x "$bin" ]; then
+        exec "$bin" inventory "$@"
+      fi
+    done
+    echo "No compiled Calix native engine found." >&2
+    exit 1
+    ;;
   gui)
     shift
     cmd_gui "$@"
@@ -193,6 +204,11 @@ case "${1:-help}" in
     show_help
     ;;
   *)
+    for bin in "$CALIX_HOME/Calix.Cli.Zig/zig-out/bin/calix" "/usr/lib/calix/calix"; do
+      if [ -x "$bin" ]; then
+        exec "$bin" "$@"
+      fi
+    done
     echo "Unknown command '$1'. Run 'calix --help' for usage." >&2
     exit 1
     ;;

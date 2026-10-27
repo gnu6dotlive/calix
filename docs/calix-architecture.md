@@ -6,6 +6,8 @@
 
 > \[!NOTE\] **Reading note (2026-10-20).** This is an internal working plan, originally written in French, and it uses the names that were current when it was written. Calix is historically forked from Shelly (`Seafoam-Labs/Shelly-ALPM`) and has since been deeply refactored into a distinct project. The rename is complete; the old names below are historical. See [`legacy-references.md`](legacy-references.md). Where this plan and the README disagree about current state, the README and the code are authoritative.
 
+> \[!NOTE\] **Workstation Ratification & Shelly Retirement (2026-10-27).** Upstream Shelly (`/usr/bin/shelly`) and legacy `shelly-gpui-git` have been completely uninstalled from the host system via `pkexec pacman -Rns`. Calix is the ratified, sole GUI and unified package manager surface on this workstation. Desktop catalog deduplication was completed (reverse-DNS XDG naming standardized for AppImages), OpenWork purged, and Tranche 1 migration defined in [`workstreams/TRANCHE-01-ZIG-ENGINE.md`](workstreams/TRANCHE-01-ZIG-ENGINE.md).
+
 > \[!NOTE\] **The composition has its own contract (2026-10-21).** The rules that decide where the surfaces are, what gives way when the space runs short, and what never disappears are stated in [`gpui/CONTRACT-01-SPACE.md`](gpui/CONTRACT-01-SPACE.md), and confronted with the repository — with the measurements — in [`gpui/CONTRACT-01-SPACE-AUDIT.md`](gpui/CONTRACT-01-SPACE-AUDIT.md). Where this plan describes the layout in prose, the contract is the normative document.
 
 ---

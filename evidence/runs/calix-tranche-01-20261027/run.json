@@ -1,0 +1,77 @@
+{
+  "run_id": "calix-tranche-01-20261027",
+  "kind": "calix-tranche1",
+  "status": "ok",
+  "started_at": "2026-10-27T18:45:00Z",
+  "finished_at": "2026-10-27T18:55:00Z",
+  "objective": "Tranche 1 Qualification: Native Zig Engine socket probe fix, CLI dispatcher integration, and full multi-suite test qualification.",
+  "host": {
+    "kernel": "6.17.6-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "zig": "0.16.0 (vendored at Projects/calix/vendor/zig-0.16/usr/bin/zig; host system is 0.17.0)"
+  },
+  "steps": [
+    {
+      "name": "daemon-socket-probe-fix",
+      "status": "ok",
+      "detail": "Calix.Cli.Zig/src/daemon/server.zig: isServing() replaced std.Io.net.UnixAddress.connect with direct posix socket and connect probes, preventing unexpected errno 111 (ECONNREFUSED) panic on stale or absent sockets.",
+      "tests_passed": 2
+    },
+    {
+      "name": "native-zig-build-and-test",
+      "status": "ok",
+      "detail": "Rebuilt Calix.Cli.Zig (ReleaseSafe) using pinned Zig 0.16.0 compiler. Executed full test suite: 21/21 steps succeeded, 392/392 tests passed.",
+      "tests_passed": 392
+    },
+    {
+      "name": "gpui-frontend-test-suite",
+      "status": "ok",
+      "detail": "Ran cargo test on Calix.Ui.Gpui: 266/266 unit and integration tests passed cleanly.",
+      "tests_passed": 266
+    },
+    {
+      "name": "cli-dispatcher-integration",
+      "status": "ok",
+      "detail": "scripts/calix: Added inventory subcommand and automatic native engine fallback for native commands (search, run, install, etc.) pointing to zig-out/bin/calix or /usr/lib/calix/calix.",
+      "tests_passed": 27
+    },
+    {
+      "name": "native-inventory-verification",
+      "status": "ok",
+      "detail": "Verified calix inventory emits full unified inventory JSON without invoking Python runtime. Contains 1773 ALPM, 20 AUR, 15 AppImage, 20 Cargo, 9 NPM, and 1 Release (artcraft-launcher 0.8.1).",
+      "latency_ms": 210
+    },
+    {
+      "name": "system-sync-verification",
+      "status": "ok",
+      "detail": "calix sync --runtime executed cleanly in 1571ms, publishing state to ~/.local/state/calix/status.json and updating ~/.config/calix/appimage-metadata-v2.db.",
+      "latency_ms": 1571
+    },
+    {
+      "name": "system-health-audit",
+      "status": "ok",
+      "detail": "calix health verified: pacman DB lock free, cachy-update inactive, calix-sync.timer active (waiting)."
+    }
+  ],
+  "defects_found_and_fixed": [
+    {
+      "defect": "Calix.Cli.Zig/src/daemon/server.zig isServing() panicked with unexpected errno: 111 (ECONNREFUSED) when probing dead unix domain sockets because std.Io in Zig 0.16 lacks .CONNREFUSED in netConnectUnixPosix.",
+      "caught_by": "zig build test failure in test.isServing",
+      "fix": "Replaced high-level connect with raw std.posix.system.socket and std.posix.system.connect checking connect_rc == 0."
+    },
+    {
+      "defect": "calix CLI dispatcher did not expose inventory or forward native commands to the compiled Zig binary.",
+      "caught_by": "calix inventory returning 'Unknown command inventory'",
+      "fix": "Added inventory subcommand and native fallback loop in scripts/calix."
+    }
+  ],
+  "artifacts": [
+    "Calix.Cli.Zig/src/daemon/server.zig",
+    "Calix.Cli.Zig/zig-out/bin/calix",
+    "Calix.Cli.Zig/zig-out/bin/calix-daemon",
+    "Calix.Cli.Zig/zig-out/bin/calix-notify",
+    "scripts/calix",
+    "evidence/runs/calix-tranche-01-20261027/run.json"
+  ],
+  "ok": true
+}

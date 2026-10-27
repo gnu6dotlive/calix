@@ -1,0 +1,60 @@
+{
+  "run_id": "calix-update-20261027-171334",
+  "kind": "calix-update",
+  "status": "ok",
+  "destination": "repo",
+  "started_at": "2026-10-27T21:13:34Z",
+  "finished_at": "2026-10-27T21:13:36Z",
+  "duration_ms": 2331,
+  "tool_version": "2.0.0",
+  "host": {
+    "kernel": "7.3.0-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "python": "3.14.8"
+  },
+  "steps": [
+    {
+      "name": "probe",
+      "status": "ok",
+      "at": "2026-10-27T21:13:35Z",
+      "releases": 14,
+      "provider": "github"
+    },
+    {
+      "name": "resolve",
+      "status": "ok",
+      "at": "2026-10-27T21:13:35Z",
+      "installed": "0.5.1",
+      "latest": "0.8.1"
+    },
+    {
+      "name": "updpkgsums",
+      "status": "ok",
+      "at": "2026-10-27T21:13:36Z",
+      "returncode": 0
+    },
+    {
+      "name": "checksum",
+      "status": "ok",
+      "at": "2026-10-27T21:13:36Z",
+      "artifact": "artcraft-launcher-0.8.1-linux-x86_64.tar.gz",
+      "verified": true
+    },
+    {
+      "name": "dry-run",
+      "status": "ok",
+      "at": "2026-10-27T21:13:36Z",
+      "pkgver": "0.8.1",
+      "pkgbuild_restored": true
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "../artcraft-launcher-bin/PKGBUILD.calix-bak",
+      "sha256": "b1da8aa76d00188fbc0d2bec9c5df5c94bab5c9857893f6c231e76451db742de"
+    }
+  ],
+  "known_gaps": [],
+  "dry_run": true,
+  "target_version": "0.8.1"
+}

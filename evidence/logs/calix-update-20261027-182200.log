@@ -1,0 +1,8 @@
+[2026-10-27T18:22:00-0400] update requested for 'artcraft-launcher' (repo=storytold/craft-launcher, canal=stable)
+[2026-10-27T18:22:01-0400] step probe -> ok {'releases': 14, 'provider': 'github'}
+[2026-10-27T18:22:01-0400] step resolve -> ok {'installed': '0.5.1', 'latest': '0.8.1'}
+[2026-10-27T18:22:01-0400] step updpkgsums -> ok {'returncode': 0}
+[2026-10-27T18:22:01-0400] step checksum -> ok {'artifact': 'artcraft-launcher-0.8.1-linux-x86_64.tar.gz', 'verified': True}
+[2026-10-27T18:22:04-0400] step makepkg -> ok {'returncode': 0}
+[2026-10-27T18:22:08-0400] step pkexec-pacman -> ok {'returncode': 0, 'artifact': 'artcraft-launcher-bin-0.8.1-1-x86_64.pkg.tar.zst'}
+[2026-10-27T18:22:08-0400] step verify -> ok {'installed_version': '0.8.1'}

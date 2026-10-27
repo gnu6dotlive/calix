@@ -1,0 +1,2 @@
+[2026-10-27T17:49:06-0400] step version -> ok {'installed': '0.6.1', 'latest': 'unknown', 'ok': False}
+[2026-10-27T17:49:06-0400] known gap: no local artifact matched the upstream checksum manifest
