@@ -376,9 +376,23 @@ const ReportedRelease = struct {
 /// A connect that succeeds means a live daemon; any failure means the socket
 /// is stale or absent, and a stale socket is safe to replace.
 fn isServing(io: std.Io, address: *const std.Io.net.UnixAddress) !bool {
-    const stream = address.connect(io) catch return false;
-    stream.close(io);
-    return true;
+    _ = io;
+    const rc = std.posix.system.socket(std.posix.AF.UNIX, std.posix.SOCK.STREAM | std.posix.SOCK.CLOEXEC, 0);
+    const fd: std.posix.fd_t = switch (std.posix.errno(rc)) {
+        .SUCCESS => @intCast(rc),
+        else => return false,
+    };
+    defer _ = std.posix.system.close(fd);
+    var sa: std.posix.sockaddr.un = .{
+        .family = std.posix.AF.UNIX,
+        .path = undefined,
+    };
+    @memset(&sa.path, 0);
+    if (address.path.len >= sa.path.len) return false;
+    @memcpy(sa.path[0..address.path.len], address.path);
+    const len: std.posix.socklen_t = @intCast(@offsetOf(std.posix.sockaddr.un, "path") + address.path.len + 1);
+    const connect_rc = std.posix.system.connect(fd, @ptrCast(&sa), len);
+    return std.posix.errno(connect_rc) == .SUCCESS;
 }
 
 /// Wall-clock seconds, for anything a human reads or that is compared
