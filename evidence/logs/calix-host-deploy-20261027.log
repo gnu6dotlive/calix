@@ -1,0 +1,46 @@
+== timestamp ==
+2026-10-27T19:41:54-04:00
+== installed binaries ==
+total 82544
+-rwxr-xr-x 1 root root 28834984 2026-10-27 19:36:14.579685611 -0400 calix
+-rwxr-xr-x 1 root root 11197592 2026-10-27 19:36:22.290797017 -0400 calix-daemon
+-rwxr-xr-x 1 root root 35459120 2026-10-22 06:10:02.000000000 -0400 calix-gpui
+-rwxr-xr-x 1 root root  3496448 2026-10-27 19:36:27.297869296 -0400 calix-notify
+lrwxrwxrwx 1 root root       29 2026-10-22 06:10:02.000000000 -0400 libcalix-flatpak-backend.so -> libcalix-flatpak-backend.so.1
+lrwxrwxrwx 1 root root       33 2026-10-22 06:10:02.000000000 -0400 libcalix-flatpak-backend.so.1 -> libcalix-flatpak-backend.so.1.0.0
+-rwxr-xr-x 1 root root  5520072 2026-10-27 19:36:33.715961872 -0400 libcalix-flatpak-backend.so.1.0.0
+== sha256 installed ==
+c5d22f7492e5ff854965eb95036bb117c1ac6b5da1c9b6e82d7f96d7d31e5513  /usr/lib/calix/calix
+06cf5c9ddc6a1b6df0dd1dcc42ea4b09a4ed1f27c9b8781d40b97ae4cc80a58a  /usr/lib/calix/calix-daemon
+9d80b90de72f952bc0040f263c63155310d656e09a08cb2875125950a6863098  /usr/lib/calix/calix-notify
+37dbee8dff0842ddcb993762e821e73d164f3b17fa1003ba0fede52c881f20bd  /usr/lib/calix/libcalix-flatpak-backend.so.1.0.0
+== running daemon ==
+ActiveState=active
+SubState=running
+FragmentPath=/usr/lib/systemd/user/calix-daemon.service
+ActiveEnterTimestamp=Tue 2026-10-27 19:41:39 EDT
+MainPID=3891729
+06cf5c9ddc6a1b6df0dd1dcc42ea4b09a4ed1f27c9b8781d40b97ae4cc80a58a  /proc/3891729/exe
+/usr/lib/calix/calix-daemon
+== running notify ==
+ActiveState=active
+ActiveEnterTimestamp=Tue 2026-10-27 19:41:45 EDT
+MainPID=3891861
+9d80b90de72f952bc0040f263c63155310d656e09a08cb2875125950a6863098  /proc/3891861/exe
+/usr/lib/calix/calix-notify
+== ipc ping ==
+ping -> {"version":1,"ok":true,"data":{"pid":3891729,"protocol":1,"started_at":1793144499}}
+status -> {"version":1,"ok":true,"data":{"pid":3891729,"protocol":1,"started_at":1793144499,"uptime_seconds":14,"socket_path":"/run/user/1000/calix/daemon.sock","state_directory":"/home/tension_atoi/.local/state/calix","tracked_releases":0}}
+== calix health ==
+🏺 Calix System Health Check — 2026-10-27T19:41:54-04:00
+
+  Pacman DB Lock:     ✓ Free
+  cachy-update:       ✓ Inactive / clean
+  AppImages Indexed:  ✓ 15 registered in state
+  Cargo Crates:       ✓ 20 crates registered
+  Last State Sync:    ✓ 2026-10-27T22:54:26Z
+  calix-sync.timer:   ✓ Enabled and active
+
+health_exit=0
+== inventory latency ==
+inventory_wall_ms=1.56

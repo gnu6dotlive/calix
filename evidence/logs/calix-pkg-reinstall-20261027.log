@@ -1,0 +1,43 @@
+== timestamp ==
+2026-10-27T19:55:53-04:00
+== package ==
+-rw-r--r-- 1 tension_atoi tension_atoi 14673831 2026-10-22 06:15:07.953459602 -0400 /home/tension_atoi/Projects/calix/.ci-cache/pkg/calix-gpui-git-r4874.gaaa19992-1-x86_64.pkg.tar.zst
+-rw-r--r-- 1 tension_atoi tension_atoi 14672405 2026-10-27 19:52:13.911027690 -0400 /home/tension_atoi/Projects/calix/.ci-cache/pkg/calix-gpui-git-r5001.g5e5225ae-1-x86_64.pkg.tar.zst
+== pacman record ==
+calix-gpui-git r5001.g5e5225ae-1
+Version         : r5001.g5e5225ae-1
+Install Date    : Tue 27 Oct 2026 07:52:44 PM EDT
+Install Reason  : Explicitly installed
+Install Script  : No
+== integrity ==
+calix-gpui-git: 61 total files, 0 altered files
+== installed files ==
+total 43784
+-rwxr-xr-x 1 root root  5868696 2026-10-27 19:47:40.000000000 -0400 calix
+-rwxr-xr-x 1 root root  1897008 2026-10-27 19:47:40.000000000 -0400 calix-daemon
+-rwxr-xr-x 1 root root 35499576 2026-10-27 19:47:40.000000000 -0400 calix-gpui
+-rwxr-xr-x 1 root root   543568 2026-10-27 19:47:40.000000000 -0400 calix-notify
+lrwxrwxrwx 1 root root       29 2026-10-27 19:47:40.000000000 -0400 libcalix-flatpak-backend.so -> libcalix-flatpak-backend.so.1
+lrwxrwxrwx 1 root root       33 2026-10-27 19:47:40.000000000 -0400 libcalix-flatpak-backend.so.1 -> libcalix-flatpak-backend.so.1.0.0
+-rwxr-xr-x 1 root root  1010304 2026-10-27 19:47:40.000000000 -0400 libcalix-flatpak-backend.so.1.0.0
+== running ==
+calix-daemon pid=3930203 active=active exe=/usr/lib/calix/calix-daemon
+fe6f72c146a03fec4987067a04557870b7909566754c4b312448ddc6f530bbff  RUNNING
+fe6f72c146a03fec4987067a04557870b7909566754c4b312448ddc6f530bbff  /usr/lib/calix/calix-daemon
+calix-notify pid=3930204 active=active exe=/usr/lib/calix/calix-notify
+294faa39811262f4a58302019fd5f18ca55ad0a304c708bdf821a1c4b781481b  RUNNING
+294faa39811262f4a58302019fd5f18ca55ad0a304c708bdf821a1c4b781481b  /usr/lib/calix/calix-notify
+== ipc ==
+ping -> {"version":1,"ok":true,"data":{"pid":3930203,"protocol":1,"started_at":1793145177}}
+status -> {"version":1,"ok":true,"data":{"pid":3930203,"protocol":1,"started_at":1793145177,"uptime_seconds":176,"socket_path":"/run/user/1000/calix/daemon.sock","state_directory":"/home/tension_atoi/.local/state/calix","tracked_releases":0}}
+== health ==
+🏺 Calix System Health Check — 2026-10-27T19:55:53-04:00
+
+  Pacman DB Lock:     ✓ Free
+  cachy-update:       ✓ Inactive / clean
+  AppImages Indexed:  ✓ 15 registered in state
+  Cargo Crates:       ✓ 20 crates registered
+  Last State Sync:    ✓ 2026-10-27T22:54:26Z
+  calix-sync.timer:   ✓ Enabled and active
+
+health_rc=0

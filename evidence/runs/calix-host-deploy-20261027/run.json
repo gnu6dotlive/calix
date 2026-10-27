@@ -1,0 +1,63 @@
+{
+  "run_id": "calix-host-deploy-20261027",
+  "kind": "calix-host-deploy",
+  "status": "superseded",
+  "superseded_by": "the canonical path, scripts/install-machine (evidence/runs/install-<stamp>/run.json)",
+  "started_at": "2026-10-27T23:34:00Z",
+  "finished_at": "2026-10-27T23:53:00Z",
+  "objective": "Put the qualified Zig engine on the host and close the drift it left behind. Two paths were used, and the difference between them is the finding of this run.",
+  "source": {
+    "worktree": "/home/tension_atoi/cwt",
+    "branch": "main",
+    "head_at_build": "5e5225ae"
+  },
+  "host": {
+    "kernel": "6.17.6-2-cachyos-bore-lto",
+    "arch": "x86_64",
+    "zig": "0.16.0 (vendored at Projects/calix/vendor/zig-0.16/usr/bin/zig; host system is 0.17.0)"
+  },
+  "steps": [
+    {
+      "name": "manual-deploy",
+      "status": "ok",
+      "detail": "18:36 local: the four freshly built files were installed straight into /usr/lib/calix with pkexec install, after snapper snapshot #2518. The daemon and notifier were then restarted so they stopped running deleted inodes.",
+      "finding": "The files landed, and nothing recorded that they had: pacman still described a package whose contents were replaced underneath it. This is the failure mode of installing by copy."
+    },
+    {
+      "name": "drift-measured",
+      "status": "ok",
+      "detail": "pacman -Qkk calix-gpui-git: 61 total files, 4 altered — exactly the four files installed by hand, on a package the database still reported at r4874.gaaa19992 while the disk held a newer build."
+    },
+    {
+      "name": "package-built",
+      "status": "ok",
+      "detail": "19:47-19:52 local: makepkg in .ci-cache/pkg from the repository's PKGBUILD-calix (source git+https branch=main), pinned Zig 0.16.0. Result: calix-gpui-git r5001.g5e5225ae-1. The package carries the engine, the GPUI frontend, the flatpak backend, the units, the polkit policy and the desktop files.",
+      "tests_passed": 259
+    },
+    {
+      "name": "package-installed",
+      "status": "ok",
+      "detail": "pkexec pacman -U replaced r4874.gaaa19992 with r5001.g5e5225ae-1. pacman's own hooks took the transaction's pre/post snapshots (2522/2523), which makes hand-taken pairs redundant for a pacman transaction.",
+      "snapshots": {
+        "manual_pair_closed": [2518, 2519],
+        "redundant_pair_removed": [2520, 2521],
+        "pacman_transaction": [2522, 2523]
+      }
+    },
+    {
+      "name": "acceptance",
+      "status": "ok",
+      "detail": "pacman -Qkk: 61 files, 0 altered. Daemon and notifier restarted, each /proc/<pid>/exe a live inode whose sha256 equals the installed binary. IPC ping and status answered on daemon.sock. calix health exit 0. calix-gpui --help answers."
+    }
+  ],
+  "defect_found_and_fixed": {
+    "defect": "The package had no install scriptlet, so pacman -U left calix-daemon and calix-notify running the inodes they were started from. Nothing in the transaction said so.",
+    "fix": "calix-gpui-git.install added: post_install/post_upgrade restart the user units of every logged-in user through `systemctl --user -M user@`. `scripts/package-build` became the single staging point so the PKGBUILD and its scriptlet cannot be copied out of step; `scripts/install-machine` now verifies the running inode's hash instead of only asserting a PID exists."
+  },
+  "artifacts": [
+    "evidence/logs/calix-host-deploy-20261027.log",
+    "evidence/logs/calix-pkg-build-20261027.log",
+    "evidence/logs/calix-pkg-reinstall-20261027.log",
+    "Projects/calix/.ci-cache/pkg/calix-gpui-git-r5001.g5e5225ae-1-x86_64.pkg.tar.zst"
+  ]
+}
