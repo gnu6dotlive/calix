@@ -9,7 +9,7 @@ pub mod sources;
 pub mod toast;
 
 pub use console::{ConsoleEvent, ConsoleModel, OperationStatus};
-pub use motion::{AnimatedScalar, MotionDurations};
+pub use motion::MotionDurations;
 pub use package_store::{PackageStore, PackageStoreEvent};
 pub use semantic::{
     canonical_install_command, canonical_remove_command, DependencyKind, DependencyRef,

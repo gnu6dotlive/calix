@@ -19,3 +19,12 @@ Calix is a distinct project with a recorded lineage; see
 - This is a strict security measure. Any agent or automated process that circumvents it by
   invoking `sudo`, `su`, `doas`, or equivalent privilege-bypass tools is in violation of this
   contract.
+
+## Front-end rules (GPUI)
+
+Learned from Skwir (another GPUI application) and binding for `Calix.Ui.Gpui`:
+
+- **Never animate by re-notifying from `render`.** A view that calls `cx.notify()` from its own `render` redraws the whole window every frame. Motion is carried by the element (`with_animation`), keyed by an epoch, and stays under `MotionDurations::CEILING` (200 ms). Sizes (a sidebar's width, a drawer's height) change at once.
+- **Size-dependent layout lives in an element's `prepaint`, or in the flex.** Never compute a size in one `render` to push it into another entity (`set_assigned_height`-style). Shares are flex (`flex_1`, `min_h`, `max_h(relative(..))`); a choice between variants of a control is an element that measures them where the bounds are real (`elements::adaptive`). A `render` may read the window for a pure decision, never write state from it.
+- **No hand-measured constants.** A height "measured on the bench" and copied into `ui_metrics.rs` breaks with the next font or padding change. Let the layout measure; keep only scale tokens.
+- **Drags read their bounds from `DragMoveEvent`**, the container they resize, never from the window.
