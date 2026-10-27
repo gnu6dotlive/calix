@@ -1,0 +1,33 @@
+# The running service is not the installed one until something restarts it.
+#
+# pacman replaces /usr/lib/calix/calix-daemon, and the old inode stays mapped
+# in the process that started before the upgrade: `systemctl status` is green,
+# the IPC socket answers, and everything the daemon does still comes from
+# yesterday's code. That stays invisible until a fixed bug is chased inside a
+# binary that does not contain the fix.
+#
+# calix-daemon.service and calix-notify.service are *user* units. A bare
+# `systemctl --user` here would target root's manager, which has neither unit,
+# so each logged-in user's manager is addressed through `-M user@`.
+#
+# `try-restart` restarts a unit only when it is running: a machine where the
+# user never enabled the daemon is left exactly as it was.
+
+_restart_calix_user_services() {
+    command -v systemctl >/dev/null 2>&1 || return 0
+    command -v loginctl >/dev/null 2>&1 || return 0
+    loginctl list-users --no-legend 2>/dev/null |
+        while read -r _uid user _rest; do
+            [ -n "${user:-}" ] || continue
+            systemctl --user -M "${user}@" try-restart \
+                calix-daemon.service calix-notify.service 2>/dev/null || true
+        done
+}
+
+post_install() {
+    _restart_calix_user_services
+}
+
+post_upgrade() {
+    _restart_calix_user_services
+}

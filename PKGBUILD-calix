@@ -46,6 +46,9 @@ optdepends=(
 )
 provides=('calix-gpui')
 conflicts=('calix-gpui')
+# A replaced binary is not a restarted service: the scriptlet restarts the
+# user's daemon and notifier so the running code is the installed code.
+install=calix-gpui-git.install
 source=("${pkgname}::git+https://github.com/gnu6dotlive/calix.git#branch=main")
 sha256sums=('SKIP')
 

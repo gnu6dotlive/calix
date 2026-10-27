@@ -90,22 +90,21 @@ zig-rebuild:
 	@echo ">>> Recompilation forcée des binaires Zig..."
 	cd $(ZIG_SRC) && $(ZIG) build -Doptimize=ReleaseSafe
 
-## Construit le paquet dans /tmp sans installer (jamais sudo)
+## Construit le paquet dans .ci-cache (jamais sudo)
 # Le travail de la construction vit dans le dépôt, dans le répertoire que le
 # dépôt ignore : /tmp est en mémoire et partagé.
 PKG_WORKDIR := $(REPO_ROOT).ci-cache/pkg
 
 package:
-	@echo ">>> Test PKGBUILD dans $(PKG_WORKDIR)..."
-	rm -rf $(PKG_WORKDIR)
-	mkdir -p $(PKG_WORKDIR)
-	cp $(PKGBUILD) $(PKG_WORKDIR)/PKGBUILD
-	cd $(PKG_WORKDIR) && makepkg --noconfirm
+	@$(REPO_ROOT)scripts/package-build
 
 ## Installe le paquet construit via polkit
 package-install: package
 	@echo ">>> Installation via pkexec..."
-	pkexec pacman -U --noconfirm $(PKG_WORKDIR)/*.pkg.tar.zst
+	# The newest package, not the glob: several builds are kept as the
+	# rollback path, and handing all of them to pacman -U installs the last
+	# one listed rather than the one just built.
+	pkexec pacman -U --noconfirm "$$(ls -t $(PKG_WORKDIR)/*.pkg.tar.zst | head -1)"
 
 ## Installe directement sans PKGBUILD (pour dev rapide)
 install: build

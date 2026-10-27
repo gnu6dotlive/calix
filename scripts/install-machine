@@ -83,50 +83,24 @@ echo "  main is at ${LOCAL}"
 
 # ── 2. The package ─────────────────────────────────────────────────────────
 step "The package"
-if [[ $FROM_LOCAL -eq 1 ]]; then
-    # The package is built from *this* tree, not from the published branch:
-    # it is how a change is tried on the machine before it is merged. The
-    # PKGBUILD is copied into the repository's scratch, and its source
-    # points at the local checkout.
-    if [[ $DRY_RUN -eq 1 ]]; then
-        echo "  would build the package from the local tree, in ${PKGDIR}"
+if [[ $DRY_RUN -eq 1 ]]; then
+    if [[ $FROM_LOCAL -eq 1 ]]; then
+        echo "  would build the package from this tree with scripts/package-build --from-local"
     else
-        rm -rf "${PKGDIR}"
-        mkdir -p "${PKGDIR}"
-        cp "$ROOT/PKGBUILD-calix" "${PKGDIR}/PKGBUILD"
-        python3 - "$ROOT" "${PKGDIR}/PKGBUILD" "$(git branch --show-current)" <<'PY'
-import re
-import sys
-
-root, target, branch = sys.argv[1], sys.argv[2], sys.argv[3]
-with open(target) as handle:
-    text = handle.read()
-local = "git+file://{}#branch={}".format(root, branch)
-text = re.sub(
-    r'source=\("\$\{pkgname\}::git\+[^"]*"\)',
-    'source=("${pkgname}::' + local + '")',
-    text,
-)
-with open(target, "w") as handle:
-    handle.write(text)
-PY
-        # The tree needs Zig 0.16 — the system's is 0.17 — and the
-        # repository carries that toolchain in vendor/. The PKGBUILD honours
-        # the ZIG override for exactly this.
-        (cd "${PKGDIR}" && ZIG="$ROOT/vendor/zig-0.16/usr/bin/zig" makepkg --noconfirm) >/dev/null
-        PACKAGE=$(ls -t "${PKGDIR}"/*.pkg.tar.zst 2>/dev/null | head -1)
-        [[ -n "$PACKAGE" ]] || fail "the package was not built"
-        echo "  built $(basename "$PACKAGE") from the local tree"
+        echo "  would build the package from PKGBUILD-calix with scripts/package-build"
     fi
 else
-    if [[ $DRY_RUN -eq 1 ]]; then
-        echo "  would build the package from PKGBUILD-calix in ${PKGDIR}"
+    # Staging is not repeated here. `scripts/package-build` owns which files
+    # enter the build tree and which source the PKGBUILD points at; a second
+    # copy of that logic is how the cached PKGBUILD drifted onto another
+    # branch and its clone then refused to build.
+    if [[ $FROM_LOCAL -eq 1 ]]; then
+        PACKAGE=$("$ROOT/scripts/package-build" --from-local)
     else
-        make package
-        PACKAGE=$(ls -t "${PKGDIR}"/*.pkg.tar.zst 2>/dev/null | head -1)
-        [[ -n "$PACKAGE" ]] || fail "the package was not built"
-        echo "  built $(basename "$PACKAGE")"
+        PACKAGE=$("$ROOT/scripts/package-build")
     fi
+    [[ -n "$PACKAGE" ]] || fail "the package was not built"
+    echo "  built $(basename "$PACKAGE")"
 fi
 
 # ── 3. The installation ─────────────────────────────────────────────────────
@@ -180,12 +154,23 @@ else
         echo "  the daemon answers"
     fi
 
-    # The services run the code that is on disk now.
+    # The services run the code that is on disk now — not the inode they were
+    # started from before this upgrade. A non-zero PID proves a process
+    # exists, not which binary it is: after an upgrade /proc/<pid>/exe points
+    # at the deleted inode and the hashes differ. This is the check that the
+    # claim in the line above is actually true.
     for unit in calix-daemon.service calix-notify.service; do
         pid=$(systemctl --user show "$unit" --property MainPID --value 2>/dev/null || echo 0)
         [[ "$pid" != "0" ]] || fail "${unit} has no process"
+        exe=$(readlink "/proc/${pid}/exe")
+        [[ "$exe" != *"(deleted)"* ]] || fail "${unit} still runs a deleted inode (${exe})"
+        installed="/usr/lib/calix/${unit%.service}"
+        running_hash=$(sha256sum <"/proc/${pid}/exe" | cut -d' ' -f1)
+        installed_hash=$(sha256sum <"$installed" | cut -d' ' -f1)
+        [[ "$running_hash" == "$installed_hash" ]] ||
+            fail "${unit} runs a binary that is not the installed one"
     done
-    echo "  the services run"
+    echo "  the services run the installed code"
 fi
 
 # ── 6. The record ───────────────────────────────────────────────────────────

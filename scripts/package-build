@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# The one place a package build is staged.
+#
+# `make package` and `scripts/install-machine` build the same package, and
+# both used to copy the PKGBUILD into .ci-cache/pkg by hand. A hand copy is a
+# fork nobody owns: the cached PKGBUILD had drifted onto another branch, its
+# clone then refused to build, and the build tree was describing a package
+# that no longer existed. Staging lives here, once.
+#
+#   scripts/package-build               # from the published main (git+https)
+#   scripts/package-build --from-local  # from this tree  (git+file://…#branch=…)
+#
+# Prints the package's path on stdout; the build's own output goes to stderr.
+set -euo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+WORK="$ROOT/.ci-cache/pkg"
+ZIG=${ZIG:-"$ROOT/vendor/zig-0.16/usr/bin/zig"}
+
+FROM_LOCAL=0
+case "${1:-}" in
+    "" | --from-git) ;;
+    --from-local) FROM_LOCAL=1 ;;
+    -h | --help)
+        sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+        exit 0
+        ;;
+    *)
+        echo "package-build: unknown argument: $1" >&2
+        exit 2
+        ;;
+esac
+
+# The system Zig is 0.17; this tree's build API is 0.16, and the repository
+# carries that toolchain in vendor/ precisely so the build does not depend on
+# what the host happens to have installed.
+[[ -x "$ZIG" ]] || {
+    echo "package-build: no Zig 0.16 at $ZIG (set ZIG)" >&2
+    exit 1
+}
+
+BRANCH=""
+if [[ $FROM_LOCAL -eq 1 ]]; then
+    BRANCH=$(git -C "$ROOT" rev-parse --abbrev-ref HEAD)
+    [[ "$BRANCH" != "HEAD" ]] || {
+        echo "package-build: --from-local needs a branch, not a detached HEAD" >&2
+        exit 1
+    }
+fi
+
+mkdir -p "$WORK"
+# The sources and the unpacked tree are rebuilt every time — a reused clone is
+# how a build ends up packaging a commit nobody chose. The built packages are
+# the rollback path and are kept: they live in the repository, which is the
+# only place a locally built package can come back from.
+rm -rf "$WORK/pkg" "$WORK/src" "$WORK/calix-gpui-git"
+cp "$ROOT/PKGBUILD-calix" "$WORK/PKGBUILD"
+
+# The PKGBUILD's auxiliary files travel with it — the install scriptlet today.
+# A file the PKGBUILD names and the staging does not copy is a build that
+# fails late, or worse, a package that silently lost its scriptlet.
+while read -r file; do
+    [[ -n "$file" ]] || continue
+    cp "$ROOT/$file" "$WORK/$file"
+done < <(sed -n 's/^install=//p' "$WORK/PKGBUILD" | tr -d "'\"")
+
+if [[ $FROM_LOCAL -eq 1 ]]; then
+    sed -i "s|^source=(\"\${pkgname}::git+[^\"]*\")\$|source=(\"\${pkgname}::git+file://${ROOT}#branch=${BRANCH}\")|" "$WORK/PKGBUILD"
+fi
+echo "package-build: $(grep '^source=' "$WORK/PKGBUILD")" >&2
+
+(cd "$WORK" && ZIG="$ZIG" makepkg -f --noconfirm) >&2
+
+PACKAGE=$(ls -t "$WORK"/*.pkg.tar.zst 2>/dev/null | head -1)
+[[ -n "$PACKAGE" ]] || {
+    echo "package-build: makepkg produced no package" >&2
+    exit 1
+}
+printf '%s\n' "$PACKAGE"
