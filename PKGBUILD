@@ -1,6 +1,6 @@
-pkgname=also-needs-two
+pkgname=('skip-suite' 'skip-addon' )
 pkgver=1
 pkgrel=1
 arch=('any')
-depends=('skip-two>=1')
-package() { :; }
+package_skip-suite() { :; }
+package_skip-addon() { :; }
