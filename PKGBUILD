@@ -1,6 +1,7 @@
-pkgname=('demo-cli' 'demo-docs' )
+pkgname=demo
 pkgver=1
 pkgrel=1
 arch=('any')
-package_demo-cli() { :; }
-package_demo-docs() { :; }
+source=('helper.sh')
+sha256sums=('SKIP')
+package() { install -Dm755 helper.sh "$pkgdir/usr/bin/demo"; }
