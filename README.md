@@ -598,16 +598,16 @@ In rough order of value:
    [`docs/gpui/slice-08/`](docs/gpui/slice-08/). What is left: the clicks, which
    the synthetic pointer could not exercise, and the focus a place change should
    move to the first element of the new place.
-2. **The daemon scheduler and the Zig release watcher.** The daemon currently answers
-   on demand; a scheduler and a native release watcher would retire the frozen Python
-   bridge and make tracked releases continuous instead of sampled.
+2. **The rest of the release surface in Zig.** The daemon probes on request and the
+   timer asks it (`calix-releases.timer` → `calix releases --refresh`); what remains in
+   Python is `registry`, `verify`, `update` and `probe`, which S2 ports.
 3. **Wire the application flow.** A dedicated root helper and a narrower polkit action
    set, so the UI asks for exactly the operation it needs instead of a general CLI
    invocation.
 4. **Close the mutation gap.** Installing and removing Cargo and NPM packages from the
    UI, and searching the sources that are currently inventory-only.
-5. **Cut the frozen Python engine.** Once the watcher is native, `scripts/calix_*.py`
-   and the legacy `packaging/systemd/calix-sync.*` units can go.
+5. **Cut the frozen Python engine.** With the release surface native, `scripts/calix-release.py`
+   and `scripts/calix` go; the legacy `calix-sync.*` units already have.
 
 Just before this list: `v0.3.0` is the spatial release — a written contract
 for the composition, a single owner of the vertical budget, a window's floor

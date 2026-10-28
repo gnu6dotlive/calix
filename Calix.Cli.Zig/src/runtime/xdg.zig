@@ -42,6 +42,18 @@ pub fn stateDirectory(context: *const runtime.RuntimeContext) ![]const u8 {
     return std.fs.path.join(context.allocator, &.{ try stateHome(context), "calix" });
 }
 
+/// `<config>/calix/releases.json` -- which packages the user asked to follow.
+///
+/// Written by `calix registry add`, read by the daemon. It is intent, and it
+/// lives with the configuration because that is what it is: a decision the
+/// user made, which the service must not overrule.
+pub fn releaseIntentPath(context: *const runtime.RuntimeContext) ![]const u8 {
+    return std.fs.path.join(
+        context.allocator,
+        &.{ try configHome(context), "calix", "releases.json" },
+    );
+}
+
 pub fn configPath(context: *const runtime.RuntimeContext) ![]const u8 {
     return std.fs.path.join(context.allocator, &.{ try configHome(context), "calix", "config.json" });
 }
@@ -169,6 +181,10 @@ test "uses absolute XDG paths and rejects relative overrides" {
     try std.testing.expectEqualStrings(
         "/tmp/config-root/calix/config.json",
         try configPath(&context),
+    );
+    try std.testing.expectEqualStrings(
+        "/tmp/config-root/calix/releases.json",
+        try releaseIntentPath(&context),
     );
 }
 

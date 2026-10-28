@@ -1,0 +1,16 @@
+[Unit]
+Description=Calix periodic release probe
+
+[Timer]
+# The clock lives here, the work lives in the daemon (D1). `Persistent=true`
+# makes a probe missed while the machine was off happen at the next boot
+# rather than never, which is the whole reason this is a timer and not a loop
+# inside the service.
+OnBootSec=2min
+OnUnitActiveSec=4h
+Persistent=true
+RandomizedDelaySec=5min
+Unit=calix-releases.service
+
+[Install]
+WantedBy=timers.target

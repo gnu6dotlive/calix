@@ -20,7 +20,7 @@ const xdg = @import("../runtime/xdg.zig");
 const address = @import("../daemon/address.zig");
 const client = @import("../daemon/client.zig");
 
-const tracked = Zigalpm.release.tracked;
+const document = Zigalpm.release.document;
 
 const command_path = "calix releases standard";
 
@@ -62,9 +62,17 @@ fn printCommitted(context: *runtime.RuntimeContext) !u8 {
         .limited(max_document_bytes),
     ) catch |err| switch (err) {
         // Nothing tracked yet is a state, not a fault: the document is an
-        // observation, and no observation has been made.
+        // observation, and no observation has been made. It is printed in the
+        // shape the daemon would have written, through the same serializer --
+        // a reader that invented its own empty document would be a second
+        // opinion about a format that has one owner.
         error.FileNotFound => {
-            try context.stdout.writeAll("{}\n");
+            var empty = document.Document.init(context.allocator);
+            defer empty.deinit();
+            const bytes = try empty.toJson(context.allocator, null);
+            defer context.allocator.free(bytes);
+            try context.stdout.writeAll(bytes);
+            try context.stdout.writeAll("\n");
             return 0;
         },
         error.OutOfMemory => return error.OutOfMemory,
@@ -97,7 +105,17 @@ fn refresh(context: *runtime.RuntimeContext) !u8 {
     const socket_path = try address.socketPath(context.allocator, context);
     defer context.allocator.free(socket_path);
 
-    const answer = client.exchange(context.allocator, context.io, socket_path, .releases) catch |err| {
+    // `{"refresh": true}` is the request to probe. The daemon answers at once
+    // with the document as last committed and sets `refreshing` in the
+    // answer, so this prints what the daemon holds rather than waiting on a
+    // forge whose latency is not the daemon's to spend.
+    const answer = client.exchange(
+        context.allocator,
+        context.io,
+        socket_path,
+        .releases,
+        "{\"refresh\":true}",
+    ) catch |err| {
         switch (err) {
             error.OutOfMemory => return error.OutOfMemory,
             error.DaemonUnavailable => {
@@ -154,7 +172,7 @@ fn emit(context: *runtime.RuntimeContext, answer: client.Answer) !u8 {
 fn documentPath(context: *runtime.RuntimeContext) ![]const u8 {
     return std.fs.path.join(
         context.allocator,
-        &.{ try xdg.stateDirectory(context), tracked.file_name },
+        &.{ try xdg.stateDirectory(context), document.file_name },
     );
 }
 
@@ -260,7 +278,7 @@ test "a missing document is an empty set, not an error" {
     defer fixture.deinit();
 
     try testing.expectEqual(@as(u8, 0), try printCommitted(&fixture.context));
-    try testing.expectEqualStrings("{}\n", fixture.stdout.written());
+    try testing.expectEqualStrings("{\"version\":2,\"entries\":[]}\n", fixture.stdout.written());
     try testing.expectEqualStrings("", fixture.stderr.written());
 }
 
@@ -274,11 +292,11 @@ test "the committed document is printed as the writer left it" {
     try fixture.setup(root);
     defer fixture.deinit();
 
-    const document = "{\n  \"artcraft-launcher\": {\n    \"installed_version\": \"0.8.1\"\n  }\n}\n";
-    try fixture.writeDocument(document);
+    const body = "{\n  \"artcraft-launcher\": {\n    \"installed_version\": \"0.8.1\"\n  }\n}\n";
+    try fixture.writeDocument(body);
 
     try testing.expectEqual(@as(u8, 0), try printCommitted(&fixture.context));
-    try testing.expectEqualStrings(document, fixture.stdout.written());
+    try testing.expectEqualStrings(body, fixture.stdout.written());
 }
 
 test "a malformed document is refused by name, not printed" {

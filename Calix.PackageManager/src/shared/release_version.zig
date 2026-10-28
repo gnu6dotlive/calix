@@ -33,7 +33,17 @@ pub const ReleaseVersion = struct {
 /// The core must be a run of numeric components separated by dots. Anything
 /// else — `abc123`, `nightly`, `release-1.7.4` — is left to the caller.
 pub fn parse(raw: []const u8) ?ReleaseVersion {
-    const trimmed = std.mem.trim(u8, raw, &std.ascii.whitespace);
+    var trimmed = std.mem.trim(u8, raw, &std.ascii.whitespace);
+    // A forge tag routinely carries a `v` (`v1.7.4`), and it is decoration:
+    // the number is `1.7.4`. Refusing it would make every package whose
+    // upstream tags this way un-orderable -- `v0.9.0` would never be newer
+    // than an installed `0.8.1` -- which is a silent upgrade that is never
+    // offered. Same rule the probe applies to the same tags.
+    if (trimmed.len > 1 and (trimmed[0] == 'v' or trimmed[0] == 'V') and
+        std.ascii.isDigit(trimmed[1]))
+    {
+        trimmed = trimmed[1..];
+    }
     if (trimmed.len == 0) return null;
 
     const hyphen = std.mem.indexOfScalar(u8, trimmed, '-');
@@ -157,6 +167,15 @@ test "parse: splits the prerelease at the first hyphen" {
     const version = parse("1.7.4-rc.1").?;
     try std.testing.expectEqualStrings("1.7.4", version.core);
     try std.testing.expectEqualStrings("rc.1", version.prerelease);
+}
+
+test "parse: a leading v is decoration, not part of the number" {
+    try std.testing.expectEqualStrings("1.7.4", parse("v1.7.4").?.core);
+    try std.testing.expectEqualStrings("1.7.4", parse("V1.7.4").?.core);
+    try std.testing.expectEqualStrings("rc1", parse("v2.0.0-rc1").?.prerelease);
+    try std.testing.expectEqual(.gt, compare("v0.9.0", "0.8.1").?);
+    // A `v` in front of anything but a number is still un-orderable.
+    try std.testing.expect(parse("vendored") == null);
 }
 
 test "parse: refuses tags it cannot order" {

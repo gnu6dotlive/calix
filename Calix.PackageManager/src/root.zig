@@ -166,11 +166,13 @@ pub const inventory = struct {
 };
 
 pub const release = struct {
-    pub const registry = @import("release/registry.zig");
+    pub const document = @import("release/document.zig");
+    pub const intent = @import("release/intent.zig");
     pub const tracked = @import("release/tracked.zig");
-    pub const Registry = registry.Registry;
-    pub const Entry = registry.Entry;
-    pub const Probe = registry.Probe;
+    pub const Document = document.Document;
+    pub const Observation = document.Observation;
+    pub const Subject = document.Subject;
+    pub const Probe = document.Probe;
 };
 
 pub const cargo = struct {
@@ -374,8 +376,11 @@ test "public library surface exposes package manager APIs" {
     _ = appimage.AppImageDiscovery;
     _ = shared.provenance.Digest;
     _ = shared.provenance.Verification;
-    _ = release.Registry;
-    _ = release.Entry;
+    _ = release.Document;
+    _ = release.intent.Entry;
+    _ = release.Observation;
+    _ = release.Subject;
+    _ = release.Probe;
     _ = release.tracked;
     _ = inventory.record.Record;
     _ = inventory.record.Source;

@@ -54,8 +54,13 @@ XDG_STATE = os.environ.get("XDG_STATE_HOME", os.path.join(HOME, ".local/state"))
 CONFIG_DIR = os.path.join(XDG_CONFIG, "calix")
 STATE_DIR = os.path.join(XDG_STATE, "calix")
 
+# Which packages the user follows: intent, read by the daemon.
+#
+# The observations the daemon makes live in `<state>/releases.json`, and no
+# script here reads or writes them: that document has one writer, and it is
+# the daemon (D3). A Python reader would be a second opinion about a schema
+# the daemon owns, and a Python writer would be the fault this work removes.
 REGISTRY_PATH = os.path.join(CONFIG_DIR, "releases.json")
-RELEASE_STATE_PATH = os.path.join(STATE_DIR, "releases.json")
 
 # Repository root = parent of the `scripts/` directory holding this file.
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -418,41 +423,6 @@ def read_registry():
 def write_registry(registry):
     ensure_dirs()
     write_json(REGISTRY_PATH, registry)
-
-
-def read_release_state():
-    """Return the resolved release state (what we know about each release)."""
-    return read_json(RELEASE_STATE_PATH, default={})
-
-
-def write_release_state(state):
-    ensure_dirs()
-    write_json(RELEASE_STATE_PATH, state)
-
-
-def merge_release_state(registry, checked):
-    """Merge freshly checked results into the persisted state, preserving keys.
-
-    The previous implementation rewrote `releases.json` wholesale from a
-    hardcoded literal, which silently discarded the `installed_version`
-    recorded by a successful update. State is now merged, never clobbered.
-    """
-    state = read_release_state()
-    for name, entry in registry.items():
-        current = dict(state.get(name, {}))
-        current.update({
-            "repo": entry.get("repo"),
-            "provider": entry.get("provider"),
-            "canal": entry.get("canal", "stable"),
-            "pkgname": entry.get("pkgname"),
-            "pkgbuild_path": entry.get("pkgbuild_path"),
-            "status": entry.get("status", "managed"),
-        })
-        if name in checked:
-            current.update(checked[name])
-        current.setdefault("installed_version", entry.get("installed_version"))
-        state[name] = current
-    return state
 
 
 # --------------------------------------------------------------------------

@@ -30,19 +30,27 @@ pub const Journal = struct {
     allocator: std.mem.Allocator,
     io: std.Io,
     directory: []const u8,
+    /// Serialises appends.
+    ///
+    /// The connection loop and the release probe both journal, and two
+    /// writers appending to one file without a lock interleave their bytes
+    /// into lines that are neither event.
+    mutex: std.Io.Mutex = .init,
 
     pub fn init(allocator: std.mem.Allocator, io: std.Io, directory: []const u8) Journal {
         return .{ .allocator = allocator, .io = io, .directory = directory };
     }
 
     /// Appends an event, best effort.
-    pub fn append(self: Journal, event: Event) void {
+    pub fn append(self: *Journal, event: Event) void {
+        self.mutex.lockUncancelable(self.io);
+        defer self.mutex.unlock(self.io);
         self.appendOrReport(event) catch |err| {
             std.log.warn("calix-daemon: could not append to the journal: {s}", .{@errorName(err)});
         };
     }
 
-    fn appendOrReport(self: Journal, event: Event) !void {
+    fn appendOrReport(self: *Journal, event: Event) !void {
         var handle = try std.Io.Dir.cwd().createDirPathOpen(self.io, self.directory, .{
             .permissions = .fromMode(0o700),
         });
@@ -105,7 +113,7 @@ test "Journal: an event is one JSON line, appended" {
     const directory = try testing.allocator.dupe(u8, buffer[0..length]);
     defer testing.allocator.free(directory);
 
-    const journal = Journal.init(testing.allocator, testing.io, directory);
+    var journal = Journal.init(testing.allocator, testing.io, directory);
     journal.append(.{ .at = 1_792_454_400, .action = "inventory", .ok = true, .message = "served" });
     journal.append(.{ .at = 1_792_454_400, .action = "releases", .ok = false, .message = "probe failed" });
 
@@ -146,7 +154,7 @@ test "Journal: an unwritable directory is reported, not fatal" {
     );
     defer testing.allocator.free(blocked);
 
-    const journal = Journal.init(testing.allocator, testing.io, blocked);
+    var journal = Journal.init(testing.allocator, testing.io, blocked);
     // No error escapes: a journal that cannot be written must not take the
     // daemon down with it.
     journal.append(.{ .at = 0, .action = "daemon", .ok = true });

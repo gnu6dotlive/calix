@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # calix — Universal package manager CLI for the gnosix desktop.
 #
-# Thin dispatcher over the Calix engine (scripts/calix-sync.py,
-# scripts/calix-release.py) plus health reporting.
+# Thin dispatcher over the Calix engine (scripts/calix-release.py) and the
+# Zig CLI, plus health reporting.
 #
 # Installed to ~/.local/bin/calix as a symlink to this file so the CLI is
 # version-controlled alongside the engine it drives.
@@ -16,12 +16,10 @@
 set -u
 
 CALIX_HOME="${CALIX_HOME:-$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)}"
-CALIX_STATE="${XDG_STATE_HOME:-$HOME/.local/state}/calix"
 # The AppImage database is a document of its own, written by
 # `calix sync appimage` (the Python that mirrored it into state is gone).
 CALIX_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/calix"
 PYTHON_BIN="${CALIX_BIN:-/usr/bin/python3}"
-SYNC="$CALIX_HOME/scripts/calix-sync.py"
 RELEASE="$CALIX_HOME/scripts/calix-release.py"
 
 show_help() {
@@ -32,17 +30,12 @@ Usage:
   calix <command> [options]
 
 Commands:
-  sync                 Synchronize real system state across all package channels:
-                       ALPM, AUR, Cargo (~/.cargo/bin), NPM global, and
-                       tracked GitHub/GitLab/Gitea releases.
-                       Pass --runtime to record the run in the engine's state
-                       directory instead of the repository's evidence/ tree.
   inventory            Print unified package inventory across all ecosystems as JSON.
-  list [all|cargo|npm|alpm|releases]
-                       List installed packages in a unified table.
+  releases [--refresh]
+                       What is release-tracked, and what the daemon last saw.
+                       --refresh asks the daemon to probe now.
   probe <repo_or_url> [--canal stable|beta|canary|nightly|all]
                        Probe a repository's releases, channels and binary assets.
-  check                Check for pending updates across release-managed repositories.
   update <package>     Build and install a newer release through its PKGBUILD
                        (elevation via pkexec — never sudo).
   registry [list|add|remove]
@@ -99,30 +92,20 @@ cmd_health() {
     echo "  cachy-update:       ✓ Inactive / clean"
   fi
 
-  local appimage_count cargo_count
+  local appimage_count
   appimage_count="$(count_entries "$CALIX_CONFIG/appimage-metadata-v2.db")"
-  cargo_count="$(count_entries "$CALIX_STATE/cargo.json")"
   echo "  AppImages Indexed:  ✓ $appimage_count in ~/.config/calix/appimage-metadata-v2.db"
-  echo "  Cargo Crates:       ✓ $cargo_count crates registered"
 
-  if [ -f "$CALIX_STATE/status.json" ]; then
-    local ts
-    ts="$("$PYTHON_BIN" -c "
-import json
-print(json.load(open('$CALIX_STATE/status.json')).get('timestamp','unknown'))
-" 2>/dev/null || echo unknown)"
-    echo "  Last State Sync:    ✓ $ts"
-  else
-    echo "  Last State Sync:    · Never"
-  fi
-
+  # The probe's own record -- when it last ran, and what it found -- is the
+  # daemon's document, printed by `calix releases`. Health says whether the
+  # clock that starts it is armed, and nothing about state it cannot see.
   local timer_enabled timer_active
-  timer_enabled="$(systemctl --user is-enabled calix-sync.timer 2>/dev/null || echo disabled)"
-  timer_active="$(systemctl --user is-active calix-sync.timer 2>/dev/null || echo inactive)"
+  timer_enabled="$(systemctl --user is-enabled calix-releases.timer 2>/dev/null || echo disabled)"
+  timer_active="$(systemctl --user is-active calix-releases.timer 2>/dev/null || echo inactive)"
   if [ "$timer_enabled" = "enabled" ] && [ "$timer_active" = "active" ]; then
-    echo "  calix-sync.timer:   ✓ Enabled and active"
+    echo "  calix-releases.timer: ✓ Enabled and active"
   else
-    echo "  calix-sync.timer:   · $timer_enabled / $timer_active"
+    echo "  calix-releases.timer: · $timer_enabled / $timer_active"
   fi
   echo ""
 }
@@ -158,17 +141,25 @@ cmd_gui() {
 }
 
 case "${1:-help}" in
-  sync)
-    shift
-    exec "$PYTHON_BIN" "$SYNC" "$@"
+  sync|list)
+    # Both wrote or printed the five state documents of the Python mirror.
+    # The mirror is gone, and each of them has a successor that keeps one
+    # writer: say which, rather than falling through to "unknown command".
+    echo "calix $1 was removed with the Python state mirror it fed:" >&2
+    echo "  calix releases [--refresh]  — what is tracked, and what the daemon saw" >&2
+    echo "  calix inventory             — every installed package, one document" >&2
+    exit 1
+    ;;
+  check)
+    # Without its write, `check` was a second reader of the probe `releases`
+    # performs, over a document it no longer owns.
+    echo "calix check is gone: \`calix releases\` reports what is tracked and what" >&2
+    echo "the daemon last saw, and \`calix releases --refresh\` asks it to probe." >&2
+    exit 1
     ;;
   probe)
     shift
     exec "$PYTHON_BIN" "$RELEASE" probe "$@"
-    ;;
-  check)
-    shift
-    exec "$PYTHON_BIN" "$RELEASE" check "$@"
     ;;
   update|upgrade)
     shift
@@ -181,10 +172,6 @@ case "${1:-help}" in
   verify)
     shift
     exec "$PYTHON_BIN" "$RELEASE" verify "$@"
-    ;;
-  list)
-    shift
-    exec "$PYTHON_BIN" "$SYNC" list "${1:-all}"
     ;;
   health)
     cmd_health

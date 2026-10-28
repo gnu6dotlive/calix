@@ -222,4 +222,10 @@ EOF
         "${pkgdir}/usr/lib/systemd/user/calix-daemon.service"
     install -Dm644 "packaging/systemd/calix-notify.service" \
         "${pkgdir}/usr/lib/systemd/user/calix-notify.service"
+    # The probe's clock. The service is a request to the daemon, not a write:
+    # `calix releases --refresh` needs a binary on PATH, which /usr/bin/calix is.
+    install -Dm644 "packaging/systemd/calix-releases.service" \
+        "${pkgdir}/usr/lib/systemd/user/calix-releases.service"
+    install -Dm644 "packaging/systemd/calix-releases.timer" \
+        "${pkgdir}/usr/lib/systemd/user/calix-releases.timer"
 }

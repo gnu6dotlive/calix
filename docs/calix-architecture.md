@@ -63,7 +63,7 @@
 └───────────────────────────────────┬──────────────────────────┘
                            │ IPC / Unix Socket
 ┌───────────────────────────────────▼──────────────────────────┐
-│               calix-sync.service (daemon systemd user)       │
+│               calix-daemon.service (daemon systemd user)     │
 │           Source of Truth · État temps réel · SQLite agent   │
 └───────────────────────────────────┬──────────────────────────┘
          │
@@ -116,7 +116,8 @@ Nouveau backend `Calix.Release` dans `calix.cli.zig` :
    AppImage \> Flatpak \> tar.gz \> .deb/.rpm (extrait) \> source (build)
 4. **Install** : télécharge, vérifie checksum, installe dans `~/Applications/`, crée `.desktop` XDG
 5. **Lockfile** : enregistre dans SurrealDB (`source_url`, `version`, `canal`, `asset_type`, `checksum`)
-6. **Update** : compare la version lockée vs. latest release à chaque `calix-sync` poll
+6. **Update** : compare la version lockée vs. latest release à chaque sonde du daemon
+   (`calix-releases.timer` → `calix releases --refresh`)
 
 ### Lockfile SurrealDB Schema (simplifié)
 
@@ -159,25 +160,34 @@ CREATE package:artcraft_launcher SET
 
 ---
 
-## 🌊 calix-sync.service — Daemon Source of Truth
+## 🌊 calix-daemon.service — Daemon Source of Truth
 
-```
-# ~/.config/systemd/user/calix-sync.service
-[Unit]
-Description=Calix Package State Daemon
-After=network.target
+Deux unités, deux rôles, et un seul écrivain.
 
+`calix-daemon.service` porte l'état : c'est le processus qui lit l'intention,
+sonde les forges et écrit `<state>/releases.json`. `calix-releases.timer` garde
+l'horloge ; son `ExecStart` est une **requête** au daemon, jamais une écriture
+(D1, `docs/workstreams/TRANCHE-01B4-ONE-BINARY.md`).
+
+```ini
+# ~/.config/systemd/user/calix-daemon.service
 [Service]
-Type=notify
-ExecStart=%h/.local/bin/calix sync --daemon
+ExecStart=/usr/lib/calix/calix-daemon
 Restart=on-failure
-RestartSec=10
 
-[Install]
-WantedBy=default.target
+# ~/.config/systemd/user/calix-releases.timer   (ExecStart : calix releases --refresh)
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=4h
+Persistent=true
 ```
 
-**Cycle du daemon :**
+Les deux fichiers sont versionnés dans `packaging/systemd/`, installés par le
+paquet dans `/usr/lib/systemd/user/`, et ce sont des fichiers réels : un lien
+vers un arbre de travail fait tourner le code d'une branche.
+
+**Cycle du daemon (cible — ce qui existe aujourd'hui est l'horloge ci-dessus
+et la sonde qu'elle déclenche) :**
 
 1. **Au démarrage** : scan complet de tous les backends → état initial SurrealDB
 2. **Poll continu** (configurable, défaut 4h) : compare versions installées vs. disponibles
@@ -454,7 +464,7 @@ Ces décisions remplacent les hypothèses du plan initial. Elles ont été prise
 
 > État réel au 2026-10-19 (audit effectué contre le système, pas contre le plan).
 
-**Déjà fait** ✔ — research CachyOS, renommage du repo, `PKGBUILD-calix`, moteur `calix-release` avec dispatch GitHub/GitLab/Gitea, CLI unifiée versionnée, `calix-sync.service`/`.timer` installés **et activés**, branding Calix du frontend GPUI (Phase 7a), vue multi-source Cargo/NPM/releases (Phase 7b), `snap-pac` installé, **tranche 0** (ordering des tags de release + fin de l'escalade `sudo`).
+**Déjà fait** ✔ — research CachyOS, renommage du repo, `PKGBUILD-calix`, moteur `calix-release` avec dispatch GitHub/GitLab/Gitea, CLI unifiée versionnée, `calix-daemon.service` + `calix-releases.timer` installés **et activés** (les anciens `calix-sync.*` sont supprimés en S1B4), branding Calix du frontend GPUI (Phase 7a), vue multi-source Cargo/NPM/releases (Phase 7b), `snap-pac` installé, **tranche 0** (ordering des tags de release + fin de l'escalade `sudo`).
 
 ### Tranche 1 — l'absorption (le prochain chantier)
 

@@ -68,8 +68,8 @@ export TMPDIR="$ROOT/.ci-cache/tmp"
 # tests instead of 380 is not "faster", it is a suite that stopped being
 # compiled or collected. Raise a floor when the real count grows; never lower
 # one to make a run pass.
-PACKAGEMANAGER_FLOOR=1392
-CLI_FLOOR=414
+PACKAGEMANAGER_FLOOR=1406
+CLI_FLOOR=416
 RUST_FLOOR=195
 
 # ---- plumbing ---------------------------------------------------------------
@@ -529,15 +529,22 @@ cli_smoke() {
     local state printed
     state=$(mktemp -d)
     printed=$(XDG_STATE_HOME="$state" ./Calix.Cli.Zig/zig-out/bin/calix releases) || return 1
-    rm -rf "$state"
-    test "$printed" = "{}" || return 1
+    # The empty document is the daemon's own shape, not `{}`: a reader that
+    # invented its own empty answer would be a second opinion about a format
+    # that has one owner.
+    test "$printed" = '{"version":2,"entries":[]}' || return 1
 
     # And a refresh is a mutation, so it belongs to the daemon: with no daemon
-    # the command must refuse rather than write behind the writer's back.
+    # the command must refuse rather than write behind the writer's back. The
+    # state home stays alive until here, so the refusal is the daemon's
+    # absence and not a directory that never existed.
+    local succeeded=0
     if XDG_STATE_HOME="$state" XDG_RUNTIME_DIR="$state" \
         ./Calix.Cli.Zig/zig-out/bin/calix releases --refresh >/dev/null 2>&1; then
-        return 1
+        succeeded=1
     fi
+    rm -rf "$state"
+    test "$succeeded" = "0" || return 1
 }
 
 # Tests and the release binary share one release target directory. The old

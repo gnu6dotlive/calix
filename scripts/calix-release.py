@@ -6,9 +6,6 @@ Commands:
   probe <repo_or_url> [--canal stable|beta|canary|nightly|all] [--json]
       Probe a repository: releases, channels, assets, trunk commit.
 
-  check [--json]
-      Compare every tracked release package against its upstream latest.
-
   update <name>
       Build and install a newer release through its PKGBUILD.
       Privilege elevation uses pkexec (never sudo).
@@ -16,9 +13,15 @@ Commands:
   registry list|add|remove
       Manage the set of release-tracked packages.
 
-The registry lives in ~/.config/calix/releases.json (tracking intent) and the
-resolved state in ~/.local/state/calix/releases.json (observations). The two
-are separate so that a sync can never erase the recorded installed version.
+The registry lives in ~/.config/calix/releases.json: it is intent, and the
+only release file this script writes. The observations of what each source
+offered live in ~/.local/state/calix/releases.json, which belongs to
+`calix-daemon` -- `calix releases` reads it, and this script does not.
+
+`check` used to probe every tracked package and merge the result into that
+document. It is gone: probing wrote state a second process had to keep
+coherent with the daemon's, and `calix releases [--refresh]` is the same
+capability with one writer.
 """
 
 
@@ -67,14 +70,11 @@ from calix_core import (  # noqa: E402
     pkgbuild_source_names,
     print_table,
     read_registry,
-    read_release_state,
     run_command,
     sha256_file,
     split_pkgrel,
     strip_version_prefix,
     write_registry,
-    write_release_state,
-    merge_release_state,
 )
 
 
@@ -398,66 +398,6 @@ def cmd_probe(args):
     return 0
 
 
-def cmd_check(args):
-    _positional, flags = _parse_flags(args)
-    emit_json = "json" in flags
-    registry = read_registry()
-
-    if not registry:
-        print("No release-managed packages registered yet.")
-        print(f"Register one with: calix registry add <name> --repo <owner/repo> --pkgbuild <path>")
-        return 0
-
-    print("🔭 Checking Release-Tracked Packages...")
-    results = {}
-    rows = []
-    for name, item in registry.items():
-        repo = item.get("repo")
-        if not repo:
-            continue
-        try:
-            probe = probe_repo(repo, item.get("canal", "stable"))
-        except Exception as exc:  # noqa: BLE001
-            print(f"  * {name:<20} probe error: {exc}")
-            results[name] = {"error": str(exc)}
-            continue
-
-        selected = probe.get("selected_release")
-        if not selected:
-            print(f"  * {name:<20} no release found ({probe.get('releases_error', 'empty')})")
-            results[name] = {"error": probe.get("releases_error", "no release")}
-            continue
-
-        remote_version = strip_version_prefix(selected["tag"])
-        current_version = item.get("installed_version") or detect_installed_version(item.get("pkgname"))
-        update_available = is_newer(remote_version, current_version)
-
-        best = pick_asset(selected["assets"])
-        results[name] = {
-            "repo": repo,
-            "provider": probe["provider"],
-            "installed_version": current_version,
-            "latest_version": remote_version,
-            "update_available": update_available,
-            "published_at": selected.get("published_at"),
-            "asset": best["name"] if best else None,
-            "download_url": best["download_url"] if best else None,
-        }
-        marker = "🔄 UPDATE AVAILABLE" if update_available else "✓ Up-to-date"
-        rows.append([name, current_version, remote_version, marker])
-
-    if rows:
-        print()
-        print_table(rows, ["Package", "Installed", "Latest", "Status"])
-
-    if emit_json:
-        print(json.dumps(results, indent=2))
-
-    state = merge_release_state(registry, results)
-    write_release_state(state)
-    return 0
-
-
 def detect_installed_version(pkgname):
     """Read the installed version of an Arch package via pacman.
 
@@ -636,15 +576,12 @@ def cmd_update(args):
             raise RuntimeError(
                 f"post-install verification failed: expected {remote_version}, pacman reports {installed}")
 
-        # Record the new version in the registry *and* the state file.
+        # The intent records what was installed; the observation is the
+        # daemon's to make. It reads the installed version from the package
+        # base on its next probe, so writing it here would be a second writer
+        # of a document this script no longer owns.
         registry[name]["installed_version"] = remote_version
         write_registry(registry)
-        state = read_release_state()
-        state.setdefault(name, {})
-        state[name]["installed_version"] = remote_version
-        state[name]["latest_version"] = remote_version
-        state[name]["update_available"] = False
-        write_release_state(state)
 
         print(f"✓ Successfully updated and installed '{name}' {remote_version}.")
         evidence.finish(package=os.path.basename(pkg_file), version=remote_version)
@@ -781,9 +718,10 @@ def cmd_registry(args):
             return 1
         del registry[name]
         write_registry(registry)
-        state = read_release_state()
-        state.pop(name, None)
-        write_release_state(state)
+        # The observation goes at the daemon's next probe, which rebuilds the
+        # document from this intent. Until then `calix releases` still shows
+        # it: the document is what was observed, and a script that edited it
+        # would be the second writer this work exists to remove.
         print(f"✓ Untracked '{name}'.")
         return 0
 
@@ -799,14 +737,18 @@ def main():
     if command == "probe":
         return cmd_probe(sys.argv[2:])
     if command == "check":
-        return cmd_check(sys.argv[2:])
+        eprint(
+            "calix check is gone: `calix releases` reports what is tracked and "
+            "what the daemon last saw, and `calix releases --refresh` asks it to probe."
+        )
+        return 1
     if command in ("update", "upgrade"):
         return cmd_update(sys.argv[2:])
     if command == "registry":
         return cmd_registry(sys.argv[2:])
     if command == "verify":
         return cmd_verify(sys.argv[2:])
-    eprint(f"Unknown command '{command}'. Use 'probe', 'check', 'update', or 'registry'.")
+    eprint(f"Unknown command '{command}'. Use 'probe', 'update', 'registry', or 'verify'.")
     return 1
 
 

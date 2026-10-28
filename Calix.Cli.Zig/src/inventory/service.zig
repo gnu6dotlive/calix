@@ -295,9 +295,9 @@ fn appendNpm(context: *runtime.RuntimeContext, records: *std.ArrayList(record.Re
 
 /// Appends the packages a release is tracked for.
 ///
-/// Transitional: see `release/tracked.zig`. The records exist so the
-/// frontend keeps the row it has today while the file it used to read
-/// disappears from the frontend.
+/// Read from the daemon's document, through `release/tracked.zig`: the same
+/// file the daemon writes, so a package the user follows appears in the one
+/// list the frontend renders.
 fn appendTracked(
     context: *runtime.RuntimeContext,
     options: Options,

@@ -51,14 +51,26 @@ pub const Error = error{
 };
 
 /// The request line, exactly as it goes on the wire.
+///
+/// `payload_json` is already serialised, and is inserted as it stands: the
+/// caller is the one that knows what the action takes, and a second encoder
+/// here would be a second opinion about the same bytes. A payload that is not
+/// JSON is a malformed request, which the daemon refuses by name.
 pub fn requestLine(
     allocator: std.mem.Allocator,
     action: protocol.Action,
+    payload_json: ?[]const u8,
 ) error{OutOfMemory}![]u8 {
+    const body = payload_json orelse
+        return std.fmt.allocPrint(
+            allocator,
+            "{{\"version\":{d},\"action\":\"{s}\"}}\n",
+            .{ protocol.version, action.name() },
+        );
     return std.fmt.allocPrint(
         allocator,
-        "{{\"version\":{d},\"action\":\"{s}\"}}\n",
-        .{ protocol.version, action.name() },
+        "{{\"version\":{d},\"action\":\"{s}\",\"payload\":{s}}}\n",
+        .{ protocol.version, action.name(), body },
     );
 }
 
@@ -108,13 +120,14 @@ pub fn exchange(
     io: std.Io,
     socket_path: []const u8,
     action: protocol.Action,
+    payload_json: ?[]const u8,
 ) Error!Answer {
     const address = std.Io.net.UnixAddress.init(socket_path) catch return error.SocketPathTooLong;
 
     var stream = address.connect(io) catch return error.DaemonUnavailable;
     defer stream.close(io);
 
-    const line = try requestLine(allocator, action);
+    const line = try requestLine(allocator, action, payload_json);
     defer allocator.free(line);
 
     var write_buffer: [256]u8 = undefined;
@@ -135,7 +148,7 @@ test "the request line carries the version and the action's wire name" {
     var arena = std.heap.ArenaAllocator.init(testing.allocator);
     defer arena.deinit();
 
-    const line = try requestLine(arena.allocator(), .releases);
+    const line = try requestLine(arena.allocator(), .releases, null);
     try testing.expectEqualStrings("{\"version\":1,\"action\":\"releases\"}\n", line);
 
     // The name is the enum tag, so a rename is a protocol break. This is
@@ -149,6 +162,28 @@ test "the request line carries the version and the action's wire name" {
     defer decoded.deinit();
     try testing.expectEqual(protocol.version, decoded.value.version);
     try testing.expectEqual(protocol.Action.releases, protocol.Action.fromName(decoded.value.action).?);
+}
+
+test "the request line carries a payload when there is one" {
+    var arena = std.heap.ArenaAllocator.init(testing.allocator);
+    defer arena.deinit();
+
+    const line = try requestLine(arena.allocator(), .releases, "{\"refresh\":true}");
+    try testing.expectEqualStrings(
+        "{\"version\":1,\"action\":\"releases\",\"payload\":{\"refresh\":true}}\n",
+        line,
+    );
+
+    // The daemon reads it as a request, not as a string holding JSON.
+    const decoded = try std.json.parseFromSlice(
+        struct { action: []const u8, payload: struct { refresh: bool } },
+        arena.allocator(),
+        line,
+        .{ .ignore_unknown_fields = true },
+    );
+    defer decoded.deinit();
+    try testing.expectEqualStrings("releases", decoded.value.action);
+    try testing.expect(decoded.value.payload.refresh);
 }
 
 test "an answer's payload survives the parse tree it arrived in" {
@@ -227,6 +262,6 @@ test "an absent daemon is one error, not a syscall name" {
 
     try testing.expectError(
         error.DaemonUnavailable,
-        exchange(arena.allocator(), testing.io, socket_path, .releases),
+        exchange(arena.allocator(), testing.io, socket_path, .releases, null),
     );
 }

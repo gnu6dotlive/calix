@@ -37,7 +37,6 @@ from calix_core import (  # noqa: E402
     compare_versions,
     detect_canal,
     is_newer,
-    merge_release_state,
     parse_repo_target,
     parse_version,
     pick_asset,
@@ -47,7 +46,6 @@ from calix_core import (  # noqa: E402
 )
 
 RELEASE_SCRIPT = os.path.join(SCRIPTS_DIR, "calix-release.py")
-SYNC_SCRIPT = os.path.join(SCRIPTS_DIR, "calix-sync.py")
 
 
 def find_undefined_names(source):
@@ -198,19 +196,6 @@ class TestAssetHandling(unittest.TestCase):
         self.assertEqual(detect_canal("v1.0.0-rc1", True), "beta")
 
 
-class TestReleaseStateMerging(unittest.TestCase):
-    def test_merge_preserves_installed_version(self):
-        registry = {"pkg": {"repo": "o/r", "pkgname": "pkg", "canal": "stable"}}
-        merged = merge_release_state(registry, {"pkg": {"latest_version": "2.0.0"}})
-        self.assertEqual(merged["pkg"]["latest_version"], "2.0.0")
-        self.assertIn("installed_version", merged["pkg"])
-
-    def test_merge_keeps_entries_absent_from_the_check(self):
-        registry = {"pkg": {"repo": "o/r"}}
-        merged = merge_release_state(registry, {})
-        self.assertIn("pkg", merged)
-
-
 class TestPkgbuildSources(unittest.TestCase):
     """The PKGBUILD source line carries shell variables that must be expanded.
 
@@ -271,14 +256,6 @@ class TestStaticAnalysis(unittest.TestCase):
         self.assertEqual(
             undefined, set(),
             f"calix-release.py reads undefined names: {sorted(undefined)}")
-
-    def test_sync_script_has_no_undefined_names(self):
-        with open(SYNC_SCRIPT, "r", encoding="utf-8") as handle:
-            source = handle.read()
-        undefined = find_undefined_names(source)
-        self.assertEqual(
-            undefined, set(),
-            f"calix-sync.py reads undefined names: {sorted(undefined)}")
 
     def test_core_module_has_no_undefined_names(self):
         core = os.path.join(SCRIPTS_DIR, "calix_core.py")

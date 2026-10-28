@@ -1,0 +1,24 @@
+[Unit]
+Description=Calix release probe request
+Documentation=https://github.com/gnu6dotlive/calix
+# The probe is the daemon's work: this unit only asks. If the daemon is not
+# running, starting it is part of the request rather than something the
+# caller works around.
+Wants=calix-daemon.service
+After=calix-daemon.service
+StartLimitBurst=3
+StartLimitIntervalSec=30s
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/calix releases --refresh
+# `Type=simple` units are ordered, not synchronised: the daemon may still be
+# binding its socket when this runs, and one refused connection must not cost
+# four hours. The retry is bounded by StartLimit*.
+Restart=on-failure
+RestartSec=5s
+# The daemon journals what the probe found; the caller's copy of the document
+# would be the same bytes a second time, six times a day.
+StandardOutput=null
+StandardError=journal
+Nice=10
