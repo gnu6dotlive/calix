@@ -1,0 +1,29 @@
+== what this shows ==
+The package's install scriptlet must restart the user units during the
+pacman transaction, before scripts/install-machine's own restart step.
+Two stop/start pairs seconds apart are therefore expected: the first is
+the scriptlet, the second is step 4 of the installer. One pair would mean
+the scriptlet did nothing and the restart came from the installer alone.
+
+== journal, calix-daemon and calix-notify, around the transaction ==
+Oct 27 20:03:32 gnosisos-x8664 systemd[1031]: Stopping Calix package inventory service...
+Oct 27 20:03:32 gnosisos-x8664 systemd[1031]: Stopping Calix desktop notification bridge...
+Oct 27 20:03:32 gnosisos-x8664 systemd[1031]: Stopped Calix desktop notification bridge.
+Oct 27 20:03:32 gnosisos-x8664 systemd[1031]: Stopped Calix package inventory service.
+Oct 27 20:03:32 gnosisos-x8664 systemd[1031]: Started Calix package inventory service.
+Oct 27 20:03:32 gnosisos-x8664 systemd[1031]: Started Calix desktop notification bridge.
+Oct 27 20:03:34 gnosisos-x8664 systemd[1031]: Stopping Calix package inventory service...
+Oct 27 20:03:34 gnosisos-x8664 systemd[1031]: Stopping Calix desktop notification bridge...
+Oct 27 20:03:34 gnosisos-x8664 systemd[1031]: Stopped Calix desktop notification bridge.
+Oct 27 20:03:34 gnosisos-x8664 systemd[1031]: Stopped Calix package inventory service.
+Oct 27 20:03:34 gnosisos-x8664 systemd[1031]: Started Calix package inventory service.
+Oct 27 20:03:34 gnosisos-x8664 systemd[1031]: Started Calix desktop notification bridge.
+
+== package record ==
+Version         : r5003.ge8e03172-1
+Install Date    : Tue 27 Oct 2026 08:03:31 PM EDT
+Install Script  : Yes
+
+== after both ==
+calix-daemon pid=4049866 exe=/usr/lib/calix/calix-daemon sha=fe6f72c146a03fec4987067a04557870b7909566754c4b312448ddc6f530bbff
+calix-notify pid=4049867 exe=/usr/lib/calix/calix-notify sha=294faa39811262f4a58302019fd5f18ca55ad0a304c708bdf821a1c4b781481b
