@@ -2,7 +2,7 @@
 
 > **Document Type:** Decision record + autonomous-agent handoff
 > **Repository:** `gnu6dotlive/calix` — main worktree `~/cwt`, working copy `~/Projects/calix`
-> **Status:** PROPOSED — awaiting ratification
+> **Status:** RATIFIED — 2026-10-28, decisions D1–D5 in §4
 > **Decision date:** 2026-10-28
 > **Extends:** `docs/calix-architecture.md` — Décisions 1, 2, 6, 10, and tranche 1 items 9, 10, 12.
 > **Supersedes:** nothing. This is the work tranche 1 already named and did not finish.
@@ -46,7 +46,7 @@ scripts/calix-sync.py ──▶  <state>/pacman.json      (no reader)
 
 Five of the six outputs are dead. The sixth is the only thing keeping the chain alive, and it is the exact capability tranche 1b4 is for.
 
-**Four of the five links are symlinks into a git worktree.** The last two are the only ones that survive S1.
+**Four of the five links are symlinks into a git worktree.** After S1 the chain survives, in a different shape: systemd keeps the clock, the daemon keeps the pen, and neither is a symlink into a source tree.
 
 ---
 
@@ -117,7 +117,7 @@ Each slice is a ticket, and each ticket's definition of done is the same as the 
 - `release-registry.json` is retired. Its content is absorbed: `last_seen`, `notified`, `consecutive_failures` join the observation under one schema version.
 - `tracked.zig` loses its transitional reader and its transitional note; it reads the daemon's schema.
 - The five unread documents are **not ported** — they are deleted from the writer (F5). Porting dead output is how a migration doubles in size for no user.
-- `calix-sync.timer` and `.service` retire. Their one remaining job is the probe, and the probe now has an owner.
+- `calix-sync.{service,timer}` stay, and change job. Per D1 systemd keeps the clock, so their command becomes a request to the daemon rather than a write, and they are renamed `calix-releases.{service,timer}` in the same transaction — a unit called `sync` that no longer syncs is a lie the next reader has to decode.
 
 **The probe must not block the socket.** The daemon serves connections serially and holds mutable state; a network probe of several forges on that path would make `status` wait on a forge. Ratify D2 before writing code.
 
@@ -125,9 +125,9 @@ Each slice is a ticket, and each ticket's definition of done is the same as the 
 
 1. Red test: with a scratch state directory and one package in intent, drive the daemon's `releases` action and assert `<state>/releases.json` now exists with schema 2 and one observation. Today the daemon writes `release-registry.json` and `releases.json` stays absent — the test fails for the right reason.
 2. Schema: define version 2, write the migration for a version-1 document, and refuse a document from a future version with a named error rather than a silent empty read.
-3. Scheduler per D1; worker thread and atomic commit per D2.
+3. The probe runs on a worker thread and commits atomically (D2); requests read the last committed document.
 4. Cut the Python writer: `sync_releases()` stops writing `<state>/releases.json`; the five dead writes are deleted outright.
-5. Retire the timer and the service; remove the two symlinks; they leave the ledger.
+5. Replace the two symlinks with real files, `calix-releases.{service,timer}`, whose `ExecStart` is `/usr/bin/calix releases --refresh` and whose timer keeps `Persistent=true`; disable and remove `calix-sync.*`. The three ledger entries go to zero.
 6. `tracked.zig`: delete the transitional reader.
 
 **Proofs.**
@@ -135,7 +135,7 @@ Each slice is a ticket, and each ticket's definition of done is the same as the 
 - The red test above, then green.
 - `grep -rn "release-registry" --include='*.zig' .` returns nothing.
 - `grep -rn "pacman.json\|appimages.json\|cargo.json\|npm.json" scripts/` returns nothing.
-- On the host: `systemctl --user list-timers` no longer lists `calix-sync.timer`; `~/.local/state/calix/releases.json` still advances, and its `checked_at` moves after a daemon probe.
+- On the host: `systemctl --user list-timers` lists `calix-releases.timer` and no `calix-sync.timer`; both unit paths are real files, not symlinks; `~/.local/state/calix/releases.json` still advances, and its `checked_at` moves after a timer firing.
 - A daemon that is asked `status` **while** a probe is running answers within the protocol's normal time — measured, not asserted.
 
 ---
@@ -197,17 +197,22 @@ Exit codes per D5: `0` clean, `1` defects found, `2` not running (nothing broken
 
 ---
 
-## 4. Decisions to ratify
+## 4. Decisions, ratified
 
-Each of these changes the shape of S1 or S3 and should be settled before code, not during it.
+Ratified 2026-10-28. All five took the recommendation. D1's recommendation changed during ratification, and the change is recorded rather than quietly applied — a decision record that conceals its own revision is worth nothing.
 
 | # | Question | Recommendation | Why |
 | --- | --- | --- | --- |
-| D1 | Who schedules the probe: a loop inside the daemon, or a systemd timer driving a one-shot? | **The daemon loops; the timer retires.** | Two schedulers on one document is the same fault as two writers on one file — the fault §1 is made of. A timer that fires the CLI would also reintroduce a process that writes state without being the writer. |
+| D1 | Who schedules the probe: a loop inside the daemon, or a systemd timer? | **systemd keeps the clock; the daemon does the work.** The timer's command is a protocol request, never a write. | An interval loop does not catch up after suspend, and it hides *when* a probe happened from `systemctl`. This file first recommended the opposite — a daemon loop, the timer retired — which was wrong for that reason. The fault that recommendation feared, a timer that writes state, is avoided by making its command a request instead of a write. |
 | D2 | Does the probe run on the connection path? | **No: worker thread, atomic commit, requests read the last committed document.** | The daemon serves connections serially. A probe on that path makes `status` wait on a forge, and a forge that hangs makes the daemon look dead. |
 | D3 | One document for observation and notification, or two? | **One, schema 2.** | `release-registry.json` and `releases.json` describe the same packages and were confused for each other once already (F7). One document makes the confusion unrepresentable. |
 | D4 | Keep `probe` and `check` as commands, or fold them into `releases`? | **Fold them; keep `registry`, `verify`, `update`.** | `probe` is what `releases` does for one package and `check` is what it reports. `verify` and `update` are different acts — one audits provenance, the other changes the machine. Confirm against actual usage before deleting anything. |
 | D5 | `calix doctor` exit codes. | **`0` clean / `1` defects / `2` not running.** | It is the convention `browseros-health` already uses on this machine; an operator should not have to learn a second one. |
+
+**Derived from D1 and the anti-goal *No second writer* — a consequence, not a new choice, recorded so nobody re-opens it by accident:**
+
+- `calix releases` (read) works with the daemon down, by reading the committed document. Décision 10's guarantee is about the one-shot read, and it survives intact.
+- `calix releases --refresh` requires the daemon. A refresh is a mutation, and mutations belong to the single writer. With the daemon down the command says so and names the way to start it. It does not become a second writer behind a lock file: a lock is an admission that the single-writer rule was not worth designing for.
 
 ---
 
@@ -241,6 +246,6 @@ Binding, in the manner of `TRANCHE-01-ZIG-ENGINE.md` §3.
 
 Recorded here rather than fixed silently, because a stale blueprint is how a future session repeats this one.
 
-- `docs/workstreams/TRANCHE-01-ZIG-ENGINE.md` §4 draws the frontend reading `~/.local/state/calix/*.json`. Décision 2 of `docs/calix-architecture.md` and tranche 1 item 11 say the opposite, and 1b3 implemented the opposite: `calix_state.rs` is deleted and the UI reads the daemon. The blueprint is wrong; correct it in the S1 commit that retires the last document.
+- `docs/workstreams/TRANCHE-01-ZIG-ENGINE.md` §4 draws the frontend reading `~/.local/state/calix/*.json`. Décision 2 of `docs/calix-architecture.md` and tranche 1 item 11 say the opposite, and 1b3 implemented the opposite: `calix_state.rs` is deleted and the UI reads the daemon. The blueprint is wrong; correct it in the S1 commit that retires `release-registry.json`.
 - The same document states `Repository: ~/Projects/calix`. Since the 2026-10-27 packaging work, commits and pushes happen in the `main` worktree at `~/cwt`, and `~/Projects/calix` carries a branch. Name both.
 - `docs/calix-architecture.md` item 9 says the scheduler "reste à faire" but does not say where it goes. D1 answers that; the answer belongs in the document, not only here.
