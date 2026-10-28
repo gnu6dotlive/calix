@@ -1,0 +1,88 @@
+# S1 commit a — `calix releases [--refresh]`
+# binary: /home/tension_atoi/cwt/Calix.Cli.Zig/zig-out/bin/calix
+# 2026-10-28T18:04:36Z
+
+--- A. no document: an empty set, exit 0
+$ env XDG_STATE_HOME=/home/tension_atoi/cwt/.ci-cache/proof/s1a/empty /home/tension_atoi/cwt/Calix.Cli.Zig/zig-out/bin/calix releases
+{}
+exit=0
+
+--- B. an existing document is printed unaltered
+$ calix releases > printed.json && cmp printed.json /home/tension_atoi/cwt/.ci-cache/proof/s1a/fixture/calix/releases.json
+exit=0
+identical
+
+--- C. malformed document: refused by name, exit 1
+$ env XDG_STATE_HOME=/home/tension_atoi/cwt/.ci-cache/proof/s1a/malformed /home/tension_atoi/cwt/Calix.Cli.Zig/zig-out/bin/calix releases
+releases: /home/tension_atoi/cwt/.ci-cache/proof/s1a/malformed/calix/releases.json is not JSON; the daemon's next probe replaces it
+exit=1
+
+--- D. --refresh with no daemon: exit 1 and the way to start one
+$ env XDG_STATE_HOME=/home/tension_atoi/cwt/.ci-cache/proof/s1a/empty XDG_RUNTIME_DIR=/home/tension_atoi/cwt/.ci-cache/proof/s1a/runtime /home/tension_atoi/cwt/Calix.Cli.Zig/zig-out/bin/calix releases --refresh
+releases: no daemon is answering on /home/tension_atoi/cwt/.ci-cache/proof/s1a/runtime/calix/daemon.sock. A refresh is a write, and the daemon is the writer; start it with `systemctl --user start calix-daemon.service`.
+exit=1
+
+--- E. --refresh against a scratch daemon
+$ calix-daemon --socket /home/tension_atoi/cwt/.ci-cache/proof/s1a/runtime/calix/daemon.sock --state-dir /home/tension_atoi/cwt/.ci-cache/proof/s1a/daemonstate/calix &
+socket=up
+$ calix releases --refresh
+[]
+exit=0
+state directory after the request:
+total 4
+drwxr-xr-x 1 tension_atoi tension_atoi 56 Oct 28 14:04 .
+drwxr-xr-x 1 tension_atoi tension_atoi 10 Oct 28 14:04 ..
+drwx------ 1 tension_atoi tension_atoi 46 Oct 28 14:04 journal
+-rw-r--r-- 1 tension_atoi tension_atoi 26 Oct 28 14:04 release-registry.json
+
+--- F1. calix releases --help
+$ env XDG_STATE_HOME=/home/tension_atoi/cwt/.ci-cache/proof/s1a/empty /home/tension_atoi/cwt/Calix.Cli.Zig/zig-out/bin/calix releases --help
+Description:
+  Show the release-tracked packages and what was last seen for each. The document is read from the state directory, so this works with the daemon stopped; --refresh asks the daemon to probe the tracked forges first.
+
+Usage:
+  calix releases [options]
+
+Options:
+  --refresh            Ask the daemon to probe the tracked releases now, then print what it committed
+  -?, -h, --help       Show command-specific help and usage information
+  -n, --no-confirm     Use safe automatic answers instead of prompting
+  -U, --ui-mode        Emit framed output for the Calix UI
+  -j, --json           Output structured JSON where the command supports it
+  --aur-url <aur-url>  Base URL of the AUR service used for Git clones and RPC requests
+
+Examples:
+  calix releases  Long form
+  -W              Shortcode
+  -Wh             Show help for this command
+
+exit=0
+
+--- F2. -W is calix releases
+$ env XDG_STATE_HOME=/home/tension_atoi/cwt/.ci-cache/proof/s1a/empty /home/tension_atoi/cwt/Calix.Cli.Zig/zig-out/bin/calix -W
+{}
+exit=0
+
+--- F3. -Wh is its help
+$ env XDG_STATE_HOME=/home/tension_atoi/cwt/.ci-cache/proof/s1a/empty /home/tension_atoi/cwt/Calix.Cli.Zig/zig-out/bin/calix -Wh
+Description:
+  Show the release-tracked packages and what was last seen for each. The document is read from the state directory, so this works with the daemon stopped; --refresh asks the daemon to probe the tracked forges first.
+
+Usage:
+  calix releases [options]
+
+Options:
+  --refresh            Ask the daemon to probe the tracked releases now, then print what it committed
+  -?, -h, --help       Show command-specific help and usage information
+  -n, --no-confirm     Use safe automatic answers instead of prompting
+  -U, --ui-mode        Emit framed output for the Calix UI
+  -j, --json           Output structured JSON where the command supports it
+  --aur-url <aur-url>  Base URL of the AUR service used for Git clones and RPC requests
+
+Examples:
+  calix releases  Long form
+  -W              Shortcode
+  -Wh             Show help for this command
+
+exit=0
+

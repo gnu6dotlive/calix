@@ -1,0 +1,52 @@
+{
+  "run_id": "s1-client-verb-20261028",
+  "kind": "slice",
+  "slice": "1B4-S1 (commit a of d)",
+  "status": "ok",
+  "started_at": "2026-10-28T17:50:00Z",
+  "finished_at": "2026-10-28T18:05:00Z",
+  "objective": "Give the daemon's wire protocol its first CLI client -- `calix releases` and `calix releases --refresh` -- because D1 points a timer at a protocol request and nothing in this repository could make one (F9: only the Rust UI spoke the protocol).",
+  "artefacts": {
+    "Calix.Cli.Zig/src/daemon/address.zig": "One definition of the socket path, used by the daemon that binds it and the CLI that asks through it. Two copies would drift the day one learned a new fallback, and the failure would look like 'the daemon is not running' on a machine where it is.",
+    "Calix.Cli.Zig/src/daemon/client.zig": "The client side of the protocol: one request line out, one answer line back. Checks the response version before believing the answer, reports a failed connect as one `DaemonUnavailable` rather than a syscall name, and never writes state. `Answer.deinit` releases what the answer owns, because the answer is detached from the parse tree it arrived in.",
+    "Calix.Cli.Zig/src/commands/releases.zig": "`calix releases` prints the committed document verbatim (no rendering: the CLI is not the owner). `--refresh` asks the daemon and prints what it committed; with the daemon down it refuses and names `systemctl --user start calix-daemon.service`.",
+    "Calix.Cli.Zig/src/cli/catalog/releases.zig": "The catalogue entry, with the `--refresh` flag.",
+    "Calix.Cli.Zig/src/runtime/xdg.zig": "`stateDirectory()` -- `<state>/calix`, one definition shared by the daemon that writes there and the commands that read from it. It replaces the stack-buffer join in `inventory/service.zig` that could not be freed and the duplicate join in `daemon/main.zig`.",
+    "Calix.Cli.Zig/src/daemon/main.zig": "Uses `address.socketPath` and `xdg.stateDirectory`; the private `defaultSocketPath` is deleted, so the daemon and the client cannot disagree about where to meet.",
+    "Calix.Cli.Zig/src/cli/catalog/types.zig": "New action `releases`, code 'W' (free, mnemonic 'watch'), with its one-line description in `calix --help`.",
+    "scripts/verify": "`cli-smoke` now runs the verb: an empty state home must print `{}` and exit 0, and `--refresh` with no daemon must exit non-zero. The unit tests exercise the code; this checks it reached the catalogue and the dispatcher. `CLI_FLOOR` 393 -> 410."
+  },
+  "invariant_now_testable": {
+    "read_without_daemon": "`calix releases` reads the document from disk and exits 0 with the daemon stopped, because a command that cannot answer while a service is down hides state the machine already has.",
+    "write_requires_daemon": "`calix releases --refresh` is a mutation, so it is a request. With the daemon down it refuses and names the way to start it rather than becoming a second writer behind a lock file."
+  },
+  "proofs": {
+    "log": "evidence/logs/calix-releases-cli-20261028.log",
+    "log_sha256": "f59623dd52423a35d6472d30c24a6aa4f9183db620ee08fbdc42fe9a0dde252c",
+    "reproducer": ".ci-cache/proof/s1a-proof.sh (ignored scratch; the log is the durable record)",
+    "A": "no document, empty state home -> `{}`, exit 0",
+    "B": "the live document, printed byte for byte -- `cmp` against the file says identical, exit 0",
+    "C": "a malformed document -> named as not JSON, exit 1, nothing printed",
+    "D": "`--refresh` with no daemon -> exit 1, names the socket and `systemctl --user start calix-daemon.service`",
+    "E": "`--refresh` against a scratch daemon -> exit 0, answer printed, and the scratch state directory gains the registry the probe committed; the request reached the writer",
+    "F": "`--help` lists `--refresh`; `-W` runs the command; `-Wh` shows its help; `calix --help` lists it in the command table and in the shortcode examples",
+    "gate": "`./scripts/verify --quick` PASSED on a dirty tree at 4d93e65a -- cli 411 tests, package manager 1390, ui 259; record ~/.local/state/calix/verify/local-verify-20261028T180049Z/run.json"
+  },
+  "zig_tests_added": {
+    "daemon/address.zig": 2,
+    "daemon/client.zig": 8,
+    "commands/releases.zig": 6,
+    "runtime/xdg.zig": 1,
+    "total": 17
+  },
+  "deviation_forced_by_the_action_code": {
+    "what": "The shortcode test `passes ordinary long form and unrelated options through unchanged` used `-WW` as an example of a token that is not a shortcode. `W` is now an action code, so that token translates.",
+    "fix": "The test now asks the catalogue for a letter that is not an action code instead of naming one, so the test is about pass-through rather than about one free letter. It still fails loudly if the alphabet is ever exhausted, which would be a real design limit rather than a stale example."
+  },
+  "what_this_commit_does_not_do": {
+    "no_document_merge": "`<state>/releases.json` is still the Python observation and `release-registry.json` still exists. The daemon's `releases` action answers with the registry list, while this command reads the document -- two shapes, because commit a leaves the daemon's behaviour untouched. That gap is exactly what commit b closes.",
+    "no_worker_thread": "The probe still runs on the connection path. D2's worker thread and atomic commit are commit b, together with the cut of the Python writer, so there is never an interval with zero writers.",
+    "no_unit_change": "Nothing on the machine changes yet: no unit was renamed, no deployment, so this commit carries no host risk."
+  },
+  "next": "S1 commit b: schema 2 on one document, `release-registry.json` absorbed, the probe moved to a worker thread with an atomic commit, and the Python release writer cut in the same commit as the move."
+}
