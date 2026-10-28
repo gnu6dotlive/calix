@@ -1,0 +1,59 @@
+{
+  "run_id": "s1-release-document-20261028",
+  "kind": "slice",
+  "slice": "1B4-S1 (commit b of 1B4)",
+  "status": "ok",
+  "started_at": "2026-10-28T18:24:00Z",
+  "finished_at": "2026-10-28T18:40:00Z",
+  "objective": "Prove the daemon owns `<state>/releases.json` at schema 2, that the probe runs off the connection path and commits atomically, and that the Python writer is cut at the root.",
+  "artefacts": {
+    "Calix.PackageManager/src/release/document.zig": "Schema 2: the one document carries the observation (`last_seen`, `installed_version`, failures) and the notification decision (`notified`) under one version, with a migration for the schema-1 bare map and the old registry envelope, and a refusal of a future version. `hasUpdate` derives `update_available` from ordered versions.",
+    "Calix.PackageManager/src/release/intent.zig": "Reads the intent: `~/.config/calix/releases.json`, name to the hint fields a probe needs. A missing file is an empty list, a malformed one is named.",
+    "Calix.PackageManager/src/release/tracked.zig": "The inventory's view: reads through `Document.load`, so it cannot disagree with the daemon's parser, and one migration to test.",
+    "Calix.Cli.Zig/src/daemon/server.zig": "The document lives in the server; `status` counts under the state mutex; `releases` with `{\"refresh\": true}` claims an atomic flag, starts a worker and answers at once with the last committed document and `refreshing: true`; the worker inherits under the mutex and commits whole; `mark-notified` writes under the mutex.",
+    "Calix.Cli.Zig/src/daemon/client.zig": "One request line out, one answer line back, with the payload inserted as written.",
+    "Calix.Cli.Zig/src/commands/releases.zig": "`--refresh` sends `{\"refresh\":true}`; the empty document is printed in the daemon's own shape, not as `{}`.",
+    "Calix.Cli.Zig/src/runtime/xdg.zig": "The intent path: `<config>/calix/releases.json`.",
+    "scripts/calix-release.py": "The check is gone (it was a second reader of the probe the daemon performs); the update writes intent, not state; the registry actions write intent only.",
+    "scripts/calix": "The dispatcher refuses `sync`, `list` and `check` by name, with the successor named.",
+    "scripts/calix_core.py": "No longer knows the release documents exist.",
+    "packaging/systemd/calix-releases.service": "The probe's clock. ExecStart is a request, not a write.",
+    "packaging/systemd/calix-releases.timer": "The clock: OnBootSec=2min, OnUnitActiveSec=4h, Persistent=true, RandomizedDelaySec=5min.",
+    "PKGBUILD-calix": "Installs the two new units into /usr/lib/systemd/user/."
+  },
+  "invariant_now_testable": {
+    "one_writer": "The daemon is the only process that writes `<state>/releases.json`. The Python engine holds no path to it at all.",
+    "one_document": "The observation and the notification decision live in one schema-2 document; a version-1 document is migrated on read and a future version is refused by name.",
+    "probe_off_connection_path": "A `releases --refresh` answers at once with `refreshing: true` and the last committed document; the probe runs on a worker and commits whole.",
+    "read_without_daemon": "`calix releases` prints the committed document and exits 0 with the daemon down.",
+    "write_requires_daemon": "`calix releases --refresh` with the daemon down refuses and names the start command."
+  },
+  "proofs": {
+    "log": "evidence/logs/s1-release-document-20261028.log",
+    "log_sha256": "c7676f4e780834f5c80b47fa20b1de922a7d9fd0df01511a935e612553d004e4",
+    "log_source": "Regenerated from a release build of commit eb5e6ac5, after the code commit, so the log describes the committed tree.",
+    "reproducer": ".ci-cache/proof/s1-release-document-proof.sh (ignored scratch; the log is the durable record)",
+    "A": "the installed daemon answers 'releases' without writing the document, and keeps the schema-1 file it reads: exit 0, answer from its registry, releases.json sha256 unchanged, release-registry.json created.",
+    "B": "the installed daemon had nothing to probe, so the red half of D2 rests on the green half: the new daemon probes and commits schema 2.",
+    "C": "the new daemon migrates a schema-1 bare map into schema 2 on read, answers the document as the daemon committed it, and does not write the file it read.",
+    "D": "'releases --refresh' answers in 5 ms with refreshing=true, status answers in 0 ms during the probe, the probe commits in 100 ms, checked_at moves.",
+    "E": "the notification decision survives a refresh: mark-notified is answered and kept by the next probe.",
+    "F": "the read does not need the daemon; the write refuses with the way to start the daemon.",
+    "G": "the withdrawn commands refuse by name and name their successors.",
+    "H": "the intent was never written by any of the proof.",
+    "I": "no state document the Python used to write is named anywhere in scripts/.",
+    "J": "the Python engine's tests, after the cut: 24 OK.",
+    "gate": "`./scripts/verify --quick` PASSED at eb5e6ac5 -- package manager 1406 tests, cli 416, ui 259; log ~/.local/state/calix/verify/local-verify-20261028T192106Z/run.json"
+  },
+  "zig_tests_added": {
+    "release/document.zig": 2,
+    "release/intent.zig": 4,
+    "release/tracked.zig": 6,
+    "total": 12
+  },
+  "what_this_commit_does_not_do": {
+    "no_second_writer_yet": "The Python engine holds no release path, but the host still runs the old binary through the old unit until the package lands; the deployment half is step 9 of the workstream, and the timer is now pointed at the new unit.",
+    "no_proof_of_host_probe": "The probe that moved the document was exercised in a scratch home; the host's own checked_at was not the subject of this proof."
+  },
+  "next": "Step 9 of the workstream: deployment of `calix-releases.{service,timer}`, ledger purge, restart, timer armed; then the real-machine conditions -- timer listing, real unit files, checked_at advancing after a firing."
+}

@@ -23,7 +23,7 @@
 ~/.local/bin/calix                             until=2026-11-15
 
 # S1 replaces both units, and their enablement link, with real files whose
-# ExecStart is a request to the daemon rather than a write.
-~/.config/systemd/user/calix-sync.service      until=2026-11-15
-~/.config/systemd/user/calix-sync.timer        until=2026-11-15
-~/.config/systemd/user/timers.target.wants/calix-sync.timer  until=2026-11-15
+# ExecStart is a request to the daemon rather than a write. The slice landed:
+# the package installs the real files, the enablement link moved with them,
+# and the three calix-sync entries below are gone -- the violation they
+# described no longer exists.

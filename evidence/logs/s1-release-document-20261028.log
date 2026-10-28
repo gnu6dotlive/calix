@@ -1,0 +1,75 @@
+
+== identity
+   tree   eb5e6ac5
+   new    calix-daemon 3.1.9-dev / 3.1.9-dev
+   old    calix-daemon 3.1.9-dev
+   sha256 new daemon 9ac1374717413637b80c16f3977db867f6cab51307c8a489a2d74627ac0bda87
+   sha256 new cli    3b521069180bc681079a3acf0c0721cfee6161defe6684fe2a9eddbce3dbb4b1
+
+== A — red: the installed daemon answers 'releases' without writing the document
+   state directory before: calix.log
+releases.json
+   document on disk: bare map (schema 1), keys=['artcraft-launcher']
+   artcraft-launcher: {'installed_version': '0.8.1', 'repo': 'storytold/craft-launcher', 'source_type': 'github_release', 'pkgbuild_path': '/home/tension_atoi/Projects/artcraft-launcher-bin/PKGBUILD', 'status': 'managed', 'provider': 'github', 'canal': 'stable', 'pkgname': 'artcraft-launcher-bin', 'checked_at': '2026-10-28T18:30:00Z', 'latest_version': '0.8.1', 'update_available': False, 'published_at': '2026-10-25T14:05:05Z', 'asset': 'artcraft-launcher-0.8.1-linux-x86_64.AppImage', 'download_url': 'https://github.com/storytold/craft-launcher/releases/download/v0.8.1/artcraft-launcher-0.8.1-linux-x86_64.AppImage', 'installed_package_version': '0.8.1-1'}
+   answer   {"elapsed_ms": 41, "answer": {"version": 1, "ok": true, "data": []}}
+   releases round trip: 41 ms
+   state directory after: calix.log
+journal
+release-registry.json
+releases.json
+   releases.json sha256 unchanged: yes
+
+== B — red, second half: the installed daemon had nothing to probe
+   status round trip while it answered: 0 ms
+   release-registry.json written by the old daemon: yes
+
+== C — green: the new daemon migrates on read and answers 'releases' with schema 2
+   round trip 0 ms
+   document   {"version": 1, "ok": true, "data": {"version": 2, "entries": [{"name": "artcraft-launcher", "source": "", "installed_version": "0.8.1", "last_seen": "0.8.1", "consecutive_failures": 0, "repo": "storytold/craft-launcher", "provider": "github", "canal": "stable", "pkgname": "artcraft-launcher-bin"}]}}
+   document on disk, still untouched by the read: bare map (schema 1), keys=['artcraft-launcher']
+   artcraft-launcher: {'installed_version': '0.8.1', 'repo': 'storytold/craft-launcher', 'source_type': 'github_release', 'pkgbuild_path': '/home/tension_atoi/Projects/artcraft-launcher-bin/PKGBUILD', 'status': 'managed', 'provider': 'github', 'canal': 'stable', 'pkgname': 'artcraft-launcher-bin', 'checked_at': '2026-10-28T18:30:00Z', 'latest_version': '0.8.1', 'update_available': False, 'published_at': '2026-10-25T14:05:05Z', 'asset': 'artcraft-launcher-0.8.1-linux-x86_64.AppImage', 'download_url': 'https://github.com/storytold/craft-launcher/releases/download/v0.8.1/artcraft-launcher-0.8.1-linux-x86_64.AppImage', 'installed_package_version': '0.8.1-1'}
+
+== D — green: 'releases --refresh' answers at once; the probe runs off the connection path
+   command    exit 0 in 5 ms, refreshing=True
+   status during the probe: 0 ms
+   waiting for the probe to commit...
+   probe committed after 100 ms
+   document on disk: schema 2 envelope, entries=1, checked_at=1793215665, last_error=None
+   {'name': 'artcraft-launcher', 'source': 'github', 'installed_version': '0.8.1', 'last_seen': '0.8.1', 'last_checked': 1793215665, 'consecutive_failures': 0, 'repo': 'storytold/craft-launcher', 'provider': 'github', 'canal': 'stable', 'pkgname': 'artcraft-launcher-bin'}
+
+== E — green: the notification decision survives a refresh
+   marked   {"elapsed_ms": 2, "answer": {"version": 1, "ok": true, "data": {"name": "artcraft-launcher", "notified": "0.8.1"}}}
+   after a second probe: notified=0.8.1 last_seen=0.8.1 last_checked=1793215665
+
+== F — the read does not need the daemon; the write refuses without one
+   releases (daemon down): exit 0, stdout {"version":2,"checked_at":1793215665,"entries":[{"name":"artcraft-launcher","source":"gith...
+   releases --refresh (daemon down): exit 1
+     stderr: releases: no daemon is answering on /home/tension_atoi/cwt/.ci-cache/proof/s1-release-document/run/calix/daemon.sock. A refresh is a write, and the daemon is the writer; start it with `systemctl --user start calix-daemon.service`.
+
+== G — the dispatcher's withdrawn commands name their successors
+   calix sync -> exit 1
+     calix sync was removed with the Python state mirror it fed:
+       calix releases [--refresh]  — what is tracked, and what the daemon saw
+       calix inventory             — every installed package, one document
+   calix list -> exit 1
+     calix list was removed with the Python state mirror it fed:
+       calix releases [--refresh]  — what is tracked, and what the daemon saw
+       calix inventory             — every installed package, one document
+   calix check -> exit 1
+     calix check is gone: `calix releases` reports what is tracked and what
+     the daemon last saw, and `calix releases --refresh` asks it to probe.
+
+== H — the intent was never written by any of this
+   intent sha256 unchanged: yes
+
+== I — the documents that died have no writer and no reader left
+   scripts/ state files: none
+   tracked tree, release-registry: none
+   tracked tree, release\.registry module: none
+
+== J — the Python engine's tests, after the cut
+Ran 24 tests in 0.015s
+
+OK
+
+== done
