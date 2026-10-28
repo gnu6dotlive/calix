@@ -1,0 +1,7 @@
+installed-paths: audited 33 artefact(s); 4 resolve into a git worktree.
+installed-paths: 4 known violation(s), tolerated until 2026-11-15
+installed-paths: known  ~/.config/systemd/user/calix-sync.service until=2026-11-15
+installed-paths: known  ~/.config/systemd/user/calix-sync.timer until=2026-11-15
+installed-paths: known  ~/.config/systemd/user/timers.target.wants/calix-sync.timer until=2026-11-15
+installed-paths: known  ~/.local/bin/calix until=2026-11-15
+installed-paths: no unledgered artefact resolves into a git worktree.

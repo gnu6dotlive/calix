@@ -1,0 +1,73 @@
+{
+  "run_id": "s0-installed-paths-20261028",
+  "kind": "slice",
+  "slice": "1B4-S0",
+  "status": "ok",
+  "started_at": "2026-10-28T17:25:00Z",
+  "finished_at": "2026-10-28T17:35:00Z",
+  "objective": "Make an installed artefact that resolves into a git worktree impossible to merge, and make the instances that exist a debt with a date instead of a permanent exception.",
+  "artefacts": {
+    "scripts/check-installed-paths": "Enumerates what the machine is supposed to own -- every non-directory file of `pacman -Qlq calix-gpui-git`, every `calix*` entry of ~/.local/bin, every `calix*` unit and every `calix*` enablement link under ~/.config/systemd/user -- resolves each with `readlink -f`, and walks its ancestors for `.git` (checked with -e, because a linked worktree has a `.git` file, not a directory).",
+    "packaging/known-installed-path-violations.txt": "The ledger. `<path> until=YYYY-MM-DD`, paths relative to $HOME so the file carries no user name.",
+    "scripts/test-check-installed-paths": "Five cases proving the rules bite, on fixtures rebuilt under .ci-cache/ on every run.",
+    "scripts/verify": "New `installed-paths` stage, immediately after `naming-check`, running the tests then the audit, and lifting the tolerated set into the run's own output."
+  },
+  "finding_not_in_the_plan": {
+    "expected": "Three violations: ~/.local/bin/calix, ~/.config/systemd/user/calix-sync.service, ~/.config/systemd/user/calix-sync.timer.",
+    "actual": "Four. `~/.config/systemd/user/timers.target.wants/calix-sync.timer` is an enablement link of its own, and it points into the same worktree.",
+    "why_it_matters": "Fixing the unit file would not fix the link that enables it, so the link is audited as its own artefact rather than treated as a duplicate of the unit. The first thing this guard did was find a fourth instance of the class it was written for. The ledger therefore has four entries, and the workstream record was corrected rather than left claiming three.",
+    "live_target": "/home/tension_atoi/Projects/calix/packaging/systemd/calix-sync.timer"
+  },
+  "the_three_rules": {
+    "1": "A live violation that is not in the ledger fails. New shadowing cannot merge.",
+    "2": "A ledger entry with no live violation fails. A fixed entry must be deleted, so the ledger cannot rot into decoration.",
+    "3": "An entry past its `until` date fails even while the violation is still live. This is the rule that answers the project's own decision record -- a temporary bridge without a deadline becomes permanent -- by making the deadline the thing that breaks."
+  },
+  "refusals": {
+    "malformed_line": "A line that is not `<path> until=YYYY-MM-DD`, or carries a date that is not a real date, is an error rather than a skip. An entry nobody can parse would never expire.",
+    "duplicate_line": "The same path listed twice is an error: two deadlines for one artefact is not a rule.",
+    "missing_ledger": "In the live audit, a missing ledger is not an empty one. Toleration has to be written down, so its absence must not read as zero known violations.",
+    "empty_audit": "If the package is installed but lists no files, the audit fails rather than reporting success over nothing. With `--from` the caller is explicit, so an empty list is allowed there -- that is how rule 2 is tested.",
+    "not_installed": "A host without the package (a CI container) has nothing to audit. The check says so, loudly, and exits 0 -- otherwise rule 2 would fire on every ledger line on every CI run."
+  },
+  "test_first": {
+    "note": "The check is new, so there is no previous implementation to fail against. The red kept here is the live host audited with nothing tolerated, which is the state the check exists to refuse.",
+    "red": "evidence/logs/calix-installed-paths-red-20261028.log -- 33 artefacts audited, 4 resolve into a git worktree, exit 1.",
+    "cases": [
+      "rule 1: unledgered violation -- exit 1, 'is not in the ledger'",
+      "rule 2: ledger entry with nothing live -- exit 1, 'delete the entry'",
+      "rule 3: entry past its date -- exit 1, 'still resolves into'",
+      "in date: tolerated and printed -- exit 0, the tolerated line appears",
+      "malformed: entry without a date -- exit 1, the shape is named"
+    ],
+    "log": "evidence/logs/calix-installed-paths-selftest-20261028.log"
+  },
+  "proof": [
+    {
+      "stage": "rules",
+      "result": "5/5 cases ok. Each of the three rules was made to fire on purpose, and the in-date control passes with the tolerated set printed.",
+      "log": "evidence/logs/calix-installed-paths-selftest-20261028.log"
+    },
+    {
+      "stage": "host",
+      "result": "33 artefacts audited, 4 resolve into a worktree, all four in the ledger, exit 0: `installed-paths: 4 known violation(s), tolerated until 2026-11-15`.",
+      "log": "evidence/logs/calix-installed-paths-live-20261028.log"
+    },
+    {
+      "stage": "ci-shape",
+      "result": "With a `pacman` that reports the package absent, the check prints 'not installed on this host -- nothing to audit' and exits 0, so the ledger does not fail a container that never had the package.",
+      "log": null
+    },
+    {
+      "stage": "gate",
+      "result": "scripts/verify PASSED at 4e1f1cdb (clean tree), with the tolerated set printed in the run's own output rather than left in the step log.",
+      "log": "evidence/logs/calix-verify-installed-paths-20261028.log",
+      "run": "evidence/runs/s0-installed-paths-20261028/verify-run.json"
+    }
+  ],
+  "commit": "4e1f1cdb",
+  "left_open": [
+    "The four ledger entries are debt, not a fix. S1 removes the three that belong to the units (including the enablement link) and S2 removes `~/.local/bin/calix`; rule 2 forces each line to be deleted when its violation is gone.",
+    "The 2026-11-15 date is an estimate for S1 and S2, not a constraint. If a slice slips, the date moves explicitly and the commit says so. The rule that makes the date bite does not move."
+  ]
+}

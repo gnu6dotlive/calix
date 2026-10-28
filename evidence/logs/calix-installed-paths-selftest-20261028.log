@@ -1,0 +1,7 @@
+test-installed-paths: /home/tension_atoi/cwt/.ci-cache/tmp/installed-paths-selftest
+  rule 1: unledgered violation                 ok
+  rule 2: ledger entry with nothing live       ok
+  rule 3: entry past its date                  ok
+  in date: tolerated and printed               ok
+  malformed: entry without a date              ok
+test-installed-paths: 5 case(s) ok.

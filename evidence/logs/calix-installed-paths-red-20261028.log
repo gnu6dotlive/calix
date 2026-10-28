@@ -1,0 +1,11 @@
+# Deliberate red: the live host, audited with nothing tolerated.
+# Command: scripts/check-installed-paths --ledger <empty file>
+
+installed-paths: ~/.config/systemd/user/calix-sync.service resolves into a git worktree (/home/tension_atoi/Projects/calix/packaging/systemd/calix-sync.service) and is not in the ledger.
+installed-paths: ~/.config/systemd/user/timers.target.wants/calix-sync.timer resolves into a git worktree (/home/tension_atoi/Projects/calix/packaging/systemd/calix-sync.timer) and is not in the ledger.
+installed-paths: ~/.local/bin/calix resolves into a git worktree (/home/tension_atoi/Projects/calix/scripts/calix) and is not in the ledger.
+installed-paths: ~/.config/systemd/user/calix-sync.timer resolves into a git worktree (/home/tension_atoi/Projects/calix/packaging/systemd/calix-sync.timer) and is not in the ledger.
+installed-paths: audited 33 artefact(s); 4 resolve into a git worktree.
+installed-paths: an installed artefact must belong to the machine, not to a source tree.
+
+exit=1

@@ -1,0 +1,78 @@
+{
+  "run_id": "local-verify-20261028T173315Z",
+  "kind": "local-verify",
+  "status": "ok",
+  "ok": true,
+  "started_at": "2026-10-28T17:33:15Z",
+  "finished_at": "2026-10-28T17:34:30Z",
+  "commit": "4e1f1cdb",
+  "working_tree_dirty": false,
+  "steps": [
+    {
+      "name": "naming-check",
+      "status": "ok",
+      "duration_ms": 25
+    },
+    {
+      "name": "installed-paths",
+      "status": "ok",
+      "duration_ms": 392
+    },
+    {
+      "name": "packagemanager-tests",
+      "status": "ok",
+      "duration_ms": 62186
+    },
+    {
+      "name": "cli-tests",
+      "status": "ok",
+      "duration_ms": 1456
+    },
+    {
+      "name": "cli-release-build",
+      "status": "ok",
+      "duration_ms": 114
+    },
+    {
+      "name": "cli-smoke",
+      "status": "ok",
+      "duration_ms": 8
+    },
+    {
+      "name": "flatpak-backend-tests",
+      "status": "ok",
+      "duration_ms": 127
+    },
+    {
+      "name": "flatpak-backend-release-build",
+      "status": "ok",
+      "duration_ms": 87
+    },
+    {
+      "name": "portable-binaries",
+      "status": "ok",
+      "duration_ms": 1758
+    },
+    {
+      "name": "package-metadata",
+      "status": "ok",
+      "duration_ms": 4822
+    },
+    {
+      "name": "build-flags",
+      "status": "ok",
+      "duration_ms": 11
+    },
+    {
+      "name": "rust-tests",
+      "status": "ok",
+      "duration_ms": 3760
+    },
+    {
+      "name": "rust-release-build",
+      "status": "ok",
+      "duration_ms": 292
+    }
+  ],
+  "note": "A dirty tree means this is a development run, not proof of the commit."
+}
