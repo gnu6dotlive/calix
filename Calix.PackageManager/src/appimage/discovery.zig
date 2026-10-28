@@ -36,8 +36,11 @@ const version_keys = [_][]const u8{
 
 /// Where discovery looks, and what it correlates against.
 pub const Options = struct {
-    /// Directory holding the installed AppImages, e.g. `~/Applications`.
-    install_directory: []const u8,
+    /// Directories holding the installed AppImages, scanned in order, e.g.
+    /// `~/.local/bin` then `~/Applications`. Several, because the project has
+    /// two conventions and an AppImage in either one is tracked; a single
+    /// directory left every AppImage outside it invisible.
+    install_directories: []const []const u8,
     /// Directory holding the XDG desktop entries, e.g.
     /// `~/.local/share/applications`.
     applications_directory: []const u8,
@@ -232,7 +235,10 @@ fn appImagePathOf(exec_value: []const u8) ?[]const u8 {
     return candidate;
 }
 
-/// Scans the installation directory for AppImages and builds their records.
+/// Scans the installation directories for AppImages and builds their records.
+///
+/// The desktop entries are read once, before the directories: they are the
+/// same for every root, and a record is matched to its entry by path.
 pub fn discover(
     allocator: std.mem.Allocator,
     io: std.Io,
@@ -250,26 +256,32 @@ pub fn discover(
         discovered.deinit(allocator);
     }
 
-    var directory = std.Io.Dir.cwd().openDir(io, options.install_directory, .{ .iterate = true }) catch |err| switch (err) {
-        error.FileNotFound, error.NotDir => return try discovered.toOwnedSlice(allocator),
-        else => return err,
-    };
-    defer directory.close(io);
+    for (options.install_directories) |install_directory| {
+        // A root the user does not have is not an error: it is one convention
+        // that does not apply here, and the others still scan.
+        var directory = std.Io.Dir.cwd().openDir(io, install_directory, .{ .iterate = true }) catch |err| switch (err) {
+            error.FileNotFound, error.NotDir => continue,
+            else => return err,
+        };
+        defer directory.close(io);
 
-    var iterator = directory.iterate();
-    while (iterator.next(io) catch return error.DirectoryReadFailed) |directory_entry| {
-        if (directory_entry.kind == .directory) continue;
-        if (!std.mem.endsWith(u8, directory_entry.name, appimage_suffix)) continue;
+        var iterator = directory.iterate();
+        while (iterator.next(io) catch return error.DirectoryReadFailed) |directory_entry| {
+            if (directory_entry.kind == .directory) continue;
+            if (!std.mem.endsWith(u8, directory_entry.name, appimage_suffix)) continue;
 
-        const stat = directory.statFile(io, directory_entry.name, .{}) catch continue;
-        if (stat.kind == .directory) continue;
+            const stat = directory.statFile(io, directory_entry.name, .{}) catch continue;
+            if (stat.kind == .directory) continue;
 
-        const path = try std.fs.path.join(allocator, &.{ options.install_directory, directory_entry.name });
-        errdefer allocator.free(path);
+            const path = try std.fs.path.join(allocator, &.{ install_directory, directory_entry.name });
+            // The record owns a copy of this. An `errdefer` freed it only when
+            // the record failed, so every AppImage found leaked its join.
+            defer allocator.free(path);
 
-        const entry = try buildAppImage(allocator, desktop_entries, directory_entry.name, path, stat.size);
-        errdefer freeAppImage(allocator, entry);
-        try discovered.append(allocator, entry);
+            const entry = try buildAppImage(allocator, desktop_entries, directory_entry.name, path, stat.size);
+            errdefer freeAppImage(allocator, entry);
+            try discovered.append(allocator, entry);
+        }
     }
 
     return try discovered.toOwnedSlice(allocator);
@@ -285,49 +297,59 @@ fn buildAppImage(
 ) !appimage.AppImage {
     const desktop = findDesktopEntry(desktop_entries, path);
 
+    // The values a scan derives are scratch: they are copied into the record,
+    // which owns every string it carries. An arena keeps them together and
+    // releases them on every path out, including the one taken when a desktop
+    // entry supplied the value and nothing was allocated at all.
+    var scratch = std.heap.ArenaAllocator.init(allocator);
+    defer scratch.deinit();
+    const temporary = scratch.allocator();
+
     var name: []const u8 = "";
     if (desktop) |entry| {
         if (entry.name.len > 0) name = entry.name;
     }
-    if (name.len == 0) name = try nameFromFileName(allocator, file_name);
-    errdefer allocator.free(name);
+    if (name.len == 0) name = try nameFromFileName(temporary, file_name);
 
     var version: []const u8 = "";
     if (desktop) |entry| {
         if (entry.version.len > 0) version = entry.version;
     }
-    if (version.len == 0) version = try versionFromFileName(allocator, file_name);
-    errdefer allocator.free(version);
+    if (version.len == 0) version = try versionFromFileName(temporary, file_name);
 
     var icon_name: []const u8 = "";
     if (desktop) |entry| {
         if (entry.icon.len > 0) icon_name = entry.icon;
     }
     if (icon_name.len == 0) {
-        const lowered = try allocator.dupe(u8, name);
+        const lowered = try temporary.dupe(u8, name);
         for (lowered) |*character| {
             character.* = std.ascii.toLower(character.*);
         }
         icon_name = lowered;
     }
-    errdefer allocator.free(icon_name);
 
     var description: []const u8 = "";
     if (desktop) |entry| {
         if (entry.comment.len > 0) description = entry.comment;
     }
     if (description.len == 0) {
-        description = try std.fmt.allocPrint(allocator, "{s} application", .{name});
+        description = try std.fmt.allocPrint(temporary, "{s} application", .{name});
     }
-    errdefer allocator.free(description);
 
-    const release_tag = try std.fmt.allocPrint(allocator, "{s}", .{
-        if (std.mem.startsWith(u8, version, "v")) version else try std.fmt.allocPrint(allocator, "v{s}", .{version}),
-    });
+    const tag_source = if (std.mem.startsWith(u8, version, "v"))
+        version
+    else
+        try std.fmt.allocPrint(temporary, "v{s}", .{version});
+    const release_tag = try std.fmt.allocPrint(allocator, "{s}", .{tag_source});
     errdefer allocator.free(release_tag);
 
     const owned_name = try allocator.dupe(u8, name);
     errdefer allocator.free(owned_name);
+    // Its own copy: the record frees every field, so sharing this pointer
+    // with `name` would free the same allocation twice.
+    const owned_desktop_name = try allocator.dupe(u8, name);
+    errdefer allocator.free(owned_desktop_name);
     const owned_version = try allocator.dupe(u8, version);
     errdefer allocator.free(owned_version);
     const owned_icon = try allocator.dupe(u8, icon_name);
@@ -352,7 +374,7 @@ fn buildAppImage(
         .raw_update_info = owned_raw_update_info,
         .icon_name = owned_icon,
         .description = owned_description,
-        .desktop_name = owned_name,
+        .desktop_name = owned_desktop_name,
         .size_on_disk = size_on_disk,
         // An empty but owned slice: the manager frees the environment with
         // the allocator, and a static empty slice must never be freed.
@@ -525,6 +547,12 @@ pub fn merge(
             // Keep what the database already knows; fill in the blanks.
             try keepWhenPresent(allocator, previous.name, &entry.name);
             try keepWhenPresent(allocator, previous.version, &entry.version);
+            // The tag names the version, so it travels with it: a scan that
+            // falls back to the filename would otherwise pair a kept version
+            // with `v1.0.0` derived from the filename, and the update guard
+            // (`releaseTagMatches`) would stop recognising the installed
+            // release and offer it again.
+            try keepTagWhenPresent(allocator, previous.release_tag, &entry.release_tag);
             try keepWhenPresent(allocator, previous.icon_name, &entry.icon_name);
             try keepWhenPresent(allocator, previous.description, &entry.description);
             try keepWhenPresent(allocator, previous.desktop_name, &entry.desktop_name);
@@ -579,6 +607,20 @@ fn keepWhenPresent(
     if (known.len == 0) return;
     allocator.free(discovered.*);
     discovered.* = try allocator.dupe(u8, known);
+}
+
+/// Keeps the database's release tag when it has one, for the same reason the
+/// version is kept: the two describe one release, and a tag derived from a
+/// filename the scan guessed is worse than no tag at all.
+fn keepTagWhenPresent(
+    allocator: std.mem.Allocator,
+    known: ?[]const u8,
+    discovered: *?[]const u8,
+) !void {
+    const value = known orelse return;
+    if (value.len == 0) return;
+    if (discovered.*) |tag| allocator.free(tag);
+    discovered.* = try allocator.dupe(u8, value);
 }
 
 /// Deep-copies a record so the copy owns every one of its strings.
@@ -775,6 +817,40 @@ test "merge: a discovered record keeps the configured update fields" {
     try testing.expect(merged[0].allow_prerelease);
 }
 
+test "merge: the release tag travels with the version the database keeps" {
+    // The host's EffectCraft is this case: its desktop entry carries no
+    // version, so a scan falls back to the filename ("1.0.0") while the
+    // database knows 0.11.1. Keeping the version but taking the scanned tag
+    // would pair one version with another version's tag, and the update guard
+    // (`releaseTagMatches`) would stop recognising the installed release.
+    const path = "/apps/EffectCraft.AppImage";
+    const previous = appimage.AppImage{
+        .name = try testing.allocator.dupe(u8, "EffectCraft"),
+        .version = try testing.allocator.dupe(u8, "0.11.1"),
+        .release_tag = try testing.allocator.dupe(u8, "v0.11.1"),
+        .path = try testing.allocator.dupe(u8, path),
+    };
+    defer freeAppImage(testing.allocator, previous);
+
+    const discovered = appimage.AppImage{
+        .name = try testing.allocator.dupe(u8, "EffectCraft"),
+        .version = try testing.allocator.dupe(u8, "1.0.0"),
+        .release_tag = try testing.allocator.dupe(u8, "v1.0.0"),
+        .path = try testing.allocator.dupe(u8, path),
+    };
+    defer freeAppImage(testing.allocator, discovered);
+
+    const merged = try merge(testing.allocator, &.{previous}, &.{discovered});
+    defer {
+        for (merged) |item| freeAppImage(testing.allocator, item);
+        testing.allocator.free(merged);
+    }
+
+    try testing.expectEqual(@as(usize, 1), merged.len);
+    try testing.expectEqualStrings("0.11.1", merged[0].version);
+    try testing.expectEqualStrings("v0.11.1", merged[0].release_tag.?);
+}
+
 test "merge: a record outside the scanned directory is kept" {
     const elsewhere = appimage.AppImage{
         .name = try testing.allocator.dupe(u8, "Other"),
@@ -803,4 +879,44 @@ test "merge: a record outside the scanned directory is kept" {
     }
     try testing.expectEqual(@as(usize, 1), merged.len);
     try testing.expectEqualStrings("/opt/Other.AppImage", merged[0].path);
+}
+
+test "discover: every root is scanned and a missing one is not an error" {
+    var temporary = std.testing.tmpDir(.{});
+    defer temporary.cleanup();
+    var path_buffer: [std.Io.Dir.max_path_bytes]u8 = undefined;
+    const path_length = try temporary.dir.realPath(testing.io, &path_buffer);
+    const root = path_buffer[0..path_length];
+
+    const first = try std.fs.path.join(testing.allocator, &.{ root, "bin" });
+    defer testing.allocator.free(first);
+    const second = try std.fs.path.join(testing.allocator, &.{ root, "Applications" });
+    defer testing.allocator.free(second);
+    const missing = try std.fs.path.join(testing.allocator, &.{ root, "absent" });
+    defer testing.allocator.free(missing);
+    const desktop_entries = try std.fs.path.join(testing.allocator, &.{ root, "desktop" });
+    defer testing.allocator.free(desktop_entries);
+
+    try std.Io.Dir.cwd().createDirPath(testing.io, first);
+    try std.Io.Dir.cwd().createDirPath(testing.io, second);
+    const first_appimage = try std.fs.path.join(testing.allocator, &.{ first, "One.AppImage" });
+    defer testing.allocator.free(first_appimage);
+    const second_appimage = try std.fs.path.join(testing.allocator, &.{ second, "Two.AppImage" });
+    defer testing.allocator.free(second_appimage);
+    try std.Io.Dir.cwd().writeFile(testing.io, .{ .sub_path = first_appimage, .data = "one" });
+    try std.Io.Dir.cwd().writeFile(testing.io, .{ .sub_path = second_appimage, .data = "two" });
+
+    const discovered = try discover(testing.allocator, testing.io, .{
+        .install_directories = &.{ first, missing, second },
+        .applications_directory = desktop_entries,
+    });
+    defer {
+        for (discovered) |item| freeAppImage(testing.allocator, item);
+        testing.allocator.free(discovered);
+    }
+
+    try testing.expectEqual(@as(usize, 2), discovered.len);
+    try testing.expectEqualStrings(first_appimage, discovered[0].path);
+    try testing.expectEqualStrings(second_appimage, discovered[1].path);
+    try testing.expectEqual(@as(u64, 3), discovered[0].size_on_disk);
 }

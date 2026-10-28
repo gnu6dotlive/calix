@@ -68,8 +68,8 @@ export TMPDIR="$ROOT/.ci-cache/tmp"
 # tests instead of 380 is not "faster", it is a suite that stopped being
 # compiled or collected. Raise a floor when the real count grows; never lower
 # one to make a run pass.
-PACKAGEMANAGER_FLOOR=1390
-CLI_FLOOR=411
+PACKAGEMANAGER_FLOOR=1392
+CLI_FLOOR=414
 RUST_FLOOR=195
 
 # ---- plumbing ---------------------------------------------------------------

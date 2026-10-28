@@ -1133,24 +1133,31 @@ pub const AppImageManager = struct {
         operation_scope.finish(.success);
     }
 
-    /// Scans the installation directory and commits the result to the database.
+    /// Scans the installation directories and commits the result to the
+    /// database.
     ///
     /// The database used to hold only what the backend itself had installed:
-    /// an AppImage dropped into the installation directory by hand, or by
+    /// an AppImage dropped into an installation directory by hand, or by
     /// another tool, was invisible. Discovery closes that gap and is the
     /// backend's own responsibility — it owns the database, so it reads its
-    /// own directory.
+    /// own directories.
+    ///
+    /// The roots are the caller's decision, not the backend's: this only
+    /// knows the one AppImages are installed into (`install_directory`), while
+    /// where they are *found* is a convention the command layer owns.
     ///
     /// The fields a scan cannot supply — the update URL and type, the forge
-    /// coordinates, the prerelease opt-in — are carried over untouched.
+    /// coordinates, the prerelease opt-in — are carried over untouched, and
+    /// records the scan does not see are kept.
     ///
     /// Returns the number of records in the database after the scan.
     pub fn discoverAppImages(
         self: AppImageManager,
+        install_directories: []const []const u8,
         applications_directory: []const u8,
     ) !usize {
         const discovered = try discovery.discover(self.allocator, self.io, .{
-            .install_directory = self.install_directory,
+            .install_directories = install_directories,
             .applications_directory = applications_directory,
         });
         defer {

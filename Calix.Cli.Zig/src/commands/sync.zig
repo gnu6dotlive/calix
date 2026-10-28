@@ -214,19 +214,24 @@ fn runRealAppImageSync(
         return;
     }
 
-    std.Io.Dir.cwd().access(context.io, install_directory, .{}) catch |err| switch (err) {
-        error.FileNotFound => {
-            const message = try std.fmt.allocPrint(
-                context.allocator,
-                "{s} directory does not exist. No AppImages to sync.",
-                .{install_directory},
-            );
-            defer context.allocator.free(message);
-            emitAppImageInfo(operation_context, message);
-            return;
-        },
-        else => return err,
-    };
+    // Where AppImages are found, which is not only where this command writes
+    // them: the configured directory is one convention, `~/Applications` the
+    // other, and an AppImage in either belongs in the database.
+    const roots = try discoveryRoots(context, install_directory);
+    defer freeDiscoveryRoots(context, roots);
+    const scanned = try std.mem.join(context.allocator, ", ", roots);
+    defer context.allocator.free(scanned);
+
+    if (!try anyRootExists(context, roots)) {
+        const message = try std.fmt.allocPrint(
+            context.allocator,
+            "No AppImage directory exists ({s}). No AppImages to sync.",
+            .{scanned},
+        );
+        defer context.allocator.free(message);
+        emitAppImageInfo(operation_context, message);
+        return;
+    }
 
     var manager = Zigalpm.AppImageManager{
         .allocator = context.allocator,
@@ -240,7 +245,7 @@ fn runRealAppImageSync(
     defer manager.setOperationContext(null) catch {};
 
     // Discovery: pick up AppImages that are present in the installation
-    // directory but unknown to the database. Without this the database only
+    // directories but unknown to the database. Without this the database only
     // ever held what the backend itself had installed, and an AppImage
     // dropped in by hand was invisible.
     const applications_directory = try std.fs.path.join(
@@ -249,15 +254,15 @@ fn runRealAppImageSync(
     );
     defer context.allocator.free(applications_directory);
 
-    _ = try manager.discoverAppImages(applications_directory);
+    _ = try manager.discoverAppImages(roots, applications_directory);
 
     if (optionEnabled(invocation, "--discover")) {
         const app_images_after = try manager.getAppImagesFromLocalDb();
         defer manager.freeAppImages(app_images_after);
         const message = try std.fmt.allocPrint(
             context.allocator,
-            "Discovered {d} AppImage(s) in {s}.",
-            .{ app_images_after.len, install_directory },
+            "Tracking {d} AppImage(s); scanned {s}.",
+            .{ app_images_after.len, scanned },
         );
         defer context.allocator.free(message);
         emitAppImageInfo(operation_context, message);
@@ -274,6 +279,54 @@ fn runRealAppImageSync(
     defer context.allocator.free(names);
     if (invocation.positionals.len != 0 and names.len == 0) return;
     if (!try manager.syncAppImageMeta(names)) return error.AppImageMetadataSyncFailed;
+}
+
+/// The directories discovery scans: the configured install directory (or its
+/// default), then `~/Applications`.
+///
+/// Two roots because two conventions exist. The install path is where this
+/// command writes; `~/Applications` is where the architecture document and
+/// the Python sync put AppImages, and where every AppImage on this machine
+/// is. Scanning only the install path left the database refreshed by nothing
+/// but the script this slice deletes (F11).
+///
+/// Deduplicated: discovery does not de-duplicate within one scan, so a
+/// directory named twice would write every record twice.
+fn discoveryRoots(
+    context: *const runtime.RuntimeContext,
+    install_directory: []const u8,
+) ![][]const u8 {
+    const applications = try xdg.applicationsDirectory(context);
+    errdefer context.allocator.free(applications);
+
+    var roots: std.ArrayList([]const u8) = .empty;
+    errdefer roots.deinit(context.allocator);
+
+    try roots.append(context.allocator, try context.allocator.dupe(u8, install_directory));
+    if (std.mem.eql(u8, install_directory, applications))
+        context.allocator.free(applications)
+    else
+        try roots.append(context.allocator, applications);
+    return roots.toOwnedSlice(context.allocator);
+}
+
+fn freeDiscoveryRoots(context: *const runtime.RuntimeContext, roots: []const []const u8) void {
+    for (roots) |root| context.allocator.free(root);
+    context.allocator.free(roots);
+}
+
+/// Whether any root is there to scan. A path that exists but is not a
+/// directory does not count: discovery would open it and skip it.
+fn anyRootExists(context: *const runtime.RuntimeContext, roots: []const []const u8) !bool {
+    for (roots) |root| {
+        var directory = std.Io.Dir.cwd().openDir(context.io, root, .{}) catch |err| switch (err) {
+            error.FileNotFound, error.NotDir => continue,
+            else => return err,
+        };
+        directory.close(context.io);
+        return true;
+    }
+    return false;
 }
 
 fn runRealFlatpakSync(
@@ -1000,7 +1053,114 @@ test "real AppImage runner reports a missing install directory without failing" 
         @as(u8, 0),
         try executeWithRunner(&context, &outcome.dispatch, AppImage{}),
     );
-    try std.testing.expect(std.mem.indexOf(u8, stdout.writer.buffered(), "directory does not exist. No AppImages to sync") != null);
+    try std.testing.expect(std.mem.indexOf(u8, stdout.writer.buffered(), "No AppImage directory exists") != null);
+    try std.testing.expect(std.mem.indexOf(u8, stdout.writer.buffered(), "No AppImages to sync") != null);
+}
+
+test "real AppImage runner discovers an AppImage in the applications directory with no install path configured" {
+    // The defect: the native default root is `~/.local/bin`, the Python's is
+    // `~/Applications` (F11), and this machine keeps them in the latter. A
+    // discovery that looks only at the default sees nothing, so the script
+    // stays the only thing refreshing the database -- and cutting it would
+    // freeze the records.
+    var temporary = std.testing.tmpDir(.{});
+    defer temporary.cleanup();
+    var path_buffer: [std.Io.Dir.max_path_bytes]u8 = undefined;
+    const path_length = try temporary.dir.realPath(std.testing.io, &path_buffer);
+    const root = path_buffer[0..path_length];
+
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    const allocator = arena.allocator();
+    const home = try std.fs.path.join(allocator, &.{ root, "home" });
+    const applications = try std.fs.path.join(allocator, &.{ home, "Applications" });
+    const desktop_entries = try std.fs.path.join(allocator, &.{ home, ".local", "share", "applications" });
+    try std.Io.Dir.cwd().createDirPath(std.testing.io, applications);
+    try std.Io.Dir.cwd().createDirPath(std.testing.io, desktop_entries);
+
+    const appimage = try std.fs.path.join(allocator, &.{ applications, "DeckCraft.AppImage" });
+    try std.Io.Dir.cwd().writeFile(std.testing.io, .{ .sub_path = appimage, .data = "" });
+    const entry = try std.fmt.allocPrint(
+        allocator,
+        "[Desktop Entry]\nType=Application\nName=DeckCraft\n" ++
+            "Comment=Presentations and slide shows\nExec=\"{s}\" %F\n" ++
+            "Icon=ai.storyteller.deckcraft\nX-AppImage-Version=0.7.3\n",
+        .{appimage},
+    );
+    const entry_path = try std.fs.path.join(allocator, &.{ desktop_entries, "deckcraft.desktop" });
+    try std.Io.Dir.cwd().writeFile(std.testing.io, .{ .sub_path = entry_path, .data = entry });
+
+    var environment = std.process.Environ.Map.init(allocator);
+    try environment.put("HOME", home);
+    try environment.put("XDG_CONFIG_HOME", root);
+    try environment.put("XDG_DATA_HOME", try std.fs.path.join(allocator, &.{ home, ".local", "share" }));
+    var stdout = std.Io.Writer.Allocating.init(std.testing.allocator);
+    defer stdout.deinit();
+    var stderr = std.Io.Writer.Allocating.init(std.testing.allocator);
+    defer stderr.deinit();
+    var context: runtime.RuntimeContext = .{
+        .allocator = allocator,
+        .io = std.testing.io,
+        .stdout = &stdout.writer,
+        .stderr = &stderr.writer,
+        .environment = &environment,
+    };
+
+    const manifest = try spec.Manifest.load(allocator);
+    const outcome = try parser.parse(allocator, &manifest, &.{ "sync", "appimage", "--discover" });
+    try std.testing.expectEqual(
+        @as(u8, 0),
+        try executeWithRunner(&context, &outcome.dispatch, AppImage{}),
+    );
+
+    const local_db_path = try std.fs.path.join(allocator, &.{ root, "calix", "appimage-metadata-v2.db" });
+    var manager = Zigalpm.AppImageManager{
+        .allocator = allocator,
+        .io = std.testing.io,
+        .environ = context.environ,
+        .install_directory = applications,
+        .local_db_path = local_db_path,
+    };
+    defer manager.deinit();
+    const records = try manager.getAppImagesFromLocalDb();
+    defer manager.freeAppImages(records);
+    try std.testing.expectEqual(@as(usize, 1), records.len);
+    try std.testing.expectEqualStrings("DeckCraft", records[0].name);
+    try std.testing.expectEqualStrings("0.7.3", records[0].version);
+    try std.testing.expectEqualStrings("ai.storyteller.deckcraft", records[0].icon_name);
+    try std.testing.expectEqualStrings("Presentations and slide shows", records[0].description);
+    try std.testing.expectEqualStrings(appimage, records[0].path);
+}
+
+test "the discovery roots are the install directory and the applications directory, once each" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var environment = std.process.Environ.Map.init(arena.allocator());
+    try environment.put("HOME", "/home/tester");
+    var stdout = std.Io.Writer.Discarding.init(&.{});
+    var stderr = std.Io.Writer.Discarding.init(&.{});
+    const context: runtime.RuntimeContext = .{
+        .allocator = arena.allocator(),
+        .io = std.testing.io,
+        .stdout = &stdout.writer,
+        .stderr = &stderr.writer,
+        .environment = &environment,
+    };
+
+    const roots = try discoveryRoots(&context, "/tmp/appimages");
+    defer freeDiscoveryRoots(&context, roots);
+    try std.testing.expectEqual(@as(usize, 2), roots.len);
+    try std.testing.expectEqualStrings("/tmp/appimages", roots[0]);
+    try std.testing.expectEqualStrings("/home/tester/Applications", roots[1]);
+
+    // A configuration that already names `~/Applications` must not scan it
+    // twice: discovery does not de-duplicate within one pass, so the same
+    // AppImage would be written twice.
+    const applications = try xdg.applicationsDirectory(&context);
+    const same = try discoveryRoots(&context, applications);
+    defer freeDiscoveryRoots(&context, same);
+    try std.testing.expectEqual(@as(usize, 1), same.len);
+    try std.testing.expectEqualStrings("/home/tester/Applications", same[0]);
 }
 
 test "AppImage sync name matching is case insensitive and selects the first match" {

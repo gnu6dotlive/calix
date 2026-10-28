@@ -22,6 +22,17 @@ pub fn binHome(context: *const runtime.RuntimeContext) ![]const u8 {
     return resolve(context, "XDG_BIN_HOME", &.{ ".local", "bin" });
 }
 
+/// `~/Applications` — where the architecture document and the Python sync put
+/// AppImages, and where this machine keeps all of them.
+///
+/// Not an XDG directory, and not derived from `XDG_BIN_HOME`: it is the
+/// AppImage convention the project documents (`docs/calix-architecture.md`)
+/// and the one the script scans. A discovery that only looked at the install
+/// path was blind to every AppImage here.
+pub fn applicationsDirectory(context: *const runtime.RuntimeContext) ![]const u8 {
+    return std.fs.path.join(context.allocator, &.{ try invokingUserHome(context), "Applications" });
+}
+
 /// `<state>/calix` — the directory the daemon keeps its documents in.
 ///
 /// One definition, because both the daemon that writes there and the commands
@@ -182,4 +193,30 @@ test "the state directory is the XDG state home, under calix" {
     );
     try environment.put("XDG_STATE_HOME", "/tmp/state-root");
     try std.testing.expectEqualStrings("/tmp/state-root/calix", try stateDirectory(&context));
+}
+
+test "the applications directory is under the home, whatever the XDG paths say" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var environment = std.process.Environ.Map.init(arena.allocator());
+    try environment.put("HOME", "/home/tester");
+    // The XDG directories move; this one does not, because it is not an XDG
+    // directory. An AppImage store that followed `XDG_BIN_HOME` is exactly the
+    // mismatch that left every AppImage on this machine undiscovered.
+    try environment.put("XDG_BIN_HOME", "/tmp/bin-root");
+    try environment.put("XDG_DATA_HOME", "/tmp/data-root");
+    var stdout = std.Io.Writer.Discarding.init(&.{});
+    var stderr = std.Io.Writer.Discarding.init(&.{});
+    const context: runtime.RuntimeContext = .{
+        .allocator = arena.allocator(),
+        .io = std.testing.io,
+        .stdout = &stdout.writer,
+        .stderr = &stderr.writer,
+        .environment = &environment,
+    };
+
+    try std.testing.expectEqualStrings(
+        "/home/tester/Applications",
+        try applicationsDirectory(&context),
+    );
 }
