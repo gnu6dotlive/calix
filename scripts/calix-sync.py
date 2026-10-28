@@ -3,19 +3,21 @@
 calix-sync — Universal package state synchronizer for Calix & gnosix desktop.
 
 Unifies & synchronizes:
-  1. AppImages: discovers ~/Applications, correlates ~/.local/share/applications
-     metadata (icon, version, description) and mirrors the result into the
-     Calix AppImage registry for interoperability.
-  2. Cargo:     ingests ~/.cargo/.crates2.json (user + desktop daemons).
-  3. NPM:       ingests `npm list -g --depth=0 --json`.
-  4. ALPM/AUR:  ingests pacman status, checks the database lock and pending
+  1. Cargo:     ingests ~/.cargo/.crates2.json (user + desktop daemons).
+  2. NPM:       ingests `npm list -g --depth=0 --json`.
+  3. ALPM/AUR:  ingests pacman status, checks the database lock and pending
      updates.
-  5. Releases:  ingests release-tracked packages from the Calix registry.
-  6. Health:    audits locks and conflicting update notifiers.
+  4. Releases:  ingests release-tracked packages from the Calix registry.
+  5. Health:    audits locks and conflicting update notifiers.
+
+AppImages are not here any more: `calix sync appimage` owns the metadata
+database under `~/.config/calix`, on both conventions' roots, and the mirror
+this script used to keep in the state directory had no reader anyway (F10,
+F11).
 
 Usage:
   calix-sync [--dry-run] [--json] [--quiet] [--runtime]
-  calix-sync list [all|appimage|cargo|npm|alpm|releases]
+  calix-sync list [all|cargo|npm|alpm|releases]
 
   --runtime  Record the run in the engine's state directory instead of the
              repository's evidence/ tree. Used by the periodic timer, which
@@ -36,19 +38,16 @@ Usage:
 # classification des forges et des assets, et le probing de releases lui-même
 # (6 forges dans shared/ et appimage/update_manager.zig).
 #
-# Ce qui reste à écrire en Zig : backends Cargo et NPM, découverte
-# ~/Applications, registre de releases, vérification de provenance amont,
-# flux d'application, helper root + polkit, inventaire unifié, daemon.
+# Ce qui reste à écrire en Zig : backends Cargo et NPM, registre de releases,
+# vérification de provenance amont, flux d'application, helper root + polkit,
+# inventaire unifié, daemon.
 #
 # L'UI ne lit plus ce moteur : elle lit ~/.local/state/calix/*.json, qu'il
 # écrit. Ce couplage est transitoire et disparaît avec le daemon.
 # =============================================================================
 
-import glob
 import json
 import os
-import re
-import shutil
 import subprocess
 import sys
 import time
@@ -72,152 +71,11 @@ from calix_core import (  # noqa: E402
 
 HOME = os.path.expanduser("~")
 SHARE_DIR = os.path.join(HOME, ".local/share/calix")
-APP_DIR = os.path.join(HOME, "Applications")
-DESKTOP_DIR = os.path.join(HOME, ".local/share/applications")
-CALIX_CONFIG_DIR = os.path.join(HOME, ".config/calix")
-CALIX_APPIMAGE_DB = os.path.join(CALIX_CONFIG_DIR, "appimage-metadata-v2.db")
-
-VERSION_KEYS = (
-    "X-AppImage-Version",
-    "X-OpenWork-Version",
-    "X-Craft-Version",
-)
 
 
 def ensure_dirs():
     os.makedirs(STATE_DIR, exist_ok=True)
     os.makedirs(SHARE_DIR, exist_ok=True)
-
-
-# --------------------------------------------------------------------------
-# AppImages
-# --------------------------------------------------------------------------
-
-def _read_desktop_metadata():
-    """Map AppImage exec path → metadata harvested from .desktop entries."""
-    metadata = {}
-    if not os.path.isdir(DESKTOP_DIR):
-        return metadata
-    for desktop_file in sorted(glob.glob(os.path.join(DESKTOP_DIR, "*.desktop"))):
-        try:
-            with open(desktop_file, "r", encoding="utf-8", errors="ignore") as handle:
-                content = handle.read()
-        except OSError:
-            continue
-        name = comment = icon = exec_path = version = ""
-        for raw_line in content.splitlines():
-            line = raw_line.strip()
-            if line.startswith("Name=") and not name:
-                name = line.split("=", 1)[1]
-            elif line.startswith("Comment=") and not comment:
-                comment = line.split("=", 1)[1]
-            elif line.startswith("Icon=") and not icon:
-                icon = line.split("=", 1)[1]
-            elif line.startswith("Exec="):
-                match = re.search(r"\"?(/[^\"\s]+\.AppImage)\"?", line.split("=", 1)[1])
-                if match:
-                    exec_path = match.group(1)
-            elif line.startswith(VERSION_KEYS) and not version:
-                version = line.split("=", 1)[1]
-        if exec_path:
-            metadata[exec_path] = {
-                "name": name,
-                "comment": comment,
-                "icon": icon,
-                "version": version,
-                "desktop_file": desktop_file,
-            }
-    return metadata
-
-
-def _version_from_filename(filename):
-    """Best-effort version extraction from an AppImage filename."""
-    match = re.match(
-        r"^([a-zA-Z0-9_-]+?)[-_]v?(\d+\.\d+.*?)[\.-](linux.*|x86_64.*|aarch64.*)\.AppImage$",
-        filename,
-    )
-    if match:
-        return match.group(1), match.group(2)
-    return None, None
-
-
-def sync_appimages(dry_run=False):
-    """Discover ~/Applications and refresh the AppImage registry entries.
-
-    Entries already present in the registry are *refreshed* (size, version,
-    icon, description) instead of being carried over verbatim — the previous
-    implementation kept stale metadata forever.
-    """
-    registry = []
-    if os.path.exists(CALIX_APPIMAGE_DB):
-        try:
-            with open(CALIX_APPIMAGE_DB, "r", encoding="utf-8") as handle:
-                registry = json.load(handle)
-        except (OSError, json.JSONDecodeError):
-            registry = []
-    if not isinstance(registry, list):
-        registry = []
-
-    known = {item.get("path"): item for item in registry if isinstance(item, dict) and item.get("path")}
-    desktop_meta = _read_desktop_metadata()
-    entries = []
-
-    if os.path.isdir(APP_DIR):
-        for filename in sorted(os.listdir(APP_DIR)):
-            if not filename.endswith(".AppImage"):
-                continue
-            full_path = os.path.join(APP_DIR, filename)
-            if not os.path.isfile(full_path):
-                continue
-            size_on_disk = os.path.getsize(full_path)
-            meta = desktop_meta.get(full_path, {})
-            existing = known.get(full_path, {})
-
-            app_name = meta.get("name") or existing.get("name")
-            version = meta.get("version") or existing.get("version")
-            description = meta.get("comment") or existing.get("description")
-            icon_name = meta.get("icon") or existing.get("icon_name")
-
-            if not app_name or not version:
-                fallback_name, fallback_version = _version_from_filename(filename)
-                app_name = app_name or fallback_name
-                version = version or fallback_version
-
-            if not app_name:
-                app_name = os.path.splitext(filename)[0]
-            if not version:
-                version = "1.0.0"
-
-            entries.append({
-                "name": app_name,
-                "version": version,
-                "release_tag": version if version.startswith("v") else f"v{version}",
-                "raw_update_info": existing.get("raw_update_info", ""),
-                "icon_name": icon_name or app_name.lower(),
-                "description": description or f"{app_name} application",
-                "desktop_name": existing.get("desktop_name", app_name),
-                "size_on_disk": size_on_disk,
-                "environment_variables": existing.get("environment_variables", []),
-                "command_line_args": existing.get("command_line_args", ""),
-                "path": full_path,
-                "update_url": existing.get("update_url", ""),
-                "update_type": existing.get("update_type", "none"),
-                "repo_owner": existing.get("repo_owner"),
-                "repo_name": existing.get("repo_name"),
-                "allow_prerelease": existing.get("allow_prerelease", False),
-            })
-
-    if not dry_run:
-        if os.path.exists(CALIX_APPIMAGE_DB):
-            try:
-                shutil.copy2(CALIX_APPIMAGE_DB, f"{CALIX_APPIMAGE_DB}.bak")
-            except OSError:
-                pass
-        os.makedirs(CALIX_CONFIG_DIR, exist_ok=True)
-        write_json(CALIX_APPIMAGE_DB, entries)
-        write_json(os.path.join(STATE_DIR, "appimages.json"), entries)
-
-    return entries
 
 
 # --------------------------------------------------------------------------
@@ -350,22 +208,6 @@ def _load(name):
 def cmd_list(target):
     target = (target or "all").lower()
 
-    if target in ("appimage", "appimages", "all"):
-        data = _load("appimages")
-        if data:
-            rows = []
-            for item in data:
-                size_mb = f"{item.get('size_on_disk', 0) / (1024 * 1024):.1f} MB"
-                rows.append([
-                    item.get("name", ""),
-                    item.get("version", ""),
-                    size_mb,
-                    os.path.basename(item.get("path", "")),
-                ])
-            print("🚀 AppImages in ~/Applications:")
-            print_table(rows, ["Name", "Version", "Size", "File"])
-            print()
-
     if target in ("cargo", "all"):
         data = _load("cargo")
         if data:
@@ -444,8 +286,6 @@ def main():
     )
 
     start = time.time()
-    appimages = sync_appimages(dry_run=dry_run)
-    evidence.step("appimages", count=len(appimages))
     cargo_packages = sync_cargo()
     evidence.step("cargo", count=len(cargo_packages))
     npm_packages = sync_npm()
@@ -463,7 +303,6 @@ def main():
         "counts": {
             "alpm_total": pacman_info["installed_total"],
             "aur_total": pacman_info["foreign_aur_total"],
-            "appimages": len(appimages),
             "cargo": len(cargo_packages),
             "npm": len(npm_packages),
             "releases": len(releases),
@@ -471,7 +310,6 @@ def main():
         "pending_updates": {
             "alpm": len(pacman_info["pending_updates"]),
             "aur": 0,
-            "appimages": 0,
         },
     }
     write_json(os.path.join(STATE_DIR, "status.json"), status)
@@ -485,14 +323,12 @@ def main():
         print("🏺 Calix System Sync — Unified Package State")
         print(f"  Time: {status['timestamp']} (completed in {status['duration_ms']}ms)\n")
         print(f"  📦 Pacman / ALPM:   {status['counts']['alpm_total']:>5} installed ({status['counts']['aur_total']} AUR)")
-        print(f"  🚀 AppImages:        {status['counts']['appimages']:>5} registered in ~/Applications")
         print(f"  🦀 Cargo binaries:   {status['counts']['cargo']:>5} installed in ~/.cargo/bin")
         print(f"  📦 NPM globals:      {status['counts']['npm']:>5} installed in /usr/lib")
         print(f"  🔭 Release tracked:  {status['counts']['releases']:>5} repositories")
         print(f"  🔒 Pacman DB Lock:   {'LOCKED ⚠️' if status['db_locked'] else 'Free ✓'}")
         print(f"  🔄 Pending Updates:  {status['pending_updates']['alpm']} standard updates available\n")
         print("  ✓ State synchronized: ~/.local/state/calix/status.json")
-        print("  ✓ Calix AppImage DB updated: ~/.config/calix/appimage-metadata-v2.db")
 
     evidence.finish(counts=status["counts"], db_locked=status["db_locked"])
     return 0

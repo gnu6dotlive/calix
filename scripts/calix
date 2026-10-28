@@ -17,6 +17,9 @@ set -u
 
 CALIX_HOME="${CALIX_HOME:-$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)}"
 CALIX_STATE="${XDG_STATE_HOME:-$HOME/.local/state}/calix"
+# The AppImage database is a document of its own, written by
+# `calix sync appimage` (the Python that mirrored it into state is gone).
+CALIX_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/calix"
 PYTHON_BIN="${CALIX_BIN:-/usr/bin/python3}"
 SYNC="$CALIX_HOME/scripts/calix-sync.py"
 RELEASE="$CALIX_HOME/scripts/calix-release.py"
@@ -30,12 +33,12 @@ Usage:
 
 Commands:
   sync                 Synchronize real system state across all package channels:
-                       ALPM, AUR, AppImages, Cargo (~/.cargo/bin), NPM global,
-                       and tracked GitHub/GitLab/Gitea releases.
+                       ALPM, AUR, Cargo (~/.cargo/bin), NPM global, and
+                       tracked GitHub/GitLab/Gitea releases.
                        Pass --runtime to record the run in the engine's state
                        directory instead of the repository's evidence/ tree.
   inventory            Print unified package inventory across all ecosystems as JSON.
-  list [all|appimage|cargo|npm|alpm|releases]
+  list [all|cargo|npm|alpm|releases]
                        List installed packages in a unified table.
   probe <repo_or_url> [--canal stable|beta|canary|nightly|all]
                        Probe a repository's releases, channels and binary assets.
@@ -97,9 +100,9 @@ cmd_health() {
   fi
 
   local appimage_count cargo_count
-  appimage_count="$(count_entries "$CALIX_STATE/appimages.json")"
+  appimage_count="$(count_entries "$CALIX_CONFIG/appimage-metadata-v2.db")"
   cargo_count="$(count_entries "$CALIX_STATE/cargo.json")"
-  echo "  AppImages Indexed:  ✓ $appimage_count registered in state"
+  echo "  AppImages Indexed:  ✓ $appimage_count in ~/.config/calix/appimage-metadata-v2.db"
   echo "  Cargo Crates:       ✓ $cargo_count crates registered"
 
   if [ -f "$CALIX_STATE/status.json" ]; then
