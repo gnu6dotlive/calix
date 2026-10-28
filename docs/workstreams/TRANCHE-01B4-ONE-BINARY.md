@@ -23,6 +23,8 @@ Every row below is a fact produced by a command run against the machine, not a r
 | F6 | The one live document is `releases.json`: written by `scripts/calix-sync.py` → `sync_releases()` → `write_release_state()`, read only by `Calix.PackageManager/src/release/tracked.zig` | `scripts/calix_core.py:428`, `calix-sync.py:307-330`, `tracked.zig:1-26` | `tracked.zig` calls itself transitional and says it dies with the release watcher. That watcher is tranche 1b4. |
 | F7 | The daemon carries a **second** document for the same subject: `<state>/release-registry.json`, its notification memory, written by nothing else | `grep -rn release-registry.json` → one site, the reader | Two files, two owners, one concept. This is the defect the 2026-10-28 fix exposed but did not remove. |
 | F8 | `/usr/bin/calix` → `/usr/lib/calix/calix`, both owned by the package | `pacman -Ql calix-gpui-git` | The packaged binary is correct and complete. Nothing about F1–F4 is a packaging fault. |
+| F9 | The daemon's protocol has **no CLI client**. `status`, `inventory`, `releases` and `mark-notified` are spoken only by the Rust UI (`Calix.Ui.Gpui/src/backend/calix_daemon.rs`); the Zig CLI has no command that opens the socket | `grep -rn "inventory\|daemon" Calix.Cli.Zig/src/cli/` → nothing; `grep -rn "socket" Calix.Cli.Zig/src` → only the server side | D1 makes the timer's command a *request*. A request needs a client, and the repository has none. S1 cannot point a unit at a verb that does not exist. |
+| F10 | `calix-sync.py` has a **seventh output**, `~/.config/calix/appimage-metadata-v2.db`, and it is alive: `list`, `list-updates`, `install`, `remove`, `run`, `sync`, `upgrade` and `config` read it, and so does the daemon's own `probeReleases` | `grep -rn appimage-metadata-v2.db Calix.Cli.Zig/src` → 11 sites | The five dead documents are dead (F5); this one is not. And it has **two writers** — the Python `sync_appimages()` and the native `calix sync appimage` path — which is the same fault F7 describes, on a document S1 was not looking at. |
 
 ### The chain, drawn
 
@@ -120,29 +122,36 @@ enumerated as its own artefact rather than as a duplicate.
 
 **Scope.** One capability, one writer, one document.
 
+- **The CLI gains its first client verb** — `calix releases` (read) and `calix releases --refresh` (request). D1 makes the timer's command a protocol request, and a request needs a client; nothing in this repository speaks the protocol except the Rust UI (F9). This is the one part of S2 that S1 cannot defer: without it the timer has nothing to run, and the alternative — a Python client for the daemon — is a second client to delete later, which is a bridge with a deadline for no benefit. S2 keeps everything else.
 - The daemon reads intent from `~/.config/calix/releases.json` (read-only for the daemon).
 - The daemon probes the tracked packages, and writes observations and notification state **into one document**, `<state>/releases.json`, schema-versioned.
 - `release-registry.json` is retired. Its content is absorbed: `last_seen`, `notified`, `consecutive_failures` join the observation under one schema version.
 - `tracked.zig` loses its transitional reader and its transitional note; it reads the daemon's schema.
 - The five unread documents are **not ported** — they are deleted from the writer (F5). Porting dead output is how a migration doubles in size for no user.
+- **The AppImage metadata database is not one of them** (F10). It is read by eight CLI commands and by the daemon's own probe, and it currently has two writers. The script may only be deleted once the native path is proven to do what the Python one does — refresh the database from the `.desktop` entries, not merely read it. The script's own comment records a previous implementation that "kept stale metadata forever", so this is a condition to prove, not an assumption to make:
+  - **Exit condition:** after deleting `sync_appimages()`, deleting an AppImage and re-detecting it in a scratch home repopulates icon, version and description from the desktop entry, without the Python script ever running. Until that is shown, the timer keeps this one job and the document says so.
 - `calix-sync.{service,timer}` stay, and change job. Per D1 systemd keeps the clock, so their command becomes a request to the daemon rather than a write, and they are renamed `calix-releases.{service,timer}` in the same transaction — a unit called `sync` that no longer syncs is a lie the next reader has to decode.
 
-**The probe must not block the socket.** The daemon serves connections serially and holds mutable state; a network probe of several forges on that path would make `status` wait on a forge. Ratify D2 before writing code.
+**The probe must not block the socket.** The daemon serves connections serially and holds mutable state; a network probe of several forges on that path would make `status` wait on a forge. D2 is ratified: worker thread, atomic commit, requests read the last committed document. Note that today `releases` *does* probe on the connection path (`server.zig`, the `.releases` branch of `dispatch`), so this slice removes an existing coupling rather than avoiding a new one.
 
 **Steps.**
 
-1. Red test: with a scratch state directory and one package in intent, drive the daemon's `releases` action and assert `<state>/releases.json` now exists with schema 2 and one observation. Today the daemon writes `release-registry.json` and `releases.json` stays absent — the test fails for the right reason.
-2. Schema: define version 2, write the migration for a version-1 document, and refuse a document from a future version with a named error rather than a silent empty read.
-3. The probe runs on a worker thread and commits atomically (D2); requests read the last committed document.
-4. Cut the Python writer: `sync_releases()` stops writing `<state>/releases.json`; the five dead writes are deleted outright.
-5. Replace the two symlinks with real files, `calix-releases.{service,timer}`, whose `ExecStart` is `/usr/bin/calix releases --refresh` and whose timer keeps `Persistent=true`; disable and remove `calix-sync.*`, including its enablement link. The three ledger entries that belong to the units go to zero; `~/.local/bin/calix` is S2's.
-6. `tracked.zig`: delete the transitional reader.
+1. The client verb: `calix releases` and `calix releases --refresh`, opening the daemon socket, sending a versioned request, and rendering the answer. Tests against a fake server; no change to the machine, so nothing to deploy yet.
+2. Red test: with a scratch state directory and one package in intent, drive the daemon's `releases` action and assert `<state>/releases.json` now exists with schema 2 and one observation. Today the daemon writes `release-registry.json` and `releases.json` stays absent — the test fails for the right reason.
+3. Schema: define version 2, write the migration for a version-1 document, and refuse a document from a future version with a named error rather than a silent empty read.
+4. The probe moves off the connection path and commits atomically (D2); requests read the last committed document.
+5. Cut the Python writer in the same commit as step 4: `sync_releases()` stops writing `<state>/releases.json`, and the five dead writes are deleted outright. Two commits here would leave an interval in which nothing writes the document.
+6. Settle F10 by its exit condition; delete `sync_appimages()` only if it holds.
+7. Replace the two symlinks with real files, `calix-releases.{service,timer}`, whose `ExecStart` is `/usr/bin/calix releases --refresh` and whose timer keeps `Persistent=true`; disable and remove `calix-sync.*`, including its enablement link. The three ledger entries that belong to the units go to zero; `~/.local/bin/calix` is S2's.
+8. `tracked.zig`: delete the transitional reader.
 
 **Proofs.**
 
 - The red test above, then green.
+- `calix releases` with the daemon **stopped** prints the committed document and exits 0; `calix releases --refresh` with the daemon stopped names that the daemon is down and exits non-zero. Neither is a second writer.
 - `grep -rn "release-registry" --include='*.zig' .` returns nothing.
 - `grep -rn "pacman.json\|appimages.json\|cargo.json\|npm.json" scripts/` returns nothing.
+- F10's exit condition, run in a scratch home, recorded: an AppImage removed and re-detected gains its icon, version and description from the desktop entry with the Python script never executed.
 - On the host: `systemctl --user list-timers` lists `calix-releases.timer` and no `calix-sync.timer`; both unit paths are real files, not symlinks; `~/.local/state/calix/releases.json` still advances, and its `checked_at` moves after a timer firing.
 - A daemon that is asked `status` **while** a probe is running answers within the protocol's normal time — measured, not asserted.
 
@@ -154,7 +163,7 @@ enumerated as its own artefact rather than as a duplicate.
 
 **Scope.**
 
-- The Zig CLI gains the release surface. Per D4, `probe` and `check` fold into `releases`; `registry` and `verify` stay distinct because they are distinct capabilities, not conveniences.
+- The Zig CLI gains the **rest** of the release surface — `registry`, `verify`, `update` — on top of the client verb and the read path S1 already added (D4).
 - `~/.local/bin/calix` is deleted. `scripts/calix` is deleted with its last caller.
 - The `zig-out` preference disappears with the file that contains it.
 - The two systemd symlinks were already removed in S1; the ledger's three entries are now empty and are deleted, which is rule 2 doing its job.
@@ -221,6 +230,7 @@ Ratified 2026-10-28. All five took the recommendation. D1's recommendation chang
 
 - `calix releases` (read) works with the daemon down, by reading the committed document. Décision 10's guarantee is about the one-shot read, and it survives intact.
 - `calix releases --refresh` requires the daemon. A refresh is a mutation, and mutations belong to the single writer. With the daemon down the command says so and names the way to start it. It does not become a second writer behind a lock file: a lock is an admission that the single-writer rule was not worth designing for.
+- **A request needs a client, and the repository has none** (F9). This is a consequence of D1, not a re-opening of it: the timer is pointed at a protocol request, so one command must be able to make it. S1 carries that command — and only that one — because a unit cannot be pointed at a verb that does not exist.
 
 ---
 
