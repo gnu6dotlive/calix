@@ -1,0 +1,33 @@
+# F10 — the AppImage metadata database: who can refresh it
+# 2026-10-28T18:21:45Z
+
+--- A. native `calix sync appimage --discover`, AppImage in ~/.local/bin
+:: Synchronizing AppImage metadata...
+Discovered 1 AppImage(s) in /home/tension_atoi/cwt/.ci-cache/proof/f10/home/.local/bin.
+:: Transaction complete.
+  exit=0 -- python executed: no
+  entries: 1
+  {"name": "CADCraft", "version": "0.8.0", "icon_name": "ai.storyteller.cadcraft", "description": "Computer-aided design and drafting", "path": "/home/tension_atoi/cwt/.ci-cache/proof/f10/home/.local/bin/CADCraft.AppImage"}
+
+--- B. native `calix sync appimage --discover`, AppImage in ~/Applications
+:: Synchronizing AppImage metadata...
+Discovered 0 AppImage(s) in /home/tension_atoi/cwt/.ci-cache/proof/f10/home/.local/bin.
+:: Transaction complete.
+  exit=0 -- python executed: no
+  entries: 0
+
+--- C. python `sync_appimages()`, same scratch home
+  python APP_DIR: /home/tension_atoi/cwt/.ci-cache/proof/f10/home/Applications
+  entries: 1
+  {'name': 'DeckCraft', 'version': '0.7.3', 'icon_name': 'ai.storyteller.deckcraft', 'description': 'Presentations and slide shows', 'path': '/home/tension_atoi/cwt/.ci-cache/proof/f10/home/Applications/DeckCraft.AppImage'}
+  exit=0
+  entries: 1
+  {"name": "DeckCraft", "version": "0.7.3", "icon_name": "ai.storyteller.deckcraft", "description": "Presentations and slide shows", "path": "/home/tension_atoi/cwt/.ci-cache/proof/f10/home/Applications/DeckCraft.AppImage"}
+
+--- D. this machine, read only
+  AppImageInstallPath in ~/.config/calix/config.json: None
+  AppImages in ~/.local/bin: 0
+  AppImages in ~/Applications: 15
+  database entries: 15
+  database entries under ~/Applications: 15
+  ~/.local/state/calix/release-registry.json: absent

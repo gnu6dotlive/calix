@@ -25,6 +25,7 @@ Every row below is a fact produced by a command run against the machine, not a r
 | F8 | `/usr/bin/calix` → `/usr/lib/calix/calix`, both owned by the package | `pacman -Ql calix-gpui-git` | The packaged binary is correct and complete. Nothing about F1–F4 is a packaging fault. |
 | F9 | The daemon's protocol has **no CLI client**. `status`, `inventory`, `releases` and `mark-notified` are spoken only by the Rust UI (`Calix.Ui.Gpui/src/backend/calix_daemon.rs`); the Zig CLI has no command that opens the socket | `grep -rn "inventory\|daemon" Calix.Cli.Zig/src/cli/` → nothing; `grep -rn "socket" Calix.Cli.Zig/src` → only the server side | D1 makes the timer's command a *request*. A request needs a client, and the repository has none. S1 cannot point a unit at a verb that does not exist. |
 | F10 | `calix-sync.py` has a **seventh output**, `~/.config/calix/appimage-metadata-v2.db`, and it is alive: `list`, `list-updates`, `install`, `remove`, `run`, `sync`, `upgrade` and `config` read it, and so does the daemon's own `probeReleases` | `grep -rn appimage-metadata-v2.db Calix.Cli.Zig/src` → 11 sites | The five dead documents are dead (F5); this one is not. And it has **two writers** — the Python `sync_appimages()` and the native `calix sync appimage` path — which is the same fault F7 describes, on a document S1 was not looking at. |
+| F11 | The native AppImage paths default to `~/.local/bin` when `AppImageInstallPath` is unset, while the Python scans `~/Applications`. On this machine the setting is null, `~/.local/bin` holds no AppImage, and all fifteen records point into `~/Applications` | `sync.zig:174`, `server.zig:319`, `install.zig:685` all fall back to `xdg.binHome`; `scripts/calix-sync.py:75` sets `APP_DIR = ~/Applications` | F10 says two writers share one document. This says they also scan **disjoint directories**, so each is blind to the other's AppImages and deleting either side does not hand the job over. It is why `~/.local/state/calix/release-registry.json` has never existed on this machine: the daemon probes `~/.local/bin`, which is empty. |
 
 ### The chain, drawn
 
@@ -118,7 +119,7 @@ enumerated as its own artefact rather than as a duplicate.
 
 ### 1B4-S1 — The daemon owns the release document
 
-> **In progress** 2026-10-28 — commit a is in (`f444145c`, `5d5d942f`): `calix releases [--refresh]`, 17 new Zig tests, and `cli-smoke` now runs the verb on the built binary. Step 1 of the list below is done; steps 2–8 are commit b. Nothing on the machine changed, so nothing was deployed.
+> **In progress** 2026-10-28 — commit a is in (`f444145c`, `5d5d942f`): `calix releases [--refresh]`, 17 new Zig tests, and `cli-smoke` now runs the verb on the built binary. Step 1 of the list below is done; steps 2–10 are commit b. Nothing on the machine changed, so nothing was deployed.
 
 **Problem.** The only live release pipeline is a 4-hourly timer running a frozen Python script through two symlinks (F3–F6), writing one document whose transitional reader says it should not exist. A second document holds the same subject (F7).
 
@@ -143,9 +144,11 @@ enumerated as its own artefact rather than as a duplicate.
 3. Schema: define version 2, write the migration for a version-1 document, and refuse a document from a future version with a named error rather than a silent empty read.
 4. The probe moves off the connection path and commits atomically (D2); requests read the last committed document.
 5. Cut the Python writer in the same commit as step 4: `sync_releases()` stops writing `<state>/releases.json`, and the five dead writes are deleted outright. Two commits here would leave an interval in which nothing writes the document.
-6. Settle F10 by its exit condition; delete `sync_appimages()` only if it holds.
-7. Replace the two symlinks with real files, `calix-releases.{service,timer}`, whose `ExecStart` is `/usr/bin/calix releases --refresh` and whose timer keeps `Persistent=true`; disable and remove `calix-sync.*`, including its enablement link. The three ledger entries that belong to the units go to zero; `~/.local/bin/calix` is S2's.
-8. `tracked.zig`: delete the transitional reader.
+6. Settle F10 by its exit condition. **Settled 2026-10-28: it holds for the harvest and fails for the directory** (`evidence/runs/f10-appimage-scan-root-20261028/run.json`). With the AppImage where it scans, `calix sync appimage --discover` writes name, version, icon and description from the desktop entry with the Python never running — field for field what `sync_appimages()` writes. With the AppImage in `~/Applications` it writes nothing, because it scans `~/.local/bin` (F11).
+7. Settle the roots before anything is cut: an unset `AppImageInstallPath` must reach the AppImages that exist, or the database stops being refreshed and the probe keeps finding nothing. A red test first — an AppImage in `~/Applications` with the setting unset is discovered — then the smallest change that makes it pass; `remove.zig` and `run.zig` already carry an ad-hoc two-root search, which is the shape the rest of the code needs rather than a second special case.
+8. Only then delete `sync_appimages()`, in the same commit as the root it no longer supplies.
+9. Replace the two symlinks with real files, `calix-releases.{service,timer}`, whose `ExecStart` is `/usr/bin/calix releases --refresh` and whose timer keeps `Persistent=true`; disable and remove `calix-sync.*`, including its enablement link. The three ledger entries that belong to the units go to zero; `~/.local/bin/calix` is S2's.
+10. `tracked.zig`: delete the transitional reader.
 
 **Proofs.**
 
@@ -153,7 +156,8 @@ enumerated as its own artefact rather than as a duplicate.
 - `calix releases` with the daemon **stopped** prints the committed document and exits 0; `calix releases --refresh` with the daemon stopped names that the daemon is down and exits non-zero. Neither is a second writer.
 - `grep -rn "release-registry" --include='*.zig' .` returns nothing.
 - `grep -rn "pacman.json\|appimages.json\|cargo.json\|npm.json" scripts/` returns nothing.
-- F10's exit condition, run in a scratch home, recorded: an AppImage removed and re-detected gains its icon, version and description from the desktop entry with the Python script never executed.
+- F10's exit condition, as settled: the native path supplies the metadata, and the root it scans is the one the AppImages are in. The first half is proved; the second is the red test of step 7, and the scratch-home record shows both halves side by side.
+- After the cut, `~/.config/calix/appimage-metadata-v2.db` still advances with the Python script gone: `size_on_disk` and the desktop-sourced fields of an AppImage refreshed after its file changes, and a newly dropped AppImage appears with them.
 - On the host: `systemctl --user list-timers` lists `calix-releases.timer` and no `calix-sync.timer`; both unit paths are real files, not symlinks; `~/.local/state/calix/releases.json` still advances, and its `checked_at` moves after a timer firing.
 - A daemon that is asked `status` **while** a probe is running answers within the protocol's normal time — measured, not asserted.
 
