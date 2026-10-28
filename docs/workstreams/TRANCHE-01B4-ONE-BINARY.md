@@ -118,6 +118,8 @@ enumerated as its own artefact rather than as a duplicate.
 
 ### 1B4-S1 — The daemon owns the release document
 
+> **In progress** 2026-10-28 — commit a is in (`f444145c`, `5d5d942f`): `calix releases [--refresh]`, 17 new Zig tests, and `cli-smoke` now runs the verb on the built binary. Step 1 of the list below is done; steps 2–8 are commit b. Nothing on the machine changed, so nothing was deployed.
+
 **Problem.** The only live release pipeline is a 4-hourly timer running a frozen Python script through two symlinks (F3–F6), writing one document whose transitional reader says it should not exist. A second document holds the same subject (F7).
 
 **Scope.** One capability, one writer, one document.
