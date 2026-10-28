@@ -1,0 +1,42 @@
+# S1 step 8 — the AppImage writer is the native path alone
+# binary: /home/tension_atoi/cwt/Calix.Cli.Zig/zig-out/bin/calix
+# 2026-10-28T18:53:15Z
+
+--- A. a fresh scratch home: one AppImage, one desktop entry
+  AppImage in ~/Applications, AppImageInstallPath unset, database absent
+$ calix sync appimage --discover
+:: Synchronizing AppImage metadata...
+Tracking 1 AppImage(s); scanned /home/tension_atoi/cwt/.ci-cache/proof/cut/home/.local/bin, /home/tension_atoi/cwt/.ci-cache/proof/cut/home/Applications.
+:: Transaction complete.
+  exit=0
+  {"description": "Photo editor", "icon_name": "ai.storyteller.photocraft", "name": "PhotoCraft", "path": "/home/tension_atoi/cwt/.ci-cache/proof/cut/home/Applications/PhotoCraft.AppImage", "size_on_disk": 24, "version": "1.2.0"}
+
+--- B. delete the AppImage and its record, then re-detect it
+  AppImage removed, database emptied: 0 record(s)
+  the desktop entry is edited while the AppImage is absent
+$ calix sync appimage --discover
+:: Synchronizing AppImage metadata...
+Tracking 1 AppImage(s); scanned /home/tension_atoi/cwt/.ci-cache/proof/cut/home/.local/bin, /home/tension_atoi/cwt/.ci-cache/proof/cut/home/Applications.
+:: Transaction complete.
+  exit=0
+  {"description": "Photo editor with layers", "icon_name": "ai.storyteller.photocraft.layers", "name": "PhotoCraft", "path": "/home/tension_atoi/cwt/.ci-cache/proof/cut/home/Applications/PhotoCraft.AppImage", "size_on_disk": 31, "version": "1.3.0"}
+
+--- C. the Python sync runs and leaves the database alone
+  database sha256 before: 1c013c7a4a297e92d6b73a524b2c5d66b972f2207969fa4510398eccd1dbc78c
+  python exit=0
+  database sha256 after:  1c013c7a4a297e92d6b73a524b2c5d66b972f2207969fa4510398eccd1dbc78c
+  unchanged: yes
+  appimages.json written: no
+  status.json counts: ['alpm_total', 'aur_total', 'cargo', 'npm', 'releases']
+  what is left of the writer in scripts/calix-sync.py:
+  `appimages.json` left in scripts/: 0 reference(s)
+
+--- E. `calix health` counts the database, not a state mirror
+    AppImages Indexed:  ✓ 1 in ~/.config/calix/appimage-metadata-v2.db
+  a state mirror exists for it: no
+
+--- D. this machine, read only
+  database records: 15
+  database sha256: 2128cc81919672aa09923c5b589e86be2606958b32be605c3f071a246cd94a5d
+  database mtime:  2026-10-28T18:29:59Z
+  calix-sync.timer: active

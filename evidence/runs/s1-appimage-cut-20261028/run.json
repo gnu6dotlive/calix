@@ -1,0 +1,38 @@
+{
+  "run_id": "s1-appimage-cut-20261028",
+  "kind": "slice",
+  "slice": "1B4-S1 (step 8 of 10)",
+  "status": "ok",
+  "started_at": "2026-10-28T18:46:00Z",
+  "finished_at": "2026-10-28T18:56:00Z",
+  "objective": "Delete `sync_appimages()` -- the second writer of `~/.config/calix/appimage-metadata-v2.db` -- and prove the exit condition the workstream sets for it: an AppImage deleted and re-detected in a scratch home repopulates icon, version and description from the desktop entry, with the Python script never writing the database.",
+  "why_now": "Its precondition was met by commit 72c9f659 (step 7): the native scan reaches `~/Applications`, and a scan over the host's fifteen records leaves them 15/15 unchanged. Cutting the writer before that would have frozen the database at the Python's last pass (F11).",
+  "changes": {
+    "scripts/calix-sync.py": "`sync_appimages()` and everything only it used: `_read_desktop_metadata()`, `_version_from_filename()`, `APP_DIR`, `DESKTOP_DIR`, `CALIX_CONFIG_DIR`, `CALIX_APPIMAGE_DB`, `VERSION_KEYS`, the `glob`/`re`/`shutil` imports, the `<state>/appimages.json` mirror, the `appimages` counts in `status.json`, the print line that claimed this run updated the database, and `cmd_list`'s `appimage` branch (a table over a document nothing writes any more).",
+    "scripts/calix": "`calix health` counted `<state>/appimages.json`; it now counts `~/.config/calix/appimage-metadata-v2.db`. The help text no longer offers `list appimage` or claims `sync` handles AppImages.",
+    "docs/workstreams/TRANCHE-01B4-ONE-BINARY.md": "Step 8 marked settled, the F10 exit condition marked proved, the in-progress header updated."
+  },
+  "readers_that_had_to_move": {
+    "cmd_list": "`calix list appimage` read the mirror, which would have frozen at the last Python run. Removed rather than repointed: the unified table it produced is the dead output F5 describes, and `calix list-updates`/the native paths read the database directly.",
+    "calix_health": "Reported a count from the mirror. Repointed to the database, because the count is real information an operator uses; the label now names the file it counts."
+  },
+  "proofs": {
+    "log": "evidence/logs/s1-appimage-cut-20261028.log",
+    "log_sha256": "224ae2f199d2026432416161bfc83e86893f5b7da8cec09ba2e25f5985b58826",
+    "log_source": "Regenerated from a release build of commit 2b4f171a, after the code commit, so the log describes the committed tree.",
+    "reproducer": ".ci-cache/proof/s1-cut-appimages-proof.sh (ignored scratch; the log is the durable record)",
+    "A": "fresh scratch home, one AppImage in `~/Applications`, `AppImageInstallPath` unset, no database -> the native scan writes one record whose name, version 1.2.0, icon and description all come from the desktop entry, size from the file",
+    "B": "the workstream's exit condition: the AppImage and its record are deleted, the desktop entry is edited to 1.3.0 with a new comment and icon, the file returns at a different size -> the next scan writes all three new values and the new size, so the record is refreshed from the entry and not carried over stale",
+    "C": "a full `python3 scripts/calix-sync.py --runtime --quiet --json` over that same home -> exit 0, database sha256 identical before and after (1c013c7a...), no `<state>/appimages.json` written, `status.json` counts no longer include `appimages`, and `grep -rn appimages.json scripts/` returns nothing",
+    "E": "`scripts/calix health` in that scratch home -> `AppImages Indexed: OK 1 in ~/.config/calix/appimage-metadata-v2.db`, with no state mirror present",
+    "D": "the host, read only: 15 records, database sha256 2128cc81..., mtime 2026-10-28T18:29:59Z, `calix-sync.timer` still active -- nothing was deployed and the timer is untouched",
+    "gate": "`./scripts/verify --quick` PASSED on the code tree; `python3 -m unittest discover -s tests/calix` 27 tests OK; record ~/.local/state/calix/verify/local-verify-20261028T185156Z/run.json"
+  },
+  "what_this_does_not_do": {
+    "other_dead_documents": "`cargo.json`, `npm.json`, `pacman.json` and `status.json` are still written and still have no reader. Step 5 deletes them, in commit b, together with `sync_releases()` handing the release document to the daemon; deleting them here would have been a second concern in a commit about one writer.",
+    "timer_unchanged": "`calix-sync.timer` still fires every four hours and still runs the Python, which now updates the other four documents and no longer touches the database. Step 9 renames the units and points them at `calix releases --refresh`.",
+    "install_and_run_still_default_to_bin_home": "Unchanged from step 7: `install` writes into `~/.local/bin` when `AppImageInstallPath` is unset, and `run`/`remove` still look only there. F11 records it.",
+    "no_pruning": "A record whose AppImage file has gone is kept by the merge, by design. The proof deletes the record explicitly, because pruning is not a capability this slice adds."
+  },
+  "next": "S1 commit b, steps 2-6 and 9-10: schema 2 with a migration and a refusal of a future version, the probe moved off the connection path with an atomic commit, the registry absorbed into one document, `sync_releases()` cut, `tracked.zig`'s transitional reader deleted, and `calix-releases.{service,timer}` deployed in place of `calix-sync.*`."
+}
