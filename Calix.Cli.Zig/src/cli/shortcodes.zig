@@ -731,7 +731,19 @@ test "passes ordinary long form and unrelated options through unchanged" {
         &.{ "install", "standard", "pkg" },
     );
     try expectTranslation(allocator, &manifest, &.{"-n"}, &.{"-n"});
-    try expectTranslation(allocator, &manifest, &.{ "-WW", "x" }, &.{ "-WW", "x" });
+
+    // The token only passes through when its leading letter is not an action
+    // code, so the example asks the catalogue instead of naming a letter:
+    // this test used to spell `-WW`, and then `releases` took `W`. Deriving
+    // it keeps the test about pass-through rather than about one letter.
+    const free_letter: u8 = free: {
+        for ("ABCDEFGHIJKLMNOPQRSTUVWXYZ") |letter| {
+            if (!catalog.hasActionCode(letter)) break :free letter;
+        }
+        return error.NoFreeActionCode;
+    };
+    const unrelated = try std.fmt.allocPrint(allocator, "-{c}{c}", .{ free_letter, free_letter });
+    try expectTranslation(allocator, &manifest, &.{ unrelated, "x" }, &.{ unrelated, "x" });
 }
 
 test "every catalog leaf supports native long-form help and shortcode help" {

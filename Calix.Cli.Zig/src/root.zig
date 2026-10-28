@@ -32,6 +32,7 @@ pub const remove_command = @import("commands/remove.zig");
 pub const run_command = @import("commands/run.zig");
 pub const utility_command = @import("commands/utility.zig");
 pub const repository_command = @import("commands/repository.zig");
+pub const releases_command = @import("commands/releases.zig");
 pub const repo_db_command = @import("commands/repo_db.zig");
 pub const pacfiles_command = @import("commands/pacfiles.zig");
 pub const config = @import("config/manager.zig");
@@ -44,6 +45,8 @@ pub const table_output = @import("output/table.zig");
 pub const inventory_service = @import("inventory/service.zig");
 pub const daemon = struct {
     pub const protocol = @import("daemon/protocol.zig");
+    pub const client = @import("daemon/client.zig");
+    pub const address = @import("daemon/address.zig");
     pub const journal = @import("daemon/journal.zig");
     pub const server = @import("daemon/server.zig");
 };
@@ -83,6 +86,7 @@ test {
     _ = run_command;
     _ = utility_command;
     _ = repository_command;
+    _ = releases_command;
     _ = repo_db_command;
     _ = pacfiles_command;
     _ = config;
@@ -96,4 +100,6 @@ test {
     _ = daemon.server;
     _ = daemon.journal;
     _ = daemon.protocol;
+    _ = daemon.client;
+    _ = daemon.address;
 }

@@ -22,6 +22,7 @@ pub const Action = enum {
     build,
     resolve,
     repo_db,
+    releases,
 
     pub fn name(self: Action) []const u8 {
         return switch (self) {
@@ -54,6 +55,7 @@ pub const Action = enum {
             .build => 'A',
             .resolve => 'Q',
             .repo_db => 'G',
+            .releases => 'W',
         };
     }
 
@@ -80,6 +82,7 @@ pub const Action = enum {
             .build => "Builds a PKGBUILD into an installable package",
             .resolve => "Resolve exact package names to source package bases without changing package state.",
             .repo_db => "Add, remove, list, or verify entries in a pacman repository database (repo-add / repo-remove).",
+            .releases => "Show the release-tracked packages and what was last seen for each, optionally asking the daemon to probe their forges first.",
         };
     }
 

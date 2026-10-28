@@ -69,7 +69,7 @@ export TMPDIR="$ROOT/.ci-cache/tmp"
 # compiled or collected. Raise a floor when the real count grows; never lower
 # one to make a run pass.
 PACKAGEMANAGER_FLOOR=1390
-CLI_FLOOR=393
+CLI_FLOOR=411
 RUST_FLOOR=195
 
 # ---- plumbing ---------------------------------------------------------------
@@ -520,7 +520,24 @@ cli_smoke() {
     printf '%s\n' "$output"
     # A binary that prints nothing, or prints a version it does not have, is
     # not a smoke test.
-    printf '%s' "$output" | grep -qE '[0-9]+\.[0-9]+\.[0-9]+'
+    printf '%s' "$output" | grep -qE '[0-9]+\.[0-9]+\.[0-9]+' || return 1
+
+    # `releases` is the CLI's first client verb, and reading must not need the
+    # daemon: a state home with no document is an empty set. The unit tests
+    # exercise the code; this checks it is wired into the catalogue and the
+    # dispatcher, which is where a command silently fails to arrive.
+    local state printed
+    state=$(mktemp -d)
+    printed=$(XDG_STATE_HOME="$state" ./Calix.Cli.Zig/zig-out/bin/calix releases) || return 1
+    rm -rf "$state"
+    test "$printed" = "{}" || return 1
+
+    # And a refresh is a mutation, so it belongs to the daemon: with no daemon
+    # the command must refuse rather than write behind the writer's back.
+    if XDG_STATE_HOME="$state" XDG_RUNTIME_DIR="$state" \
+        ./Calix.Cli.Zig/zig-out/bin/calix releases --refresh >/dev/null 2>&1; then
+        return 1
+    fi
 }
 
 # Tests and the release binary share one release target directory. The old

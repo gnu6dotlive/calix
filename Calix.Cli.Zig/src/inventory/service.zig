@@ -303,14 +303,7 @@ fn appendTracked(
     options: Options,
     records: *std.ArrayList(record.Record),
 ) !void {
-    // A stack buffer, not an allocation: `xdg.stateHome` returns either the
-    // environment's string or a fresh one, and there is no way to tell from
-    // the outside which, so there is nothing safe to free.
-    var buffer: [std.fs.max_path_bytes]u8 = undefined;
-    const directory = options.state_directory orelse blk: {
-        const home = try xdg.stateHome(context);
-        break :blk try std.fmt.bufPrint(&buffer, "{s}/calix", .{home});
-    };
+    const directory = options.state_directory orelse try xdg.stateDirectory(context);
     try tracked.append(context.allocator, context.io, directory, records);
 }
 

@@ -12,6 +12,7 @@ const Zigalpm = @import("Zigalpm");
 
 const runtime = Calix_Cli_Zig.runtime;
 const xdg = Calix_Cli_Zig.xdg;
+const address = Calix_Cli_Zig.daemon.address;
 const server = Calix_Cli_Zig.daemon.server;
 
 const usage =
@@ -81,11 +82,8 @@ pub fn main(init: std.process.Init) !void {
     };
     Zigalpm.HttpClient.setDefaultProxyEnvironment(init.environ_map);
 
-    const socket_path = socket_argument orelse try defaultSocketPath(arena, &context);
-    const state_directory = state_argument orelse try std.fs.path.join(
-        arena,
-        &.{ try xdg.stateHome(&context), "calix" },
-    );
+    const socket_path = socket_argument orelse try address.socketPath(arena, &context);
+    const state_directory = state_argument orelse try xdg.stateDirectory(&context);
 
     var daemon = try server.Server.init(init.gpa, io, &context, .{
         .socket_path = socket_path,
@@ -109,22 +107,6 @@ pub fn main(init: std.process.Init) !void {
             std.process.exit(1);
         },
     };
-}
-
-/// The socket to serve on when the caller did not choose one.
-///
-/// `XDG_RUNTIME_DIR` is the right home: it is per-user, mode 0700, and
-/// cleared when the session ends, so a socket left behind by a crash does
-/// not outlive the session that produced it.
-fn defaultSocketPath(allocator: std.mem.Allocator, context: *const runtime.RuntimeContext) ![]const u8 {
-    if (xdg.getEnv(context, "XDG_RUNTIME_DIR")) |runtime_directory| {
-        if (runtime_directory.len > 0) {
-            return std.fs.path.join(allocator, &.{ runtime_directory, "calix", "daemon.sock" });
-        }
-    }
-
-    const uid = std.os.linux.getuid();
-    return std.fmt.allocPrint(allocator, "/tmp/calix-{d}/daemon.sock", .{uid});
 }
 
 fn usageError(stderr: *std.Io.Writer, detail: []const u8) !void {

@@ -24,6 +24,7 @@ const upgrade = @import("catalog/upgrade.zig");
 const utility = @import("catalog/utility.zig");
 const builder = @import("catalog/builder.zig");
 const resolve = @import("catalog/resolve.zig");
+const releases = @import("catalog/releases.zig");
 
 pub const Action = core.Action;
 pub const Argument = core.Argument;
@@ -115,6 +116,7 @@ pub const variants = search.variants ++
     run.variants ++
     builder.variants ++
     resolve.variants ++
+    releases.variants ++
     repo_db.variants;
 
 pub const shared_modifiers = [_]SharedModifier{

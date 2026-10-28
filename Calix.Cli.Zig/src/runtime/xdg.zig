@@ -22,6 +22,15 @@ pub fn binHome(context: *const runtime.RuntimeContext) ![]const u8 {
     return resolve(context, "XDG_BIN_HOME", &.{ ".local", "bin" });
 }
 
+/// `<state>/calix` — the directory the daemon keeps its documents in.
+///
+/// One definition, because both the daemon that writes there and the commands
+/// that read from it have to agree; a second copy of this join is how a
+/// reader ends up watching an empty directory while the writer fills another.
+pub fn stateDirectory(context: *const runtime.RuntimeContext) ![]const u8 {
+    return std.fs.path.join(context.allocator, &.{ try stateHome(context), "calix" });
+}
+
 pub fn configPath(context: *const runtime.RuntimeContext) ![]const u8 {
     return std.fs.path.join(context.allocator, &.{ try configHome(context), "calix", "config.json" });
 }
@@ -150,4 +159,27 @@ test "uses absolute XDG paths and rejects relative overrides" {
         "/tmp/config-root/calix/config.json",
         try configPath(&context),
     );
+}
+
+test "the state directory is the XDG state home, under calix" {
+    var arena = std.heap.ArenaAllocator.init(std.testing.allocator);
+    defer arena.deinit();
+    var environment = std.process.Environ.Map.init(arena.allocator());
+    try environment.put("HOME", "/home/tester");
+    var stdout = std.Io.Writer.Discarding.init(&.{});
+    var stderr = std.Io.Writer.Discarding.init(&.{});
+    const context: runtime.RuntimeContext = .{
+        .allocator = arena.allocator(),
+        .io = std.testing.io,
+        .stdout = &stdout.writer,
+        .stderr = &stderr.writer,
+        .environment = &environment,
+    };
+
+    try std.testing.expectEqualStrings(
+        "/home/tester/.local/state/calix",
+        try stateDirectory(&context),
+    );
+    try environment.put("XDG_STATE_HOME", "/tmp/state-root");
+    try std.testing.expectEqualStrings("/tmp/state-root/calix", try stateDirectory(&context));
 }
