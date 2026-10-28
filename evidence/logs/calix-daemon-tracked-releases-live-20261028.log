@@ -1,0 +1,28 @@
+== what this proves ==
+The daemon installed on the machine reports the tracked set it serves.
+Before the fix it answered 0 on this host while the tracked document
+held one entry.
+
+== when ==
+2026-10-28T13:09:30-04:00
+
+== package ==
+calix-gpui-git r5005.g95d20622-1
+Version         : r5005.g95d20622-1
+Install Date    : Wed 28 Oct 2026 01:08:37 PM EDT
+Install Script  : Yes
+calix-gpui-git: 62 total files, 0 altered files
+
+== tracked document (the set the inventory serves) ==
+1 entries: ['artcraft-launcher']
+
+== daemon answers ==
+ping -> {"version":1,"ok":true,"data":{"pid":1355395,"protocol":1,"started_at":1793207319}}
+status -> {"version":1,"ok":true,"data":{"pid":1355395,"protocol":1,"started_at":1793207319,"uptime_seconds":51,"socket_path":"/run/user/1000/calix/daemon.sock","state_directory":"/home/tension_atoi/.local/state/calix","tracked_releases":1}}
+
+== services on live inodes ==
+calix-daemon active=active pid=1355395 exe=/usr/lib/calix/calix-daemon
+calix-notify active=active pid=1355396 exe=/usr/lib/calix/calix-notify
+
+== expectation ==
+tracked_releases equals the number of entries above: 1.

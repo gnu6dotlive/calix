@@ -1,0 +1,55 @@
+{
+  "run_id": "daemon-tracked-releases-20261028",
+  "kind": "defect-fix",
+  "status": "ok",
+  "started_at": "2026-10-28T16:55:00Z",
+  "finished_at": "2026-10-28T17:10:00Z",
+  "objective": "Make `status.tracked_releases` report the release-tracked set the inventory serves. It reported 0 on a host that tracks artcraft-launcher.",
+  "defect": {
+    "symptom": "The daemon's status reply carried `tracked_releases: 0` while `calix inventory` served `artcraft-launcher` and `~/.local/state/calix/releases.json` held one observation.",
+    "cause": "`daemon/server.zig` built the number from `self.registry.entries.items.len`, where `registry` is loaded from `<state>/release-registry.json` — the daemon's own memory of what it has already notified. Nothing outside the daemon writes that file, so its size is zero until the daemon has notified about something, and `status` reported it under the name of a different set.",
+    "why_it_was_not_obvious": "The name was right and the number was real; only the set was wrong. Nothing failed, no log line appeared, and the inventory — a separate code path — was correct all along, so the two answers disagreed without either being an error."
+  },
+  "the_two_sets": {
+    "<state>/releases.json": "The release-tracked packages and what was last seen for each. Written by the frozen Python engine; read by `Zigalpm.release.tracked` for the inventory, and now by the daemon for `status`.",
+    "<state>/release-registry.json": "The daemon's own record of what it has already told the user. Only the daemon reads and writes it. It is not the tracked set and `status` no longer reports it."
+  },
+  "test_first": {
+    "test": "Calix.Cli.Zig/src/daemon/server.zig — \"status: tracked_releases counts the document the inventory reads\"",
+    "observed_red": "expected 1, found 0",
+    "run": "cd Calix.Cli.Zig && zig build test --summary all → 381 pass, 1 fail (382 total)"
+  },
+  "fix": {
+    "Calix.PackageManager/src/release/tracked.zig": "`append` and a new `count` share one `loadDocument`, so the list and the number cannot be parsed differently. Both treat an absent, unreadable or malformed document as nothing, and both skip an entry that is not an observation.",
+    "Calix.Cli.Zig/src/daemon/server.zig": "`status.tracked_releases` comes from `release_tracked.count(...)` on the state directory. The registry keeps its own role and its own file.",
+    "scripts/verify": "Floors raised to the real counts, as the file's own comment requires: 1390 package manager, 393 CLI."
+  },
+  "proof": [
+    {
+      "stage": "unit",
+      "result": "393/393 CLI tests, 1390/1394 package-manager tests (4 skipped). The new status test asserts the count against a document with one observation.",
+      "log": null
+    },
+    {
+      "stage": "built binary",
+      "result": "A scratch state directory holding two tracked packages and an empty registry answered `tracked_releases: 2`. This is the same shape that answered 0 before.",
+      "log": "evidence/logs/calix-daemon-tracked-releases-20261028.log"
+    },
+    {
+      "stage": "installed",
+      "result": "r5005.g95d20622-1 installed by scripts/install-machine (snapper 2544/2545). The live daemon answers `tracked_releases: 1`, matching the one entry in the tracked document.",
+      "log": "evidence/logs/calix-daemon-tracked-releases-live-20261028.log",
+      "run": "evidence/runs/install-20261028T170841Z/run.json"
+    }
+  ],
+  "host": {
+    "package_before": "calix-gpui-git r5003.ge8e03172-1",
+    "package_after": "calix-gpui-git r5005.g95d20622-1",
+    "integrity": "pacman -Qkk: 62 files, 0 altered",
+    "snapshots": [2544, 2545]
+  },
+  "commit": "95d20622",
+  "left_open": [
+    "`~/.local/bin/calix` is the frozen dispatcher and shadows the packaged /usr/bin/calix; its `inventory` and fallback paths prefer `Projects/calix/Calix.Cli.Zig/zig-out/bin/calix`, a dev build whose hash differs from the installed binary. A product decision about where registry/probe/verify live, not a fix to slip into this run."
+  ]
+}
