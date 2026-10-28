@@ -74,6 +74,8 @@ Each slice is a ticket, and each ticket's definition of done is the same as the 
 
 ### 1B4-S0 — The dated exception ledger
 
+> **Done** 2026-10-28 — `4e1f1cdb` (guard), `1fd1cc8a` (evidence). The ledger holds four entries, not three; see the note under the seed below.
+
 **Problem.** `~/.local/bin/calix` and the two `calix-sync` units are installed artefacts that resolve into a git worktree. A checker that fails on them today cannot land; a checker that ignores them teaches nothing.
 
 **The mechanism.** A check that knows which violations exist, refuses new ones, and refuses to let the known ones outlive their date.
