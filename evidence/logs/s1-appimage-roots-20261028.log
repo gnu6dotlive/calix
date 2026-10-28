@@ -1,0 +1,80 @@
+# S1 step 7 — the AppImage discovery roots
+# binary: /home/tension_atoi/cwt/Calix.Cli.Zig/zig-out/bin/calix
+# 2026-10-28T18:48:04Z
+
+--- A. AppImageInstallPath unset, AppImage in ~/Applications, ~/.local/bin absent
+  ~/.local/bin exists: no
+$ calix sync appimage --discover
+:: Synchronizing AppImage metadata...
+Tracking 1 AppImage(s); scanned /home/tension_atoi/cwt/.ci-cache/proof/roots/home/.local/bin, /home/tension_atoi/cwt/.ci-cache/proof/roots/home/Applications.
+:: Transaction complete.
+  exit=0
+  entries: 1
+  {"name": "DeckCraft", "version": "0.7.3", "icon_name": "ai.storyteller.deckcraft", "description": "Presentations and slide shows", "path": "/home/tension_atoi/cwt/.ci-cache/proof/roots/home/Applications/DeckCraft.AppImage", "update_url": ""}
+
+--- B. a record outside every root survives the scan
+:: Synchronizing AppImage metadata...
+Tracking 2 AppImage(s); scanned /home/tension_atoi/cwt/.ci-cache/proof/roots/home/.local/bin, /home/tension_atoi/cwt/.ci-cache/proof/roots/home/Applications.
+:: Transaction complete.
+  exit=0
+  entries: 2
+  {"name": "DeckCraft", "version": "0.7.3", "icon_name": "ai.storyteller.deckcraft", "description": "Presentations and slide shows", "path": "/home/tension_atoi/cwt/.ci-cache/proof/roots/home/Applications/DeckCraft.AppImage", "update_url": ""}
+  {"name": "Ghost", "version": "9.9.9", "icon_name": "ghost", "description": "registered elsewhere", "path": "/opt/Ghost.AppImage", "update_url": "https://example.invalid/ghost"}
+
+--- C. AppImageInstallPath set, one AppImage in each root
+:: Synchronizing AppImage metadata...
+Tracking 3 AppImage(s); scanned /home/tension_atoi/cwt/.ci-cache/proof/roots/home/CustomApps, /home/tension_atoi/cwt/.ci-cache/proof/roots/home/Applications.
+:: Transaction complete.
+  exit=0
+  entries: 3
+  {"name": "DeckCraft", "version": "0.7.3", "icon_name": "ai.storyteller.deckcraft", "description": "Presentations and slide shows", "path": "/home/tension_atoi/cwt/.ci-cache/proof/roots/home/Applications/DeckCraft.AppImage", "update_url": ""}
+  {"name": "CADCraft", "version": "0.8.0", "icon_name": "ai.storyteller.cadcraft", "description": "Computer-aided design and drafting", "path": "/home/tension_atoi/cwt/.ci-cache/proof/roots/home/CustomApps/CADCraft.AppImage", "update_url": ""}
+  {"name": "Ghost", "version": "9.9.9", "icon_name": "ghost", "description": "registered elsewhere", "path": "/opt/Ghost.AppImage", "update_url": "https://example.invalid/ghost"}
+
+--- D. AppImageInstallPath names ~/Applications: one root, no duplicate
+:: Synchronizing AppImage metadata...
+Tracking 3 AppImage(s); scanned /home/tension_atoi/cwt/.ci-cache/proof/roots/home/Applications.
+:: Transaction complete.
+  exit=0
+  entries: 3
+  {"name": "DeckCraft", "version": "0.7.3", "icon_name": "ai.storyteller.deckcraft", "description": "Presentations and slide shows", "path": "/home/tension_atoi/cwt/.ci-cache/proof/roots/home/Applications/DeckCraft.AppImage", "update_url": ""}
+  {"name": "CADCraft", "version": "0.8.0", "icon_name": "ai.storyteller.cadcraft", "description": "Computer-aided design and drafting", "path": "/home/tension_atoi/cwt/.ci-cache/proof/roots/home/CustomApps/CADCraft.AppImage", "update_url": ""}
+  {"name": "Ghost", "version": "9.9.9", "icon_name": "ghost", "description": "registered elsewhere", "path": "/opt/Ghost.AppImage", "update_url": "https://example.invalid/ghost"}
+
+--- F. the host's AppImages, rebuilt by the native scan into a scratch home
+:: Synchronizing AppImage metadata...
+Tracking 15 AppImage(s); scanned /home/tension_atoi/.local/bin, /home/tension_atoi/Applications.
+:: Transaction complete.
+  exit=0
+  rebuilt from the filesystem alone: 15 record(s)
+  the live database holds:           15 record(s)
+  identical: /home/tension_atoi/Applications/CADCraft.AppImage
+  identical: /home/tension_atoi/Applications/DeckCraft.AppImage
+  identical: /home/tension_atoi/Applications/DesignCraft.AppImage
+  {'version': ('0.11.1', '1.0.0')}: /home/tension_atoi/Applications/EffectCraft.AppImage
+  identical: /home/tension_atoi/Applications/FigCraft.AppImage
+  identical: /home/tension_atoi/Applications/FilmCraft.AppImage
+  identical: /home/tension_atoi/Applications/GitHub Copilot.AppImage
+  identical: /home/tension_atoi/Applications/GridCraft.AppImage
+  identical: /home/tension_atoi/Applications/Handy_0.9.8_amd64.AppImage
+  identical: /home/tension_atoi/Applications/LightCraft.AppImage
+  identical: /home/tension_atoi/Applications/PdfCraft.AppImage
+  identical: /home/tension_atoi/Applications/PhotoCraft.AppImage
+  identical: /home/tension_atoi/Applications/SoundCraft.AppImage
+  identical: /home/tension_atoi/Applications/VectorCraft.AppImage
+  identical: /home/tension_atoi/Applications/WordCraft.AppImage
+
+--- G. the host's AppImages, scanned on top of a copy of the live database
+:: Synchronizing AppImage metadata...
+Tracking 15 AppImage(s); scanned /home/tension_atoi/.local/bin, /home/tension_atoi/Applications.
+:: Transaction complete.
+  exit=0
+  records before: 15, after: 15
+  identical record for record: 15/15
+
+--- E. this machine, read only
+  AppImageInstallPath in ~/.config/calix/config.json: None
+  AppImages in ~/.local/bin: 0
+  AppImages in ~/Applications: 15
+  database entries: 15
+  database entries under ~/Applications: 15

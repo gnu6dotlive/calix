@@ -1,0 +1,53 @@
+{
+  "run_id": "s1-appimage-roots-20261028",
+  "kind": "slice",
+  "slice": "1B4-S1 (step 7 of 10)",
+  "status": "ok",
+  "started_at": "2026-10-28T18:25:00Z",
+  "finished_at": "2026-10-28T18:45:00Z",
+  "objective": "Settle the AppImage discovery roots before anything is cut: an unset `AppImageInstallPath` must reach the AppImages that exist, or deleting `sync_appimages()` freezes the metadata database and the Python stays the only writer that ever saw this machine's AppImages (F11).",
+  "red_test_first": {
+    "test": "Calix.Cli.Zig/src/commands/sync.zig::real AppImage runner discovers an AppImage in the applications directory with no install path configured",
+    "failed_because": "expected 1, found 0 -- the runner returned early on `~/.local/bin` not existing, and would have scanned only that directory if it had existed",
+    "note": "The test deliberately does not create `~/.local/bin`, because a machine without it would otherwise never scan at all."
+  },
+  "changes": {
+    "Calix.Cli.Zig/src/runtime/xdg.zig": "`applicationsDirectory()` -- `~/Applications`, derived from the invoking user's home and not from `XDG_BIN_HOME`, because it is the AppImage convention the architecture document and the Python script share, not an XDG directory.",
+    "Calix.PackageManager/src/appimage/discovery.zig": "`Options.install_directory` becomes `install_directories`: `discover` reads the desktop entries once and scans every root, skipping a root that is absent instead of treating it as 'nothing to find'.",
+    "Calix.PackageManager/src/appimage/manager.zig": "`discoverAppImages(install_directories, applications_directory)` -- the roots are the caller's decision; the backend still knows only the directory AppImages are installed into.",
+    "Calix.Cli.Zig/src/commands/sync.zig": "`discoveryRoots()` returns the configured install directory (or its `~/.local/bin` default) followed by `~/Applications`, deduplicated; `anyRootExists()` replaces the single-directory early return; the two messages now name every root.",
+    "scripts/verify": "`PACKAGEMANAGER_FLOOR` 1390 -> 1392, `CLI_FLOOR` 411 -> 414."
+  },
+  "defects_found_while_making_it_pass": {
+    "buildAppImage leaked every derived string": "name, version, icon, description, the inner `v{version}` tag source and the joined AppImage path were allocated and only released on the error path, so a successful scan leaked six allocations per AppImage. Nothing had ever called `discover` on real files, so the leak had never been observed. Fixed with an arena for the scratch values and a `defer` on the joined path.",
+    "buildAppImage aliased its own fields": "`.desktop_name` was set to the same pointer as `.name`, while `freeAppImage` frees both -- the first caller to free a discovered record would free one allocation twice. It is now its own copy.",
+    "merge degraded `release_tag`": "The scan derives a tag from the version it sees; when the filename fallback yields `1.0.0` the tag became `v1.0.0` while the database's `0.11.1` version was kept, so the record said two different versions. `releaseTagMatches` uses the tag to suppress an update the machine already has, so the pair being inconsistent means a false update. The tag now travels with the version it names. Found by case G on the host's own data (EffectCraft's desktop entry carries no `X-AppImage-Version`)."
+  },
+  "proofs": {
+    "log": "evidence/logs/s1-appimage-roots-20261028.log",
+    "log_sha256": "342c6b74602895ce5f1f1bae211877e385a9b0b9517931d18b185ba3520cec79",
+    "reproducer": ".ci-cache/proof/s1-roots-proof.sh (ignored scratch; the log is the durable record)",
+    "A": "AppImageInstallPath unset, `~/.local/bin` absent, one AppImage in `~/Applications` -> exit 0, one record carrying name, version, icon and description from the desktop entry, and the message names both roots",
+    "B": "a record at /opt/Ghost.AppImage added by hand -> still there after the scan (the merge keeps what it does not see)",
+    "C": "AppImageInstallPath set, one AppImage in each root -> two records, both roots scanned",
+    "D": "AppImageInstallPath naming `~/Applications` -> one root, no duplicate record",
+    "F": "the host's AppImages with no database at all -> 15 records rebuilt from `~/Applications`; 14 identical to the live database, EffectCraft's version falling back to `1.0.0` because its desktop entry carries none",
+    "G": "the host's AppImages scanned on top of a copy of the live database -> 15 records before, 15 after, 15/15 identical record for record",
+    "E": "the host read only: AppImageInstallPath null, 0 AppImages in `~/.local/bin`, 15 in `~/Applications`, 15 database records, all under `~/Applications`",
+    "gate": "`./scripts/verify --quick` PASSED on a dirty tree -- cli 414 tests, package manager 1392, ui 259; record ~/.local/state/calix/verify/local-verify-20261028T184246Z/run.json",
+    "log_source": "Regenerated from the release build of commit 72c9f659, not from the working tree that produced it: the log's timestamp line is the only thing that differs from the run that guided the fix."
+  },
+  "message_change": {
+    "what": "`Discovered {d} AppImage(s) in {dir}.` became `Tracking {d} AppImage(s); scanned {dir, dir}.`",
+    "why": "The count is the number of records the database holds after the merge, not the number the scan found, and there is no longer one directory to name. `No AppImage directory exists ({roots}). No AppImages to sync.` replaces the single-directory sentence for the same reason.",
+    "test_updated": "`real AppImage runner reports a missing install directory without failing` now asserts the two halves of the new sentence instead of the old one."
+  },
+  "what_this_does_not_do": {
+    "write_default_unchanged": "`install`, `list`, `list-updates`, `upgrade` and the daemon still fall back to `~/.local/bin` when `AppImageInstallPath` is unset. Only discovery was widened, because only discovery decides what enters the database; changing where installs land is a narrower, separate decision.",
+    "run_and_remove_still_look_in_two_places": "`remove` and `run` search the configured directory and the `~/.local/bin` fallback, and fall back to the database name on a miss (remove) or fail (run). On this machine, with the setting unset, `calix run appimage` therefore still cannot find an AppImage in `~/Applications`. That is the remaining half of F11.",
+    "python_writer_alive": "`sync_appimages()` still runs on the 4-hourly timer. Step 8 deletes it, in the same commit as the root it no longer has to supply.",
+    "no_deployment": "No unit changed and nothing was installed on the host; the host was only read."
+  },
+  "next": "S1 step 8: delete `sync_appimages()` -- the root it supplied is now the backend's own -- then commit b (schema 2, the worker thread, the registry merged into one document, the Python release writer cut).",
+  "commit": "72c9f659"
+}
