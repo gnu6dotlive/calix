@@ -1,0 +1,255 @@
+#!/usr/bin/env bash
+# Refuse installed artefacts that resolve into a git worktree.
+#
+# An artefact the machine is supposed to own -- a file the package ships, the
+# `calix` on PATH, a user unit -- may not resolve into a source tree. When it
+# does, moving or deleting that worktree changes what `calix` means, silently,
+# and nothing reports it.
+#
+# The ledger beside this script is what makes the existing instances a debt
+# with a date instead of a permanent exception:
+#
+#   packaging/known-installed-path-violations.txt
+#       <path> until=YYYY-MM-DD
+#
+# Three rules, and the third is the one that matters:
+#
+#   1. a live violation that is not in the ledger fails;
+#   2. a ledger entry with no live violation fails -- it was fixed, so the
+#      line must go, and the ledger cannot rot into decoration;
+#   3. a ledger entry past its date fails even if the violation is still live.
+#
+# Rule 3 exists because a project decision already says it: "a temporary
+# bridge without a deadline becomes permanent". Here the deadline breaks, not
+# the bridge.
+#
+# A host without the package (a CI container, another machine) has nothing to
+# audit, and says so rather than passing quietly.
+#
+# Usage:
+#   scripts/check-installed-paths
+#   scripts/check-installed-paths --from FILE     # audit a fixture list
+#   scripts/check-installed-paths --ledger FILE   # audit against a fixture ledger
+
+set -euo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+PACKAGE=calix-gpui-git
+LEDGER="$ROOT/packaging/known-installed-path-violations.txt"
+SOURCE=""
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --from)
+            SOURCE="${2:?--from needs a file}"
+            shift 2
+            ;;
+        --ledger)
+            LEDGER="${2:?--ledger needs a file}"
+            shift 2
+            ;;
+        --help | -h)
+            sed -n '2,32p' "$0" | sed 's/^# \{0,1\}//'
+            exit 0
+            ;;
+        *)
+            echo "installed-paths: unknown argument: $1" >&2
+            exit 2
+            ;;
+    esac
+done
+
+# ---- plumbing ---------------------------------------------------------------
+
+# Ledger entries are written relative to $HOME so the file can live in a
+# public repository without carrying a user name.
+display_name() {
+    local path="$1"
+    case "$path" in
+        "$HOME"/*) printf '~/%s\n' "${path#"$HOME"/}" ;;
+        *) printf '%s\n' "$path" ;;
+    esac
+}
+
+expand_name() {
+    case "$1" in
+        "~") printf '%s\n' "$HOME" ;;
+        "~/"*) printf '%s/%s\n' "$HOME" "${1#\~/}" ;;
+        *) printf '%s\n' "$1" ;;
+    esac
+}
+
+trim() {
+    printf '%s' "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+}
+
+# Walk the ancestors of the real path. `.git` is checked with -e, not -d:
+# a linked worktree has a `.git` *file*, which is the case this repository
+# itself is checked out as.
+resolves_into_worktree() {
+    local real directory
+    real=$(readlink -f -- "$1" 2>/dev/null) || return 1
+    [ -n "$real" ] || return 1
+    directory=$(dirname -- "$real")
+    while :; do
+        if [ -e "$directory/.git" ]; then
+            printf '%s\n' "$real"
+            return 0
+        fi
+        if [ "$directory" = "/" ]; then
+            return 1
+        fi
+        directory=$(dirname -- "$directory")
+    done
+}
+
+# ---- the artefacts the machine is supposed to own ---------------------------
+
+enumerate_live() {
+    local file directory
+    pacman -Qlq "$PACKAGE" 2>/dev/null | while IFS= read -r file; do
+        [ -d "$file" ] || printf '%s\n' "$file"
+    done
+    # Only calix* entries: the operator's ~/.local/bin and unit directory hold
+    # other tools, and this check is not their keeper.
+    for directory in "$HOME/.local/bin" "$HOME/.config/systemd/user"; do
+        [ -d "$directory" ] || continue
+        for file in "$directory"/calix*; do
+            if [ -e "$file" ] || [ -L "$file" ]; then
+                printf '%s\n' "$file"
+            fi
+        done
+    done
+    # Enablement links live in a wants directory and are a separate artefact
+    # from the unit they point at: fixing one does not fix the other.
+    for file in "$HOME"/.config/systemd/user/*.wants/calix*; do
+        if [ -e "$file" ] || [ -L "$file" ]; then
+            printf '%s\n' "$file"
+        fi
+    done
+}
+
+if [ -n "$SOURCE" ]; then
+    if [ ! -r "$SOURCE" ]; then
+        echo "installed-paths: cannot read the fixture list: $SOURCE" >&2
+        exit 2
+    fi
+    mapfile -t candidates < <(sed -e 's/#.*//' "$SOURCE" | while IFS= read -r line; do
+        line=$(trim "$line")
+        [ -n "$line" ] && printf '%s\n' "$line"
+    done)
+else
+    if ! pacman -Qq "$PACKAGE" >/dev/null 2>&1; then
+        echo "installed-paths: $PACKAGE is not installed on this host (or pacman is absent) -- nothing to audit."
+        exit 0
+    fi
+    mapfile -t candidates < <(enumerate_live)
+    if [ "${#candidates[@]}" -eq 0 ]; then
+        echo "installed-paths: $PACKAGE is installed but listed no files -- the audit would check nothing." >&2
+        exit 1
+    fi
+fi
+
+# ---- what is actually installed, and where it resolves ----------------------
+
+declare -A live=()
+audited=0
+
+for candidate in "${candidates[@]}"; do
+    candidate=$(trim "$candidate")
+    [ -n "$candidate" ] || continue
+    target=$(expand_name "$candidate")
+    audited=$((audited + 1))
+    if resolved=$(resolves_into_worktree "$target"); then
+        live["$(display_name "$target")"]="$resolved"
+    fi
+done
+
+# ---- the ledger -------------------------------------------------------------
+
+declare -A until_of=()
+status=0
+
+if [ -f "$LEDGER" ]; then
+    line_number=0
+    while IFS= read -r line || [ -n "$line" ]; do
+        line_number=$((line_number + 1))
+        line=$(trim "${line%%#*}")
+        [ -n "$line" ] || continue
+        if [[ ! "$line" =~ ^(.+[^[:space:]])[[:space:]]+until=([0-9]{4}-[0-9]{2}-[0-9]{2})$ ]]; then
+            echo "installed-paths: $LEDGER:$line_number is not '<path> until=YYYY-MM-DD': $line" >&2
+            status=1
+            continue
+        fi
+        entry=$(display_name "${BASH_REMATCH[1]}")
+        until="${BASH_REMATCH[2]}"
+        if [ "$(date -u -d "$until" +%F 2>/dev/null || true)" != "$until" ]; then
+            echo "installed-paths: $LEDGER:$line_number: $until is not a real date." >&2
+            status=1
+            continue
+        fi
+        if [ -n "${until_of[$entry]+listed}" ]; then
+            echo "installed-paths: $LEDGER lists $entry twice." >&2
+            status=1
+            continue
+        fi
+        until_of["$entry"]="$until"
+    done <"$LEDGER"
+elif [ -z "$SOURCE" ]; then
+    # The live audit without a ledger is a missing file, not an empty ledger:
+    # toleration has to be written down, so its absence must not read as zero
+    # known violations.
+    echo "installed-paths: the ledger is missing: $LEDGER" >&2
+    exit 1
+fi
+
+today=$(date -u +%F)
+
+# ---- rule 1 and rule 3, over what is live -----------------------------------
+
+tolerated=()
+
+for entry in "${!live[@]}"; do
+    if [ -z "${until_of[$entry]+listed}" ]; then
+        echo "installed-paths: $entry resolves into a git worktree (${live[$entry]}) and is not in the ledger." >&2
+        status=1
+        continue
+    fi
+    if [[ "${until_of[$entry]}" < "$today" ]]; then
+        echo "installed-paths: $entry was due to leave the ledger on ${until_of[$entry]}; it still resolves into ${live[$entry]}." >&2
+        status=1
+        continue
+    fi
+    tolerated+=("$entry until=${until_of[$entry]}")
+done
+
+# ---- rule 2, over the ledger ------------------------------------------------
+
+for entry in "${!until_of[@]}"; do
+    if [ -z "${live[$entry]+seen}" ]; then
+        echo "installed-paths: the ledger lists $entry, but nothing at that path resolves into a worktree -- delete the entry." >&2
+        status=1
+    fi
+done
+
+# ---- the report -------------------------------------------------------------
+
+echo "installed-paths: audited $audited artefact(s); ${#live[@]} resolve into a git worktree."
+
+if [ "${#tolerated[@]}" -gt 0 ]; then
+    # Toleration is printed on every run, passing or failing: an exception
+    # nobody sees is an exception nobody remembers. The summary line is one
+    # line on purpose -- scripts/verify lifts it into its own output.
+    dates=$(printf '%s\n' "${tolerated[@]}" | sed -n 's/.* until=//p' | sort -u | paste -sd, -)
+    echo "installed-paths: ${#tolerated[@]} known violation(s), tolerated until $dates"
+    printf '%s\n' "${tolerated[@]}" | sort | while IFS= read -r entry; do
+        echo "installed-paths: known  $entry"
+    done
+fi
+
+if [ "$status" -ne 0 ]; then
+    echo "installed-paths: an installed artefact must belong to the machine, not to a source tree." >&2
+    exit 1
+fi
+
+echo "installed-paths: no unledgered artefact resolves into a git worktree."

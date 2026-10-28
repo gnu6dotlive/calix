@@ -88,13 +88,19 @@ Each slice is a ticket, and each ticket's definition of done is the same as the 
 2. A ledger entry with **no** live violation is a failure. A fixed entry must be deleted, so the ledger cannot rot into decoration.
 3. A ledger entry past its `until` date is a failure, even if the violation is still live. This is the rule that answers Décision 1's own lesson — *« Un pont temporaire sans échéance devient permanent »* — by making the deadline the thing that breaks, not the bridge.
 
-**Initial ledger (to be confirmed at implementation time):**
+**Initial ledger, confirmed at implementation time — four entries, not three:**
 
 ```
-~/.local/bin/calix                                  until=2026-11-15
-~/.config/systemd/user/calix-sync.service           until=2026-11-15
-~/.config/systemd/user/calix-sync.timer             until=2026-11-15
+~/.local/bin/calix                                            until=2026-11-15
+~/.config/systemd/user/calix-sync.service                     until=2026-11-15
+~/.config/systemd/user/calix-sync.timer                       until=2026-11-15
+~/.config/systemd/user/timers.target.wants/calix-sync.timer   until=2026-11-15
 ```
+
+The fourth was not in the draft: enabling a unit writes a link of its own, and
+`timers.target.wants/calix-sync.timer` points into the same worktree. Fixing
+the unit file would not have fixed it, which is why the enablement link is
+enumerated as its own artefact rather than as a duplicate.
 
 **Steps.** Write the check; add the stage; seed the ledger; prove all three rules bite by manufacturing each case in a scratch directory.
 
@@ -102,7 +108,7 @@ Each slice is a ticket, and each ticket's definition of done is the same as the 
 
 - `scripts/verify` runs the new stage, and the stage prints the ledger it is tolerating — toleration must be visible on every run, not buried in a file.
 - Three tests, one per rule, each asserting a failure it caused on purpose.
-- A clean line in the run record: `installed-paths ok (3 known, until 2026-11-15)`.
+- A clean line in the run record: `installed-paths: 4 known violation(s), tolerated until 2026-11-15`, printed by `verify` itself and not only left in the step's log, with the tolerated paths listed under it. The boundaries are recorded in `logs/installed-paths.log`, beside `run.json`.
 
 ---
 
@@ -127,7 +133,7 @@ Each slice is a ticket, and each ticket's definition of done is the same as the 
 2. Schema: define version 2, write the migration for a version-1 document, and refuse a document from a future version with a named error rather than a silent empty read.
 3. The probe runs on a worker thread and commits atomically (D2); requests read the last committed document.
 4. Cut the Python writer: `sync_releases()` stops writing `<state>/releases.json`; the five dead writes are deleted outright.
-5. Replace the two symlinks with real files, `calix-releases.{service,timer}`, whose `ExecStart` is `/usr/bin/calix releases --refresh` and whose timer keeps `Persistent=true`; disable and remove `calix-sync.*`. The three ledger entries go to zero.
+5. Replace the two symlinks with real files, `calix-releases.{service,timer}`, whose `ExecStart` is `/usr/bin/calix releases --refresh` and whose timer keeps `Persistent=true`; disable and remove `calix-sync.*`, including its enablement link. The three ledger entries that belong to the units go to zero; `~/.local/bin/calix` is S2's.
 6. `tracked.zig`: delete the transitional reader.
 
 **Proofs.**

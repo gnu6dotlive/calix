@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+# Prove that scripts/check-installed-paths fails when it should.
+#
+# A checker that only ever passes is indistinguishable from one that checks
+# nothing, so each of the ledger's rules is exercised against a fixture built
+# to trip it -- plus the two ways a ledger can be written wrong and silently
+# never expire.
+#
+# The fixtures are rebuilt on every run under .ci-cache/. They live inside
+# this repository on purpose: a linked worktree has a `.git` *file* rather
+# than a directory, and that is the harder detection case, so the fixture uses
+# it.
+
+set -uo pipefail
+
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+CHECKER="$ROOT/scripts/check-installed-paths"
+SCRATCH="$ROOT/.ci-cache/tmp/installed-paths-selftest"
+
+rm -rf -- "$SCRATCH"
+mkdir -p "$SCRATCH/worktree/bin" "$SCRATCH/fixtures"
+: >"$SCRATCH/worktree/.git"
+: >"$SCRATCH/worktree/bin/calix"
+
+VIOLATING="$SCRATCH/worktree/bin/calix"
+VIOLATIONS="$SCRATCH/fixtures/violations"
+LEDGER="$SCRATCH/fixtures/ledger"
+EMPTY="$SCRATCH/fixtures/empty"
+
+printf '%s\n' "$VIOLATING" >"$VIOLATIONS"
+: >"$EMPTY"
+
+failures=0
+
+# run <label> <expected exit> <expected output fragment> <ledger body>
+run() {
+    local label="$1" expected="$2" needle="$3" body="$4"
+    local output status
+
+    printf '%s\n' "$body" >"$LEDGER"
+    output=$("$CHECKER" --from "$VIOLATIONS" --ledger "$LEDGER" 2>&1)
+    status=$?
+
+    if [ "$status" -ne "$expected" ]; then
+        printf 'test-installed-paths: %s: expected exit %s, got %s\n%s\n' \
+            "$label" "$expected" "$status" "$output" >&2
+        failures=$((failures + 1))
+        return
+    fi
+    if ! printf '%s' "$output" | grep -qF -- "$needle"; then
+        printf 'test-installed-paths: %s: output does not mention %s\n%s\n' \
+            "$label" "$needle" "$output" >&2
+        failures=$((failures + 1))
+        return
+    fi
+    printf '  %-44s ok\n' "$label"
+}
+
+echo "test-installed-paths: $SCRATCH"
+
+# Rule 1: a violation nobody wrote down.
+run "rule 1: unledgered violation" 1 "is not in the ledger" ""
+
+# Rule 2: an entry whose violation is gone. Nothing is audited, which is
+# exactly what a fixed entry looks like.
+printf '%s\n' "$VIOLATING until=2999-12-31" >"$LEDGER"
+output=$("$CHECKER" --from "$EMPTY" --ledger "$LEDGER" 2>&1)
+status=$?
+if [ "$status" -eq 1 ] && printf '%s' "$output" | grep -qF -- "delete the entry"; then
+    printf '  %-44s ok\n' "rule 2: ledger entry with nothing live"
+else
+    printf 'test-installed-paths: rule 2: expected exit 1 and a deletion request, got %s\n%s\n' \
+        "$status" "$output" >&2
+    failures=$((failures + 1))
+fi
+
+# Rule 3: the deadline is what breaks.
+run "rule 3: entry past its date" 1 "still resolves into" \
+    "$VIOLATING until=2000-01-01"
+
+# The control: the same violation, in date, is tolerated and said out loud.
+run "in date: tolerated and printed" 0 "tolerated" \
+    "$VIOLATING until=2999-12-31"
+
+# An entry without a date would never expire, which is the failure rule 3
+# exists to prevent. It must not be silently ignored.
+run "malformed: entry without a date" 1 "is not '<path> until=YYYY-MM-DD'" \
+    "$VIOLATING"
+
+if [ "$failures" -ne 0 ]; then
+    echo "test-installed-paths: $failures case(s) failed." >&2
+    exit 1
+fi
+
+echo "test-installed-paths: 5 case(s) ok."

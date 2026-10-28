@@ -237,6 +237,33 @@ naming_check() {
     scripts/check-naming
 }
 
+# An installed artefact that resolves into a worktree is not a packaging
+# fault -- the package itself is correct. It is drift: the `calix` on PATH, or
+# the unit systemd runs, belongs to a source tree instead of to the machine,
+# and moving that tree changes what the machine does, silently.
+#
+# The stage runs the checker's own tests first. A tripwire nobody has watched
+# fail is a decoration, and the ledger's third rule -- an entry past its date
+# fails even while the violation lives -- is the one that has never been
+# exercised on this machine.
+installed_paths() {
+    scripts/test-check-installed-paths
+    scripts/check-installed-paths
+}
+
+# The step above prints one word. A step that says "ok" while four installed
+# artefacts are known to be wrong teaches the operator to stop reading it, so
+# the tolerated set is lifted into the run's own output on every passing run.
+installed_paths_report() {
+    local log="$LOG_DIR/installed-paths.log" summary
+    summary=$(grep -E '^installed-paths: [0-9]+ known violation' "$log" 2>/dev/null | head -n 1)
+    if [ -z "$summary" ]; then
+        return 0
+    fi
+    echo "  $summary"
+    grep -E '^installed-paths: known  ' "$log" | sed 's/^/  /'
+}
+
 cli_release_build() {
     (cd Calix.Cli.Zig && zig build -Doptimize=ReleaseSafe)
 }
@@ -515,6 +542,8 @@ rust_release_build() {
 }
 
 step "naming-check" naming_check
+step "installed-paths" installed_paths
+installed_paths_report
 step "packagemanager-tests" packagemanager_tests
 require_count "package manager" "$(zig_test_count "$LOG_DIR/packagemanager-tests.log")" "$PACKAGEMANAGER_FLOOR" || finish failed
 

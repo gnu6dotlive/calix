@@ -1,0 +1,29 @@
+# Installed artefacts that still resolve into a git worktree.
+#
+# Enforced by scripts/check-installed-paths, which is a stage of
+# scripts/verify. The format is one artefact per line:
+#
+#   <path> until=YYYY-MM-DD
+#
+# Paths are written relative to $HOME so this file carries no user name.
+#
+# Three rules apply, all of them enforced:
+#   1. a violation that is not listed here fails;
+#   2. a line whose violation is gone fails -- delete the line;
+#   3. a line past its date fails, even if the violation is still there.
+#
+# Rule 3 is the point: a temporary bridge without a deadline becomes
+# permanent. If a slice slips, move the date and say so in the commit; never
+# weaken the rule that makes the date bite.
+#
+# Every entry below is removed by the slice named in the workstream record
+# docs/workstreams/TRANCHE-01B4-ONE-BINARY.md.
+
+# S2 deletes the dispatcher: `calix` must resolve to the packaged binary.
+~/.local/bin/calix                             until=2026-11-15
+
+# S1 replaces both units, and their enablement link, with real files whose
+# ExecStart is a request to the daemon rather than a write.
+~/.config/systemd/user/calix-sync.service      until=2026-11-15
+~/.config/systemd/user/calix-sync.timer        until=2026-11-15
+~/.config/systemd/user/timers.target.wants/calix-sync.timer  until=2026-11-15
