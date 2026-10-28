@@ -1,0 +1,47 @@
+== what this proves ==
+status.tracked_releases must count the release-tracked set the inventory
+serves (<state>/releases.json), not the daemon's own notification memory
+(<state>/release-registry.json). The two documents below are written so
+that the answer differs: two tracked packages, zero notifications.
+
+== state directory ==
+total 8
+drwx------ 1 tension_atoi tension_atoi  46 Oct 28 13:00 journal
+-rw-r--r-- 1 tension_atoi tension_atoi  27 Oct 28 13:00 release-registry.json
+-rw-r--r-- 1 tension_atoi tension_atoi 434 Oct 28 13:00 releases.json
+
+== releases.json (2 entries) ==
+{
+  "artcraft-launcher": {
+    "installed_version": "0.8.1",
+    "repo": "storytold/craft-launcher",
+    "provider": "github",
+    "canal": "stable",
+    "pkgname": "artcraft-launcher-bin",
+    "latest_version": "0.8.1",
+    "update_available": false
+  },
+  "second-tracking-example": {
+    "installed_version": "1.2.3",
+    "provider": "gitlab",
+    "canal": "beta",
+    "update_available": true,
+    "latest_version": "1.3.0"
+  }
+}
+
+== release-registry.json (0 entries) ==
+{"version":1,"entries":[]}
+
+== binary under test ==
+calix-daemon 3.1.9-dev
+99345b716ba9cf5791cdeb19f95fc56159448f66e048b2abd598ee5cb2594e25  Calix.Cli.Zig/zig-out/bin/calix-daemon
+
+== daemon answers ==
+ping -> {"version":1,"ok":true,"data":{"pid":1245261,"protocol":1,"started_at":1793206834}}
+status -> {"version":1,"ok":true,"data":{"pid":1245261,"protocol":1,"started_at":1793206834,"uptime_seconds":1,"socket_path":"/home/tension_atoi/cwt/.ci-cache/probe/daemon.sock","state_directory":"/home/tension_atoi/cwt/.ci-cache/probe/state","tracked_releases":2}}
+
+== expectation ==
+tracked_releases is 2; the old code reported 0, because it counted the
+empty registry instead. The test in daemon/server.zig fails with
+'expected 1, found 0' against that code.

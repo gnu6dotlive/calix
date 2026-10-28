@@ -36,26 +36,7 @@ pub fn append(
     state_directory: []const u8,
     records: *std.ArrayList(record.Record),
 ) error{OutOfMemory}!void {
-    const path = try std.fs.path.join(allocator, &.{ state_directory, file_name });
-    defer allocator.free(path);
-
-    const text = std.Io.Dir.cwd().readFileAlloc(
-        io,
-        path,
-        allocator,
-        .limited(max_document_bytes),
-    ) catch |err| switch (err) {
-        error.OutOfMemory => return error.OutOfMemory,
-        // Absent: nothing has been tracked yet. Unreadable: the document is
-        // not ours to repair. Both contribute no records.
-        else => return,
-    };
-    defer allocator.free(text);
-
-    const parsed = std.json.parseFromSlice(std.json.Value, allocator, text, .{}) catch |err| switch (err) {
-        error.OutOfMemory => return error.OutOfMemory,
-        else => return,
-    };
+    const parsed = (try loadDocument(allocator, io, state_directory)) orelse return;
     defer parsed.deinit();
 
     // The document is a map of tracked name to observation.
@@ -72,6 +53,73 @@ pub fn append(
         };
         try appendOne(allocator, records, entry.key_ptr.*, observation);
     }
+}
+
+/// How many packages the state directory says are tracked.
+///
+/// The daemon reports this in `status`, and the answer has to be the same one
+/// `append` would produce: a status that counts a different set than the
+/// inventory serves is a number a frontend cannot use. Counting here rather
+/// than materialising records keeps that agreement structural instead of
+/// making it two parsers that happen to match today.
+///
+/// An absent, unreadable or malformed document is zero — the same rule
+/// `append` applies, so the two never disagree about a broken file.
+pub fn count(
+    allocator: std.mem.Allocator,
+    io: std.Io,
+    state_directory: []const u8,
+) error{OutOfMemory}!usize {
+    const parsed = (try loadDocument(allocator, io, state_directory)) orelse return 0;
+    defer parsed.deinit();
+
+    const document = switch (parsed.value) {
+        .object => |object| object,
+        else => return 0,
+    };
+
+    var total: usize = 0;
+    var iterator = document.iterator();
+    while (iterator.next()) |entry| {
+        // An entry that is not an observation is not a tracked release:
+        // `append` skips it, so it is not counted either.
+        switch (entry.value_ptr.*) {
+            .object => total += 1,
+            else => {},
+        }
+    }
+    return total;
+}
+
+/// The parsed document, or null when it is absent, unreadable or malformed.
+///
+/// Both readers above go through this so that they read the same bytes: two
+/// independent parsers of one file is how a count and a list start disagreeing.
+fn loadDocument(
+    allocator: std.mem.Allocator,
+    io: std.Io,
+    state_directory: []const u8,
+) error{OutOfMemory}!?std.json.Parsed(std.json.Value) {
+    const path = try std.fs.path.join(allocator, &.{ state_directory, file_name });
+    defer allocator.free(path);
+
+    const text = std.Io.Dir.cwd().readFileAlloc(
+        io,
+        path,
+        allocator,
+        .limited(max_document_bytes),
+    ) catch |err| switch (err) {
+        error.OutOfMemory => return error.OutOfMemory,
+        // Absent: nothing has been tracked yet. Unreadable: the document is
+        // not ours to repair. Both contribute no records.
+        else => return null,
+    };
+    defer allocator.free(text);
+
+    return std.json.parseFromSlice(std.json.Value, allocator, text, .{}) catch |err| switch (err) {
+        error.OutOfMemory => return error.OutOfMemory,
+        else => return null,
+    };
 }
 
 fn appendOne(
@@ -263,4 +311,72 @@ test "Tracked: a non-object entry is skipped, not rendered" {
     // No installed or latest version: the row still exists, labelled so.
     try testing.expectEqualStrings("unknown", records.items[0].version);
     try testing.expect(records.items[0].new_version == null);
+}
+
+test "Tracked: the count agrees with the records, entry for entry" {
+    var temporary = testing.tmpDir(.{});
+    defer temporary.cleanup();
+    try temporary.dir.writeFile(testing.io, .{ .sub_path = file_name, .data = sample });
+
+    var buffer: [std.fs.max_path_bytes]u8 = undefined;
+    const length = try temporary.dir.realPath(testing.io, &buffer);
+
+    var records: std.ArrayList(record.Record) = .empty;
+    defer {
+        for (records.items) |*item| item.deinit(testing.allocator);
+        records.deinit(testing.allocator);
+    }
+    try append(testing.allocator, testing.io, buffer[0..length], &records);
+    const counted = try count(testing.allocator, testing.io, buffer[0..length]);
+
+    // The status a daemon reports and the list an inventory serves are the
+    // same set, so these two numbers cannot drift apart.
+    try testing.expectEqual(records.items.len, counted);
+    try testing.expectEqual(@as(usize, 1), counted);
+}
+
+test "Tracked: count is zero when the document is absent" {
+    var temporary = testing.tmpDir(.{});
+    defer temporary.cleanup();
+    var buffer: [std.fs.max_path_bytes]u8 = undefined;
+    const length = try temporary.dir.realPath(testing.io, &buffer);
+
+    try testing.expectEqual(
+        @as(usize, 0),
+        try count(testing.allocator, testing.io, buffer[0..length]),
+    );
+}
+
+test "Tracked: count is zero when the document is malformed" {
+    var temporary = testing.tmpDir(.{});
+    defer temporary.cleanup();
+    try temporary.dir.writeFile(testing.io, .{ .sub_path = file_name, .data = "{not json" });
+
+    var buffer: [std.fs.max_path_bytes]u8 = undefined;
+    const length = try temporary.dir.realPath(testing.io, &buffer);
+
+    try testing.expectEqual(
+        @as(usize, 0),
+        try count(testing.allocator, testing.io, buffer[0..length]),
+    );
+}
+
+test "Tracked: a non-object entry is not counted, because it is not a release" {
+    var temporary = testing.tmpDir(.{});
+    defer temporary.cleanup();
+    try temporary.dir.writeFile(testing.io, .{
+        .sub_path = file_name,
+        .data = \\{"broken": "not an observation", "unknown-version": {"repo": "a/b"}}
+        ,
+    });
+
+    var buffer: [std.fs.max_path_bytes]u8 = undefined;
+    const length = try temporary.dir.realPath(testing.io, &buffer);
+
+    // `append` skips `broken`; a count that included it would report a
+    // tracked package the inventory never shows.
+    try testing.expectEqual(
+        @as(usize, 1),
+        try count(testing.allocator, testing.io, buffer[0..length]),
+    );
 }

@@ -30,6 +30,7 @@ const journal_mod = @import("journal.zig");
 const config_manager = @import("../config/manager.zig");
 
 const release_registry = Zigalpm.release.registry;
+const release_tracked = Zigalpm.release.tracked;
 
 pub const Error = error{
     /// Another daemon is already serving this socket.
@@ -75,7 +76,11 @@ pub const Server = struct {
         errdefer allocator.free(journal_directory);
         // Not `releases.json`: that name already belongs to the frozen
         // engine's release observations in the same directory, and a
-        // registry written over it would destroy them.
+        // registry written over it would destroy them. The two files answer
+        // different questions — the observations say which packages are
+        // tracked, this registry says what the daemon has already told the
+        // user about them — so `status` reads the first and only this
+        // process touches the second.
         const registry_path = try std.fs.path.join(allocator, &.{ options.state_directory, "release-registry.json" });
         errdefer allocator.free(registry_path);
 
@@ -252,7 +257,9 @@ pub const Server = struct {
                 .uptime_seconds = uptimeSeconds(self.io, self.started_monotonic),
                 .socket_path = self.options.socket_path,
                 .state_directory = self.options.state_directory,
-                .tracked_releases = self.registry.entries.items.len,
+                // The tracked set, not this server's own notification
+                // memory: see `trackedReleases`.
+                .tracked_releases = trackedReleases(self),
             }, protocol.json_options),
 
             .inventory => {
@@ -414,6 +421,28 @@ fn uptimeSeconds(io: std.Io, since: std.Io.Timestamp) i64 {
     ));
 }
 
+/// The number of release-tracked packages, from the document the inventory
+/// serves.
+///
+/// Two documents live in the state directory and they answer different
+/// questions. `releases.json` says which packages the user tracks and what
+/// was last seen for each; `release-registry.json` is this daemon's memory of
+/// what it has already notified, and nothing outside this process writes it.
+/// `status` used to report the second one under the name of the first, so a
+/// machine tracking anything still answered zero — the number was never
+/// wrong, it was counting a set the user never asked about.
+///
+/// An unreadable document is zero, which is the same rule the inventory
+/// applies: a status that failed here would take down the endpoint the
+/// frontend uses to decide whether the daemon is healthy.
+fn trackedReleases(server: *const Server) usize {
+    return release_tracked.count(
+        server.allocator,
+        server.io,
+        server.options.state_directory,
+    ) catch 0;
+}
+
 fn stringValue(configuration: *const @import("../config/model.zig").Config, key: []const u8) ?[]const u8 {
     const value = configuration.values.get(key) orelse return null;
     if (value != .string or value.string.len == 0) return null;
@@ -449,4 +478,51 @@ test "isServing: a bound socket with no daemon behind it is not a running daemon
 
     const address = try std.Io.net.UnixAddress.init(path);
     try testing.expect(!try isServing(testing.io, &address));
+}
+
+test "status: tracked_releases counts the document the inventory reads" {
+    // Two documents live in the state directory and they are not the same
+    // set: `releases.json` is the release-tracked packages the user asked to
+    // follow, and `release-registry.json` is the daemon's memory of what it
+    // has already told them. Only the daemon writes the second one, so a
+    // status built from it answers zero on a machine that tracks plenty.
+    var temporary = testing.tmpDir(.{});
+    defer temporary.cleanup();
+    try temporary.dir.writeFile(testing.io, .{
+        .sub_path = "releases.json",
+        .data =
+        \\{"artcraft-launcher": {"installed_version": "0.8.1", "provider": "github", "canal": "stable"}}
+        ,
+    });
+
+    var buffer: [std.fs.max_path_bytes]u8 = undefined;
+    const length = try temporary.dir.realPath(testing.io, &buffer);
+
+    var stdout = std.Io.Writer.Allocating.init(testing.allocator);
+    defer stdout.deinit();
+    var stderr = std.Io.Writer.Allocating.init(testing.allocator);
+    defer stderr.deinit();
+    var context: runtime.RuntimeContext = .{
+        .allocator = testing.allocator,
+        .io = testing.io,
+        .stdout = &stdout.writer,
+        .stderr = &stderr.writer,
+    };
+
+    var daemon = try Server.init(testing.allocator, testing.io, &context, .{
+        .socket_path = "unused.sock",
+        .state_directory = buffer[0..length],
+    });
+    defer daemon.deinit();
+
+    const line = try daemon.dispatch(testing.allocator, .status, null);
+    defer testing.allocator.free(line);
+
+    const parsed = try std.json.parseFromSlice(std.json.Value, testing.allocator, line, .{});
+    defer parsed.deinit();
+
+    try testing.expectEqual(
+        @as(i64, 1),
+        parsed.value.object.get("tracked_releases").?.integer,
+    );
 }
