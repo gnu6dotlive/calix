@@ -20,7 +20,7 @@
   "why_it_matters": {
     "the_harvest_is_not_the_problem": "discovery.zig reads the XDG desktop entries and builds name, version, icon and description from them, with filename fallbacks. It is wired into `calix sync appimage` (sync.zig:252) and merges without degrading a record: fields the filesystem cannot supply -- update URL and type, forge coordinates, prerelease opt-in, launch environment -- are carried over untouched, and records the scan does not see are kept rather than dropped.",
     "the_root_is": "The native default is `xdg.binHome` (sync.zig:174, server.zig:319, install.zig:685) and the Python's is `~/Applications` (calix-sync.py:75). Each side is blind to the other's AppImages.",
-    "consequence_for_the_daemon": "The daemon's own probe uses the native default, so on this machine it looks into an empty directory. `~/.local/state/calix/release-registry.json` does not exist at all: the daemon has never recorded a release here. Cutting the Python writer without settling the root would freeze `releases.json` at its last Python-written value (checked_at 2026-10-28T14:26:23Z) with nothing saying so -- the quiet failure the slice exists to prevent.",
+    "consequence_for_the_daemon": "Not the root. The daemon's `probeReleases` builds an `AppImageManager` with that directory but then reads `getAppImagesFromLocalDb()`, which opens `local_db_path` and nothing else, so the root never decides what is probed. `release-registry.json` is absent because every record in the live database carries `update_type: none` -- `probeReleases` skips an AppImage with no update source, so there is nothing for it to record. What the root does decide is whether the database is refreshed at all, and that is the part the cut would lose.",
     "consequence_for_the_database": "The script's own comment records a previous implementation that \"kept stale metadata forever\". Cutting `sync_appimages()` while the native path scans an empty directory reproduces exactly that, deliberately."
   },
   "plan_changed": {
@@ -28,5 +28,10 @@
     "new_finding": "F11 in the workstream document: two writers on one document (F10) and two disjoint scan roots (F11) are separate defects; fixing one does not fix the other.",
     "proofs": "F10's proof now states the two halves -- metadata supplied, and the root the AppImages are in -- instead of assuming one implies the other, plus a post-cut check that the database still advances with the script gone."
   },
-  "no_machine_change": "Read-only on the host: the experiment wrote only under .ci-cache/, and case D only counted what is there. No unit changed, nothing deployed."
+  "no_machine_change": "Read-only on the host: the experiment wrote only under .ci-cache/, and case D only counted what is there. No unit changed, nothing deployed.",
+  "correction": {
+    "what_was_wrong": "The first version of this record, and the F11 row in the workstream document, said the absent `release-registry.json` was caused by the daemon probing `~/.local/bin`. It is not: the probe reads the database, not a directory.",
+    "what_corrected_it": "`getAppImagesFromLocalDb` opens `local_db_path` only (manager.zig:937), and the live database's fifteen records all carry `update_type: none`, which `probeReleases` skips by design.",
+    "what_survives": "The finding itself is untouched -- the native refresh does not see this machine's AppImages, so the Python is still the only thing refreshing the database, and cutting it without settling the root would freeze it."
+  }
 }
